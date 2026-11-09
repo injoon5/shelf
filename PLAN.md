@@ -2,7 +2,7 @@
 
 An iPhone Home Screen for personal apps. Each app is a single Swift file stored on ij5.dev and run on device by [Kiln](https://github.com/haplollc/Kiln). Shelf should feel like Springboard on iOS 27: icons on a wallpaper, a Liquid Glass dock, apps that zoom out of their icon and back into it.
 
-Two repos change. The prompts for making apps are in [PROMPT.md](PROMPT.md) and [PROMPT-EDIT.md](PROMPT-EDIT.md).
+Two repos change. The prompts for making apps are in [PROMPT.md](PROMPT.md), [PROMPT-EDIT.md](PROMPT-EDIT.md) and [PROMPT-EDIT-CURRENT.md](PROMPT-EDIT-CURRENT.md).
 
 - **ij5.dev**: adds an apps table, an API, an admin editor, and a small key-value store that apps can use for their data. None of this exists yet.
 - **shelf**: adds the iOS app. It needs iOS 27 or later and uses Liquid Glass throughout.
@@ -19,6 +19,7 @@ Two repos change. The prompts for making apps are in [PROMPT.md](PROMPT.md) and 
 | `Kiln.validate` fires every action once, side effects included. | `Kiln.swift` | Shelf never validates on device. Validation goes on the Later list. |
 | The latest tag is `0.2.1`. | `git ls-remote` | Pin the package with `.upToNextMinor(from: "0.2.1")`. Before 1.0, a minor release can break the API. |
 | On iOS 26, interactive dismiss of `.navigationTransition(.zoom)` with `fullScreenCover` has open bugs: the source icon disappears and frames are misaligned. | Apple Developer Forums [796279](https://developer.apple.com/forums/thread/796279), [807208](https://developer.apple.com/forums/thread/807208), [807715](https://developer.apple.com/forums/thread/807715) | Use the zoom transition, but keep a known-good fallback behind one flag (§6.1). |
+| Kiln gives apps `UserDefaults.standard` directly, under the prefix `kiln.`. | `Engine/KEBuiltins.swift` | Apps can read each other's `@AppStorage`. Shelf keeps its own state outside `UserDefaults.standard`, and real data goes in `DB` (§6.3). |
 | No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§11). |
 | No server API exists. | `ij5.dev/src/routes/api` | Build it with the conventions the links API already uses (§1). |
 | `Kiln.register` bridges are read only by the old interpreter (`SwiftRunnerState.nativeBridges`). The modern engine never consults them. | `grep nativeBridges` | The app database can't be a native bridge. |
@@ -104,8 +105,8 @@ Shelf/
     Home/       HomeScreen.swift, IconGrid.swift, AppIcon.swift, Dock.swift, Wallpaper.swift,
                 PageDots.swift, SearchPill.swift, JiggleModifier.swift, EditDropDelegate.swift
     Runner/     RunnerView.swift, SourceRewriter.swift, ErrorScreen.swift
-    Create/     NewAppSheet.swift, ReplyParser.swift, Prompts.swift
-    Resources/  PROMPT.md, PROMPT-EDIT.md (linked from the repo root)
+    Create/     NewAppSheet.swift, ReplyParser.swift, Prompts.swift, Outline.swift
+    Resources/  PROMPT.md, PROMPT-EDIT.md, PROMPT-EDIT-CURRENT.md (linked from the repo root)
     Settings/   SettingsView.swift
   ShelfTests/   SyncEngineTests.swift, SourceRewriterTests.swift, LayoutTests.swift,
                 AppDataTests.swift, PreludeTests.swift
@@ -120,7 +121,7 @@ Shelf/
 ## 3. Connect and settings
 
 - Stored settings:
-  - the site URL in `UserDefaults`, defaulting to `https://ij5.dev`
+  - the site URL in `UserDefaults(suiteName: "shelf")`, defaulting to `https://ij5.dev`. Nothing of Shelf's goes in `UserDefaults.standard`, which apps can reach (§6.3).
   - the token in the Keychain (`kSecClassGenericPassword`, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`)
 - First run shows one screen: an app glyph, a token field and a Connect button. Connect checks the token with `GET /api/apps` before saving anything. A wrong token shakes the field and leaves no saved state.
 - The Connect button uses `.buttonStyle(.glassProminent)`, over the Shelf wallpaper.
@@ -297,6 +298,10 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
   - `@AppStorage("k", store: …)`
   - an occurrence in a comment or a string elsewhere, which must stay untouched
 - **Cleanup:** when an app is removed, `UserDefaults.standard` keys with the prefix `kiln.app.<slug>.` are deleted.
+- **This isn't a security boundary.** Kiln gives apps `UserDefaults.standard` directly (`KEBuiltins.swift`: `UserDefaults.standard.set` and `.string(forKey:)` under the prefix `kiln.`). Any app can therefore read or write any other app's `@AppStorage` by spelling out the key. The key rewrite only prevents accidental clashes. So:
+  - All of Shelf's own state lives elsewhere: settings in the `shelf` suite, the token in the Keychain, and the cache, layout and data in `Application Support`. Kiln exposes no API that reaches any of these.
+  - The prompt limits `@AppStorage` to preferences that wouldn't matter if lost. Real data goes in `DB`, which is scoped to the running app by `ShelfDBProtocol`.
+  - Shelf's own network calls (sync, data push and pull, minting keys) use a private `URLSession(configuration: .ephemeral)`. That keeps them separate from `URLSession.shared`, which apps use and where the `db` protocol is registered.
 
 ---
 
@@ -491,7 +496,14 @@ Keep both files in step with the Kiln version pinned in §0. When Kiln is update
 **Change an app**
 
 - An icon's context menu gains **Change…**, which opens the same sheet with a "Describe the change" field.
-- Copy Prompt fills `PROMPT-EDIT.md` with the app's current source.
+- Copy Prompt fills `PROMPT-EDIT.md`. An **Include Source** toggle in the sheet decides what goes into `{{CURRENT}}` (both forms are in `PROMPT-EDIT-CURRENT.md`). The toggle defaults to on and remembers its last setting.
+  - **On:** the full source.
+  - **Off:** an outline, and a `curl` command that lets an agent fetch the source itself with the install key. The source then never goes into the chat history, and an agent with a shell still sees all of it.
+- The outline is built by `Outline.swift` with no model involved:
+  - the header lines
+  - every type that is saved (`Codable` types and the types they contain), with its full declaration, so the saved shape is kept
+  - the `DB` and `@AppStorage` key names used, read from string literals
+  - every other type and function as its signature only, with the body replaced by `{ … }`
 - Paste, preview and **Update** work as for a new app. The preview uses a copy of the app's real data, so the change can be checked against it without touching the original.
 
 ### 9.3 In the ij5.dev admin
@@ -506,6 +518,7 @@ Keep both files in step with the Kiln version pinned in §0. When Kiln is update
 - **The header lines stay in the stored source.** They are harmless comments, and they make a copied app reinstallable as it is.
 - **Unknown values:** an unknown tint falls back to `blue`, and an icon name that isn't an SF Symbol falls back to `app`. Shelf checks with `UIImage(systemName:)`; the admin warns but doesn't block.
 - **Feature fixtures:** one small app per line under "What works" in `PROMPT.md`, each of which must pass `Kiln.validate`.
+- **Outline tests:** for each fixture app, the outline keeps every saved type in full and every key name, and contains no function body.
 
 ### 9.5 Install keys
 
@@ -516,7 +529,8 @@ Every copied prompt carries a one-time key, so an agent that can run commands (C
 - **Scope:**
   - A key for a new app can create one app under a slug that is free. It can never overwrite an existing app.
   - A key from Change… can update one named slug.
-  - Neither kind can read apps, read or write data, mint keys, or reach any other API.
+  - A Change… key can also run `GET /api/apps/{slug}/source` for its own slug, which returns the raw file. Reading doesn't use up the key. That way an agent can fetch the source when Include Source is off.
+  - Neither kind can read other apps, read or write data, mint keys, or reach any other API.
 - **One use:** the first successful `PUT` consumes the key. A failed attempt (`400`, `409`, `413` or `422`) doesn't, so an agent can fix its code and retry. After 5 failed attempts the key is burned anyway.
 - **Short life:** a key expires 30 minutes after it is minted.
 - **Hashed at rest:** only a hash of the secret is stored, the same way `AUTH_HASH` is stored for the admin token.
@@ -583,7 +597,7 @@ CREATE TABLE app_versions (            -- history for Revert
 - An update key can't write a different slug.
 - Two parallel `PUT`s with one key produce exactly one success.
 - A failed `422` leaves the key usable, and the sixth failure burns it.
-- The key works only on `PUT /api/apps/{slug}`. Every other route returns `401`.
+- The key works only on `PUT /api/apps/{slug}`, plus `GET /api/apps/{slug}/source` for an update key on its own slug. Every other route, and a read by a create key, returns `401`.
 - An expired key returns `401`.
 - A `text/x-swift` body parses its header the same way as the shared fixtures.
 

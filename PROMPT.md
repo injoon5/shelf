@@ -79,7 +79,7 @@ If you can't run commands, reply with the code as described above.
 
 ## Saving data
 
-Use `@AppStorage("key")` for small settings: a `Bool`, `Int`, `Double` or `String`.
+Use `@AppStorage("key")` only for small preferences that wouldn't matter if lost: a `Bool`, `Int`, `Double` or `String`. Other apps can read it.
 
 Use `DB` for everything else. Shelf provides it, so don't declare your own `DB`. Values are JSON `Data`. DB data syncs to the user's other devices and works offline. Calls return immediately.
 
@@ -93,19 +93,24 @@ The usual pattern is to load in `.onAppear` and save in `.onChange`:
 
 ```swift
 @State private var todos: [Todo] = []
+@State private var loadFailed = false
 
 List { … }
     .onAppear {
         if let data = DB.load("todos") {
-            todos = (try? JSONDecoder().decode([Todo].self, from: data)) ?? []
+            if let saved = try? JSONDecoder().decode([Todo].self, from: data) { todos = saved } else { loadFailed = true }
         }
     }
     .onChange(of: todos) {
-        if let data = try? JSONEncoder().encode(todos) { DB.save("todos", data) }
+        if !loadFailed, let data = try? JSONEncoder().encode(todos) { DB.save("todos", data) }
     }
 ```
 
 Keys are 1–128 characters with no `/`. A value can be up to 64 KB. Store one key per collection, not one key per item.
+
+Saved data has to survive future versions of the app:
+- Give every field of a saved type a default value, or make it optional, so older saved data still decodes.
+- If decoding fails, don't save over the stored data. Keep a flag such as `loadFailed`, and skip saving while it's set.
 
 ## What doesn't work
 

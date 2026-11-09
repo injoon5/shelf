@@ -3,13 +3,14 @@ Change this Shelf app. The rules in the original prompt still apply. They follow
 Change:
 {{CHANGE}}
 
-Current file:
+{{CURRENT}}
 
-```swift
-{{SOURCE}}
-```
+Reply with the whole updated file in one ```swift block, starting with the same three comment lines: `// Name:`, `// Icon:` and `// Tint:`.
 
-Reply with the whole updated file in one ```swift block, starting with the same three comment lines: `// Name:`, `// Icon:` and `// Tint:`. Keep the `DB` keys the app already uses, so the data it has saved still loads.
+Keep saved data loading:
+- Keep every `DB` and `@AppStorage` key the app already uses.
+- Never rename or remove a field of a type that is saved. Add new fields only as optionals or with default values.
+- If the saved shape really must change, read the old key, convert it, and save it under a new key. Leave the old key in place.
 
 If you can run shell commands, install the change yourself. Save the file as `App.swift`, then run:
 
