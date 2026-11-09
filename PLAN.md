@@ -2,7 +2,7 @@
 
 An iPhone Home Screen for personal apps. Each app is a single Swift file stored on ij5.dev and run on device by [Kiln](https://github.com/haplollc/Kiln). Shelf should feel like Springboard on iOS 27: icons on a wallpaper, a Liquid Glass dock, apps that zoom out of their icon and back into it.
 
-Two repos change:
+Two repos change. The prompts for making apps are in [PROMPT.md](PROMPT.md) and [PROMPT-EDIT.md](PROMPT-EDIT.md).
 
 - **ij5.dev**: adds an apps table, an API, an admin editor, and a small key-value store that apps can use for their data. None of this exists yet.
 - **shelf**: adds the iOS app. It needs iOS 27 or later and uses Liquid Glass throughout.
@@ -19,7 +19,7 @@ Two repos change:
 | `Kiln.validate` fires every action once, side effects included. | `Kiln.swift` | Shelf never validates on device. Validation goes on the Later list. |
 | The latest tag is `0.2.1`. | `git ls-remote` | Pin the package with `.upToNextMinor(from: "0.2.1")`. Before 1.0, a minor release can break the API. |
 | On iOS 26, interactive dismiss of `.navigationTransition(.zoom)` with `fullScreenCover` has open bugs: the source icon disappears and frames are misaligned. | Apple Developer Forums [796279](https://developer.apple.com/forums/thread/796279), [807208](https://developer.apple.com/forums/thread/807208), [807715](https://developer.apple.com/forums/thread/807715) | Use the zoom transition, but keep a known-good fallback behind one flag (§6.1). |
-| No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§10). |
+| No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§11). |
 | No server API exists. | `ij5.dev/src/routes/api` | Build it with the conventions the links API already uses (§1). |
 | `Kiln.register` bridges are read only by the old interpreter (`SwiftRunnerState.nativeBridges`). The modern engine never consults them. | `grep nativeBridges` | The app database can't be a native bridge. |
 | The modern engine sends requests through the real `URLSession.shared` with a real `URLRequest`, and supports `httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)` and `JSONEncoder`. | `Engine/KENetwork.swift` | A `URLProtocol` registered by Shelf can answer a private `db://` scheme on the phone. Apps get a database through the plain networking code Kiln already runs (§8). |
@@ -104,6 +104,8 @@ Shelf/
     Home/       HomeScreen.swift, IconGrid.swift, AppIcon.swift, Dock.swift, Wallpaper.swift,
                 PageDots.swift, SearchPill.swift, JiggleModifier.swift, EditDropDelegate.swift
     Runner/     RunnerView.swift, SourceRewriter.swift, ErrorScreen.swift
+    Create/     NewAppSheet.swift, ReplyParser.swift, Prompts.swift
+    Resources/  PROMPT.md, PROMPT-EDIT.md (linked from the repo root)
     Settings/   SettingsView.swift
   ShelfTests/   SyncEngineTests.swift, SourceRewriterTests.swift, LayoutTests.swift,
                 AppDataTests.swift, PreludeTests.swift
@@ -288,6 +290,7 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
 ### 6.3 `SourceRewriter`
 
 - **Rewrite:** `@AppStorage("key")` becomes `@AppStorage("<slug>.key")`. It uses one regex on string literals in the attribute position only.
+- **Header:** the `// Name:`, `// Icon:` and `// Tint:` lines (§9) stay in the source. Kiln reads them as comments.
 - **Prelude:** if the source mentions `DB.` and doesn't declare its own `enum DB`, the `DB` helper from §8.4 is added to the end of the source. Appending, rather than prepending, keeps the line numbers in error messages matching the author's file.
 - **Tests:**
   - the plain form
@@ -441,7 +444,70 @@ struct Todo: Codable, Identifiable { var id = UUID(); var title: String; var don
 
 If any of these fails, simplify the prelude to fit before writing anything that depends on it. This is step 2 of the build order.
 
-## 9. Build order
+## 9. Making apps
+
+You never write Swift by hand. Shelf hands you a prompt, you paste it into any chat model, and the reply comes back to Shelf to be installed. All three ways in end with the same `PUT /api/apps/{slug}`.
+
+| Where | How | When |
+|---|---|---|
+| **Shelf** (main path) | Copy the prompt, paste the reply, preview the app, install it | On the phone, from any chat app |
+| **ij5.dev admin** | Paste the reply into New App | At a desk |
+| **API** | `PUT /api/apps/{slug}` | An agent such as Claude Code installs the app itself |
+
+### 9.1 The prompts
+
+There are two prompt files in this repo, bundled into the app as resources:
+
+- **`PROMPT.md`** is for a new app. It covers:
+  - the reply format (a single Swift block that starts with `// Name:`, `// Icon:` and `// Tint:` lines)
+  - what Kiln runs
+  - `@AppStorage` and `DB`
+  - what Kiln doesn't run
+  - design rules
+- **`PROMPT-EDIT.md`** is for changing an app. It wraps the app's current source and the requested change, then appends everything from `PROMPT.md` from "What works" onwards.
+
+Keep both files in step with the Kiln version pinned in §0. When Kiln is updated, re-check the "What works" and "What doesn't work" sections against its README and `STATUS.md`. A test (§9.4) catches the obvious drift: every feature listed under "What works" has a fixture app that must pass `Kiln.validate`.
+
+### 9.2 In Shelf
+
+**New app**
+
+1. In edit mode, a `+` button with `.buttonStyle(.glass)` sits in the top-left corner, where Springboard puts its widget button.
+2. It opens a New App sheet with one multi-line field, focused, with the placeholder "Describe the app".
+3. **Copy Prompt** (`.glassProminent`) fills `{{IDEA}}` with the text and copies the prompt.
+   - The button turns into "Copied" with a checkmark for 1.5 s, using the `contentTransition(.symbolEffect)` swap.
+   - A `ShareLink` next to it sends the prompt straight to a chat app.
+4. When you come back with the reply copied, a `PasteButton` appears. It is the system paste button, so iOS shows no "Allow Paste" prompt.
+5. Shelf parses the reply:
+   - `Kiln.swiftSource(fromMarkdown:)` extracts the Swift (a reply with no fences is used as it is).
+   - The three header lines become the name, icon and tint.
+   - The slug is the name in lowercase with hyphens, editable, and checked for clashes with installed apps.
+6. A live preview runs the app with Kiln inside the sheet. Its data goes to a scratch `DB` store that is thrown away when the sheet closes.
+   - Compile errors show the error screen from §7, so a broken reply can be sent back to the model with Copy Error. That copies the error and the lines around it.
+7. **Install** saves the app with the `PUT` request.
+   - The sheet closes and the new icon lands in the first empty slot. Its install pie fills and the blue dot appears, exactly as for a synced app.
+   - Offline, Install is disabled and says "Offline".
+
+**Change an app**
+
+- An icon's context menu gains **Change…**, which opens the same sheet with a "Describe the change" field.
+- Copy Prompt fills `PROMPT-EDIT.md` with the app's current source.
+- Paste, preview and **Update** work as for a new app. The preview uses a copy of the app's real data, so the change can be checked against it without touching the original.
+
+### 9.3 In the ij5.dev admin
+
+- **New App:** one textarea. Paste the reply and the form fills in name, icon, tint, slug and source using the same parsing rules. The fields are still editable before Save.
+- The prompt is not shown in the admin. The phone owns the prompt, because the Kiln version on the phone decides what works. To start from a desk, copy `PROMPT.md` from GitHub.
+
+### 9.4 Parsing and tests
+
+- **The parser** extracts the Swift blocks, reads the `// Name:`, `// Icon:` and `// Tint:` lines (case-insensitive, at the top of the file) and turns the name into a slug.
+- **Two copies:** the parser exists in Swift (Shelf) and TypeScript (admin). Both run against the same fixture replies in `fixtures/replies/*.md`, and each fixture has the expected result next to it, so the two copies can't drift apart.
+- **The header lines stay in the stored source.** They are harmless comments, and they make a copied app reinstallable as it is.
+- **Unknown values:** an unknown tint falls back to `blue`, and an icon name that isn't an SF Symbol falls back to `app`. Shelf checks with `UIImage(systemName:)`; the admin warns but doesn't block.
+- **Feature fixtures:** one small app per line under "What works" in `PROMPT.md`, each of which must pass `Kiln.validate`.
+
+## 10. Build order
 
 Each step ends in something that can be run.
 
@@ -454,12 +520,13 @@ Each step ends in something that can be run.
 7. Edit mode: jiggle, drag to reorder, dock pinning and paging.
 8. The error screen and `SourceRewriter`.
 9. App data on the phone: `AppData`, `ShelfDBProtocol` and the prelude, with tests that a write made offline syncs later and a dirty key survives a pull.
-10. **ij5.dev:** the admin editor, with the Data tab.
-11. The overlay pass (§10) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
+10. Making apps in Shelf (§9.2): the New App sheet, `PasteButton`, preview and install, then Change… with the edit prompt.
+11. **ij5.dev:** the admin editor, with the Data tab and paste-to-fill (§9.3).
+12. The overlay pass (§11) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
 
 ---
 
-## 10. Checking the details
+## 11. Checking the details
 
 - **Metrics:**
   - Screenshot Springboard and Shelf with the same wallpaper on the same device.
