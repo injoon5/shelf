@@ -603,7 +603,7 @@ CREATE TABLE app_versions (            -- history for Revert
 
 ## 10. Build order
 
-Each step ends in something that can be run.
+Each step ends in something that can be run. This is the order for one builder working alone. With agents, §12.3 runs the same steps in parallel waves.
 
 1. **ij5.dev:** migrations, `apps.ts`, the apps API and the data API (§8.1–8.2), and tests. Deploy, then add one app with `curl`.
    Then install keys and `app_versions` (§9.5), with their tests.
@@ -636,6 +636,142 @@ Each step ends in something that can be run.
     - the spring on reordered icons
   - Compare the curves, not just the durations.
 - **Dark mode, every icon style, both ends of the iOS 27 glass setting, Reduce Transparency and Increased Contrast:** check each the same way.
+
+---
+
+## 12. Working with agents
+
+The plan is built by one lead agent and a group of subagents. The lead is the only agent that sees the whole plan at once. Every other agent gets a small piece with clear edges.
+
+### 12.1 Roles and models
+
+| Role | Model | Does | Never does |
+|---|---|---|---|
+| **Lead** | the strongest available (Opus) | Writes the contracts in §12.2, briefs each package, reviews every diff against the plan and §13, merges, runs the design passes in §11 | Writes large features itself while workers are running |
+| **Builder** | Opus for UI and anything in §5, §6 or §9.5. Sonnet for plumbing with a clear spec (migrations, CRUD routes, Keychain) | One work package, inside its own files | Edits a file outside its package |
+| **Test writer** | Sonnet | Writes tests from the plan and the contracts, **without reading the implementation**, so a misreading of the spec shows up as a failing test instead of being copied | Changes production code |
+| **Test runner** | Haiku | Runs the suites, the `Kiln.validate` fixtures and the lint, and reports failures with the exact output, the file and the likely cause in one line | Fixes anything |
+| **Reviewer** | Sonnet, then Opus for anything visual | Checks a diff against its brief and the §13 checklist, and lists gaps with `file:line` | Rewrites the diff |
+
+- **Use the cheapest model that can do the job.** Running and triaging tests is Haiku's job, and writing tests against a clear spec is Sonnet's. Taste stays with Opus: visual judgement, motion, the final look of anything a person sees, and security in §9.5.
+- **Escalate failures.** When a Haiku runner reports a failure it can't explain in one line, the lead hands it to a Sonnet or Opus agent with the output. The runner doesn't retry.
+
+### 12.2 Contracts first (wave 0, lead only)
+
+Before any worker starts, the lead commits the things more than one package depends on. After that, only the lead changes them. A worker that needs a change asks the lead and stops; it doesn't make the change itself.
+
+- **ij5.dev**
+  - The migration numbers, reserved in advance: `0009_apps`, `0010_app_data`, `0011_install_keys` (with `app_versions`). Each is an empty file with a header comment, so no two packages pick the same number.
+  - In `src/lib/types.ts`: `AppMeta`, `AppFull`, `Tint`, `TINTS`, `MAX_APP_BYTES` and the data limits.
+  - In `src/lib/server/api.ts`: the signature of `authorizeApp(request, env, { slug, action: 'read-source' | 'write' })`, as a stub that accepts only the admin token. Package S3 fills it in.
+  - The JSON error shapes, which follow the existing `apiError`.
+- **shelf**
+  - `project.yml`, the Kiln pin, the target layout from §2 with empty files, and `Model/` complete: `AppMeta`, `AppFull`, `Tint`, `Layout`.
+  - The interfaces between packages: `LibraryStore` (what the Home Screen reads), `AppData` (what the runner and the `db` protocol call), and `ReplyParser` (what the sheets call). Each comes with a fake that has preview data, so the UI can be built before the real store exists.
+  - `HomeMetrics.swift` with every number in §5 as a named constant, and `Motion.swift` with every spring and duration from §5 and §6. Later work changes the values there, never in the view code.
+- **Shared fixtures**
+  - `fixtures/api/*.json`: real responses for every endpoint.
+  - `fixtures/replies/*.md` with the results expected from parsing them.
+  - `fixtures/apps/*.swift`: the feature apps from §9.4.
+  - Both repos' tests read these.
+
+### 12.3 Work packages
+
+Each package owns its files, listed below, and nothing else. Two packages that need the same file run one after the other, never at the same time.
+
+| # | Package | Owns | Depends on | Wave |
+|---|---|---|---|---|
+| S1 | Apps API, versions, ETag | `server/apps.ts`, `routes/api/apps/+server.ts`, `routes/api/apps/[slug]/+server.ts`, `[slug]/source/`, `0009` | contracts | 1 |
+| S2 | Data API | `server/appdata.ts`, `routes/api/apps/[slug]/data/**`, `0010` | contracts | 1 |
+| S3 | Install keys | `server/installkeys.ts`, `authorizeApp` in `api.ts`, `routes/api/install-keys/**`, `0011` | contracts | 1 |
+| P | Reply parser and outline | `lib/replyParser.ts`, `Create/ReplyParser.swift`, `Create/Outline.swift` | fixtures | 1 |
+| I1 | Store and sync | `Store/**` | contracts | 1 |
+| I2 | Home Screen | `Home/**` except edit mode | `LibraryStore` fake | 1 |
+| I3 | Runner and errors | `Runner/**` | contracts | 1 |
+| I4 | App data on the phone | `Data/**` | `AppData` contract | 1 (the prelude check from §8.4 runs first, as a gate) |
+| I5 | Edit mode | `Home/JiggleModifier.swift`, `Home/EditDropDelegate.swift`, the edit changes in `IconGrid.swift` | I2 merged | 2 |
+| I6 | New App and Change… sheets | `Create/NewAppSheet.swift`, `Prompts.swift`, `Resources/Prompts/**` | P, I3, S3 merged | 2 |
+| I7 | Connect and Settings | `Settings/**`, the connect screen | I1 merged | 2 |
+| A | Admin pages | `routes/admin/apps/**`, the rows added to `admin/api` and `admin/security` | S1–S3 merged | 2 |
+| T | Tests from the spec | `*.test.ts`, `ShelfTests/**` for each package above | contracts | 1–2, alongside the package it tests |
+| L | Integration, §11 overlay pass and accessibility pass | anything | everything | 3 |
+
+- **Shared files:** some files are touched by more than one package (`api.ts`, `types.ts`, `RESERVED`, `project.yml`, `ShelfApp.swift`). They belong to the lead, or to one named package as shown in the table. Others ask for a change; they don't edit.
+- **Isolation:** each worker runs in its own git worktree on its own branch (`isolation: "worktree"`). The lead merges in dependency order and runs every test suite after each merge.
+- **Builds:** iOS packages need a Mac with Xcode. The server packages and the parser's TypeScript half can run in a cloud session.
+
+### 12.4 Briefing a worker
+
+Every brief has the same parts. A brief missing one of them isn't ready to send.
+
+- **Goal:** one sentence.
+- **Read:** the plan sections that apply, by number, and the contract files.
+- **Owns:** the exact files the worker may change.
+- **Must not touch:** everything else, especially the shared files in §12.3.
+- **Done when:**
+  - the package's tests pass
+  - the §13 checklist items that apply to the package are met, with screenshots for UI
+  - nothing outside the owned files has changed (`git diff --stat`)
+- **Report:**
+  - what changed
+  - what was left undone, and why
+  - any contract change it needs
+  - the screenshots or test output that prove the "Done when" items
+
+A worker that discovers the plan is wrong says so in its report. It doesn't quietly work around the problem.
+
+---
+
+## 13. Craft
+
+Shelf is judged by how it feels in the hand. Every package is held to this section; the reviewer checks it and the lead enforces it.
+
+### 13.1 Design engineering
+
+- **No magic numbers.** Every size, inset, radius, duration and spring comes from `HomeMetrics` or `Motion`. A number in a view file is a review failure.
+- **Springs, not curves.** Movement uses `.spring(duration:bounce:)`, with no `easeInOut` on anything spatial. Animations can be interrupted: tapping during an open or close reverses it from where it is, without snapping or queueing.
+- **Shapes:**
+  - Every rounded shape uses `style: .continuous`.
+  - Nested shapes are concentric: the inner radius is the outer radius minus the inset.
+  - Glass comes only from the system (§0).
+- **Feedback is immediate.**
+  - A press state shows on touch-down.
+  - Haptics accompany a launch, the start of edit mode, a reorder snap and an install, and nothing else.
+- **Nothing flashes or jumps.**
+  - Spinners appear only after 300 ms, so fast loads show none.
+  - Layout doesn't shift when data arrives: icons take their final place first and fill in after.
+  - Text never reflows during a transition.
+- **Every screen has every state.** Loading, empty, offline, error and success are each designed, not left to a default.
+- **Optical alignment over arithmetic.** Glyphs are centred by eye (SF Symbols' alignment, plus a fixed offset where needed). Text and glyph weights match: a `.medium` glyph sits next to `.medium` text.
+- **Hit targets:** at least 44×44 pt, even where the visible shape is smaller.
+- **Words:**
+  - Buttons are in Title Case, as in Apple's apps. Labels are short.
+  - No taglines, helper text or secondary labels. If a screen needs them to make sense, fix the layout.
+  - No all-caps text.
+- **Performance:**
+  - 120 fps on ProMotion devices while scrolling, jiggling and during the zoom transition, checked with the Instruments hitches tool.
+  - No work on the main thread during a transition. Sources are parsed and data is pulled before the animation starts, or after it ends.
+
+### 13.2 Definition of done for UI work
+
+These are checked with screenshots attached to the report:
+
+- [ ] light and dark mode
+- [ ] the smallest and the largest supported iPhone
+- [ ] Dynamic Type at the default size and at the largest accessibility size
+- [ ] VoiceOver: every control has a label and the order makes sense
+- [ ] Reduce Motion, Reduce Transparency, Increased Contrast and Bold Text
+- [ ] the offline and error states
+- [ ] the overlay comparison from §11, for anything that has a Springboard equivalent
+- [ ] for motion: a screen recording, compared frame by frame with the same motion on Springboard
+
+### 13.3 Definition of done for server work
+
+- [ ] errors follow `apiError`: one sentence a person can act on, no stack traces, no hint about whether a credential exists
+- [ ] secrets and keys never appear in logs or responses
+- [ ] every write keeps D1 and any mirror consistent, or rolls back, as `slugs.ts` already does
+- [ ] tests for each status code the route can return
+- [ ] the comments explain why, in the voice of the existing code
 
 ---
 
