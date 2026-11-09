@@ -24,7 +24,7 @@ Two repos change. The prompts for making apps are in the [Appendix](#appendix-pr
 | No server API exists. | `ij5.dev/src/routes/api` | Build it with the conventions the links API already uses (§1). |
 | `Kiln.register` bridges are read only by the old interpreter (`SwiftRunnerState.nativeBridges`). The modern engine never consults them. | `grep nativeBridges` | The app database can't be a native bridge. |
 | The modern engine sends requests through the real `URLSession.shared` with a real `URLRequest`, and supports `httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)` and `JSONEncoder`. | `Engine/KENetwork.swift` | A `URLProtocol` registered by Shelf can answer a private `db://` scheme on the phone. Apps get a database through the plain networking code Kiln already runs (§8). |
-| iOS 27 refines Liquid Glass and adds a system setting that makes glass clearer or more tinted. | [MacRumors](https://macrumors.com/2026/06/10/how-liquid-glass-is-changing-in-ios-27), [BGR](https://bgr.com/2191219/ios-27-liquid-glass-fix-customization/) | Use only system glass: `glassEffect`, `GlassEffectContainer`, the `.glass` and `.glassProminent` button styles, and the system's sheets and menus. Never a hand-made blur. The user's transparency setting and Reduce Transparency then apply on their own. |
+| iOS 27 refines Liquid Glass and adds a system setting that makes glass clearer or more tinted. | [MacRumors](https://macrumors.com/2026/06/10/how-liquid-glass-is-changing-in-ios-27), [BGR](https://bgr.com/2191219/ios-27-liquid-glass-fix-customization/) | Use only system glass: `glassEffect`, `GlassEffectContainer`, the `.glass` and `.glassProminent` button styles, and the system's sheets and menus. Never a hand-made blur. The iOS 27 setting for clearer or more tinted glass then applies on its own. |
 
 **Deployment target: iOS 27.** It is the current release and has the refined Liquid Glass. Kiln itself needs iOS 17, and Shelf is a personal app, so dropping older versions costs nothing.
 
@@ -55,7 +55,7 @@ Apps live only under `/api/apps`. They take no root slug, and nothing in `RESERV
 
 This file holds `listApps` (metadata only, so `source` is never read for the index), `getApp`, `putApp` and `deleteApp`, in the style of `pastes.ts`.
 
-`TINTS` is a fixed list of named colours: `red orange yellow green mint teal cyan blue indigo purple pink brown gray`. Names rather than hex codes mean the phone maps each one to the matching `Color.red` and so on. Those system colours adapt to light mode, dark mode and increased contrast; a hex code would not.
+`TINTS` is a fixed list of named colours: `red orange yellow green mint teal cyan blue indigo purple pink brown gray`. Names rather than hex codes mean the phone maps each one to the matching `Color.red` and so on. Those system colours adapt to light and dark mode; a hex code would not.
 
 ### 1.3 API, with the same `authorize`, `apiJson` and `apiError` as links
 
@@ -177,7 +177,7 @@ The aim is that a screenshot of Shelf placed next to Springboard looks the same 
 
 ### 5.1 Wallpaper
 
-- The default is a `MeshGradient` with 3×3 points in deep blue and violet tones, with separate palettes for light and dark mode. The middle points drift slowly over 20 s (`TimelineView(.animation)`). Reduce Motion turns the drift off.
+- The default is a `MeshGradient` with 3×3 points in deep blue and violet tones, with separate palettes for light and dark mode. The middle points drift slowly over 20 s (`TimelineView(.animation)`).
 - An optional photo from `PhotosPicker`, scaled to fill. The `scaledToFill` and safe-area handling match how Springboard crops a wallpaper.
 - The wallpaper extends under the status bar and the home indicator (`ignoresSafeArea()`).
 
@@ -240,7 +240,7 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
   - Edit Home Screen in an icon's context menu.
   - A long-press on empty wallpaper.
   - Starting to drag an icon.
-- **Jiggle:** each icon rotates ±1.6° and shifts ±0.6pt vertically. The period is 0.26 s with a random phase per icon, so the icons don't move in step. The animation uses `phaseAnimator`. Reduce Motion replaces it with a static grey outline.
+- **Jiggle:** each icon rotates ±1.6° and shifts ±0.6pt vertically. The period is 0.26 s with a random phase per icon, so the icons don't move in step. The animation uses `phaseAnimator`.
 - **Reordering:** drag-and-drop (`draggable` and `dropDestination`).
   - Other icons slide aside with `.spring(duration: 0.35, bounce: 0.15)`.
   - Holding an icon at the screen edge for 0.6 s flips to the next page.
@@ -250,14 +250,6 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
   - New apps go into the first empty slot on the last page, as on iOS.
   - Removed apps leave the layout.
   - Unknown slugs in the layout are ignored.
-
-### 5.7 Accessibility
-
-- **Labels:** each icon is a single `Button` with `accessibilityLabel(name)`. A "New" hint is added when the blue dot shows.
-- **Dynamic Type:** labels are capped at `.xLarge`, as Springboard's are.
-- **Bold Text:** label weight follows the setting.
-- **Increased Contrast:** a darker label shadow. The system makes the glass more opaque by itself.
-- **Reduce Transparency:** handled by the system glass; Shelf adds nothing.
 
 ---
 
@@ -617,7 +609,7 @@ Each step ends in something that can be run. This is the order for one builder w
 9. App data on the phone: `AppData`, `ShelfDBProtocol` and the prelude, with tests that a write made offline syncs later and a dirty key survives a pull.
 10. Making apps in Shelf (§9.2): the New App sheet, `PasteButton`, preview and install, then Change… with the edit prompt. Then minting install keys, waiting for the agent, and Revert (§9.5).
 11. **ij5.dev:** the admin editor, with the Data tab and paste-to-fill (§9.3).
-12. The overlay pass (§11) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
+12. The overlay pass (§11).
 
 ---
 
@@ -635,7 +627,7 @@ Each step ends in something that can be run. This is the order for one builder w
     - icon press darkening
     - the spring on reordered icons
   - Compare the curves, not just the durations.
-- **Dark mode, every icon style, both ends of the iOS 27 glass setting, Reduce Transparency and Increased Contrast:** check each the same way.
+- **Dark mode, every icon style and both ends of the iOS 27 glass setting:** check each the same way.
 
 ---
 
@@ -694,7 +686,7 @@ Each package owns its files, listed below, and nothing else. Two packages that n
 | I7 | Connect and Settings | `Settings/**`, the connect screen | I1 merged | 2 |
 | A | Admin pages | `routes/admin/apps/**`, the rows added to `admin/api` and `admin/security` | S1–S3 merged | 2 |
 | T | Tests from the spec | `*.test.ts`, `ShelfTests/**` for each package above | contracts | 1–2, alongside the package it tests |
-| L | Integration, §11 overlay pass and accessibility pass | anything | everything | 3 |
+| L | Integration and the §11 overlay pass | anything | everything | 3 |
 
 - **Shared files:** some files are touched by more than one package (`api.ts`, `types.ts`, `RESERVED`, `project.yml`, `ShelfApp.swift`). They belong to the lead, or to one named package as shown in the table. Others ask for a change; they don't edit.
 - **Isolation:** each worker runs in its own git worktree on its own branch (`isolation: "worktree"`). The lead merges in dependency order and runs every test suite after each merge.
@@ -758,9 +750,6 @@ These are checked with screenshots attached to the report:
 
 - [ ] light and dark mode
 - [ ] the smallest and the largest supported iPhone
-- [ ] Dynamic Type at the default size and at the largest accessibility size
-- [ ] VoiceOver: every control has a label and the order makes sense
-- [ ] Reduce Motion, Reduce Transparency, Increased Contrast and Bold Text
 - [ ] the offline and error states
 - [ ] the overlay comparison from §11, for anything that has a Springboard equivalent
 - [ ] for motion: a screen recording, compared frame by frame with the same motion on Springboard
