@@ -1,11 +1,11 @@
 # Shelf — plan
 
-An iPhone Home Screen for personal apps. Each app is a single Swift file stored on ij5.dev and run on device by [Kiln](https://github.com/haplollc/Kiln). Shelf should feel like Springboard: icons on a wallpaper, a glass dock, apps that zoom out of their icon and back into it.
+An iPhone Home Screen for personal apps. Each app is a single Swift file stored on ij5.dev and run on device by [Kiln](https://github.com/haplollc/Kiln). Shelf should feel like Springboard on iOS 27: icons on a wallpaper, a Liquid Glass dock, apps that zoom out of their icon and back into it.
 
 Two repos change:
 
-- **ij5.dev**: adds an apps table, an API and an admin editor. None of this exists yet.
-- **shelf**: adds the iOS app.
+- **ij5.dev**: adds an apps table, an API, an admin editor, and a small key-value store that apps can use for their data. None of this exists yet.
+- **shelf**: adds the iOS app. It needs iOS 27 or later and uses Liquid Glass throughout.
 
 ---
 
@@ -19,10 +19,13 @@ Two repos change:
 | `Kiln.validate` fires every action once, side effects included. | `Kiln.swift` | Shelf never validates on device. Validation goes on the Later list. |
 | The latest tag is `0.2.1`. | `git ls-remote` | Pin the package with `.upToNextMinor(from: "0.2.1")`. Before 1.0, a minor release can break the API. |
 | On iOS 26, interactive dismiss of `.navigationTransition(.zoom)` with `fullScreenCover` has open bugs: the source icon disappears and frames are misaligned. | Apple Developer Forums [796279](https://developer.apple.com/forums/thread/796279), [807208](https://developer.apple.com/forums/thread/807208), [807715](https://developer.apple.com/forums/thread/807715) | Use the zoom transition, but keep a known-good fallback behind one flag (§6.1). |
-| No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§9). |
+| No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§10). |
 | No server API exists. | `ij5.dev/src/routes/api` | Build it with the conventions the links API already uses (§1). |
+| `Kiln.register` bridges are read only by the old interpreter (`SwiftRunnerState.nativeBridges`). The modern engine never consults them. | `grep nativeBridges` | The app database can't be a native bridge. |
+| The modern engine sends requests through the real `URLSession.shared` with a real `URLRequest`, and supports `httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)` and `JSONEncoder`. | `Engine/KENetwork.swift` | A `URLProtocol` registered by Shelf can answer a private `db://` scheme on the phone. Apps get a database through the plain networking code Kiln already runs (§8). |
+| iOS 27 refines Liquid Glass and adds a system setting that makes glass clearer or more tinted. | [MacRumors](https://macrumors.com/2026/06/10/how-liquid-glass-is-changing-in-ios-27), [BGR](https://bgr.com/2191219/ios-27-liquid-glass-fix-customization/) | Use only system glass: `glassEffect`, `GlassEffectContainer`, the `.glass` and `.glassProminent` button styles, and the system's sheets and menus. Never a hand-made blur. The user's transparency setting and Reduce Transparency then apply on their own. |
 
-**Deployment target: iOS 26.** It brings `glassEffect` and `MeshGradient`, which the Springboard look depends on. iOS 27 is current, Kiln itself needs iOS 17, and Shelf is a personal app, so dropping older versions costs nothing.
+**Deployment target: iOS 27.** It is the current release and has the refined Liquid Glass. Kiln itself needs iOS 17, and Shelf is a personal app, so dropping older versions costs nothing.
 
 ---
 
@@ -97,11 +100,13 @@ Shelf/
     ShelfApp.swift
     Model/      AppMeta.swift, AppFull.swift, Tint.swift, Layout.swift
     Store/      Keychain.swift, Settings.swift, AppCache.swift, SyncEngine.swift, LibraryStore.swift
+    Data/       AppData.swift, ShelfDBProtocol.swift, Prelude.swift
     Home/       HomeScreen.swift, IconGrid.swift, AppIcon.swift, Dock.swift, Wallpaper.swift,
                 PageDots.swift, SearchPill.swift, JiggleModifier.swift, EditDropDelegate.swift
     Runner/     RunnerView.swift, SourceRewriter.swift, ErrorScreen.swift
     Settings/   SettingsView.swift
-  ShelfTests/   SyncEngineTests.swift, SourceRewriterTests.swift, LayoutTests.swift
+  ShelfTests/   SyncEngineTests.swift, SourceRewriterTests.swift, LayoutTests.swift,
+                AppDataTests.swift, PreludeTests.swift
 ```
 
 - The only dependency is Kiln, pinned as in §0.
@@ -116,11 +121,14 @@ Shelf/
   - the site URL in `UserDefaults`, defaulting to `https://ij5.dev`
   - the token in the Keychain (`kSecClassGenericPassword`, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`)
 - First run shows one screen: an app glyph, a token field and a Connect button. Connect checks the token with `GET /api/apps` before saving anything. A wrong token shakes the field and leaves no saved state.
-- Settings opens as a sheet from the gear icon in the dock (§5.4). It contains:
+- The Connect button uses `.buttonStyle(.glassProminent)`, over the Shelf wallpaper.
+- Settings opens as a sheet from the gear icon in the dock (§5.4). At the medium detent the sheet is glass by default on iOS 26+, so it gets no custom background. It contains:
   - Site
   - Token (masked, with Change)
   - Sync Now, with a "last synced" time
   - Wallpaper (built-in, or a photo from `PhotosPicker`)
+  - Icon Style (Automatic, Default, Dark, Clear, Tinted)
+  - App Data: storage used by each app, with Delete Data per app
   - Reset Layout
   - Sign Out, which clears the token, the cache and each app's storage
 
@@ -154,7 +162,7 @@ Before the first frame, `LibraryStore` reads `index.json` synchronously, so the 
 
 - While an app's source downloads, its icon shows the App Store install state: the icon dimmed, with a circular progress pie in the middle.
 - After an app is added or updated, a blue dot sits before its label until the app is first opened, the same as a newly installed iOS app.
-- When a sync fails and the app has a cache, a glass capsule drops from the top of the screen, like a system banner: an `exclamationmark.icloud` glyph and "Offline". It disappears after 3 s or on a tap.
+- When a sync fails and the app has a cache, a capsule with `.glassEffect()` drops from the top of the screen, like a system banner: an `exclamationmark.icloud` glyph and "Offline". It disappears after 3 s or on a tap.
 - A `401` uses the same banner with "Token Expired", and tapping it opens Settings.
 - On the first run, when there is no cache, the error replaces the grid as a `ContentUnavailableView`.
 
@@ -162,7 +170,7 @@ Before the first frame, `LibraryStore` reads `index.json` synchronously, so the 
 
 ## 5. Home Screen
 
-The aim is that a screenshot of Shelf placed next to Springboard looks the same at a glance. Every number below is a starting value for the overlay check in §9.
+The aim is that a screenshot of Shelf placed next to Springboard looks the same at a glance. Every number below is a starting value for the overlay check in §10.
 
 ### 5.1 Wallpaper
 
@@ -195,6 +203,11 @@ The aim is that a screenshot of Shelf placed next to Springboard looks the same 
   - `.system(size: 12)`, white, on one line, truncated at the tail
   - 6pt below the icon, as wide as the icon plus 14pt
   - A soft `shadow(color: .black.opacity(0.35), radius: 1.5, y: 0.5)` keeps it readable on light wallpapers.
+- **Icon style:** Settings has an Icon Style picker that mirrors the system's Home Screen options. Shelf can't read the system choice, so Automatic follows light or dark mode.
+  - **Default:** the light-mode fill described above.
+  - **Dark:** the dark-mode fill described above.
+  - **Clear:** the squircle becomes `.glassEffect(.clear, in: squircle)`, the glyph is white, and the tint is dropped. This is the iOS 26+ "Clear" icon look.
+  - **Tinted:** like Clear, but with `.glassEffect(.regular.tint(accent))` and a single accent the user picks.
 - **Pressed state:** on touch-down the icon darkens with `brightness(-0.25)`, with no scale change. Springboard darkens icons rather than shrinking them. This needs a custom `ButtonStyle` that reads `configuration.isPressed`.
 - **Haptic:** `.sensoryFeedback(.impact(weight: .light), …)` when an app launches.
 - **Long-press:** a `contextMenu` with Edit Home Screen, Reload App and Copy Source, and a `preview` showing the icon at 2× scale, like an app's quick-actions menu.
@@ -202,7 +215,7 @@ The aim is that a screenshot of Shelf placed next to Springboard looks the same 
 ### 5.4 Dock
 
 - **Contents:** up to 4 slots: the apps the user pins, plus Settings, which always stays in the dock with a gray gradient and the `gearshape.fill` glyph.
-- **Container:** `GlassEffectContainer` with `.glassEffect(.regular, in: .rect(cornerRadius: 32, style: .continuous))`, inset about 12pt from the screen edges and about 8pt above the bottom safe area.
+- **Container:** a `GlassEffectContainer` that holds the dock and the search pill together, so the two glass shapes refract as one surface and the pill can morph into the search field. The dock uses `.glassEffect(.regular, in: .rect(cornerRadius: 32, style: .continuous))`, inset about 12pt from the screen edges and about 8pt above the bottom safe area.
 - **Corner radius:** inner radius = display corner radius − inset, so the dock is concentric with the screen corners. That concentricity is the detail that gives a fake dock away when it's wrong.
 - **Labels:** dock icons show no labels, as on Springboard.
 
@@ -210,8 +223,8 @@ The aim is that a screenshot of Shelf placed next to Springboard looks the same 
 
 - **Appearance:** a glass capsule above the dock showing a `magnifyingglass` glyph and "Search", the same as iOS 18+.
 - **Opening search:** tapping the pill, or swiping down anywhere on the grid, opens search.
-  - The wallpaper blurs (`.blur(radius: 30)` plus dimming).
-  - A search field focuses at the top.
+  - The pill morphs into the search field with `glassEffectID` and `@Namespace`, and the field moves to the top of the screen. This is the iOS 26+ glass morph, not a crossfade.
+  - The grid fades and the wallpaper dims.
 - **Search behaviour:**
   - Results are the app icons whose names match, in a 4-column grid; the best match comes first and opens with Return.
   - Tapping outside the field or swiping down closes search.
@@ -229,7 +242,7 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
   - Other icons slide aside with `.spring(duration: 0.35, bounce: 0.15)`.
   - Holding an icon at the screen edge for 0.6 s flips to the next page.
 - **Dock:** dragging an icon into or out of the dock pins or unpins it.
-- **Done:** a glass capsule button in the top-right corner, plus a tap on empty wallpaper.
+- **Done:** a `Button("Done")` with `.buttonStyle(.glassProminent)` in the top-right corner, plus a tap on empty wallpaper.
 - **Storage:** the layout is saved locally in `layout.json` as `{ dock: [slug], pages: [[slug]] }`.
   - New apps go into the first empty slot on the last page, as on iOS.
   - Removed apps leave the layout.
@@ -240,7 +253,8 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
 - **Labels:** each icon is a single `Button` with `accessibilityLabel(name)`. A "New" hint is added when the blue dot shows.
 - **Dynamic Type:** labels are capped at `.xLarge`, as Springboard's are.
 - **Bold Text:** label weight follows the setting.
-- **Increased Contrast:** a darker label shadow and a solid dock.
+- **Increased Contrast:** a darker label shadow. The system makes the glass more opaque by itself.
+- **Reduce Transparency:** handled by the system glass; Shelf adds nothing.
 
 ---
 
@@ -252,7 +266,7 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
   - The app grows out of its own icon and shrinks back into it when dragged down.
   - This replaces the sheet in the original spec: a sheet leaves the Home Screen visible behind the app, which no iOS app does.
 - **Navigation:** the app still gets its own presentation context, so apps with a `NavigationStack` don't nest inside a launcher stack. The Home Screen has no `NavigationStack`.
-- **Fallback:** `Runner.presentation` is a flag that can be `.zoom` or `.sheet` (`.presentationDragIndicator(.visible)`, `.large` detent). If the iOS 26 zoom bugs in §0 still reproduce on the iOS version in use, the flag switches to the sheet. That is one line, and the rest of the runner is unchanged.
+- **Fallback:** `Runner.presentation` is a flag that can be `.zoom` or `.sheet` (`.presentationDragIndicator(.visible)`, `.large` detent). The zoom bugs in §0 were reported on iOS 26. Check whether they still reproduce on iOS 27 in step 4 of the build order, and if they do, switch the flag to the sheet. That is one line, and the rest of the runner is unchanged.
 - **Drag conflicts:** apps with their own vertical drag gestures can fight the dismiss gesture. Dragging down from the top 44pt (the status bar area) always dismisses, enforced with a small overlay `DragGesture`.
 - **Background:** the runner sets `.background(Color(.systemBackground))`, because many Kiln apps leave the background transparent.
 
@@ -260,8 +274,13 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
 
 ```swift
 @State private var result: KilnResult?
-.task(id: app.version) { result = Kiln.run(SourceRewriter.isolate(source, slug: app.slug)) }
+.task(id: app.version) {
+    await AppData.shared.pull(app.slug, timeout: .seconds(1))   // §8.3
+    result = Kiln.run(SourceRewriter.prepare(source, slug: app.slug))
+}
 ```
+
+- **Launch screen:** while the data pull runs, the runner shows a launch screen in the app's tint: a solid background with the glyph centred at the icon's size. Like a native app's launch screen, it lasts only until the app is ready.
 
 - The app runs once per open and once per version, so a sync during a session swaps in the new code only after the user closes and reopens the app. The same is true on iOS.
 - Opening an app clears its blue dot.
@@ -269,6 +288,7 @@ Edit mode does what Springboard's does that still makes sense here. Apps come fr
 ### 6.3 `SourceRewriter`
 
 - **Rewrite:** `@AppStorage("key")` becomes `@AppStorage("<slug>.key")`. It uses one regex on string literals in the attribute position only.
+- **Prelude:** if the source mentions `DB.` and doesn't declare its own `enum DB`, the `DB` helper from §8.4 is added to the end of the source. Appending, rather than prepending, keeps the line numbers in error messages matching the author's file.
 - **Tests:**
   - the plain form
   - `@AppStorage("k", store: …)`
@@ -296,24 +316,150 @@ When there is no line number, only the message is shown. The screen has no other
 
 ---
 
-## 8. Build order
+## 8. App data
+
+A small key-value database per app. Values are JSON and keys are strings. It stores what `@AppStorage` can't: lists, records, and data that should follow the user to another device or be readable from the web.
+
+### 8.1 Server storage (ij5.dev)
+
+`migrations/0010_app_data.sql`:
+
+```sql
+CREATE TABLE app_data (
+  slug       TEXT NOT NULL,
+  key        TEXT NOT NULL,            -- 1–128 chars, printable, no "/"
+  value      TEXT,                     -- JSON; NULL is a tombstone
+  rev        INTEGER NOT NULL,         -- global, strictly increasing
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (slug, key)
+);
+CREATE INDEX app_data_rev ON app_data (slug, rev);
+```
+
+- **Why D1, not Workers KV:** Workers KV takes up to 60 s to show a write everywhere, so a value saved on the phone could read back stale on the web. D1 reads back its own writes immediately.
+- **Revisions:** each write sets `rev = (SELECT COALESCE(MAX(rev), 0) + 1 FROM app_data)` in the same statement. D1 runs writes one at a time, so `rev` is a total order, and a client can resume from any `rev` it has seen.
+- **Tombstones:** a delete sets `value = NULL` and keeps the row, so other devices learn about the delete on their next sync. Tombstones older than 30 days are purged when the app is next written to.
+- **Limits** (`$lib/types`):
+  - a value of 64 KB at most
+  - 1,000 live keys per app
+  - 5 MB per app
+  - Writes over a limit get `413` with the limit in the `error` sentence.
+- **Deleting an app** in the admin asks whether to delete its data too. The default is to keep the data, so an app can be deleted and re-created without losing anything.
+
+### 8.2 API
+
+These endpoints use the same bearer token and helpers as the rest of the API.
+
+| Method | Path | Body | Returns |
+|---|---|---|---|
+| GET | `/api/apps/{slug}/data` | | `{ "entries": { key: value }, "rev": n }` with live keys only |
+| GET | `/api/apps/{slug}/data?since={rev}` | | `{ "changes": [{ key, value \| null, rev }], "rev": n }` with tombstones included |
+| GET | `/api/apps/{slug}/data/{key}` | | the JSON value, or `404` |
+| PUT | `/api/apps/{slug}/data/{key}` | any JSON | `{ key, rev }` |
+| DELETE | `/api/apps/{slug}/data/{key}` | | `{ key, rev }` |
+| POST | `/api/apps/{slug}/data` | `{ "set": { key: value }, "delete": [key] }` | `{ "rev": n }`, in one transaction (`DB.batch`) |
+
+- **Writable without an app:** the slug doesn't need a row in `apps`. The store can also back a script or a page that has no app.
+- **Conflicts:** the last write to reach the server wins, per key. There is one user, and the realistic conflict is the same person on two devices, so per-key last-write-wins is enough. Merging isn't worth its complexity.
+- **Admin:** the app editor gets a Data tab. It lists the keys, their size and when each was updated, shows a value as formatted JSON that can be edited in place, and deletes keys.
+- **Tests:**
+  - `rev` increases across interleaved writes
+  - `since` returns tombstones
+  - the batch is atomic when one value is too large
+  - the size limits
+  - a `401` with no data in the body
+
+### 8.3 On the phone
+
+- **Store:** `AppData` is an `actor` holding one JSON file per app in `Application Support/data/{slug}.json`. The file holds `{ entries: { key: { value, rev } }, dirty: [key], rev }`.
+- **Local first:** reads and writes from an app go to this store and return at once, even offline.
+- **Pull:**
+  - On app open, `GET …/data?since={rev}`, capped at 1 s; after that the app opens with what is on the phone.
+  - On every library sync (§4).
+  - A pulled change never overwrites a key that is still dirty on the phone. The phone's value is pushed next.
+- **Push:**
+  - Dirty keys are pushed with the batch `POST`, 2 s after the last write, when the app closes, and when Shelf goes to the background (`beginBackgroundTask`).
+  - A failed push leaves the keys dirty for the next attempt.
+
+### 8.4 How apps reach it
+
+`ShelfDBProtocol` is a `URLProtocol` subclass that Shelf registers with `URLProtocol.registerClass` while an app runs. It handles only the `db` scheme. It answers from `AppData` without touching the network, so Kiln's blocking `await URLSession.shared.data(from:)` returns immediately.
+
+| Request | Answer |
+|---|---|
+| `GET db://data/{key}` | `200` with the JSON value, or `404` |
+| `PUT db://data/{key}` with a JSON body | `204` |
+| `DELETE db://data/{key}` | `204` |
+| `GET db://data/` | `200` with `{ key: value }` for every key |
+
+- **Scoping:** the slug is never in the URL. The protocol answers for the app that is currently open, because Shelf runs one app at a time. An app therefore can't read or write another app's data, even by building its own URLs.
+- **Token:** the token never enters an app. The protocol works locally, and `AppData` adds the token only when it syncs with the server.
+- **Shared session:** the protocol is registered on `URLSession.shared`, the session Kiln uses, and removed when the runner closes.
+
+The prelude Shelf appends (§6.3), so app code stays short:
+
+```swift
+enum DB {
+    static func load(_ key: String) -> Data? {
+        guard let url = URL(string: "db://data/" + key),
+              let (data, response) = try? await URLSession.shared.data(from: url),
+              (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
+        return data
+    }
+    static func save(_ key: String, _ data: Data) {
+        var request = URLRequest(url: URL(string: "db://data/" + key)!)
+        request.httpMethod = "PUT"
+        request.httpBody = data
+        _ = try? await URLSession.shared.data(for: request)
+    }
+    static func remove(_ key: String) {
+        var request = URLRequest(url: URL(string: "db://data/" + key)!)
+        request.httpMethod = "DELETE"
+        _ = try? await URLSession.shared.data(for: request)
+    }
+}
+```
+
+Usage in an app:
+
+```swift
+struct Todo: Codable, Identifiable { var id = UUID(); var title: String; var done = false }
+
+@State private var todos: [Todo] = []
+
+.onAppear {
+    if let data = DB.load("todos") { todos = (try? JSONDecoder().decode([Todo].self, from: data)) ?? [] }
+}
+.onChange(of: todos) { if let data = try? JSONEncoder().encode(todos) { DB.save("todos", data) } }
+```
+
+**Check first.** Before building the rest of this, run the prelude and this example through `Kiln.validate` in a unit test. The test confirms that Kiln's engine accepts:
+
+- a tuple pattern inside `guard let`
+- `try?` around `await`
+- `JSONEncoder().encode` on an array of structs
+
+If any of these fails, simplify the prelude to fit before writing anything that depends on it. This is step 2 of the build order.
+
+## 9. Build order
 
 Each step ends in something that can be run.
 
-1. **ij5.dev:** migration, `apps.ts`, API and tests. Deploy, then add one app with `curl`.
-2. **shelf:** XcodeGen project, Kiln package and models. A test runs `Kiln.run` on a fixture.
+1. **ij5.dev:** migrations, `apps.ts`, the apps API and the data API (§8.1–8.2), and tests. Deploy, then add one app with `curl`.
+2. **shelf:** XcodeGen project, Kiln package and models. A test runs `Kiln.run` on a fixture, and the `DB` prelude and example from §8.4 pass `Kiln.validate`.
 3. `SyncEngine` with `URLProtocol` stub tests for 304, a partial failure, a deleted app, a `401` and offline.
 4. A plain Home Screen: wallpaper, grid, icon, label, and the runner with the zoom transition. A real phone starts using it here.
 5. The dock, Settings and the connect flow.
 6. The detail pass: pressed state, blue dot, install pie, banner, dark icons, search pill and search.
 7. Edit mode: jiggle, drag to reorder, dock pinning and paging.
 8. The error screen and `SourceRewriter`.
-9. **ij5.dev:** the admin editor.
-10. The overlay pass (§9) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
+9. App data on the phone: `AppData`, `ShelfDBProtocol` and the prelude, with tests that a write made offline syncs later and a dirty key survives a pull.
+10. **ij5.dev:** the admin editor, with the Data tab.
+11. The overlay pass (§10) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
 
 ---
 
-## 9. Checking the details
+## 10. Checking the details
 
 - **Metrics:**
   - Screenshot Springboard and Shelf with the same wallpaper on the same device.
@@ -327,7 +473,7 @@ Each step ends in something that can be run.
     - icon press darkening
     - the spring on reordered icons
   - Compare the curves, not just the durations.
-- **Dark mode, tinted wallpaper and Increased Contrast:** check each the same way.
+- **Dark mode, every icon style, both ends of the iOS 27 glass setting, Reduce Transparency and Increased Contrast:** check each the same way.
 
 ---
 
@@ -338,3 +484,5 @@ Each step ends in something that can be run.
 - A read-only token: `APPS_TOKEN_HASH` on the server, accepted only by `GET /api/apps*`, so the phone never holds the admin token.
 - Native bridges with `Kiln.register` (haptics, opening a URL), documented in the admin page for authors.
 - Widgets that open an app directly.
+- Live updates to app data while an app is open (a long-poll on `?since=`), so a change made on another device shows up without reopening the app.
+- Data that several apps share, through a `db://shared/` namespace.
