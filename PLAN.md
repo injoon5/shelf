@@ -203,7 +203,8 @@ The aim is that a screenshot of Shelf placed next to Springboard looks the same 
   - the specular rim that Liquid Glass icons have
 - **Shadow:** none. Springboard icons cast no drop shadow.
 - **Label:**
-  - `.system(size: 12)`, white, on one line, truncated at the tail
+  - 12pt at the default text size, from `@ScaledMetric(relativeTo: .caption2) var labelSize = 12`, so it follows Dynamic Type. It stops growing at `.xLarge`, as Springboard's labels do, so the grid never breaks.
+  - white, on one line, truncated at the tail
   - 6pt below the icon, as wide as the icon plus 14pt
   - A soft `shadow(color: .black.opacity(0.35), radius: 1.5, y: 0.5)` keeps it readable on light wallpapers.
 - **Icon style:** Settings has an Icon Style picker that mirrors the system's Home Screen options. Shelf can't read the system choice, so Automatic follows light or dark mode.
@@ -618,7 +619,6 @@ Each step ends in something that can be run. This is the order for one builder w
 - **Metrics:**
   - Screenshot Springboard and Shelf with the same wallpaper on the same device.
   - Overlay them at 50% opacity and adjust icon size, insets, row distribution, label offset, dock inset and radius until the edges line up.
-  - Repeat on the smallest and largest supported iPhones.
   - Write the final numbers back into `HomeMetrics.swift`, the one place they live.
 - **Motion:**
   - Record both screens at 60 fps and compare frame by frame:
@@ -735,6 +735,12 @@ Shelf is judged by how it feels in the hand. Every package is held to this secti
   - Text never reflows during a transition.
 - **Every screen has every state.** Loading, empty, offline, error and success are each designed, not left to a default.
 - **Optical alignment over arithmetic.** Glyphs are centred by eye (SF Symbols' alignment, plus a fixed offset where needed). Text and glyph weights match: a `.medium` glyph sits next to `.medium` text.
+- **Dynamic Type everywhere.**
+  - All text uses a text style (`.body`, `.headline`, `.footnote` and so on), or `@ScaledMetric(relativeTo:)` where a design needs a specific size.
+  - A fixed `.system(size:)` is a review failure.
+  - Glyphs that sit next to text scale with it: SF Symbols in a `Label` or set with `.font(.body)`.
+  - Layouts that could overflow at large sizes are capped with `.dynamicTypeSize(...DynamicTypeSize.xxxLarge)`, as Apple's apps do.
+  - The only screens that cap lower are the Home Screen labels and the dock.
 - **Hit targets:** at least 44×44 pt, even where the visible shape is smaller.
 - **Words:**
   - Buttons are in Title Case, as in Apple's apps. Labels are short.
@@ -749,7 +755,7 @@ Shelf is judged by how it feels in the hand. Every package is held to this secti
 These are checked with screenshots attached to the report:
 
 - [ ] light and dark mode
-- [ ] the smallest and the largest supported iPhone
+- [ ] Dynamic Type at the default size and at `.xxxLarge`: nothing clips or overlaps
 - [ ] the offline and error states
 - [ ] the overlay comparison from §11, for anything that has a Springboard equivalent
 - [ ] for motion: a screen recording, compared frame by frame with the same motion on Springboard
