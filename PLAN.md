@@ -446,13 +446,13 @@ If any of these fails, simplify the prelude to fit before writing anything that 
 
 ## 9. Making apps
 
-You never write Swift by hand. Shelf hands you a prompt, you paste it into any chat model, and the reply comes back to Shelf to be installed. All three ways in end with the same `PUT /api/apps/{slug}`.
+You never write Swift by hand. Shelf hands you a prompt, you paste it into any chat model or agent, and the app comes back either through the agent (with a one-time key in the prompt) or as a reply you paste into Shelf. All three ways in end with the same `PUT /api/apps/{slug}`.
 
 | Where | How | When |
 |---|---|---|
 | **Shelf** (main path) | Copy the prompt, paste the reply, preview the app, install it | On the phone, from any chat app |
 | **ij5.dev admin** | Paste the reply into New App | At a desk |
-| **API** | `PUT /api/apps/{slug}` | An agent such as Claude Code installs the app itself |
+| **Agent** | The copied prompt carries a one-time install key (§9.5), and the agent runs `curl -X PUT` itself | Claude Code or any agent that can run commands |
 
 ### 9.1 The prompts
 
@@ -507,11 +507,92 @@ Keep both files in step with the Kiln version pinned in §0. When Kiln is update
 - **Unknown values:** an unknown tint falls back to `blue`, and an icon name that isn't an SF Symbol falls back to `app`. Shelf checks with `UIImage(systemName:)`; the admin warns but doesn't block.
 - **Feature fixtures:** one small app per line under "What works" in `PROMPT.md`, each of which must pass `Kiln.validate`.
 
+### 9.5 Install keys
+
+Every copied prompt carries a one-time key, so an agent that can run commands (Claude Code, Codex and the like) installs the app itself. You don't need to paste anything back.
+
+**Threat model.** A prompt pasted into a chat service lives in that service's history, and an agent can be steered by text it reads. So a key that leaks must be worth very little:
+
+- **Scope:**
+  - A key for a new app can create one app under a slug that is free. It can never overwrite an existing app.
+  - A key from Change… can update one named slug.
+  - Neither kind can read apps, read or write data, mint keys, or reach any other API.
+- **One use:** the first successful `PUT` consumes the key. A failed attempt (`400`, `409`, `413` or `422`) doesn't, so an agent can fix its code and retry. After 5 failed attempts the key is burned anyway.
+- **Short life:** a key expires 30 minutes after it is minted.
+- **Hashed at rest:** only a hash of the secret is stored, the same way `AUTH_HASH` is stored for the admin token.
+- **No admin token in the prompt:** Shelf mints the key with the admin token, but only the key is copied.
+- **Reversible:** every write keeps the app's previous version in `app_versions` (below), the last 10 per app. An install made through a key shows up in Shelf with the blue dot, and the icon's context menu offers Revert. That gives an undo for a bad agent push.
+
+**Key format.** The key is `shelf_ik_{id}_{secret}`:
+
+- `id`: 8 random bytes, base64url. It is public, and Shelf uses it to check the key's status.
+- `secret`: 32 random bytes, base64url, from `crypto.getRandomValues`.
+- The `shelf_ik_` prefix sends the request to install-key checking without trying the admin hash. Secret scanners such as GitHub's can also be taught the prefix.
+
+**Server**
+
+`migrations/0011_install_keys.sql`:
+
+```sql
+CREATE TABLE install_keys (
+  id          TEXT PRIMARY KEY,
+  secret_hash TEXT NOT NULL,            -- sha256(secret), base64
+  slug        TEXT,                     -- null: create one new app; set: update this app
+  created_at  INTEGER NOT NULL,
+  expires_at  INTEGER NOT NULL,
+  attempts    INTEGER NOT NULL DEFAULT 0,
+  used_at     INTEGER,
+  used_slug   TEXT                      -- what it installed, for Shelf to pick up
+);
+
+CREATE TABLE app_versions (            -- history for Revert
+  slug TEXT NOT NULL, version TEXT NOT NULL, name TEXT NOT NULL, icon TEXT, tint TEXT NOT NULL,
+  source TEXT NOT NULL, origin TEXT NOT NULL,          -- 'admin' | 'key'
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (slug, version)
+);
+```
+
+| Method | Path | Auth | Does |
+|---|---|---|---|
+| POST | `/api/install-keys` | admin | `{ slug? }` → `{ key, id, expires_at }`. Expired keys are purged here, and at most 20 live keys are allowed. |
+| GET | `/api/install-keys/{id}` | admin | `{ status: "waiting" \| "used" \| "expired", slug? }` |
+| DELETE | `/api/install-keys/{id}` | admin | Revokes the key. |
+| PUT | `/api/apps/{slug}` | admin **or** install key | Also accepts `Content-Type: text/x-swift`: the raw file, with name, icon and tint read from the header lines by the §9.4 parser. |
+
+- **Consuming the key:** one conditional `UPDATE install_keys SET used_at = ?, used_slug = ? WHERE id = ? AND used_at IS NULL AND expires_at > ?` runs in the same `DB.batch` as the app write. Two requests racing with one key therefore can't both succeed. The one whose `UPDATE` changes no row rolls back with `401`.
+- **Checking the secret:** the lookup is by `id`, and the secret's hash is compared with `eq()` in constant time.
+- **Errors:** every failure with a key returns the same `401` sentence, "This key is used, expired or wrong", so a caller can't tell which.
+- **Logging:** keys never reach the logs, and the response never echoes one.
+- **Admin:** the Security page lists live keys (id, scope, expiry) with Revoke.
+
+**In Shelf**
+
+- **Minting:** the New App and Change… sheets mint a key when they open, so Copy Prompt stays instant.
+  - Copy Prompt fills in `{{ORIGIN}}`, `{{KEY}}` and `{{EXPIRES}}` (local time, for example "3:42 PM"), plus `{{SLUG}}` in the change prompt.
+  - If the key can't be minted, because Shelf is offline, the prompt is copied without the Installing section, and paste still works.
+- **Waiting for the agent:**
+  - While the sheet is open and Shelf is in the foreground, Shelf checks the key's status every 3 s.
+  - It also checks once when Shelf returns to the foreground, which is the usual case: you were in the agent's app.
+  - When the status is `used`, Shelf syncs and closes the sheet. The icon lands with its install pie and blue dot.
+- **Paste still works:** a pasted reply installs with the admin token as before, and Shelf revokes the unused key.
+- **Closing the sheet** without an install leaves the key alive until it expires. The prompt may already be in an agent's hands, so revoking it then would break an install in progress.
+
+**Tests (vitest)**
+- A create key can't overwrite an existing app.
+- An update key can't write a different slug.
+- Two parallel `PUT`s with one key produce exactly one success.
+- A failed `422` leaves the key usable, and the sixth failure burns it.
+- The key works only on `PUT /api/apps/{slug}`. Every other route returns `401`.
+- An expired key returns `401`.
+- A `text/x-swift` body parses its header the same way as the shared fixtures.
+
 ## 10. Build order
 
 Each step ends in something that can be run.
 
 1. **ij5.dev:** migrations, `apps.ts`, the apps API and the data API (§8.1–8.2), and tests. Deploy, then add one app with `curl`.
+   Then install keys and `app_versions` (§9.5), with their tests.
 2. **shelf:** XcodeGen project, Kiln package and models. A test runs `Kiln.run` on a fixture, and the `DB` prelude and example from §8.4 pass `Kiln.validate`.
 3. `SyncEngine` with `URLProtocol` stub tests for 304, a partial failure, a deleted app, a `401` and offline.
 4. A plain Home Screen: wallpaper, grid, icon, label, and the runner with the zoom transition. A real phone starts using it here.
@@ -520,7 +601,7 @@ Each step ends in something that can be run.
 7. Edit mode: jiggle, drag to reorder, dock pinning and paging.
 8. The error screen and `SourceRewriter`.
 9. App data on the phone: `AppData`, `ShelfDBProtocol` and the prelude, with tests that a write made offline syncs later and a dirty key survives a pull.
-10. Making apps in Shelf (§9.2): the New App sheet, `PasteButton`, preview and install, then Change… with the edit prompt.
+10. Making apps in Shelf (§9.2): the New App sheet, `PasteButton`, preview and install, then Change… with the edit prompt. Then minting install keys, waiting for the agent, and Revert (§9.5).
 11. **ij5.dev:** the admin editor, with the Data tab and paste-to-fill (§9.3).
 12. The overlay pass (§11) and an accessibility pass with VoiceOver, the largest text size, Reduce Motion and Increased Contrast.
 
@@ -548,7 +629,7 @@ Each step ends in something that can be run.
 
 - Run `Kiln.validate` before an app can be saved. Validation needs Swift, so it runs either in Shelf as a "Check" action against a sandboxed copy of the app's storage, or in a small macOS CLI.
 - Home Screen shortcuts per app through App Intents (`OpenShelfAppIntent` with an `AppEntity` per app), and Spotlight indexing through `IndexedEntity`.
-- A read-only token: `APPS_TOKEN_HASH` on the server, accepted only by `GET /api/apps*`, so the phone never holds the admin token.
+- A device token in place of the admin token on the phone. It would be minted the same way as install keys, and could read apps, read and write data, and mint install keys, but nothing else on ij5.dev.
 - Native bridges with `Kiln.register` (haptics, opening a URL), documented in the admin page for authors.
 - Widgets that open an app directly.
 - Live updates to app data while an app is open (a long-poll on `?since=`), so a change made on another device shows up without reopening the app.
