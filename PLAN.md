@@ -19,13 +19,15 @@ Two repos change. The prompts for making apps are in [`prompts/`](prompts).
 | Compile errors come back as `"Line N: message"` in `KilnResult.errors`. Errors inside a running body appear as Kiln's own red label and never reach the host. | `Engine/KEEngine.swift:62`, `KErrorView` | Shelf calls `Kiln.run` directly instead of `KilnView`, so it can show its own error screen with the failing line (§7). Render-time errors stay Kiln's to show. |
 | `Kiln.run` is `@MainActor` and synchronous. `await URLSession…` inside an app blocks for up to 20 s. | README, Limitations | Shelf runs the app once per open, after the launch animation has settled (§6.2). App authors should use `dataTask` for network calls. |
 | `Kiln.validate` fires every action once, side effects included. | `Kiln.swift` | Shelf never validates on device. Validation goes on the Later list. |
-| The latest tag is `0.2.1`. | `git ls-remote` | Pin the package with `.upToNextMinor(from: "0.2.1")`. Before 1.0, a minor release can break the API. |
+| The latest tag is `0.2.1`. `main` differs from it only in docs. | `git ls-remote`, `git diff 0.2.1 HEAD` | The fork in §0.2 starts from `0.2.1`. |
+| The modern engine constructs `JSONEncoder()` but has no `encode` method. Calling it fails with "has no method 'encode'", and inside `try?` that failure is silent. | `Engine/KEBuiltins.swift:653`, no `encode` anywhere in `Engine/` | An app can't turn its own types into JSON, so nothing could be saved to `DB`. Kiln needs the method added (§0.2). |
+| Kiln picks the old engine by substring: any source containing `GameCanvas(`, `.onTick(`, `.onSwipe`, `.dragToMove`, `BarChart(`, `LineChart(`, `Storage.save`, `Storage.load`, `Map(latitude` or `Map(markers`. `Kiln.engine = .modern` doesn't turn this off. | `KEEngine.isLegacyDialect`, `KEEngine.swift:99` | An app's own `WeeklyBarChart(` or `TodoStorage.load` trips it. The prompt bans those names (`prompts/rules.md`). |
 | On iOS 26, interactive dismiss of SwiftUI's `.navigationTransition(.zoom)` with `fullScreenCover` has open bugs: the source icon disappears and frames are misaligned. | Apple Developer Forums [796279](https://developer.apple.com/forums/thread/796279), [807208](https://developer.apple.com/forums/thread/807208), [807715](https://developer.apple.com/forums/thread/807715) | Shelf uses UIKit's zoom transition, where the source view is handed over directly, and keeps a fallback behind one flag (§6.1). |
 | Kiln gives apps `UserDefaults.standard` directly, under the prefix `kiln.`. | `Engine/KEBuiltins.swift` | Apps can read each other's `@AppStorage`. Shelf keeps its own state outside `UserDefaults.standard`, and real data goes in `DB` (§6.3). |
 | No public source documents the iOS 26 or 27 Home Screen metrics in points. | Searches | Treat the metrics in §5 as starting values, and tune them by overlaying Shelf screenshots on real Springboard screenshots (§11). |
 | No server API exists. | `ij5.dev/src/routes/api` | Build it with the conventions the links API already uses (§1). |
 | `Kiln.register` bridges are read only by the old interpreter (`SwiftRunnerState.nativeBridges`). The modern engine never consults them. | `grep nativeBridges` | The app database can't be a native bridge. |
-| The modern engine sends requests through the real `URLSession.shared` with a real `URLRequest`, and supports `httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)` and `JSONEncoder`. | `Engine/KENetwork.swift` | A `URLProtocol` registered by Shelf can answer a private `db://` scheme on the phone. Apps get a database through the plain networking code Kiln already runs (§8). |
+| The modern engine sends requests through the real `URLSession.shared` with a real `URLRequest`, and supports `httpMethod`, `httpBody` and `setValue(_:forHTTPHeaderField:)`. `data(from:)` waits on a semaphore on the main thread. | `Engine/KENetwork.swift` | A `URLProtocol` registered by Shelf can answer a private `db://` scheme on the phone. Apps get a database through the plain networking code Kiln already runs (§8). |
 | iOS 27 refines Liquid Glass and adds a system setting that makes glass clearer or more tinted. | [MacRumors](https://macrumors.com/2026/06/10/how-liquid-glass-is-changing-in-ios-27), [BGR](https://bgr.com/2191219/ios-27-liquid-glass-fix-customization/) | Use only system glass: `UIGlassEffect` and `UIGlassContainerEffect` in UIKit, `glassEffect` and the glass button styles in SwiftUI, and the system's sheets and menus. Never a hand-made blur. The iOS 27 setting then applies on its own. |
 
 ### 0.2 What was decided
@@ -37,6 +39,7 @@ Two repos change. The prompts for making apps are in [`prompts/`](prompts).
 | **Icons are drawn once into bitmaps.** | A cell is then one image view and one label. Paging, jiggle and drag move bitmaps and never redraw gradients or symbols (§5.3). |
 | **The wallpaper doesn't move.** | A drifting mesh would redraw the whole screen every frame for as long as Shelf is open. Springboard's wallpaper is still. |
 | **The app's code runs after the zoom settles.** | `Kiln.run` blocks the main thread, and a blocked main thread during the zoom drops frames. A launch screen covers the gap, as in a native app (§6.2). |
+| **Kiln is pinned to a fork that adds `JSONEncoder().encode`.** | Stock Kiln can't encode (§0.1), and `DB` is useless without it. The method is the inverse of the `decode` Kiln already has, in `KENetwork.swift`. The fork is pinned by revision and offered upstream as a pull request. When upstream has it, the pin goes back to a release. |
 | **App data is held in memory behind a lock.** | The `db://` protocol is called while Kiln blocks the main thread. It must answer without waiting on an actor or on the main thread, or the app deadlocks (§8.3). |
 | **Tombstones are never purged.** | A purge would hide deletes from a device that was offline longer than the purge window. One user and one key per collection keep the table small. |
 | **Data keys use `A–Z a–z 0–9 . _ -` only.** | A key is part of a URL on both the server and the `db://` scheme. `/`, `?`, `#` and spaces would each need escaping in app code. |
@@ -135,7 +138,7 @@ ShelfTests/   SyncEngineTests.swift, SourceRewriterTests.swift, LayoutTests.swif
   - UIKit: the app lifecycle (`AppDelegate`, `SceneDelegate`), everything in `Home/`, and `RunnerViewController`.
   - SwiftUI: `RunnerView`, `ErrorScreen`, `Create/` and `Settings/`, each presented from UIKit in a `UIHostingController`.
   - `LibraryStore` is `@Observable`. UIKit reads it in `updateProperties()` and SwiftUI reads it in `body`, so both redraw from the same store with no glue code.
-- The only dependency is Kiln, pinned as in §0.1.
+- The only dependency is Kiln, pinned as in §0.2.
 - Strict concurrency is on (Swift 6 language mode).
 - The UI targets portrait only, like Springboard on iPhone.
 
@@ -463,9 +466,10 @@ struct Todo: Codable, Identifiable { var id = UUID(); var title: String; var don
 
 **Check first.** Before building the rest of this, run the prelude and this example through `Kiln.validate` in a unit test. The test confirms that Kiln's engine accepts:
 
-- a tuple pattern inside `guard let`
+- a tuple pattern inside `guard let` (the parser has it)
 - `try?` around `await`
-- `JSONEncoder().encode` on an array of structs
+- `as? HTTPURLResponse` followed by `.statusCode`
+- `JSONEncoder().encode` on an array of structs, which needs the fork (§0.2), and a `decode` of the result that gives back equal values
 
 If any of these fails, simplify the prelude to fit before writing anything that depends on it. This is step 2 of the build order.
 
@@ -492,7 +496,7 @@ The prompts are the files in [`prompts/`](prompts). The app bundles them as reso
 | `current-source.md` | `{{CURRENT}}` with Include Source on | `{{SOURCE}}` |
 | `current-outline.md` | `{{CURRENT}}` with Include Source off | `{{ORIGIN}}`, `{{SLUG}}`, `{{KEY}}`, `{{OUTLINE}}` |
 
-Keep `rules.md` in step with the Kiln version pinned in §0.1. When Kiln is updated, re-check the "What works" and "What doesn't work" sections against its README and `STATUS.md`. A test (§9.4) catches the obvious drift: every feature listed under "What works" has a fixture app that must pass `Kiln.validate`.
+Keep `rules.md` in step with the Kiln version pinned in §0.2. When Kiln is updated, re-check the "What works" and "What doesn't work" sections against its README and `STATUS.md`. A test (§9.4) catches the obvious drift: every feature listed under "What works" has a fixture app that must pass `Kiln.validate`.
 
 ### 9.2 In Shelf
 
@@ -630,7 +634,8 @@ Each step ends in something that can be run. This is the order for one builder w
 
 1. **ij5.dev:** migrations, `apps.ts`, the apps API and the data API (§8.1–8.2), and tests. Deploy, then add one app with `curl`.
    Then install keys and `app_versions` (§9.5), with their tests.
-2. **shelf:** XcodeGen project, Kiln package and models. A test runs `Kiln.run` on a fixture, and the `DB` prelude and example from §8.4 pass `Kiln.validate`.
+2. **Kiln fork:** add `JSONEncoder().encode` with tests, and open the pull request upstream (§0.2).
+   **shelf:** XcodeGen project, the Kiln fork pinned by revision, and models. A test runs `Kiln.run` on a fixture, and the `DB` prelude and example from §8.4 pass `Kiln.validate`.
    Then three throwaway spikes on a real phone, because the plan leans on each: the time `Kiln.run` takes on a 600-line app (§6.2), the UIKit zoom from a collection view cell into a hosted SwiftUI view (§6.1), and a `UIGlassContainerEffect` holding two glass views over a photo (§5.4).
 3. `SyncEngine` with `URLProtocol` stub tests for 304, a partial failure, a deleted app, a `401` and offline.
 4. A plain Home Screen: wallpaper, grid, icon, label, and the runner with the zoom transition. A real phone starts using it here.

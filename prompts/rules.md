@@ -79,7 +79,8 @@ Saved data has to survive future versions of the app:
 - `try await URLSession.shared.data(from:)` freezes the screen until the response arrives, for up to 20 seconds. Use `dataTask(with:)` instead.
 - Custom property wrappers and result builders.
 - Protocol conformance isn't checked. Avoid designs that depend on protocol extensions or default implementations.
-- Don't use `GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage`, `BarChart(`, `LineChart(` or `Map(latitude:`. They switch Kiln to an older engine where most of the above stops working.
+- Don't use `GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage.save`, `Storage.load`, `BarChart(`, `LineChart(`, `Map(latitude:` or `Map(markers:`. They switch Kiln to an older engine where most of the above stops working.
+- Kiln matches those as plain text, so don't end a name of your own with `Storage`, `BarChart` or `LineChart`. `TodoStorage.load()` and `WeeklyBarChart()` would trip it. Use names like `TodoStore` and `WeeklyBars`.
 
 ## Design
 
