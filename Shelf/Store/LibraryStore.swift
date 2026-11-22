@@ -31,6 +31,7 @@ final class LibraryStore {
 
     @ObservationIgnored private let cache: AppCache
     @ObservationIgnored private let engine: SyncEngine
+    @ObservationIgnored private let server: @Sendable () -> API?
     @ObservationIgnored private let data: AppData
     @ObservationIgnored private let layoutURL: URL
     @ObservationIgnored private var generation = 0
@@ -41,7 +42,8 @@ final class LibraryStore {
         cache = .standard
         data = .shared
         layoutURL = URL.applicationSupportDirectory.appending(path: "layout.json")
-        engine = SyncEngine(cache: cache, api: { Account.api })
+        server = { Account.api }
+        engine = SyncEngine(cache: cache, api: server)
         isSignedIn = Account.api != nil
 
         // Read before the first frame, so the Home Screen never flashes empty.
@@ -51,6 +53,10 @@ final class LibraryStore {
         layout = (try? JSONDecoder().decode(Layout.self, from: Data(contentsOf: layoutURL))) ?? Layout()
         layout.reconcile(with: apps.map(\.slug))
     }
+
+    /// The server the library talks to: nil while signed out, and always
+    /// for the demo. Everything that asks the server anything goes through it.
+    var api: API? { server() }
 
     func app(_ slug: String) -> CachedApp? {
         apps.first { $0.slug == slug }
@@ -132,7 +138,7 @@ final class LibraryStore {
             reconcileLayout()
         case .downloading(let slug):
             downloading.insert(slug)
-        case .finished(let slug, _):
+        case .finished(let slug):
             downloading.remove(slug)
         }
     }
@@ -189,11 +195,11 @@ final class LibraryStore {
 
     // MARK: Account
 
-    /// Checks the token against the server before saving anything. A
-    /// different site is a different library, so the old one goes first.
+    /// Checks the token against the server before changing anything. A
+    /// different site is a different library, so then the old one goes.
     func signIn(site: URL, token: String) async throws(API.Failure) {
-        if isSignedIn, site != Account.site { await signOut() }
         _ = try await API(origin: site, token: token).apps(ifNoneMatch: nil)
+        if isSignedIn, site != Account.site { await signOut() }
         Account.signIn(site: site, token: token)
         isSignedIn = true
         tokenRejected = false
@@ -222,13 +228,13 @@ final class LibraryStore {
     /// Saves an app to the server. It returns once the server has it; the sync
     /// that follows lands the icon like any other, pie and blue dot included.
     func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws(API.Failure) {
-        guard let api = Account.api else { throw .unauthorized }
+        guard let api else { throw .unauthorized }
         _ = try await api.install(slug: slug, name: name, icon: icon, tint: tint, source: source)
         Task { await sync() }
     }
 
     func revert(_ slug: String) async {
-        guard let api = Account.api else { return }
+        guard let api else { return }
         do throws(API.Failure) {
             _ = try await api.revert(slug)
             await sync()
@@ -244,7 +250,8 @@ final class LibraryStore {
         self.cache = cache
         data = AppData(root: URL.temporaryDirectory.appending(path: "shelf-demo-data"), api: { nil })
         layoutURL = cache.root.appending(path: "layout.json")
-        engine = SyncEngine(cache: cache, api: { nil })
+        server = { nil }
+        engine = SyncEngine(cache: cache, api: server)
         isSignedIn = true
         isDemo = true
         self.apps = apps

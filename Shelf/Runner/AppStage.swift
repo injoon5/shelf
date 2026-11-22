@@ -29,8 +29,6 @@ struct AppStage: View {
     @State private var hasSession = false
     @State private var holder = SessionHolder()
 
-    private var version: String { app.version + source.count.description }
-
     var body: some View {
         ZStack {
             if let result {
@@ -49,9 +47,10 @@ struct AppStage: View {
                     .transition(.opacity)
             }
         }
-        // Once per open and once per version: a sync during a session swaps in
-        // new code only after the app is closed and reopened, as on iOS.
-        .task(id: version) {
+        // Once per open, with the source the app was opened with: a sync
+        // during a session swaps in new code only after the app is closed and
+        // reopened, as on iOS.
+        .task {
             result = nil
             hasSession = false
             let session = await open()
@@ -62,7 +61,7 @@ struct AppStage: View {
             await holder.replace(with: session, synced: store == .synced)
             hasSession = true
         }
-        .task(id: Build(version: version, isReady: isReady && hasSession)) {
+        .task(id: isReady && hasSession) {
             guard isReady, hasSession, result == nil else { return }
             let built = Kiln.run(SourceRewriter.prepare(source, slug: app.slug))
             if built.view == nil { onError(CompileError(errors: built.errors, source: source)) }
@@ -83,11 +82,6 @@ struct AppStage: View {
     private func close(_ session: DBSession) async {
         if store == .synced { await AppData.shared.close(session) }
     }
-}
-
-private struct Build: Equatable {
-    var version: String
-    var isReady: Bool
 }
 
 /// Keeps the `db://` protocol pointed at whichever session is on screen, and

@@ -69,8 +69,8 @@ final class CreateModel {
 
     /// Mints the key when the sheet opens, so Copy Prompt never waits. Offline,
     /// there is no key and the prompt goes out without its Installing section.
-    func mint() async {
-        guard key == nil, let api = Account.api else { return }
+    func mint(library: LibraryStore) async {
+        guard key == nil, let api = library.api else { return }
         key = try? await KeyRing.shared.key(for: app?.slug, api: api)
     }
 
@@ -78,7 +78,7 @@ final class CreateModel {
     /// and Shelf is in front, and once more each time Shelf comes back.
     func watch(library: LibraryStore) async {
         while !Task.isCancelled, !isFinished {
-            if let key, let api = Account.api, let status = try? await api.keyStatus(key.id) {
+            if let key, let api = library.api, let status = try? await api.keyStatus(key.id) {
                 switch status {
                 case .used:
                     KeyRing.shared.forget(key)
@@ -89,7 +89,7 @@ final class CreateModel {
                 case .expired:
                     KeyRing.shared.forget(key)
                     self.key = nil
-                    await mint()
+                    await mint(library: library)
                 case .waiting:
                     break
                 }
@@ -144,7 +144,7 @@ final class CreateModel {
         guard let reply else { return nil }
         let icon = reply.icon.flatMap { Symbol.resolve($0) == $0 ? $0 : nil }
         return AppMeta(slug: slug.isEmpty ? "preview" : slug, name: name.isEmpty ? "App" : name, icon: icon,
-                       tint: reply.tint, version: String(reply.source.hashValue))
+                       tint: reply.tint)
     }
 
     var isSlugValid: Bool {
@@ -170,7 +170,7 @@ final class CreateModel {
                                       tint: reply.tint, source: reply.source)
             // The app went in with the admin token; the key in the prompt is
             // no longer needed and shouldn't stay live.
-            if let key, let api = Account.api {
+            if let key, let api = library.api {
                 KeyRing.shared.forget(key)
                 Task { try? await api.revokeKey(key.id) }
             }

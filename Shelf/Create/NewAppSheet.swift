@@ -30,7 +30,7 @@ struct NewAppSheet: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .sensoryFeedback(.success, trigger: model.installs)
         .sensoryFeedback(.error, trigger: model.rejections)
-        .task { await model.mint() }
+        .task { await model.mint(library: library) }
         // Restarting on every return to the foreground gives the check that
         // matters most: you were just in the agent's app.
         .task(id: scenePhase) {

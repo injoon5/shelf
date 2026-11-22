@@ -77,7 +77,7 @@ final class EventLog: Sendable {
             switch event {
             case .listed(let apps): "listed \(apps.map(\.slug).joined(separator: ","))"
             case .downloading(let slug): "downloading \(slug)"
-            case .finished(let slug, let ok): "finished \(slug) \(ok)"
+            case .finished(let slug): "finished \(slug)"
             }
         }
     }
@@ -133,7 +133,7 @@ struct SyncHarness {
         // The list comes first, with nothing on disk yet.
         #expect(log.summary.first == "listed habits,tip-jar")
         #expect(log.listed?.allSatisfy { $0.cachedVersion == nil && !$0.isNew } == true)
-        #expect(Set(log.summary.dropFirst()) == ["downloading habits", "finished habits true", "downloading tip-jar", "finished tip-jar true"])
+        #expect(Set(log.summary.dropFirst()) == ["downloading habits", "finished habits", "downloading tip-jar", "finished tip-jar"])
     }
 
     @Test func notModified() async throws {
@@ -201,8 +201,8 @@ struct SyncHarness {
         #expect(h.app("tip-jar", in: index)?.cachedVersion == "t2")
         #expect(h.app("tip-jar", in: index)?.isNew == true)
         #expect(index.etag == nil)
-        #expect(log.summary.contains("finished habits false"))
-        #expect(log.summary.contains("finished notes false"))
+        #expect(log.summary.contains("finished habits"))
+        #expect(log.summary.contains("finished notes"))
 
         // The next sync can't get a 304, so it retries.
         h.library.update { $0.failing = [] }

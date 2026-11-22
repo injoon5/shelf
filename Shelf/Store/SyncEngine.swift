@@ -9,7 +9,7 @@ actor SyncEngine {
         /// The server's list, merged with what is cached. Sent before any download.
         case listed([CachedApp])
         case downloading(slug: String)
-        case finished(slug: String, ok: Bool)
+        case finished(slug: String)
     }
 
     /// Downloads in flight at once (plan §4, step 2).
@@ -174,12 +174,10 @@ actor SyncEngine {
             }
             while let (slug, full) = try await group.next() {
                 try checkGeneration(generation)
-                var ok = false
                 if let full, full.meta.slug == slug, (try? cache.writeSource(full.source, for: slug)) != nil {
                     done[slug] = full
-                    ok = true
                 }
-                onEvent(.finished(slug: slug, ok: ok))
+                onEvent(.finished(slug: slug))
                 if let next = queue.next() { start(next) }
             }
         }
