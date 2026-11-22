@@ -19,6 +19,7 @@ struct Wallpaper: View {
             }
         }
         .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 
     /// Filled from the centre and clipped, the way Springboard crops a photo.

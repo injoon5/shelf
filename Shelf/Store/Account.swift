@@ -31,7 +31,8 @@ enum Account {
         lock.withLock {
             defaults.set(site, forKey: "site")
             Keychain.token = token
-            cached = nil
+            // Held in memory too, so this launch works even if the Keychain refused the write.
+            cached = .some(API(origin: site, token: token))
         }
     }
 
