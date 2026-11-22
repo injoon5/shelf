@@ -33,6 +33,20 @@ struct IconFace: Equatable {
     }
 
     static let settings = IconFace(symbol: "gearshape.fill", tint: .gray)
+
+    /// The tile, top to bottom: the system's near-black in dark mode,
+    /// otherwise the tint, lifted toward white at the top. The same in every
+    /// place an icon is painted: `IconArt`, and an app's card (`CardFace`).
+    func fill(dark: Bool) -> (top: Color, bottom: Color) {
+        dark ? (HomeMetrics.darkFillTop, HomeMetrics.darkFillBottom)
+            : (tint.mix(with: .white, by: HomeMetrics.fillLift), tint)
+    }
+
+    /// Colour icons in dark mode are the system's dark variant, with the
+    /// glyph in the app's colour. Every other glyph is white.
+    static func tintsGlyph(_ style: IconStyle, dark: Bool) -> Bool {
+        style == .color && dark
+    }
 }
 
 /// The squircle and its glyph, in the current icon style. No label, no state.
@@ -61,25 +75,19 @@ struct IconArt: View {
             .compositingGroup()
     }
 
-    /// Colour icons in dark mode are the system's dark variant: a near-black
-    /// tile with the glyph in the app's colour. Otherwise the glyph is white,
-    /// a shade darker at the foot.
+    /// A white glyph is a shade darker at the foot.
     private func glyphStyle(_ style: IconStyle) -> AnyShapeStyle {
-        if style == .color, scheme == .dark { return AnyShapeStyle(face.tint) }
+        if IconFace.tintsGlyph(style, dark: scheme == .dark) { return AnyShapeStyle(face.tint) }
         return AnyShapeStyle(LinearGradient(colors: [.white, .white.opacity(HomeMetrics.glyphShade)],
                                             startPoint: .top, endPoint: .bottom))
     }
 
+    /// Clear icons have no fill: they are glass.
     @ViewBuilder
     private func fill(_ style: IconStyle) -> some View {
-        switch (style, scheme) {
-        case (.clear, _):
-            EmptyView()
-        case (.color, .dark):
-            shape.fill(LinearGradient(colors: [HomeMetrics.darkFillTop, HomeMetrics.darkFillBottom], startPoint: .top, endPoint: .bottom))
-        case (.color, _):
-            shape.fill(LinearGradient(colors: [face.tint.mix(with: .white, by: HomeMetrics.fillLift), face.tint],
-                                      startPoint: .top, endPoint: .bottom))
+        if style == .color {
+            let fill = face.fill(dark: scheme == .dark)
+            shape.fill(LinearGradient(colors: [fill.top, fill.bottom], startPoint: .top, endPoint: .bottom))
         }
     }
 

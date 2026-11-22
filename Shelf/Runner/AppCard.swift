@@ -40,15 +40,10 @@ struct CardFace {
         func ui(_ color: Color) -> UIColor { UIColor(cgColor: color.resolve(in: environment).cgColor) }
         // Clear icons are glass, which a moving card can't be; the colour
         // icon of the same appearance stands in for them.
-        if dark {
-            top = ui(HomeMetrics.darkFillTop)
-            bottom = ui(HomeMetrics.darkFillBottom)
-            glyph = style == .color ? ui(face.tint) : .white
-        } else {
-            top = ui(face.tint.mix(with: .white, by: HomeMetrics.fillLift))
-            bottom = ui(face.tint)
-            glyph = .white
-        }
+        let fill = face.fill(dark: dark)
+        top = ui(fill.top)
+        bottom = ui(fill.bottom)
+        glyph = IconFace.tintsGlyph(style, dark: dark) ? ui(face.tint) : .white
         symbol = face.symbol
         glyphSize = iconSize * HomeMetrics.glyphRatio
     }
