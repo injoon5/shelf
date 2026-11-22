@@ -49,6 +49,8 @@ struct API: Sendable {
         /// Epoch milliseconds.
         var expiresAt: Int
 
+        var expires: Date { Date(timeIntervalSince1970: Double(expiresAt) / 1000) }
+
         enum Status: Equatable, Sendable {
             case waiting
             /// The key installed this slug.

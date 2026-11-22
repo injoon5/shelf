@@ -9,6 +9,10 @@ struct StageInput: Equatable {
     var showsPageDots = false
     var pageCount = 1
     var page = 0
+
+    /// Page dots stand in for "Search" in edit mode, and while there are
+    /// pages to move between and they are moving.
+    var showsDots: Bool { isEditing || (showsPageDots && pageCount > 1) }
 }
 
 /// Where the stage has put things, for the SwiftUI views it hosts.
@@ -113,8 +117,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         search = SearchBar(fades: .init(home: icons.view, results: results.view, dim: searchDim))
         search.onTapPill = { [unowned self] in
             guard !input.isEditing, cards.isEmpty else { return }
-            setSearchTone()
-            search.open()
+            openSearch()
             model.beginSearch()
         }
         search.onQuery = { [unowned self] in model.query = $0 }
@@ -123,9 +126,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             guard let best = library.apps.matching(model.query).first else { return }
             Task { await model.open(best.slug, in: library) }
         }
-        search.onFieldMoved = { [unowned self] top in
-            layout.resultsBottom = view.bounds.height - top + HomeMetrics.searchResultsGap
-        }
+        search.onFieldMoved = { [unowned self] top in placeResults(aboveFieldAt: top) }
         home.addSubview(search)
 
         for cover in [backdropDim, backdropBlur] {
@@ -215,9 +216,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             layout.geometry = geometry
             layout.labelSize = labels.size
             search.layout(geometry)
-            layout.resultsBottom = bounds.height - search.restingField.minY + HomeMetrics.searchResultsGap
-            search.setDots(input.isEditing || (input.showsPageDots && input.pageCount > 1),
-                           count: input.pageCount, current: input.page, animated: false)
+            placeResults(aboveFieldAt: search.restingField.minY)
+            search.setDots(input.showsDots, count: input.pageCount, current: input.page, animated: false)
         }
     }
 
@@ -238,18 +238,26 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         input = new
         if new.isSearching != search.isOpen {
             if new.isSearching {
-                setSearchTone()
-                search.open()
+                openSearch()
             } else {
                 search.close()
             }
         }
         if new.isEditing != old.isEditing || new.showsPageDots != old.showsPageDots
             || new.pageCount != old.pageCount || new.page != old.page {
-            search.setDots(new.isEditing || (new.showsPageDots && new.pageCount > 1),
-                           count: new.pageCount, current: new.page, animated: true)
+            search.setDots(new.showsDots, count: new.pageCount, current: new.page, animated: true)
         }
         if new.run != old.run { follow(new.run) }
+    }
+
+    private func openSearch() {
+        setSearchTone()
+        search.open()
+    }
+
+    /// The results end a little above the search field's top.
+    private func placeResults(aboveFieldAt top: CGFloat) {
+        layout.resultsBottom = view.bounds.height - top + HomeMetrics.searchResultsGap
     }
 
     /// The text over the field follows what is behind it there: the

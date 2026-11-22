@@ -43,10 +43,10 @@ final class CreateModel {
     // MARK: Prompt
 
     private var install: Prompts.Install? {
-        guard let key, Date.now.timeIntervalSince1970 * 1000 < Double(key.expiresAt) else { return nil }
+        guard let key, key.expires > .now else { return nil }
         var origin = Account.site.absoluteString
         while origin.hasSuffix("/") { origin.removeLast() }
-        return Prompts.Install(origin: origin, key: key.key, expires: Date(timeIntervalSince1970: Double(key.expiresAt) / 1000))
+        return Prompts.Install(origin: origin, key: key.key, expires: key.expires)
     }
 
     func prompt(includeSource: Bool) -> String {
@@ -187,12 +187,11 @@ final class KeyRing {
     static let shared = KeyRing()
     private var keys: [String: API.InstallKey] = [:]
     /// A key with less time left than this isn't worth handing to an agent.
-    private let minimumLife: Double = 10 * 60 * 1000
+    private let minimumLife: TimeInterval = 10 * 60
 
-    func key(for slug: String?, api: API) async throws -> API.InstallKey {
+    func key(for slug: String?, api: API) async throws(API.Failure) -> API.InstallKey {
         let name = slug ?? ""
-        let now = Date.now.timeIntervalSince1970 * 1000
-        if let held = keys[name], Double(held.expiresAt) - now > minimumLife { return held }
+        if let held = keys[name], held.expires.timeIntervalSinceNow > minimumLife { return held }
         let minted = try await api.mintKey(for: slug)
         keys[name] = minted
         return minted
