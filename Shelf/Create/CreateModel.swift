@@ -197,7 +197,8 @@ final class KeyRing {
     private let minimumLife: TimeInterval = 10 * 60
 
     func key(for slug: String?, api: API) async throws(API.Failure) -> API.InstallKey {
-        let name = slug ?? ""
+        // Keys belong to the server that issued them.
+        let name = api.origin.absoluteString + " " + (slug ?? "")
         if let held = keys[name], held.expires.timeIntervalSinceNow > minimumLife { return held }
         let minted = try await api.mintKey(for: slug)
         keys[name] = minted

@@ -35,6 +35,8 @@ final class LibraryStore {
     @ObservationIgnored private let data: AppData
     @ObservationIgnored private let layoutURL: URL
     @ObservationIgnored private var generation = 0
+    /// Which sync `isSyncing` is about: an abandoned one never clears it.
+    @ObservationIgnored private var syncID = 0
     @ObservationIgnored private var bannerTask: Task<Void, Never>?
     @ObservationIgnored private var isDemo = false
 
@@ -79,17 +81,23 @@ final class LibraryStore {
     func sync() async {
         guard isSignedIn, !isSyncing, !isDemo else { return }
         isSyncing = true
+        syncID += 1
+        let id = syncID
         generation += 1
         let current = generation
         defer {
-            isSyncing = false
-            downloading = []
-            generation += 1
+            if syncID == id {
+                isSyncing = false
+                downloading = []
+                generation += 1
+            }
         }
         do {
             let index = try await engine.sync { [weak self] event in
                 Task { @MainActor in self?.handle(event, generation: current) }
             }
+            // A sync for an account that has since gone has nothing to show.
+            guard generation == current else { return }
             generation += 1   // events still in flight are stale from here
             apply(index)
             tokenRejected = false
@@ -168,7 +176,8 @@ final class LibraryStore {
     // MARK: Layout
 
     /// Moves an icon. Called many times during a drag, so it doesn't save;
-    /// `commitLayout` does, when the icon is dropped.
+    /// `commitLayout` does, on a drop, on leaving edit mode, and on leaving
+    /// the foreground.
     @discardableResult
     func move(_ slug: String, to slot: Layout.Slot) -> Bool {
         layout.move(slug, to: slot)
@@ -199,7 +208,9 @@ final class LibraryStore {
     /// different site is a different library, so then the old one goes.
     func signIn(site: URL, token: String) async throws(API.Failure) {
         _ = try await API(origin: site, token: token).apps(ifNoneMatch: nil)
-        if isSignedIn, site != Account.site { await signOut() }
+        if isSignedIn, !Account.isSameSite(site, Account.site) { await signOut() }
+        // A sync still running is for the old token; the new one gets its own.
+        await abandonSync()
         Account.signIn(site: site, token: token)
         isSignedIn = true
         tokenRejected = false
@@ -209,9 +220,9 @@ final class LibraryStore {
 
     /// Clears the token, the cache and each app's storage.
     func signOut() async {
-        generation += 1
         Account.signOut()
         isSignedIn = false
+        await abandonSync()
         await engine.reset()
         await data.reset()
         apps = []
@@ -221,6 +232,14 @@ final class LibraryStore {
         hideBanner()
         layout = Layout()
         try? FileManager.default.removeItem(at: layoutURL)
+    }
+
+    private func abandonSync() async {
+        generation += 1
+        syncID += 1
+        isSyncing = false
+        downloading = []
+        await engine.abandon()
     }
 
     // MARK: Changing apps

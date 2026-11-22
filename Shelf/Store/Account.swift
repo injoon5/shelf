@@ -27,6 +27,17 @@ enum Account {
         }
     }
 
+    /// Whether two addresses name the same site, however they were typed:
+    /// `https://IJ5.dev/` is `https://ij5.dev`.
+    static func isSameSite(_ a: URL, _ b: URL) -> Bool {
+        func parts(_ url: URL) -> [String] {
+            var path = url.path(percentEncoded: true)
+            while path.hasSuffix("/") { path.removeLast() }
+            return [url.scheme?.lowercased() ?? "", url.host()?.lowercased() ?? "", url.port.map(String.init) ?? "", path]
+        }
+        return parts(a) == parts(b)
+    }
+
     static func signIn(site: URL, token: String) {
         lock.withLock {
             defaults.set(site, forKey: "site")

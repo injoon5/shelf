@@ -151,6 +151,15 @@ struct APITests {
         #expect(plain.url(["apps"], query: [URLQueryItem(name: "since", value: "3")])?.absoluteString == "https://ij5.dev/api/apps?since=3")
     }
 
+    @Test func aSiteIsTheSameHoweverItIsTyped() {
+        let site = URL(string: "https://ij5.dev")!
+        #expect(Account.isSameSite(site, URL(string: "https://IJ5.dev/")!))
+        #expect(Account.isSameSite(URL(string: "http://192.168.1.2:5173/base/")!, URL(string: "http://192.168.1.2:5173/base")!))
+        #expect(!Account.isSameSite(site, URL(string: "http://ij5.dev")!))
+        #expect(!Account.isSameSite(site, URL(string: "https://ij5.dev:8443")!))
+        #expect(!Account.isSameSite(site, URL(string: "https://ij5.dev/other")!))
+    }
+
     // MARK: Errors
 
     @Test(arguments: [

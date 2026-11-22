@@ -62,10 +62,16 @@ actor SyncEngine {
         return index
     }
 
-    /// Sign Out: the cache, and every app's `@AppStorage` keys.
-    func reset() {
+    /// Another account: work begun for the old one writes nothing more, and
+    /// the next sync starts afresh instead of joining one already running.
+    func abandon() {
         generation += 1
         running = nil
+    }
+
+    /// Sign Out: the cache, and every app's `@AppStorage` keys.
+    func reset() {
+        abandon()
         cache.removeAll()
         appStorage.removeAll()
     }
