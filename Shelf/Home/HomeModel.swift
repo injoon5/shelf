@@ -50,6 +50,7 @@ final class HomeModel {
     /// Per app: how many times it has refused to open. A change shakes its icon.
     private(set) var refusals: [String: Int] = [:]
 
+    @ObservationIgnored private var liftedSlug: String?
     @ObservationIgnored private var flip: (target: Int, task: Task<Void, Never>)?
     @ObservationIgnored private var dotsTask: Task<Void, Never>?
 
@@ -86,20 +87,34 @@ final class HomeModel {
 
     func stopEditing() {
         cancelFlip()
+        liftedSlug = nil
         withAnimation(Motion.standard) {
             isEditing = false
             dragging = nil
         }
     }
 
-    func beginDrag(_ slug: String) {
-        startEditing()
-        dragging = slug
+    /// An icon was lifted. That isn't a drag yet: the system also asks for the
+    /// drag item when it opens the icon's context menu, and most lifts end there.
+    func lifted(_ slug: String) {
+        liftedSlug = slug
+    }
+
+    /// The lifted icon has moved over a drop target, so it really is a drag.
+    /// Starting to drag an icon is one of the ways into edit mode.
+    @discardableResult
+    func dragMoved() -> String? {
+        if dragging == nil, let liftedSlug {
+            startEditing()
+            dragging = liftedSlug
+        }
+        return dragging
     }
 
     func endDrag() {
         cancelFlip()
         if dragging != nil { snaps += 1 }
+        liftedSlug = nil
         withAnimation(Motion.reorder) { dragging = nil }
     }
 

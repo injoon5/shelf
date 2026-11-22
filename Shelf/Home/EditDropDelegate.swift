@@ -7,10 +7,10 @@ struct GridDropDelegate: DropDelegate {
     var model: HomeModel
     var pageCount: Int
 
-    func validateDrop(info: DropInfo) -> Bool { model.dragging != nil }
+    func validateDrop(info: DropInfo) -> Bool { true }
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
-        guard let slug = model.dragging else { return DropProposal(operation: .cancel) }
+        guard let slug = model.dragMoved() else { return DropProposal(operation: .cancel) }
         let width = geometry.size.width
         let page = min(max(Int(info.location.x / width), 0), pageCount - 1)
         let local = CGPoint(x: info.location.x - CGFloat(page) * width, y: info.location.y)
@@ -51,10 +51,10 @@ struct DockDropDelegate: DropDelegate {
     var library: LibraryStore
     var model: HomeModel
 
-    func validateDrop(info: DropInfo) -> Bool { model.dragging != nil }
+    func validateDrop(info: DropInfo) -> Bool { true }
 
     func dropUpdated(info: DropInfo) -> DropProposal? {
-        guard let slug = model.dragging else { return DropProposal(operation: .cancel) }
+        guard let slug = model.dragMoved() else { return DropProposal(operation: .cancel) }
         let dock = library.layout.dock
         let isPinned = dock.contains(slug)
         guard isPinned || dock.count < HomeMetrics.dockApps else { return DropProposal(operation: .forbidden) }

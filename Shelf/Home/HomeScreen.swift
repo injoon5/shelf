@@ -5,6 +5,7 @@ import SwiftUI
 /// presentation, so its own stack never nests inside a launcher's.
 struct HomeScreen: View {
     @Environment(LibraryStore.self) private var library
+    @Environment(\.scenePhase) private var scenePhase
     @State private var model = HomeModel()
     @Namespace private var zoom
     @Namespace private var glass
@@ -46,6 +47,11 @@ struct HomeScreen: View {
             }
         }
         .onChange(of: library.isSignedIn) { model.stopEditing() }
+        // A drag the system cancels never reaches a drop target, so nothing
+        // else would bring its icon back.
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { model.endDrag() }
+        }
     }
 }
 
@@ -94,10 +100,9 @@ private struct HomeContent: View {
                             .frame(width: size.width - 2 * HomeMetrics.searchSideInset, height: HomeMetrics.searchFieldHeight)
                             .position(x: size.width / 2, y: safeTop + HomeMetrics.searchTopGap + HomeMetrics.searchFieldHeight / 2)
                     } else {
-                        SearchPill(pageCount: library.layout.pages.count)
+                        SearchPill(pageCount: max(library.layout.pages.count, 1))
                             .glassEffectID("search", in: glass)
                             .position(x: geometry.pillFrame.midX, y: geometry.pillFrame.midY)
-                            .opacity(model.isEditing ? 0 : 1)
                     }
                 }
             }

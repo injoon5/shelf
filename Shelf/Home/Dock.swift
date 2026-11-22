@@ -12,7 +12,7 @@ struct DockGlass: View {
         Color.clear
             .frame(width: frame.width, height: frame.height)
             .glassEffect(.regular, in: .rect(cornerRadius: geometry.dockRadius, style: .continuous))
-            .onDrop(of: [.plainText], delegate: DockDropDelegate(geometry: geometry, library: library, model: model))
+            .onDrop(of: [.text], delegate: DockDropDelegate(geometry: geometry, library: library, model: model))
             .position(x: frame.midX, y: frame.midY)
     }
 }

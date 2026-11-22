@@ -51,7 +51,7 @@ struct IconGrid: View {
                 }
             }
             .frame(width: CGFloat(pageCount) * width, height: geometry.size.height)
-            .onDrop(of: [.plainText], delegate: GridDropDelegate(geometry: geometry, library: library, model: model, pageCount: pageCount))
+            .onDrop(of: [.text], delegate: GridDropDelegate(geometry: geometry, library: library, model: model, pageCount: pageCount))
         }
         .scrollTargetBehavior(.paging)
         .scrollIndicators(.hidden)

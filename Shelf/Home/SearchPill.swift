@@ -8,10 +8,11 @@ struct SearchPill: View {
 
     var body: some View {
         Button {
-            model.beginSearch()
+            if !model.isEditing { model.beginSearch() }
         } label: {
             ZStack {
-                if model.showsPageDots, pageCount > 1 {
+                // While editing, the pill is only ever the page dots.
+                if model.isEditing || (model.showsPageDots && pageCount > 1) {
                     PageDots(count: pageCount, current: model.page)
                         .transition(.opacity)
                 } else {

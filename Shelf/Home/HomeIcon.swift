@@ -5,6 +5,7 @@ import SwiftUI
 struct HomeIcon: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
+    @Environment(ShelfSettings.self) private var settings
     @Environment(\.zoomNamespace) private var zoom
     var app: CachedApp
     var geometry: HomeGeometry
@@ -14,6 +15,32 @@ struct HomeIcon: View {
     private var face: IconFace { IconFace(app.meta) }
 
     var body: some View {
+        // A long press means one thing at a time: the menu on a still Home
+        // Screen, a drag once the icons are jiggling. (Offered together, the
+        // menu's lifted preview swallows the drag and no drop target hears it.)
+        Group {
+            if model.isEditing {
+                button.onDrag {
+                    model.lifted(app.slug)
+                    return NSItemProvider(object: app.slug as NSString)
+                } preview: {
+                    // Previews are drawn outside this view tree and inherit nothing from it.
+                    IconArt(face: face, size: geometry.iconSize).environment(settings)
+                }
+            } else {
+                button.contextMenu {
+                    menu
+                } preview: {
+                    IconArt(face: face, size: geometry.iconSize * 2).environment(settings)
+                }
+            }
+        }
+        .modifier(Jiggle(isOn: model.isEditing))
+        .modifier(Shake(trigger: model.refusals[app.slug] ?? 0))
+        .opacity(model.dragging == app.slug ? 0 : 1)
+    }
+
+    private var button: some View {
         Button {
             Task { await model.open(app.slug, in: library) }
         } label: {
@@ -27,20 +54,6 @@ struct HomeIcon: View {
         }
         .buttonStyle(IconButtonStyle())
         .accessibilityLabel(app.meta.name)
-        .contextMenu {
-            menu
-        } preview: {
-            IconArt(face: face, size: geometry.iconSize * 2)
-        }
-        .onDrag {
-            model.beginDrag(app.slug)
-            return NSItemProvider(object: app.slug as NSString)
-        } preview: {
-            IconArt(face: face, size: geometry.iconSize)
-        }
-        .modifier(Jiggle(isOn: model.isEditing))
-        .modifier(Shake(trigger: model.refusals[app.slug] ?? 0))
-        .opacity(model.dragging == app.slug ? 0 : 1)
     }
 
     private var art: some View {
