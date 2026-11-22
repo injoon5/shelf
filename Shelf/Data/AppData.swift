@@ -112,12 +112,6 @@ final class DBSession: Sendable {
         state.withLock { $0.entries.mapValues(\.value) }
     }
 
-    /// Sets a value, or quietly drops a write the limits refuse. Use `write`
-    /// to learn why.
-    func set(_ value: JSONValue, for key: String) {
-        try? write(value, for: key)
-    }
-
     func remove(_ key: String) {
         guard Self.isValidKey(key) else { return }
         let changed = state.withLock { state in

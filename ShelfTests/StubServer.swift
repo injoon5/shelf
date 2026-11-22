@@ -130,7 +130,7 @@ final class StubProtocol: URLProtocol, @unchecked Sendable {
             path: url.path(percentEncoded: true),
             query: Dictionary((components?.queryItems ?? []).map { ($0.name, $0.value ?? "") }, uniquingKeysWith: { a, _ in a }),
             headers: request.allHTTPHeaderFields ?? [:],
-            body: request.httpBody ?? request.httpBodyStream.map(SpyProtocol.drain) ?? Data())
+            body: request.httpBody ?? request.httpBodyStream.map(FakeServer.drain) ?? Data())
         let response = server.begin(seen)
 
         let deliver: @Sendable () -> Void = { [self] in

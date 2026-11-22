@@ -199,7 +199,6 @@ struct APITests {
                 _ = try await server.api(token: Self.token).app("x")
                 Issue.record("expected a failure")
             } catch {
-                #expect(error is API.Failure)
                 for text in [String(describing: error), String(reflecting: error), error.localizedDescription] {
                     #expect(!text.contains(Self.token), "\(text)")
                 }

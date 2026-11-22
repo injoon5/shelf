@@ -93,7 +93,7 @@ struct DataHarness {
         let store = h.store()
 
         let session = await store.open("todos")
-        session.set(.array([.string("Milk")]), for: "list")
+        try session.write(.array([.string("Milk")]), for: "list")
         #expect(session.value(for: "list") == .array([.string("Milk")]))
         await store.close(session)
         #expect(h.file("todos")?.dirty == ["list"])
@@ -112,9 +112,9 @@ struct DataHarness {
         defer { h.cleanUp() }
         let store = h.store(pushDelay: .milliseconds(300))
         let session = await store.open("todos")
-        session.set(.int(1), for: "a")
+        try session.write(.int(1), for: "a")
         try await Task.sleep(for: .milliseconds(150))
-        session.set(.int(2), for: "a")
+        try session.write(.int(2), for: "a")
         try await Task.sleep(for: .milliseconds(200))
         #expect(h.remote.pushes.isEmpty)
         #expect(await eventually { h.remote.value("todos", "a") == .int(2) })
@@ -129,7 +129,7 @@ struct DataHarness {
         h.remote.update { $0.offline = true }
         let store = h.store(pushDelay: .seconds(60))
         let session = await store.open("todos")
-        session.set(.string("phone"), for: "k")
+        try session.write(.string("phone"), for: "k")
 
         h.remote.update { $0.offline = false }
         h.remote.write("todos", "k", .string("web"))
@@ -183,7 +183,7 @@ struct DataHarness {
 
         // Another device writes; this one pushes before it pulls.
         h.remote.write("todos", "theirs", .int(1))
-        session.set(.int(2), for: "mine")
+        try session.write(.int(2), for: "mine")
         await store.pushAll()
         #expect(h.remote.row("todos", "mine")?.rev == 2)
         #expect(h.file("todos")?.rev == 0)
@@ -200,11 +200,11 @@ struct DataHarness {
         h.remote.update { $0.pushDelay = .milliseconds(300) }
         let store = h.store(pushDelay: .seconds(60))
         let session = await store.open("todos")
-        session.set(.int(1), for: "k")
+        try session.write(.int(1), for: "k")
 
         let push = Task { await store.pushAll() }
         #expect(await eventually { !h.remote.pushes.isEmpty })
-        session.set(.int(2), for: "k")
+        try session.write(.int(2), for: "k")
         await push.value
         #expect(h.remote.value("todos", "k") == .int(1))
         #expect(await eventually { h.file("todos")?.dirty == ["k"] })
@@ -247,7 +247,7 @@ struct DataHarness {
         h.signedIn.withLock { $0 = false }
         let store = h.store()
         let session = await store.open("todos")
-        session.set(.int(1), for: "k")
+        try session.write(.int(1), for: "k")
         await store.close(session)
         #expect(h.remote.server.requests.isEmpty)
         #expect(h.file("todos")?.dirty == ["k"])
@@ -258,15 +258,15 @@ struct DataHarness {
         defer { h.cleanUp() }
         let store = h.store()
         let real = await store.open("todos")
-        real.set(.int(1), for: "k")
+        try real.write(.int(1), for: "k")
         await store.close(real)
         let before = snapshot(of: h.root)
         let pushes = h.remote.pushes.count
 
         let scratch = await store.scratch(copying: "todos")
         #expect(scratch.value(for: "k") == .int(1))
-        scratch.set(.int(99), for: "k")
-        scratch.set(.int(5), for: "new")
+        try scratch.write(.int(99), for: "k")
+        try scratch.write(.int(5), for: "new")
         await store.close(scratch)
         await store.pushAll()
         try await Task.sleep(for: .milliseconds(150))
@@ -283,9 +283,9 @@ struct DataHarness {
         h.remote.write("todos", "unseen", .int(7))
         let store = h.store(pushDelay: .seconds(60))
         let todos = await store.open("todos")
-        todos.set(.string(String(repeating: "x", count: 1000)), for: "big")
+        try todos.write(.string(String(repeating: "x", count: 1000)), for: "big")
         let notes = await store.open("notes")
-        notes.set(.int(1), for: "n")
+        try notes.write(.int(1), for: "n")
         await store.close(notes)
 
         let usage = await store.usage()
@@ -303,7 +303,7 @@ struct DataHarness {
         #expect(h.remote.value("notes", "n") == .int(1))
 
         let pushes = h.remote.pushes.count
-        notes.set(.int(2), for: "n")
+        try notes.write(.int(2), for: "n")
         await store.reset()
         #expect(!FileManager.default.fileExists(atPath: h.root.path(percentEncoded: false)))
         await store.pushAll()
@@ -318,7 +318,7 @@ struct DataHarness {
         h.remote.update { $0.offline = true }
         let store = h.store(pushDelay: .seconds(60))
         let session = await store.open("todos")
-        session.set(.object(["a": .bool(true)]), for: "settings")
+        try session.write(.object(["a": .bool(true)]), for: "settings")
         #expect(await eventually { h.file("todos")?.entries["settings"] != nil })
 
         let reopened = await h.store().open("todos")
