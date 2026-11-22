@@ -2,8 +2,6 @@ import Foundation
 
 /// The prompts Shelf copies (plan §9.1 and the Appendix), filled in from the
 /// templates in `Resources/Prompts`.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Create package.
 enum Prompts {
     /// The one-time key that lets an agent install the app itself.
     struct Install: Equatable, Sendable {

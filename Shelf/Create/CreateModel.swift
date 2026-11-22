@@ -218,15 +218,3 @@ final class Connectivity {
         monitor.start(queue: .global(qos: .utility))
     }
 }
-
-enum CreateMetrics {
-    static let nameLimit = 32
-    static let padding: CGFloat = 20
-    static let spacing: CGFloat = 14
-    static let buttonHeight: CGFloat = 36
-    static let closeSize: CGFloat = 30
-    static let previewRadius: CGFloat = 28
-    static let previewBorder: CGFloat = 0.5
-    static let tileSize: CGFloat = 52
-    static let fieldSpacing: CGFloat = 2
-}

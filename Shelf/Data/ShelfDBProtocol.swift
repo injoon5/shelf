@@ -14,8 +14,6 @@ import Synchronization
 /// The key is the URL's path after its first "/", percent-decoded. Requests
 /// are answered on the loading thread, never the main actor: Kiln holds the
 /// main thread while it waits for them.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Data package.
 final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
     private struct Registration {
         var session: DBSession?

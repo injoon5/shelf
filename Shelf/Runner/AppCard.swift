@@ -142,9 +142,6 @@ final class CardFaceView: UIView {
         layer.removeAllAnimationsDeeply()
     }
 
-    /// The card's width on screen now.
-    var shownWidth: CGFloat { (layer.presentation() ?? layer).bounds.width }
-
     var shownFrame: CGRect {
         let shown = layer.presentation() ?? layer
         return CGRect(x: shown.position.x - shown.bounds.width / 2, y: shown.position.y - shown.bounds.height / 2,

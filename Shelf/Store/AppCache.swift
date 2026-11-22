@@ -2,8 +2,6 @@ import Foundation
 
 /// The library on disk: `index.json` and one `{slug}.swift` per app, under
 /// `Application Support/apps/`. Offline, this is the whole library.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Store package.
 struct AppCache: Sendable {
     /// The folder that holds `index.json` and the sources.
     var root: URL

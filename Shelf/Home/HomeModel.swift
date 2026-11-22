@@ -127,11 +127,8 @@ final class HomeModel {
     }
 
     /// The lifted icon has moved over a drop target, so it really is a drag.
-    /// Starting to drag an icon is one of the ways into edit mode.
-    @discardableResult
     func dragMoved() -> String? {
         if dragging == nil, let liftedSlug {
-            startEditing()
             dragging = liftedSlug
         }
         return dragging

@@ -7,6 +7,7 @@ enum SettingsMetrics {
     static let formWidth: CGFloat = 340
     static let formPadding: CGFloat = 24
     static let fieldHeight: CGFloat = 50
+    static let buttonHeight: CGFloat = 36
     static let fieldInset: CGFloat = 18
     static let fieldRadius: CGFloat = 25
     static let glyphGap: CGFloat = 36

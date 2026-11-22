@@ -7,8 +7,6 @@ import Synchronization
 /// It never touches the main actor or the network. Kiln blocks the main thread
 /// while an app's `await URLSession.shared.data(…)` runs, so every answer has
 /// to come from here, at once, on the loading thread.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Data package.
 final class DBSession: Sendable {
     let slug: String
 
@@ -261,8 +259,6 @@ final class DBSession: Sendable {
 ///
 /// The open `DBSession` is the truth while an app runs; this actor saves it
 /// and syncs it.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Data package.
 actor AppData {
     static let shared = AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api })
 

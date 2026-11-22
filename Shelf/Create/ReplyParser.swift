@@ -17,8 +17,6 @@ struct ParsedReply: Equatable, Sendable {
 /// Reads a chat reply into an app. The rules are in `fixtures/replies/README.md`;
 /// the admin's TypeScript copy follows the same file, and both are tested
 /// against the same fixtures.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Create package.
 enum ReplyParser {
     static func parse(_ reply: String) -> ParsedReply {
         let source = self.source(from: reply)

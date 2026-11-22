@@ -2,8 +2,6 @@ import Foundation
 
 /// Brings the cache in line with the server (plan §4). It is the only writer
 /// of `index.json` once the app is running.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Store package.
 actor SyncEngine {
     /// What a sync reports while it runs, so icons can take their place first
     /// and fill in after.

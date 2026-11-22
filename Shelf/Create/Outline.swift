@@ -10,8 +10,6 @@ import Foundation
 /// raw and interpolated ones too), and splits each type body into its
 /// declarations. Whatever it can't make sense of, such as a file cut off in
 /// the middle, it leaves as it is.
-///
-/// CONTRACT — signatures are fixed; bodies belong to the Create package.
 enum Outline {
     static func make(from source: String) -> String {
         let scan = Scan(source)

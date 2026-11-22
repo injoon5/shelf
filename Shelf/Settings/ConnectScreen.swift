@@ -83,7 +83,7 @@ struct ConnectForm: View {
                     if isChecking { ProgressView() }
                 }
                 .font(.body.weight(.semibold))
-                .frame(maxWidth: .infinity, minHeight: SettingsMetrics.fieldHeight - 14)
+                .frame(maxWidth: .infinity, minHeight: SettingsMetrics.buttonHeight)
             }
             .buttonStyle(.glassProminent)
             .disabled(!canConnect)

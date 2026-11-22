@@ -162,7 +162,6 @@ enum HomeMetrics {
     static let pageFlipEdge: CGFloat = 28
     static let bannerTopGap: CGFloat = 4
     static let bannerPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 18)
-    static let bannerSpacing: CGFloat = 8
     static let shakeDistance: CGFloat = 8
 
     // MARK: Hit targets
