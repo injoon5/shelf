@@ -200,6 +200,7 @@ final class AppCard {
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
+        startProgress = CardMotion.progress(width: source.width, iconSize: iconSize, screenWidth: screen.width)
         self.face = CardFaceView(face: face, screen: screen)
         host = UIHostingController(rootView: CardRoot(run: run, state: state))
         // Clear until the app is built, so the card's face is its launch screen.
@@ -212,10 +213,14 @@ final class AppCard {
         CardFrame(rect: CGRect(origin: .zero, size: screen), radius: fullRadius)
     }
 
-    /// How open the card is on screen: 1 full screen, 0 its icon.
+    /// How open the card is on screen: 1 full screen, 0 its icon. A card
+    /// added this turn of the run loop has no presentation yet, and its
+    /// model already holds its target, so it is where it started.
     var progress: CGFloat {
-        CardMotion.progress(width: face.shownWidth, iconSize: iconSize, screenWidth: screen.width)
+        guard let shown = face.layer.presentation() else { return startProgress }
+        return CardMotion.progress(width: shown.bounds.width, iconSize: iconSize, screenWidth: screen.width)
     }
+    private let startProgress: CGFloat
 
     private var lastShown: CGRect?
 
@@ -225,6 +230,7 @@ final class AppCard {
     /// (and the app unbuilt) for most of a second longer than anyone can see.
     func hasComeToRest() -> Bool {
         guard face.isMoving else { return true }
+        guard face.layer.presentation() != nil else { return false }
         let shown = face.shownFrame
         defer { lastShown = shown }
         let tolerance = RunnerMetrics.restTolerance

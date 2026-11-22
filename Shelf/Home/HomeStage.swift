@@ -67,7 +67,6 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private var search: SearchBar!
     private let backdropDim = UIView()
     private let backdropBlur = UIVisualEffectView(effect: nil)
-    private var blurAnimator: UIViewPropertyAnimator?
     private let cardsView = PassthroughView()
     private var cards: [AppCard] = []
     private var heldCard: AppCard?
@@ -135,6 +134,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
         backdropDim.backgroundColor = .black
         backdropDim.alpha = 0
+        backdropBlur.effect = UIBlurEffect(style: .regular)
+        backdropBlur.alpha = 0
         view.addSubview(cardsView)
 
         edgePan.addTarget(self, action: #selector(closePan(_:)))
@@ -392,19 +393,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         let scale = 1 - (1 - RunnerMetrics.backdropScale) * openness
         home.transform = CGAffineTransform(scaleX: scale, y: scale)
         backdropDim.alpha = openness * RunnerMetrics.backdropDim
-        if blurAnimator == nil, openness > 0, view.window != nil {
-            // The blur is scrubbed, never played: how much of it shows
-            // follows the cards, frame by frame. (Made in a window, paused at
-            // once, or UIKit applies the whole effect.)
-            backdropBlur.effect = nil
-            let animator = UIViewPropertyAnimator(duration: 1, curve: .linear) { [backdropBlur] in
-                backdropBlur.effect = UIBlurEffect(style: .regular)
-            }
-            animator.pausesOnCompletion = true
-            animator.pauseAnimation()
-            blurAnimator = animator
-        }
-        blurAnimator?.fractionComplete = openness * RunnerMetrics.backdropBlur
+        // A full system blur, faded in with the cards.
+        backdropBlur.alpha = openness * RunnerMetrics.backdropBlur
     }
 
     // MARK: Gestures

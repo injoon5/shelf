@@ -41,8 +41,8 @@ enum RunnerMetrics {
     /// back to itself as the card lands. Springboard's starts its return from
     /// about 0.75x; Shelf's backdrop is only ever seen around a moving card.
     static let backdropScale: CGFloat = 0.86
-    /// How much of a regular system blur it gets.
-    static let backdropBlur: CGFloat = 0.55
+    /// How strongly a regular system blur shows over it.
+    static let backdropBlur: CGFloat = 0.85
     static let backdropDim: CGFloat = 0.18
     /// The app's picture gives way to its icon face as the card shrinks
     /// through this range of its progress (1 full screen, 0 the icon).
