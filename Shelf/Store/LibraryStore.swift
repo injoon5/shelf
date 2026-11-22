@@ -58,10 +58,7 @@ final class LibraryStore {
     }
 
     func source(for slug: String) -> String? {
-        #if DEBUG
-        if isDemo { return Demo.source }
-        #endif
-        return cache.source(for: slug)
+        cache.source(for: slug)
     }
 
     // MARK: Sync
@@ -171,23 +168,19 @@ final class LibraryStore {
         layout.move(slug, to: slot)
     }
 
-    func commitLayout() {
-        saveLayout()
-    }
-
     func resetLayout() {
         layout = Layout()
         layout.reconcile(with: apps.map(\.slug))
-        saveLayout()
+        commitLayout()
     }
 
     private func reconcileLayout() {
         let before = layout
         layout.reconcile(with: apps.map(\.slug))
-        if layout != before { saveLayout() }
+        if layout != before { commitLayout() }
     }
 
-    private func saveLayout() {
+    func commitLayout() {
         guard let encoded = try? JSONEncoder().encode(layout) else { return }
         try? FileManager.default.createDirectory(at: layoutURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try? encoded.write(to: layoutURL, options: .atomic)
@@ -242,11 +235,12 @@ final class LibraryStore {
     }
 
     #if DEBUG
-    /// A library with no server behind it, for previews and screenshots.
-    init(demo apps: [CachedApp], dock: [String] = []) {
-        cache = AppCache(root: URL.temporaryDirectory.appending(path: "shelf-demo"))
+    /// A library with no server behind it, for previews and screenshots:
+    /// `apps`, with their sources already in `cache`. It never syncs.
+    init(demo apps: [CachedApp], dock: [String] = [], cache: AppCache) {
+        self.cache = cache
         data = AppData(root: URL.temporaryDirectory.appending(path: "shelf-demo-data"), api: { nil })
-        layoutURL = URL.temporaryDirectory.appending(path: "shelf-demo/layout.json")
+        layoutURL = cache.root.appending(path: "layout.json")
         engine = SyncEngine(cache: cache, api: { nil })
         isSignedIn = true
         isDemo = true
