@@ -32,8 +32,8 @@ struct HomeScreen: View {
         .sheet(item: $model.sheet) { sheet in
             switch sheet {
             case .settings: SettingsView()
-            case .newApp: NewAppSheet(app: nil)
-            case .change(let app): NewAppSheet(app: app)
+            case .newApp: NewAppSheet(app: nil, source: nil)
+            case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
             }
         }
         .sensoryFeedback(.impact(weight: .light), trigger: model.launches)

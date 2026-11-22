@@ -215,11 +215,12 @@ final class LibraryStore {
 
     // MARK: Changing apps
 
-    /// Saves an app to the server, then syncs so it lands like any other.
+    /// Saves an app to the server. It returns once the server has it; the sync
+    /// that follows lands the icon like any other, pie and blue dot included.
     func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws {
         guard let api = Account.api else { throw API.Failure.unauthorized }
         _ = try await api.install(slug: slug, name: name, icon: icon, tint: tint, source: source)
-        await sync()
+        Task { await sync() }
     }
 
     func revert(_ slug: String) async {

@@ -1,0 +1,232 @@
+import Network
+import Observation
+import SwiftUI
+
+/// The state of one New App or Change… sheet: the idea, the key that lets an
+/// agent install it, and the pasted reply on its way to becoming an app.
+@MainActor
+@Observable
+final class CreateModel {
+    /// The app being changed, or nil for a new one.
+    let app: CachedApp?
+    /// The app's source when the sheet opened; what the change prompt carries.
+    let currentSource: String
+
+    var idea = ""
+    private(set) var key: API.InstallKey?
+    private(set) var didCopy = false
+
+    /// What the pasted reply parsed into. Non-nil means the preview is up.
+    private(set) var reply: ParsedReply?
+    var name = ""
+    var slug = ""
+    private(set) var compileError: CompileError?
+
+    private(set) var isInstalling = false
+    private(set) var failure: String?
+    /// Counts up when an install succeeds, here or by an agent.
+    private(set) var installs = 0
+    private(set) var isFinished = false
+    private(set) var rejections = 0
+
+    @ObservationIgnored private var copiedTask: Task<Void, Never>?
+
+    init(app: CachedApp?, source: String?) {
+        self.app = app
+        currentSource = source ?? ""
+    }
+
+    var isChange: Bool { app != nil }
+    var hasIdea: Bool { !idea.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+
+    // MARK: Prompt
+
+    private var install: Prompts.Install? {
+        guard let key, Date.now.timeIntervalSince1970 * 1000 < Double(key.expiresAt) else { return nil }
+        var origin = Account.site.absoluteString
+        while origin.hasSuffix("/") { origin.removeLast() }
+        return Prompts.Install(origin: origin, key: key.key, expires: Date(timeIntervalSince1970: Double(key.expiresAt) / 1000))
+    }
+
+    func prompt(includeSource: Bool) -> String {
+        let idea = idea.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let app else { return Prompts.newApp(idea: idea, install: install) }
+        return Prompts.change(idea, slug: app.slug, source: currentSource, includeSource: includeSource, install: install)
+    }
+
+    func copy(includeSource: Bool) {
+        UIPasteboard.general.string = prompt(includeSource: includeSource)
+        didCopy = true
+        copiedTask?.cancel()
+        copiedTask = Task { [weak self] in
+            try? await Task.sleep(for: Motion.copiedStay)
+            if !Task.isCancelled { self?.didCopy = false }
+        }
+    }
+
+    // MARK: Install key
+
+    /// Mints the key when the sheet opens, so Copy Prompt never waits. Offline,
+    /// there is no key and the prompt goes out without its Installing section.
+    func mint() async {
+        guard key == nil, let api = Account.api else { return }
+        key = try? await KeyRing.shared.key(for: app?.slug, api: api)
+    }
+
+    /// Checks whether an agent has used the key. Runs while the sheet is open
+    /// and Shelf is in front, and once more each time Shelf comes back.
+    func watch(library: LibraryStore) async {
+        while !Task.isCancelled, !isFinished {
+            if let key, let api = Account.api, let status = try? await api.keyStatus(key.id) {
+                switch status {
+                case .used:
+                    KeyRing.shared.forget(key)
+                    installs += 1
+                    isFinished = true
+                    Task { await library.sync() }
+                    return
+                case .expired:
+                    KeyRing.shared.forget(key)
+                    self.key = nil
+                    await mint()
+                case .waiting:
+                    break
+                }
+            }
+            try? await Task.sleep(for: Motion.keyPoll)
+        }
+    }
+
+    // MARK: Paste and preview
+
+    func paste(_ text: String, library: LibraryStore) {
+        let parsed = ReplyParser.parse(text)
+        guard !parsed.source.isEmpty else {
+            rejections += 1
+            return
+        }
+        compileError = nil
+        failure = nil
+        name = String((parsed.name ?? app?.meta.name ?? "").prefix(CreateMetrics.nameLimit))
+        slug = app?.slug ?? freeSlug(parsed.slug, in: library)
+        withAnimation(Motion.standard) { reply = parsed }
+    }
+
+    func discardReply() {
+        withAnimation(Motion.standard) { reply = nil }
+    }
+
+    func previewFailed(_ error: CompileError) {
+        compileError = error
+    }
+
+    /// `habits`, then `habits-2`, `habits-3`… until one is free.
+    private func freeSlug(_ base: String, in library: LibraryStore) -> String {
+        var candidate = base
+        var n = 2
+        while library.app(candidate) != nil {
+            candidate = "\(base)-\(n)"
+            n += 1
+        }
+        return candidate
+    }
+
+    /// The app as it will be saved, for the preview and its icon.
+    var previewMeta: AppMeta? {
+        guard let reply else { return nil }
+        let icon = reply.icon.flatMap { Symbol.resolve($0) == $0 ? $0 : nil }
+        return AppMeta(slug: slug.isEmpty ? "preview" : slug, name: name.isEmpty ? "App" : name, icon: icon,
+                       tint: reply.tint, version: String(reply.source.hashValue))
+    }
+
+    var isSlugValid: Bool {
+        slug.wholeMatch(of: /[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}/) != nil
+    }
+
+    func isSlugTaken(in library: LibraryStore) -> Bool {
+        !isChange && library.app(slug) != nil
+    }
+
+    func canInstall(in library: LibraryStore) -> Bool {
+        reply != nil && !isInstalling && compileError == nil && isSlugValid && !isSlugTaken(in: library)
+            && !name.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
+    func installReply(library: LibraryStore) async {
+        guard let reply, let meta = previewMeta, canInstall(in: library) else { return }
+        isInstalling = true
+        failure = nil
+        defer { isInstalling = false }
+        do {
+            try await library.install(slug: slug, name: name.trimmingCharacters(in: .whitespaces), icon: meta.icon,
+                                      tint: reply.tint, source: reply.source)
+            // The app went in with the admin token; the key in the prompt is
+            // no longer needed and shouldn't stay live.
+            if let key, let api = Account.api {
+                KeyRing.shared.forget(key)
+                Task { try? await api.revokeKey(key.id) }
+            }
+            installs += 1
+            isFinished = true
+        } catch {
+            switch error as? API.Failure {
+            case .rejected(_, let message): failure = message
+            case .unauthorized: failure = "Token Expired"
+            default: failure = "Can’t Reach Server"
+            }
+        }
+    }
+}
+
+/// Unused install keys, kept while they have time left. Opening the sheet
+/// again reuses one instead of minting another; the server allows only
+/// twenty live keys at once.
+@MainActor
+final class KeyRing {
+    static let shared = KeyRing()
+    private var keys: [String: API.InstallKey] = [:]
+    /// A key with less time left than this isn't worth handing to an agent.
+    private let minimumLife: Double = 10 * 60 * 1000
+
+    func key(for slug: String?, api: API) async throws -> API.InstallKey {
+        let name = slug ?? ""
+        let now = Date.now.timeIntervalSince1970 * 1000
+        if let held = keys[name], Double(held.expiresAt) - now > minimumLife { return held }
+        let minted = try await api.mintKey(for: slug)
+        keys[name] = minted
+        return minted
+    }
+
+    func forget(_ key: API.InstallKey) {
+        keys = keys.filter { $0.value.id != key.id }
+    }
+}
+
+/// Whether the phone has a network at all. Install says "Offline" without one.
+@MainActor
+@Observable
+final class Connectivity {
+    static let shared = Connectivity()
+    private(set) var isOnline = true
+    @ObservationIgnored private let monitor = NWPathMonitor()
+
+    private init() {
+        monitor.pathUpdateHandler = { [weak self] path in
+            let online = path.status == .satisfied
+            Task { @MainActor in self?.isOnline = online }
+        }
+        monitor.start(queue: .global(qos: .utility))
+    }
+}
+
+enum CreateMetrics {
+    static let nameLimit = 32
+    static let padding: CGFloat = 20
+    static let spacing: CGFloat = 14
+    static let buttonHeight: CGFloat = 36
+    static let closeSize: CGFloat = 30
+    static let previewRadius: CGFloat = 28
+    static let previewBorder: CGFloat = 0.5
+    static let tileSize: CGFloat = 52
+    static let fieldSpacing: CGFloat = 2
+}
