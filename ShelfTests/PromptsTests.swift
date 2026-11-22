@@ -54,9 +54,10 @@ struct PromptsTests {
 
     @Test func newAppIsTheAppendixWithItsSectionMarkersRemoved() {
         let template = Prompts.template("new")
-        let filled = Prompts.newApp(idea: "{{IDEA}}", install: Prompts.Install(origin: "{{ORIGIN}}", key: "{{KEY}}", expires: .now))
+        let now = Date.now
+        let filled = Prompts.newApp(idea: "{{IDEA}}", install: Prompts.Install(origin: "{{ORIGIN}}", key: "{{KEY}}", expires: now))
         let expected = template.components(separatedBy: "\n").filter { !$0.hasPrefix("<!--") }.joined(separator: "\n")
-        #expect(filled.replacingOccurrences(of: Prompts.expiresText(.now), with: "{{EXPIRES}}") + "\n" == expected)
+        #expect(filled.replacingOccurrences(of: Prompts.expiresText(now), with: "{{EXPIRES}}") + "\n" == expected)
     }
 
     @Test(arguments: [true, false])

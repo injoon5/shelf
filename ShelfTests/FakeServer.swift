@@ -2,14 +2,13 @@ import Foundation
 @testable import Shelf
 
 /// Answers `db://` the way Shelf does, from a session that starts with the
-/// stored values, and the made-up web hosts the fixtures use with a failure,
-/// so no fixture depends on the internet. Records every request.
+/// stored values, and every web request with a failure, so no fixture
+/// depends on the internet. Records every request.
 final class FakeServer: URLProtocol, @unchecked Sendable {
     struct Seen: Sendable { var method: String; var path: String; var body: Data }
     private static let lock = NSLock()
     nonisolated(unsafe) private static var _seen: [Seen] = []
     nonisolated(unsafe) private static var session = DBSession(slug: "fixture")
-    static let webHosts: Set<String> = ["api.example.com", "picsum.photos"]
 
     static var seen: [Seen] { lock.withLock { _seen } }
 
@@ -27,7 +26,7 @@ final class FakeServer: URLProtocol, @unchecked Sendable {
 
     override class func canInit(with request: URLRequest) -> Bool {
         guard let url = request.url else { return false }
-        return url.scheme == "db" || webHosts.contains(url.host() ?? "")
+        return ["db", "http", "https"].contains(url.scheme ?? "")
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
