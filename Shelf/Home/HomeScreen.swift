@@ -92,8 +92,8 @@ struct IconsLayer: View {
     var body: some View {
         IconsContent()
             .stage(stage)
-            // Labels stop growing here, as Springboard's do, so the grid never breaks.
-            .dynamicTypeSize(...DynamicTypeSize.xLarge)
+            // The labels' own size comes from the stage, under the same cap.
+            .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 }
 
@@ -146,7 +146,7 @@ struct ResultsLayer: View {
     var body: some View {
         ResultsContent()
             .stage(stage)
-            .dynamicTypeSize(...DynamicTypeSize.xLarge)
+            .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 }
 
@@ -195,7 +195,7 @@ private struct EditButton: View {
         .buttonStyle(.plain)
         .padding(.vertical, -(HomeMetrics.minimumHit - size.height) / 2)
         .accessibilityLabel(title)
-        .dynamicTypeSize(...DynamicTypeSize.xLarge)
+        .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 }
 

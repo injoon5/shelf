@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// The dock's glass, by itself, so it can share a `GlassEffectContainer` with
-/// the search pill while its icons sit in a layer above.
+/// The dock's glass and its drop target, apart from its icons, which sit
+/// above it.
 struct DockGlass: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model

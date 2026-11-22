@@ -111,7 +111,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
     private var pill: CGRect {
         guard let geometry else { return .zero }
         let frame = geometry.pillFrame
-        let width = showsDots ? max(frame.width, dots.width(for: dotCount) + 2 * HomeMetrics.pageDotGap) : frame.width
+        let width = showsDots ? max(frame.width, dots.width(for: dotCount) + 2 * HomeMetrics.pillDotsPadding) : frame.width
         return CGRect(x: frame.midX - width / 2, y: frame.minY, width: width, height: frame.height)
     }
 

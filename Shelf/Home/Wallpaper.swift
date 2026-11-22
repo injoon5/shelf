@@ -93,14 +93,11 @@ private struct MeshWallpaper: View {
         Color(red: 0.05, green: 0.10, blue: 0.36), Color(red: 0.13, green: 0.09, blue: 0.36), Color(red: 0.25, green: 0.11, blue: 0.36),
         Color(red: 0.02, green: 0.03, blue: 0.14), Color(red: 0.05, green: 0.03, blue: 0.17), Color(red: 0.10, green: 0.04, blue: 0.20),
     ]
-    /// How far a point strays from its place, as a fraction of the screen.
-    private static let reach: Float = 0.12
-    private static let frameInterval: Double = 1 / 30
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: Self.frameInterval, paused: isPaused)) { context in
+        TimelineView(.animation(minimumInterval: Motion.wallpaperFrameInterval, paused: isPaused)) { context in
             let t = Float(context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: Motion.wallpaperDrift) / Motion.wallpaperDrift) * 2 * .pi
-            let r = Self.reach
+            let r = HomeMetrics.wallpaperReach
             MeshGradient(width: 3, height: 3, points: [
                 [0, 0], [0.5 + r * sin(t), 0], [1, 0],
                 [0, 0.5 + r * cos(t)], [0.5 + r * cos(t + 1), 0.5 + r * sin(t + 2)], [1, 0.5 - r * cos(t)],

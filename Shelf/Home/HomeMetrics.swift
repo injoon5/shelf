@@ -58,8 +58,14 @@ enum HomeMetrics {
     static let pendingDim: Double = 0.35
     static let pieRatio: CGFloat = 0.5
     static let pieRingWidth: CGFloat = 2
+    /// The pie keeps a ring's width clear inside the ring.
+    static var pieInset: CGFloat { pieRingWidth * 2 }
 
     // MARK: Label
+
+    /// The Home Screen's text stops growing here, as Springboard's does, so
+    /// the grid never breaks.
+    static let textSizeCap = DynamicTypeSize.xLarge
 
     /// Springboard's labels are 12 pt medium: measured by ink width and stem
     /// weight against SF Pro rendered at 12 and 13 pt.
@@ -115,6 +121,8 @@ enum HomeMetrics {
     static let pageDotSize: CGFloat = 6.67
     static let pageDotGap: CGFloat = 7.33
     static let pageDotDim: Double = 0.45
+    /// Room either side of the dots when there are enough to widen the pill.
+    static let pillDotsPadding: CGFloat = 7.33
 
     // MARK: Search
 
@@ -146,6 +154,12 @@ enum HomeMetrics {
     static let searchOpenVelocity: CGFloat = 400
     /// Pulling the results down this far past their top closes search.
     static let searchPull: CGFloat = 60
+
+    // MARK: Wallpaper
+
+    /// How far the gradient's middle points stray from their places, as a
+    /// fraction of the screen.
+    static let wallpaperReach: Float = 0.12
 
     // MARK: Edit mode and banner
 

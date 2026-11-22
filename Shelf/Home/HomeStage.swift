@@ -239,7 +239,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private func labelMetrics() -> (size: CGFloat, height: CGFloat) {
         var category = traitCollection.preferredContentSizeCategory
         if category == .unspecified { category = .large }
-        let traits = UITraitCollection(preferredContentSizeCategory: min(category, .extraLarge))
+        let traits = UITraitCollection(preferredContentSizeCategory: min(category, UIContentSizeCategory(HomeMetrics.textSizeCap)))
         let size = UIFontMetrics(forTextStyle: .caption2).scaledValue(for: HomeMetrics.labelSize, compatibleWith: traits)
         return (size, UIFont.systemFont(ofSize: size, weight: .medium).lineHeight)
     }

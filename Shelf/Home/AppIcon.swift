@@ -140,7 +140,7 @@ struct InstallPie: View {
             Circle().strokeBorder(.white, lineWidth: HomeMetrics.pieRingWidth)
             PieSlice(progress: progress)
                 .fill(.white)
-                .padding(HomeMetrics.pieRingWidth * 2)
+                .padding(HomeMetrics.pieInset)
         }
         .frame(width: size, height: size)
     }

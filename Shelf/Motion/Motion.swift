@@ -8,12 +8,11 @@ enum Motion {
 
     /// Icons sliding aside while one is dragged.
     static let reorder = Animation.spring(duration: 0.35, bounce: 0.15)
-    /// Entering and leaving edit mode, the banner, search.
+    /// Entering and leaving edit mode, the banner, a page flip, a sheet's
+    /// own changes.
     static let standard = Animation.spring(duration: 0.4, bounce: 0.1)
     /// Small state changes: a press releasing, a dot appearing.
     static let quick = Animation.spring(duration: 0.25, bounce: 0)
-    /// An icon refusing to open.
-    static let shake = Animation.spring(duration: 0.12, bounce: 0.6)
     /// The install pie filling.
     static let pie = Animation.spring(duration: 0.5, bounce: 0)
 
@@ -73,6 +72,9 @@ enum Motion {
     /// An icon refusing to open: out, back past the middle, half out, home.
     /// Each step's duration, in order.
     static let shakeSteps: [Double] = [0.07, 0.1, 0.1, 0.25]
+    /// The spring of every step but the last, and of the last.
+    static let shakeStep = SwiftUI.Spring.snappy
+    static let shakeHome = SwiftUI.Spring.bouncy
 
     // MARK: Jiggle
 
@@ -95,4 +97,6 @@ enum Motion {
     /// shown beneath it, so there is never a frame with neither.
     static let cardHandoff: Duration = .milliseconds(50)
     static let wallpaperDrift: Double = 20
+    /// The gradient drifts too slowly to need more frames than this.
+    static let wallpaperFrameInterval: Double = 1 / 30
 }
