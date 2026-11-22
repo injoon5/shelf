@@ -116,7 +116,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         results.view.isUserInteractionEnabled = false
         search = SearchBar(fades: .init(home: icons.view, results: results.view, dim: searchDim))
         search.onTapPill = { [unowned self] in
-            guard !input.isEditing, cards.isEmpty else { return }
+            guard canOpenSearch else { return }
             openSearch()
             model.beginSearch()
         }
@@ -249,6 +249,10 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
         if new.run != old.run { follow(new.run) }
     }
+
+    /// Search opens over a still Home Screen: no app, no edit mode, and
+    /// not open already (a tap on its glass would clear what was typed).
+    private var canOpenSearch: Bool { cards.isEmpty && !input.isEditing && !search.isOpen }
 
     private func openSearch() {
         setSearchTone()
@@ -500,7 +504,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         case grab:
             return movingCard(at: point) != nil
         case pull:
-            return cards.isEmpty && !input.isEditing && !search.isOpen
+            return canOpenSearch
         default:
             return true
         }
