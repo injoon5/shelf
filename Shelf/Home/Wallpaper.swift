@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// What sits behind the icons: the user's photo, or a slow mesh gradient.
+/// What sits behind the icons: Shelf's own photo, the user's, or a slow mesh
+/// gradient.
 struct Wallpaper: View {
     @Environment(ShelfSettings.self) private var settings
     /// The gradient stops drifting while something covers the Home Screen.
@@ -8,17 +9,24 @@ struct Wallpaper: View {
 
     var body: some View {
         Group {
-            if let photo = settings.wallpaper {
-                // Filled from the centre and clipped, the way Springboard crops a photo.
-                Color.black.overlay {
-                    Image(uiImage: photo).resizable().scaledToFill()
-                }
-                .clipped()
-            } else {
+            switch settings.wallpaper {
+            case .gradient:
                 MeshWallpaper(isPaused: isPaused)
+            case .custom:
+                photo(settings.customWallpaper.map(Image.init(uiImage:)) ?? Image(.wallpaper))
+            case .photo:
+                photo(Image(.wallpaper))
             }
         }
         .ignoresSafeArea()
+    }
+
+    /// Filled from the centre and clipped, the way Springboard crops a photo.
+    private func photo(_ image: Image) -> some View {
+        Color.black.overlay {
+            image.resizable().scaledToFill()
+        }
+        .clipped()
     }
 }
 

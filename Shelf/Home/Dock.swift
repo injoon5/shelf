@@ -40,6 +40,7 @@ struct DockIcons: View {
                 IconArt(face: .settings, size: geometry.iconSize).modifier(IconPress())
             }
             .buttonStyle(IconButtonStyle())
+            .accessibilityLabel("Settings")
             .modifier(Jiggle(isOn: model.isEditing))
             .position(geometry.dockCenter(count - 1, of: count))
         }

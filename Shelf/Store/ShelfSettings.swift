@@ -24,6 +24,18 @@ enum IconStyle: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
+/// What is behind the icons.
+enum WallpaperChoice: String, CaseIterable, Identifiable, Sendable {
+    /// The photo Shelf ships with.
+    case photo
+    /// The slow mesh gradient.
+    case gradient
+    /// A photo the user picked.
+    case custom
+
+    var id: String { rawValue }
+}
+
 /// Shelf's preferences, kept in Shelf's own defaults suite.
 @MainActor
 @Observable
@@ -33,8 +45,9 @@ final class ShelfSettings {
     var accent: Tint { didSet { defaults.set(accent.rawValue, forKey: "accent") } }
     /// Whether the change prompt carries the app's full source.
     var includeSource: Bool { didSet { defaults.set(includeSource, forKey: "includeSource") } }
-    /// The photo wallpaper, when there is one. Changing it redraws the Home Screen.
-    private(set) var wallpaper: UIImage?
+    var wallpaper: WallpaperChoice { didSet { defaults.set(wallpaper.rawValue, forKey: "wallpaper") } }
+    /// The photo the user picked, when there is one.
+    private(set) var customWallpaper: UIImage?
 
     private static let wallpaperSide: CGFloat = 3000
     @ObservationIgnored private let defaults = Account.defaults
@@ -44,21 +57,21 @@ final class ShelfSettings {
         iconStyle = IconStyle(rawValue: defaults.string(forKey: "iconStyle") ?? "") ?? .automatic
         accent = Tint(rawValue: defaults.string(forKey: "accent") ?? "") ?? .blue
         includeSource = defaults.object(forKey: "includeSource") as? Bool ?? true
-        wallpaper = UIImage(contentsOfFile: wallpaperURL.path)
+        let picked = UIImage(contentsOfFile: wallpaperURL.path)
+        let saved = WallpaperChoice(rawValue: defaults.string(forKey: "wallpaper") ?? "") ?? .photo
+        wallpaper = saved == .custom && picked == nil ? .photo : saved
+        customWallpaper = picked
     }
 
-    /// Sets the photo wallpaper, or goes back to the built-in one with nil.
-    func setWallpaper(_ data: Data?) {
-        guard let data, let image = UIImage(data: data) else {
-            try? FileManager.default.removeItem(at: wallpaperURL)
-            wallpaper = nil
-            return
-        }
+    /// Saves a picked photo and makes it the wallpaper.
+    func setCustomWallpaper(_ data: Data) {
+        guard let image = UIImage(data: data) else { return }
         // Photos are far larger than any screen; keep what a screen can show.
         let fitted = image.preparingThumbnail(of: image.size.fitted(longest: Self.wallpaperSide)) ?? image
         try? FileManager.default.createDirectory(at: wallpaperURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try? fitted.jpegData(compressionQuality: 0.9)?.write(to: wallpaperURL, options: .atomic)
-        wallpaper = fitted
+        customWallpaper = fitted
+        wallpaper = .custom
     }
 }
 

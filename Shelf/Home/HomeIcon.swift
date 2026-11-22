@@ -26,6 +26,7 @@ struct HomeIcon: View {
             .contentShape(.rect)
         }
         .buttonStyle(IconButtonStyle())
+        .accessibilityLabel(app.meta.name)
         .contextMenu {
             menu
         } preview: {

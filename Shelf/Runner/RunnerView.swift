@@ -10,16 +10,18 @@ struct RunnerView: View {
 
     var body: some View {
         AppStage(app: run.app.meta, source: run.source, store: .synced)
-            .overlay(alignment: .top) {
+            .overlay {
                 // Apps with their own vertical drags can fight the system's
                 // pull-to-close. From the status bar, down always closes.
-                Color.clear
-                    .frame(height: RunnerMetrics.dismissStrip)
-                    .contentShape(.rect)
-                    .gesture(DragGesture(minimumDistance: RunnerMetrics.dismissDistance).onEnded { drag in
-                        if drag.translation.height > RunnerMetrics.dismissDistance { dismiss() }
-                    })
-                    .ignoresSafeArea()
+                GeometryReader { proxy in
+                    Color.clear
+                        .frame(height: max(proxy.safeAreaInsets.top, RunnerMetrics.dismissStrip))
+                        .contentShape(.rect)
+                        .gesture(DragGesture(minimumDistance: RunnerMetrics.dismissDistance).onEnded { drag in
+                            if drag.translation.height > RunnerMetrics.dismissDistance { dismiss() }
+                        })
+                        .ignoresSafeArea()
+                }
             }
     }
 }
