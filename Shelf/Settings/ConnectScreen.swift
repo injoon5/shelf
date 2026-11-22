@@ -17,7 +17,7 @@ struct ConnectScreen: View {
         .background { Wallpaper() }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in isKeyboardUp = true }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in isKeyboardUp = false }
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
     }
 
     @State private var isKeyboardUp = false

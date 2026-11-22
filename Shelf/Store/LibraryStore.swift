@@ -296,7 +296,8 @@ final class LibraryStore {
             _ = try await api.revert(slug)
             await sync()
         } catch {
-            show(Banner(error))
+            // The same rule a failed sync follows, so a rejected token also shows in Settings.
+            report(error)
         }
     }
 
