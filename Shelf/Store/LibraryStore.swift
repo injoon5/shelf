@@ -37,11 +37,10 @@ final class LibraryStore {
     @ObservationIgnored private var bannerTask: Task<Void, Never>?
     @ObservationIgnored private var isDemo = false
 
-    init(cache: AppCache = .standard, data: AppData = .shared,
-         layoutURL: URL = URL.applicationSupportDirectory.appending(path: "layout.json")) {
-        self.cache = cache
-        self.data = data
-        self.layoutURL = layoutURL
+    init() {
+        cache = .standard
+        data = .shared
+        layoutURL = URL.applicationSupportDirectory.appending(path: "layout.json")
         engine = SyncEngine(cache: cache, api: { Account.api })
         isSignedIn = Account.api != nil
 
