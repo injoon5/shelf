@@ -40,9 +40,15 @@ struct HomeScreen: View {
             }
             .onChange(of: library.isSignedIn) { model.stopEditing() }
             // A drag the system cancels never reaches a drop target, so nothing
-            // else would bring its icon back.
+            // else would bring its icon back, or save where it left the others.
             .onChange(of: scenePhase) { _, phase in
-                if phase != .active { model.endDrag() }
+                if phase != .active {
+                    model.endDrag()
+                    library.commitLayout()
+                }
+            }
+            .onChange(of: model.isEditing) { _, isEditing in
+                if !isEditing { library.commitLayout() }
             }
     }
 }

@@ -93,8 +93,9 @@ final class LibraryStore {
             let slugs = apps.map(\.slug)
             Task { await data.pull(slugs) }
         } catch {
-            // A sync cut short by Sign Out has nothing to report.
-            guard isSignedIn else { return }
+            // A sync cut short by Sign Out has nothing to report, even if
+            // another account has signed in since.
+            guard generation == current else { return }
             let failure = error as? API.Failure ?? .offline
             if failure == .unauthorized { tokenRejected = true }
             if apps.isEmpty {
@@ -180,8 +181,9 @@ final class LibraryStore {
         if layout != before { commitLayout() }
     }
 
+    /// Signed out, there is no library to save a layout for.
     func commitLayout() {
-        guard let encoded = try? JSONEncoder().encode(layout) else { return }
+        guard isSignedIn, let encoded = try? JSONEncoder().encode(layout) else { return }
         try? FileManager.default.createDirectory(at: layoutURL.deletingLastPathComponent(), withIntermediateDirectories: true)
         try? encoded.write(to: layoutURL, options: .atomic)
     }
