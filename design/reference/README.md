@@ -21,3 +21,29 @@ pixels:
 
 To check Shelf against it, take a 3x screenshot of Shelf on the same
 simulator and blend the two at 50%.
+
+## Icon corners
+
+Shelf's icons are not the shape Springboard's are. Measured the same way on
+both (how far the left edge is inset on each pixel row down from the top of a
+64 pt icon, at 3x):
+
+| Row (px from top) | Springboard | Shelf (`iconCornerRatio` 0.2237) |
+|---|---|---|
+| 0 | 56 | 47 |
+| 2 | 37 | 31 |
+| 4 | 31 | 25 |
+| 8 | 23 | 18 |
+| 12 | 17 | 13 |
+| 18 | 12 | 8 |
+| 24 | 7 | 5 |
+| 32 | 4 | 2 |
+| 40 | 2 | 1 |
+
+Springboard's corner is rounder everywhere: its diagonal inset is 15 px to
+Shelf's 13, which is a circle-equivalent radius of about 17.1 pt (26.7% of the
+icon) against Shelf's 14.8 pt (23.1%). The 0.2237 in the plan is the mask iOS
+used through iOS 18; the icons iOS 26 and 27 draw are rounder. The shape to
+match is the one in this table, wherever the icon's outline is drawn: the
+fill, the rim, the pressed and pending overlays, the zoom source, and the
+menu and drag previews.
