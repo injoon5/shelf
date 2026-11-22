@@ -10,7 +10,13 @@ Needs Xcode 27 and [XcodeGen](https://github.com/yonaskolb/XcodeGen). Shelf targ
 
 ```sh
 ./Scripts/bootstrap.sh        # fetches Kiln 0.2.1, applies Vendor/kiln-0.2.1.patch, generates Shelf.xcodeproj
-open Shelf.xcodeproj          # set your team on the Shelf target to run on a phone
+open Shelf.xcodeproj
+```
+
+To run on a phone, put your team in `Config/Local.xcconfig` (not committed) and run the bootstrap again. The project is generated, so a team picked in Xcode would not stick.
+
+```
+DEVELOPMENT_TEAM = ABCDE12345
 ```
 
 For a simulator, without opening Xcode:

@@ -5,13 +5,15 @@ options:
     iOS: "27.0"
   createIntermediateGroups: true
   generateEmptyDirectories: true
+configFiles:
+  Debug: Config/Shelf.xcconfig
+  Release: Config/Shelf.xcconfig
 settings:
   base:
     SWIFT_VERSION: "6.0"
     SWIFT_STRICT_CONCURRENCY: complete
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
 packages:
   # Kiln 0.2.1 plus Vendor/kiln-0.2.1.patch, put in place by Scripts/bootstrap.sh.

@@ -6,3 +6,4 @@ build/
 xcuserdata/
 *.xcresult
 Vendor/Kiln/
+Config/Local.xcconfig

@@ -1,0 +1,7 @@
+// Build settings that differ per machine live in Local.xcconfig, which is not
+// committed. To run Shelf on a phone, create Config/Local.xcconfig with:
+//
+//     DEVELOPMENT_TEAM = ABCDE12345
+//
+// XcodeGen regenerates the project, so a team picked in Xcode would not stick.
+#include? "Local.xcconfig"
