@@ -65,7 +65,7 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
-        guard let url = request.url else { return finish(400) }
+        guard request.url != nil else { return finish(400) }
         guard let session = Self.current else { return finish(503) }
         let reply = Self.answer(
             method: (request.httpMethod ?? "GET").uppercased(),
