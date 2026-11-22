@@ -38,6 +38,9 @@ struct HomeIcon: View {
         .modifier(Jiggle(isOn: model.isEditing))
         .modifier(Shake(trigger: model.refusals[app.slug] ?? 0))
         .opacity(model.dragging == app.slug ? 0 : 1)
+        // The label's size comes from the stage under this same cap; the
+        // rest of the icon stops growing where the label does.
+        .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 
     private var button: some View {

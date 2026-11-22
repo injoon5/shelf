@@ -74,7 +74,7 @@ struct ErrorScreen: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .defaultScrollAnchor(.center)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
     }
 
     private var excerpt: some View {

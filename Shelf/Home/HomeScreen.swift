@@ -90,10 +90,10 @@ struct IconsLayer: View {
     var stage: StageEnvironment
 
     var body: some View {
+        // No cap on the whole layer: the icons and edit buttons carry the
+        // Home Screen's, and the empty library and the banner the app's.
         IconsContent()
             .stage(stage)
-            // The labels' own size comes from the stage, under the same cap.
-            .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 }
 
@@ -144,9 +144,9 @@ struct ResultsLayer: View {
     var stage: StageEnvironment
 
     var body: some View {
+        // The results carry the Home Screen's cap, "No Results" the app's.
         ResultsContent()
             .stage(stage)
-            .dynamicTypeSize(...HomeMetrics.textSizeCap)
     }
 }
 
@@ -242,7 +242,7 @@ private struct EmptyLibrary: View {
         // The wallpaper is dark in both modes; draw on it as on a dark surface.
         .environment(\.colorScheme, .dark)
         .padding(.bottom, geometry.size.height - geometry.pillFrame.minY)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
     }
 }
 

@@ -27,7 +27,7 @@ struct NewAppSheet: View {
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
         .sensoryFeedback(.success, trigger: model.installs)
         .sensoryFeedback(.error, trigger: model.rejections)
         .task { await model.mint(library: library) }

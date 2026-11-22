@@ -18,7 +18,7 @@ struct SearchResults: View {
                     // The title alone: the system's version adds a line of advice.
                     ContentUnavailableView("No Results for “\(model.query)”", systemImage: "magnifyingglass")
                         .environment(\.colorScheme, .dark)
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
                 } else {
                     LazyVGrid(columns: Array(repeating: GridItem(.fixed(geometry.labelWidth), spacing: geometry.columnPitch - geometry.labelWidth),
                                              count: Layout.columns),

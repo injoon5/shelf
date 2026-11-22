@@ -88,7 +88,7 @@ struct SettingsView: View {
             .animation(Motion.quick, value: settings.iconStyle)
         }
         .presentationDetents([.medium, .large])
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
         .onChange(of: picked) { _, item in
             guard let item else { return }
             Task {

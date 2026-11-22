@@ -63,8 +63,9 @@ enum HomeMetrics {
 
     // MARK: Label
 
-    /// The Home Screen's text stops growing here, as Springboard's does, so
-    /// the grid never breaks.
+    /// The Home Screen's icons and edit buttons stop growing here, as
+    /// Springboard's do, so the grid never breaks. The empty library, "No
+    /// Results" and the banner follow `ShelfMetrics.textSizeCap` instead.
     static let textSizeCap = DynamicTypeSize.xLarge
 
     /// Springboard's labels are 12 pt medium: measured by ink width and stem
