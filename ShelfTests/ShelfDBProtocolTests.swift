@@ -1,5 +1,5 @@
 import Foundation
-import Kiln
+@testable import Kiln
 import Synchronization
 import Testing
 @testable import Shelf
@@ -102,6 +102,12 @@ struct ShelfDBProtocolTests {
         #expect(ShelfDBProtocol.answer(method: "POST", key: "k", body: { nil }, session: DBSession(slug: "x")).status == 405)
         #expect(ShelfDBProtocol.key(in: URL(string: "db://data")!) == "")
         #expect(ShelfDBProtocol.key(in: URL(string: "db://data/a%2Fb")!) == "a/b")
+
+        // The header, where `DB` puts the key, wins over the path.
+        var request = URLRequest(url: URL(string: "db://data/")!)
+        #expect(ShelfDBProtocol.key(for: request) == "")
+        request.setValue("a?b", forHTTPHeaderField: ShelfDBProtocol.keyHeader)
+        #expect(ShelfDBProtocol.key(for: request) == "a?b")
     }
 
     /// The whole path: an app run by Kiln, the appended prelude, this protocol
@@ -128,5 +134,49 @@ struct ShelfDBProtocolTests {
         #expect(first["done"] == .bool(false))
         guard case .string(let id)? = first["id"] else { Issue.record("\(first)"); return }
         #expect(UUID(uuidString: id) != nil)
+    }
+
+    /// Every key the server accepts comes back as itself through the prelude,
+    /// including the ones a URL would cut short, decode or collapse.
+    @Test func kilnKeepsEveryValidKeyWhole() {
+        let keys = ["a?b", "a#b", "a b", "100%", "q=1&r=2", "한글", "..", ".", "a%2Fb", " padded ", "a"]
+        let session = DBSession(slug: "keys")
+        ShelfDBProtocol.activate(session)
+        defer { ShelfDBProtocol.deactivate(session) }
+
+        let list = keys.map { "\"\($0)\"" }.joined(separator: ", ")
+        let (errors, console, _) = FeatureFixtureTests.probe(SourceRewriter.prepare(#"""
+            import SwiftUI
+
+            struct ContentView: View {
+                var body: some View {
+                    Text("x").onAppear {
+                        let keys = [\#(list)]
+                        for i in 0..<keys.count {
+                            DB.save(keys[i], "\(i)".data(using: .utf8)!)
+                        }
+                        for i in 0..<keys.count {
+                            if let data = DB.load(keys[i]), let n = try? JSONDecoder().decode(Int.self, from: data) {
+                                print("load", i, n)
+                            } else {
+                                print("load", i, "missing")
+                            }
+                        }
+                        DB.remove("a?b")
+                        print("removed", DB.load("a?b") == nil, DB.load("a") != nil)
+                    }
+                }
+            }
+            """#, slug: "keys"))
+        #expect(errors.isEmpty, "\(errors)")
+
+        var expected: [String: JSONValue] = [:]
+        for (i, key) in keys.enumerated() where key != "a?b" { expected[key] = .int(i) }
+        #expect(session.all() == expected)
+        for i in keys.indices {
+            #expect(console.contains("load \(i) \(i)\n"), "\(keys[i]): \(console)")
+        }
+        // The look-alike went alone.
+        #expect(console.contains("removed true true"), "\(console)")
     }
 }

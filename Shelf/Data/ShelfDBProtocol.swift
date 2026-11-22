@@ -11,9 +11,10 @@ import Synchronization
 /// | `DELETE db://data/{key}`      | `204`                                   |
 /// | `GET db://data/`              | `200` with `{ key: value }`             |
 ///
-/// The key is the URL's path after its first "/", percent-decoded. Requests
-/// are answered on the loading thread, never the main actor: Kiln holds the
-/// main thread while it waits for them.
+/// The key is the `DB-Key` header when there is one, which is how the `DB`
+/// helper sends it (`Prelude`), and otherwise the URL's path after its first
+/// "/", percent-decoded. Requests are answered on the loading thread, never
+/// the main actor: Kiln holds the main thread while it waits for them.
 final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
     private struct Registration {
         var session: DBSession?
@@ -21,6 +22,11 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
     }
 
     private static let registration = Mutex(Registration())
+
+    /// Where `DB` puts the key. A key in a URL is cut short at "?" or "#" and
+    /// has its "%" escapes decoded, and Kiln can't percent-encode one; a
+    /// header carries every valid key as it is. It never leaves the phone.
+    static let keyHeader = "DB-Key"
 
     /// The session `db://` requests go to now, if any.
     static var current: DBSession? { registration.withLock { $0.session } }
@@ -63,7 +69,7 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
         guard let session = Self.current else { return finish(503) }
         let reply = Self.answer(
             method: (request.httpMethod ?? "GET").uppercased(),
-            key: Self.key(in: url),
+            key: Self.key(for: request),
             body: { [request] in request.httpBody ?? request.httpBodyStream.map(Self.drain) },
             session: session)
         finish(reply.status, body: reply.body)
@@ -102,6 +108,12 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
         default:
             return Reply(status: 405)
         }
+    }
+
+    /// The `DB-Key` header, or else the key in the URL. Either way the open
+    /// app's session answers, so no key names another app's data.
+    static func key(for request: URLRequest) -> String {
+        request.value(forHTTPHeaderField: keyHeader) ?? request.url.map(key(in:)) ?? ""
     }
 
     /// Everything after the path's first "/", percent-decoded. `db://data/`

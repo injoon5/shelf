@@ -75,12 +75,12 @@ Then connect Shelf to `http://localhost:8787` with the token whose hash is `AUTH
 - `AppMeta` has a `revertible` flag and the server has `POST /api/apps/{slug}/revert`, which is what the icon menu's Revert calls.
 - A closed sheet's unused install key is reused by the next sheet while it has ten minutes left, since the server allows twenty live keys.
 - On the server, `rev` comes from a counter table rather than `MAX(rev) + 1`, which could go backwards after a purge.
+- The `DB` helper sends the key in a `DB-Key` header to `db://data/`, not in the URL, which would cut a key at `?` or `#`. The URL forms in §8.4 still answer.
 
 **Not done**
 
 - The 120 fps check in Instruments (§13.1) and a frame-by-frame comparison of a finger-driven close against Springboard's: the simulator can't be made to perform the system's home gesture, so there is no recording to compare with.
 - With an app's own keyboard up, the swipe from the bottom edge lands on the keyboard and can't close the app. The drag from the status bar still does.
-- A `DB` key containing `?` or `#` is cut short at that character, because the helper puts the key in a URL as it is.
 - Everything under "Later" in the plan.
 
 ## Layout
