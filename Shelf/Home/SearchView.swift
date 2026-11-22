@@ -13,23 +13,31 @@ struct SearchResults: View {
     var body: some View {
         let results = library.apps.matching(model.query)
         ScrollView {
-            if results.isEmpty {
-                // The title alone: the system's version adds a line of advice.
-                ContentUnavailableView("No Results for “\(model.query)”", systemImage: "magnifyingglass")
-                    .environment(\.colorScheme, .dark)
-                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            } else {
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(geometry.labelWidth), spacing: geometry.columnPitch - geometry.labelWidth),
-                                         count: HomeMetrics.columns),
-                          spacing: geometry.rowPitch - geometry.cellHeight) {
-                    ForEach(results) { app in
-                        HomeIcon(app: app, geometry: geometry, labelSize: labelSize)
-                            .frame(height: geometry.cellHeight, alignment: .top)
-                            .environment(\.iconPlace, .result)
+            Group {
+                if results.isEmpty {
+                    // The title alone: the system's version adds a line of advice.
+                    ContentUnavailableView("No Results for “\(model.query)”", systemImage: "magnifyingglass")
+                        .environment(\.colorScheme, .dark)
+                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                } else {
+                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(geometry.labelWidth), spacing: geometry.columnPitch - geometry.labelWidth),
+                                             count: HomeMetrics.columns),
+                              spacing: geometry.rowPitch - geometry.cellHeight) {
+                        ForEach(results) { app in
+                            HomeIcon(app: app, geometry: geometry, labelSize: labelSize)
+                                .frame(height: geometry.cellHeight, alignment: .top)
+                                .environment(\.iconPlace, .result)
+                        }
                     }
+                    .padding(.top, HomeMetrics.topInset)
                 }
-                .padding(.top, HomeMetrics.topInset)
             }
+            // The content fills what is visible, so a tap anywhere that
+            // isn't a result reaches it (the scroll view would take one
+            // aimed at anything behind it) and closes search.
+            .frame(maxWidth: .infinity, minHeight: geometry.size.height - geometry.safeTop - bottom, alignment: .top)
+            .contentShape(.rect)
+            .onTapGesture { model.endSearch() }
         }
         .scrollDismissesKeyboard(.immediately)
         .scrollBounceBehavior(.always)
@@ -41,7 +49,7 @@ struct SearchResults: View {
         }
         .padding(.top, geometry.safeTop)
         .padding(.bottom, bottom)
-        // Tapping anywhere that isn't a result closes search.
+        // Above and below the scroll view too.
         .background {
             Color.clear.contentShape(.rect).onTapGesture { model.endSearch() }
         }

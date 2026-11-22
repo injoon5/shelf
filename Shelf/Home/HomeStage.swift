@@ -327,6 +327,16 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         card.face.removeFromSuperview()
         cards.removeAll { $0 === card }
         if cards.isEmpty { setBackdrop(0) }
+        coverChanged()
+    }
+
+    /// While an app is open, VoiceOver stays in it: the Home Screen behind
+    /// is out of sight, so it is out of reach too.
+    private func coverChanged() {
+        let covered = cards.contains { $0.phase == .open }
+        for layer in [wallpaper.view!, home] where layer.accessibilityElementsHidden != covered {
+            layer.accessibilityElementsHidden = covered
+        }
     }
 
     /// The topmost card that is open and at rest.
@@ -371,6 +381,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             }
         }
         setBackdrop(openness)
+        coverChanged()
         if cards.allSatisfy({ $0.phase == .open }) {
             displayLink?.invalidate()
             displayLink = nil
