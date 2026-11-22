@@ -217,30 +217,3 @@ actor SyncEngine {
         if generation != self.generation { throw API.Failure.unauthorized }
     }
 }
-
-/// The `@AppStorage` keys Kiln writes for apps: `kiln.app.{slug}.{key}` once
-/// `SourceRewriter` has prefixed them, all in one shared `UserDefaults`.
-struct AppStorageKeys: @unchecked Sendable {
-    // `UserDefaults` is thread-safe; it just isn't marked `Sendable`.
-    let defaults: UserDefaults
-
-    init(_ defaults: UserDefaults) {
-        self.defaults = defaults
-    }
-
-    /// Every key of one app.
-    func remove(slug: String) {
-        remove(prefix: "kiln.app.\(slug).")
-    }
-
-    /// Every app's keys.
-    func removeAll() {
-        remove(prefix: "kiln.app.")
-    }
-
-    private func remove(prefix: String) {
-        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix(prefix) {
-            defaults.removeObject(forKey: key)
-        }
-    }
-}

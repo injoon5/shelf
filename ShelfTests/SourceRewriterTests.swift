@@ -73,6 +73,17 @@ struct SourceRewriterTests {
         #expect(out.contains(#"@AppStorage("habits.after")"#))
     }
 
+    @Test func aStringLaterOnTheAttributesLineIsStillAString() {
+        let source = #"""
+        @AppStorage("note") var note = """
+            @AppStorage("inside")
+            """
+        """#
+        let out = scoped(source)
+        #expect(out.contains(#"@AppStorage("habits.note")"#))
+        #expect(out.contains(#"    @AppStorage("inside")"#))
+    }
+
     @Test func similarNamesAndOtherFormsAreNotTouched() {
         #expect(scoped(#"@AppStorageBacked("k") var k = 0"#) == #"@AppStorageBacked("k") var k = 0"#)
         #expect(scoped("@AppStorage(key) var k = 0") == "@AppStorage(key) var k = 0")
@@ -93,7 +104,10 @@ struct SourceRewriterTests {
     }
 
     @Test @MainActor func twoAppsWithTheSameKeyKeepTheirOwnValues() {
-        // What the rewrite is for: Kiln stores `@AppStorage` under `kiln.app.<key>`.
+        // What the rewrite is for: Kiln stores `@AppStorage` under `kiln.app.<key>`,
+        // in the `UserDefaults.standard` every test shares, so these slugs are this run's own.
+        let one = "one-\(UUID().uuidString)"
+        let two = "two-\(UUID().uuidString)"
         let source = """
         import SwiftUI
         struct ContentView: View {
@@ -101,13 +115,13 @@ struct SourceRewriterTests {
             var body: some View { Text("\\(count)").onAppear { count += 1 } }
         }
         """
-        let defaults = UserDefaults.standard
-        defer { ["kiln.app.one.count", "kiln.app.two.count"].forEach(defaults.removeObject) }
-        _ = Kiln.validate(SourceRewriter.prepare(source, slug: "one"))
-        _ = Kiln.validate(SourceRewriter.prepare(source, slug: "one"))
-        _ = Kiln.validate(SourceRewriter.prepare(source, slug: "two"))
-        #expect(defaults.integer(forKey: "kiln.app.one.count") == 2)
-        #expect(defaults.integer(forKey: "kiln.app.two.count") == 1)
+        let keys = AppStorageKeys(.standard)
+        defer { [one, two].forEach { keys.remove(slug: $0) } }
+        _ = Kiln.validate(SourceRewriter.prepare(source, slug: one))
+        _ = Kiln.validate(SourceRewriter.prepare(source, slug: one))
+        _ = Kiln.validate(SourceRewriter.prepare(source, slug: two))
+        #expect(keys.defaults.integer(forKey: "kiln.app.\(one).count") == 2)
+        #expect(keys.defaults.integer(forKey: "kiln.app.\(two).count") == 1)
     }
 }
 
