@@ -120,7 +120,7 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    private static func drain(_ stream: InputStream) -> Data {
+    static func drain(_ stream: InputStream) -> Data {
         stream.open()
         defer { stream.close() }
         var data = Data()

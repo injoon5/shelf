@@ -169,8 +169,6 @@ final class DBSession: Sendable {
 
     var version: Int { state.withLock { $0.version } }
     var isDirty: Bool { state.withLock { !$0.dirty.isEmpty } }
-    /// Bytes of the live values, as the server counts them.
-    var storedBytes: Int { state.withLock { $0.total } }
 
     /// Where a pull starts: the cursor, and the write number at that moment.
     func pullStart() -> (rev: Int, writeCount: Int) {

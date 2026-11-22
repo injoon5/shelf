@@ -8,7 +8,7 @@ import Testing
 ///
 /// Every test runs synchronously on the main actor, blocking it while each
 /// request loads, exactly as Kiln does. That also keeps these tests from
-/// interleaving with `PreludeTests`, which registers its own `db` protocol.
+/// interleaving with the fixture tests, whose `FakeServer` also answers `db`.
 @MainActor
 @Suite(.serialized)
 struct ShelfDBProtocolTests {
@@ -114,7 +114,7 @@ struct ShelfDBProtocolTests {
         defer { ShelfDBProtocol.deactivate(session) }
 
         // The probe fires onAppear, which loads the list; the change saves it back.
-        let source = try Fixture.app("todos-db") + "\n" + Prelude.db
+        let source = SourceRewriter.prepare(try Fixture.app("todos-db"), slug: "todos-db")
         let validation = Kiln.validate(source)
         #expect(validation.errors.isEmpty, "\(validation.errors)")
 
