@@ -360,7 +360,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private func startTicking() {
         guard displayLink == nil else { return }
         let link = CADisplayLink(target: self, selector: #selector(tick))
-        link.preferredFrameRateRange = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
+        link.preferredFrameRateRange = Motion.frameRate
         link.add(to: .main, forMode: .common)
         displayLink = link
         tick()

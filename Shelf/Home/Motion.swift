@@ -56,6 +56,10 @@ enum Motion {
     /// The pill widening or narrowing for its page dots.
     static let pillResize = Spring(duration: 0.25, bounce: 0)
 
+    /// What follows the cards every frame (the Home Screen's scale, blur
+    /// and dim) runs at the display's full rate, 120 Hz on ProMotion.
+    static let frameRate = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
+
     // MARK: Fades
 
     static let fade = Animation.easeOut(duration: 0.2)
