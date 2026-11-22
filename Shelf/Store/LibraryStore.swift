@@ -32,7 +32,9 @@ final class LibraryStore {
     @ObservationIgnored private let cache: AppCache
     @ObservationIgnored private let engine: SyncEngine
     @ObservationIgnored private let server: @Sendable () -> API?
-    @ObservationIgnored private let data: AppData
+    /// Every app's data. The runner, the New App preview and Settings reach
+    /// it through the library, so the demo's apps write only to the demo's.
+    @ObservationIgnored let data: AppData
     @ObservationIgnored private let layoutURL: URL
     @ObservationIgnored private var generation = 0
     /// Which sync `isSyncing` is about: an abandoned one never clears it.
@@ -44,7 +46,8 @@ final class LibraryStore {
     @ObservationIgnored private var isDemo = false
 
     convenience init() {
-        self.init(cache: .standard, data: .shared,
+        self.init(cache: .standard,
+                  data: AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api }),
                   layoutURL: URL.applicationSupportDirectory.appending(path: "layout.json"),
                   server: { Account.api })
     }
