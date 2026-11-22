@@ -414,7 +414,7 @@ struct SyncHarness {
 
         cache.removeSource(for: "a")
         #expect(cache.source(for: "a") == nil)
-        #expect(throws: AppCache.Failure.self) { try cache.writeSource("x", for: "../evil") }
+        #expect(throws: SlugFolder.Failure.self) { try cache.writeSource("x", for: "../evil") }
     }
 
     @Test func unreadableIndexIsEmpty() throws {

@@ -262,7 +262,7 @@ final class DBSession: Sendable {
 actor AppData {
     static let shared = AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api })
 
-    private let root: URL
+    private let files: SlugFolder
     private let api: @Sendable () -> API?
     private let pushDelay: Duration
     private let saveDelay: Duration
@@ -287,7 +287,7 @@ actor AppData {
         pushDelay: Duration = .seconds(2),
         saveDelay: Duration = .milliseconds(250)
     ) {
-        self.root = root
+        files = SlugFolder(root: root, fileExtension: "json")
         self.api = api
         self.pushDelay = pushDelay
         self.saveDelay = saveDelay
@@ -325,7 +325,7 @@ actor AppData {
 
     /// Pushes everything dirty. Called when Shelf goes to the background.
     func pushAll() async {
-        for slug in slugsOnDisk() { _ = session(slug) }
+        for slug in files.slugs() { _ = session(slug) }
         for slug in sessions.keys { save(slug) }
         let dirty = sessions.filter { $0.value.isDirty }.map(\.key)
         await withTaskGroup(of: Void.self) { group in
@@ -337,10 +337,8 @@ actor AppData {
     func usage() async -> [String: Int] {
         for slug in sessions.keys { save(slug) }
         var usage: [String: Int] = [:]
-        for slug in slugsOnDisk() {
-            let url = root.appending(path: slug + ".json")
-            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0
-            usage[slug] = size
+        for slug in files.slugs() {
+            usage[slug] = files.size(of: slug)
         }
         return usage
     }
@@ -366,7 +364,7 @@ actor AppData {
         pulls = [:]
         sessions = [:]
         saved = [:]
-        try? FileManager.default.removeItem(at: root)
+        files.removeAll()
     }
 
     // MARK: Sessions and files
@@ -381,28 +379,17 @@ actor AppData {
         return session
     }
 
-    private func fileURL(_ slug: String) -> URL? {
-        AppCache.isFileSafe(slug) ? root.appending(path: slug + ".json", directoryHint: .notDirectory) : nil
-    }
-
     private func readFile(_ slug: String) -> DBSession.File? {
-        guard let url = fileURL(slug), let data = try? Data(contentsOf: url) else { return nil }
-        return try? JSONDecoder().decode(DBSession.File.self, from: data)
-    }
-
-    private func slugsOnDisk() -> [String] {
-        let names = (try? FileManager.default.contentsOfDirectory(atPath: root.path(percentEncoded: false))) ?? []
-        return names.filter { $0.hasSuffix(".json") }.map { String($0.dropLast(".json".count)) }
+        files.read(slug).flatMap { try? JSONDecoder().decode(DBSession.File.self, from: $0) }
     }
 
     /// Writes the session's file now, if it changed since the last save.
     private func save(_ slug: String) {
         saveTimers.removeValue(forKey: slug)?.cancel()
-        guard let session = sessions[slug], let url = fileURL(slug), saved[slug] != session.version else { return }
+        guard let session = sessions[slug], saved[slug] != session.version else { return }
         let (data, version) = session.encoded()
         do {
-            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-            try data.write(to: url, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+            try files.write(data, for: slug)
             saved[slug] = version
         } catch {
             // Kept in memory; the next save tries again.
