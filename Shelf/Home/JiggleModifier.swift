@@ -30,10 +30,11 @@ struct Shake: ViewModifier {
         content.keyframeAnimator(initialValue: CGFloat.zero, trigger: trigger) { view, x in
             view.offset(x: x)
         } keyframes: { _ in
-            SpringKeyframe(HomeMetrics.shakeDistance, duration: 0.07, spring: .snappy)
-            SpringKeyframe(-HomeMetrics.shakeDistance, duration: 0.1, spring: .snappy)
-            SpringKeyframe(HomeMetrics.shakeDistance / 2, duration: 0.1, spring: .snappy)
-            SpringKeyframe(0, duration: 0.25, spring: .bouncy)
+            let step = Motion.shakeSteps
+            SpringKeyframe(HomeMetrics.shakeDistance, duration: step[0], spring: .snappy)
+            SpringKeyframe(-HomeMetrics.shakeDistance, duration: step[1], spring: .snappy)
+            SpringKeyframe(HomeMetrics.shakeDistance / 2, duration: step[2], spring: .snappy)
+            SpringKeyframe(0, duration: step[3], spring: .bouncy)
         }
     }
 }

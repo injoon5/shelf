@@ -138,6 +138,13 @@ final class HomeModel {
         flip = nil
     }
 
+    /// How many pages there are to scroll through. While editing there is
+    /// always an empty page at the end to drop onto, and a dot for it.
+    func pageCount(_ pages: [[String]]) -> Int {
+        let spare = isEditing && pages.last?.isEmpty == false
+        return max(pages.count + (spare ? 1 : 0), 1)
+    }
+
     func pagesMoved(_ moving: Bool) {
         dotsTask?.cancel()
         if moving {

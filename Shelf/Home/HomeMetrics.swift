@@ -25,24 +25,47 @@ enum HomeMetrics {
 
     // MARK: Icon
 
-    /// The continuous corner that approximates Apple's icon mask.
-    static let iconCornerRatio: CGFloat = 0.2237
+    /// The icon's corner, as a fraction of its side. A continuous corner of
+    /// 26% traces Springboard's iOS 27 icon outline (`design/reference/
+    /// README.md`, "Icon corners") to within a fifth of a pixel on every row
+    /// at 3x when rendered alone, and within half a pixel on screen; the
+    /// 22.37% of iOS 18 and earlier is up to 6.6 pixels tighter.
+    static let iconCornerRatio: CGFloat = 0.26
+
+    /// The icon's outline at `size`. Everything that draws or clips to an
+    /// icon uses this, so no state can show two different corners.
+    static func iconShape(_ size: CGFloat) -> RoundedRectangle {
+        RoundedRectangle(cornerRadius: size * iconCornerRatio, style: .continuous)
+    }
+
     static let glyphRatio: CGFloat = 0.5
-    /// How far the top of the fill is lightened toward white.
-    static let fillLift: Double = 0.14
+    /// How far the top of the fill is lightened toward white. Measured on
+    /// Messages, whose top is its bottom colour about a quarter of the way to white.
+    static let fillLift: Double = 0.24
+    /// The glyph's bottom, against its white top: a little of the depth
+    /// iOS 27's icon glyphs have.
+    static let glyphShade: Double = 0.88
     static let darkFillTop = Color(red: 0.173, green: 0.173, blue: 0.180)
     static let darkFillBottom = Color(red: 0.110, green: 0.110, blue: 0.118)
     static let rimWidth: CGFloat = 0.5
-    static let rimOpacity: Double = 0.22
-    static let pressedBrightness: Double = -0.25
-    static let pendingDim: Double = 0.45
+    /// The rim's brightness at the top edge, and the fainter return at the bottom.
+    static let rimOpacity: Double = 0.4
+    static let rimReturnOpacity: Double = 0.12
+    /// Touch-down lays black this strong over the whole tile, glyph included,
+    /// and never scales it. On screen that leaves the tile at about 59% of its
+    /// brightness, as Springboard's (measured frame by frame on both).
+    static let pressedDim: Double = 0.37
+    static let pendingDim: Double = 0.35
     static let pieRatio: CGFloat = 0.5
     static let pieRingWidth: CGFloat = 2
 
     // MARK: Label
 
-    static let labelSize: CGFloat = 13
-    static let labelGap: CGFloat = 4
+    /// Springboard's labels are 12 pt medium: measured by ink width and stem
+    /// weight against SF Pro rendered at 12 and 13 pt.
+    static let labelSize: CGFloat = 12
+    /// Puts the label's baseline 16.3 pt below the icon, as measured.
+    static let labelGap: CGFloat = 5
     /// The label may be this much wider than its icon.
     static let labelExtraWidth: CGFloat = 22
     static let labelShadowOpacity: Double = 0.35
@@ -50,6 +73,24 @@ enum HomeMetrics {
     static let labelShadowY: CGFloat = 0.5
     static let newDotSize: CGFloat = 7
     static let newDotGap: CGFloat = 4
+
+    // MARK: Glass
+
+    /// The one glass the Home Screen is made of: the dock, the search pill,
+    /// the search field, the edit-mode buttons and Clear icons. One
+    /// definition, so they always match each other and Springboard's.
+    ///
+    /// Springboard's dock and pill let the wallpaper through with only a
+    /// light frost: over black they are 32 of 255 in light mode and 17 in
+    /// dark, with a bright hairline at the edge. `.regular` turns into a pale
+    /// grey slab over a dark photo (134 over black); `.clear` measures 32 with
+    /// the same hairline, and a black tint takes it to Springboard's 17 in
+    /// dark mode.
+    static func glass(_ scheme: ColorScheme) -> Glass {
+        scheme == .dark ? .clear.tint(darkGlassTint) : .clear
+    }
+
+    static let darkGlassTint = Color.black.opacity(0.45)
 
     // MARK: Dock
 
@@ -67,10 +108,15 @@ enum HomeMetrics {
 
     static let pillSize = CGSize(width: 78.67, height: 29.33)
     static let pillGap: CGFloat = 20.33
-    static let pillGlyphGap: CGFloat = 4
-    static let pageDotSize: CGFloat = 7
-    static let pageDotGap: CGFloat = 8
-    static let pageDotDim: Double = 0.4
+    static let pillGlyphGap: CGFloat = 3.33
+    /// "Search" and its glyph: measured over black, Springboard's text is
+    /// 189 of 255 on a 32 glass, which is white at 70%.
+    static let pillTextOpacity: Double = 0.7
+    /// Springboard's dots, measured in edit mode: 6.67 pt on a 14 pt pitch,
+    /// the other pages' at 45% white.
+    static let pageDotSize: CGFloat = 6.67
+    static let pageDotGap: CGFloat = 7.33
+    static let pageDotDim: Double = 0.45
 
     // MARK: Search
 
@@ -78,11 +124,18 @@ enum HomeMetrics {
     static let searchSideInset: CGFloat = 16
     static let searchTopGap: CGFloat = 8
     static let searchDim: Double = 0.35
+    /// Above this average brightness, the wallpaper behind the search field
+    /// counts as light, and the field's text turns dark.
+    static let brightBackdrop: Double = 0.55
     static let searchPull: CGFloat = 60
 
     // MARK: Edit mode and banner
 
-    static let editButtonInset: CGFloat = 16
+    /// Springboard's two edit-mode buttons, measured: glass capsules 36 pt in
+    /// from the sides, 19 pt from the top, where the hidden status bar was.
+    static let editButtonSize = CGSize(width: 66, height: 28)
+    static let editButtonInset: CGFloat = 36
+    static let editButtonTop: CGFloat = 19
     static let jiggleAngle: Double = 1.6
     static let jiggleShift: CGFloat = 0.6
     /// How close to a screen edge a dragged icon flips the page.

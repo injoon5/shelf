@@ -5,13 +5,14 @@ import SwiftUI
 struct DockGlass: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
+    @Environment(\.colorScheme) private var scheme
     var geometry: HomeGeometry
 
     var body: some View {
         let frame = geometry.dockFrame
         Color.clear
             .frame(width: frame.width, height: frame.height)
-            .glassEffect(.regular, in: .rect(cornerRadius: geometry.dockRadius, style: .continuous))
+            .glassEffect(HomeMetrics.glass(scheme), in: .rect(cornerRadius: geometry.dockRadius, style: .continuous))
             .onDrop(of: [.text], delegate: DockDropDelegate(geometry: geometry, library: library, model: model))
             .position(x: frame.midX, y: frame.midY)
     }
@@ -37,7 +38,7 @@ struct DockIcons: View {
                 if model.isEditing { model.stopEditing() }
                 model.sheet = .settings
             } label: {
-                IconArt(face: .settings, size: geometry.iconSize).modifier(IconPress())
+                IconArt(face: .settings, size: geometry.iconSize).modifier(IconPress(size: geometry.iconSize))
             }
             .buttonStyle(IconButtonStyle())
             .accessibilityLabel("Settings")

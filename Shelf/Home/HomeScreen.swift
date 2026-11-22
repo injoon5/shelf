@@ -58,6 +58,7 @@ struct HomeScreen: View {
 private struct HomeContent: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
+    @Environment(ShelfSettings.self) private var settings
     @Environment(\.zoomNamespace) private var zoom
     @ScaledMetric(relativeTo: .caption2) private var labelSize = HomeMetrics.labelSize
     var size: CGSize
@@ -67,6 +68,12 @@ private struct HomeContent: View {
     private var geometry: HomeGeometry {
         HomeGeometry(size: size, safeTop: safeTop, displayRadius: Display.cornerRadius,
                      labelHeight: UIFont.systemFont(ofSize: labelSize, weight: .medium).lineHeight)
+    }
+
+    /// Light or dark content for the search field, after the wallpaper behind it.
+    private var searchTone: ColorScheme {
+        let top = (safeTop + HomeMetrics.searchTopGap) / max(size.height, 1)
+        return Wallpaper.tone(settings, screen: size, band: top...(top + HomeMetrics.searchFieldHeight / max(size.height, 1)))
     }
 
     var body: some View {
@@ -95,12 +102,12 @@ private struct HomeContent: View {
                     DockGlass(geometry: geometry)
                         .opacity(isSearching ? 0 : 1)
                     if isSearching {
-                        SearchField()
+                        SearchField(tone: searchTone)
                             .glassEffectID("search", in: glass)
                             .frame(width: size.width - 2 * HomeMetrics.searchSideInset, height: HomeMetrics.searchFieldHeight)
                             .position(x: size.width / 2, y: safeTop + HomeMetrics.searchTopGap + HomeMetrics.searchFieldHeight / 2)
                     } else {
-                        SearchPill(pageCount: max(library.layout.pages.count, 1))
+                        SearchPill(pageCount: model.pageCount(library.layout.pages))
                             .glassEffectID("search", in: glass)
                             .position(x: geometry.pillFrame.midX, y: geometry.pillFrame.midY)
                     }
@@ -120,7 +127,7 @@ private struct HomeContent: View {
             if model.isEditing {
                 EditControls()
                     .frame(maxHeight: .infinity, alignment: .top)
-                    .padding(.top, max(safeTop - HomeMetrics.minimumHit - HomeMetrics.bannerTopGap, HomeMetrics.bannerTopGap))
+                    .padding(.top, HomeMetrics.editButtonTop)
                     .transition(.opacity)
             }
 
@@ -146,29 +153,43 @@ private struct HomeContent: View {
     }
 }
 
-/// The two buttons edit mode adds, where Springboard puts its own.
+/// The two buttons edit mode adds, where Springboard puts its own and in the
+/// same glass capsules: New App on the left, Done on the right.
 private struct EditControls: View {
     @Environment(HomeModel.self) private var model
 
     var body: some View {
         HStack {
-            Button {
-                model.sheet = .newApp
-            } label: {
-                Image(systemName: "plus")
-                    .font(.body.weight(.semibold))
-                    .frame(minWidth: HomeMetrics.minimumHit - 16, minHeight: HomeMetrics.minimumHit - 16)
-            }
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
+            EditButton(symbol: "plus", title: "New App") { model.sheet = .newApp }
             Spacer()
-            Button("Done") {
-                model.stopEditing()
-            }
-            .fontWeight(.semibold)
-            .buttonStyle(.glassProminent)
+            EditButton(symbol: "checkmark", title: "Done") { model.stopEditing() }
         }
         .padding(.horizontal, HomeMetrics.editButtonInset)
+    }
+}
+
+private struct EditButton: View {
+    @Environment(\.colorScheme) private var scheme
+    var symbol: String
+    var title: LocalizedStringKey
+    var action: () -> Void
+
+    var body: some View {
+        let size = HomeMetrics.editButtonSize
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.body.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: size.width, height: size.height)
+                .glassEffect(HomeMetrics.glass(scheme).interactive(), in: .capsule)
+                // The capsule is shorter than a finger; the target isn't.
+                .padding(.vertical, (HomeMetrics.minimumHit - size.height) / 2)
+                .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .padding(.vertical, -(HomeMetrics.minimumHit - size.height) / 2)
+        .accessibilityLabel(title)
+        .dynamicTypeSize(...DynamicTypeSize.xLarge)
     }
 }
 

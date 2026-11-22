@@ -25,6 +25,12 @@ enum Motion {
     /// The app replacing its launch screen.
     static let launch = Animation.easeOut(duration: 0.18)
 
+    // MARK: Shake
+
+    /// An icon refusing to open: out, back past the middle, half out, home.
+    /// Each step's duration, in order.
+    static let shakeSteps: [Double] = [0.07, 0.1, 0.1, 0.25]
+
     // MARK: Jiggle
 
     /// One full swing, there and back.
@@ -35,9 +41,9 @@ enum Motion {
 
     /// Nothing that loads shows a spinner before this.
     static let spinnerDelay: Duration = .milliseconds(300)
-    /// How far the pie creeps while a download is still running.
-    static let pieCreep: Double = 0.85
-    static let pieCreepTime: Double = 2.5
+    /// How far the pie creeps while a download is still running, and how.
+    static let pieCreepTarget: Double = 0.85
+    static let pieCreep = Animation.easeOut(duration: 2.5)
     static let bannerStay: Duration = .seconds(3)
     static let pageDotsStay: Duration = .seconds(1)
     static let copiedStay: Duration = .milliseconds(1500)

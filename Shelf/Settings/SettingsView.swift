@@ -60,9 +60,6 @@ struct SettingsView: View {
                             Text(style.title).tag(style)
                         }
                     }
-                    if settings.iconStyle == .tinted {
-                        TintSwatches(selection: $settings.accent)
-                    }
                 }
 
                 Section {
@@ -101,38 +98,6 @@ struct SettingsView: View {
                 picked = nil
             }
         }
-    }
-}
-
-/// The accent Tinted icons take.
-private struct TintSwatches: View {
-    @Binding var selection: Tint
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: SettingsMetrics.swatchSpacing) {
-                ForEach(Tint.allCases, id: \.self) { tint in
-                    Button {
-                        selection = tint
-                    } label: {
-                        Circle()
-                            .fill(tint.color)
-                            .frame(width: SettingsMetrics.swatchSize, height: SettingsMetrics.swatchSize)
-                            .padding(SettingsMetrics.swatchRingGap)
-                            .overlay {
-                                Circle().strokeBorder(tint.color, lineWidth: SettingsMetrics.swatchRing)
-                                    .opacity(selection == tint ? 1 : 0)
-                            }
-                            .frame(minWidth: HomeMetrics.minimumHit - SettingsMetrics.swatchSpacing, minHeight: HomeMetrics.minimumHit)
-                            .contentShape(.rect)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(tint.rawValue.capitalized)
-                }
-            }
-        }
-        .scrollIndicators(.hidden)
-        .listRowInsets(EdgeInsets(top: 0, leading: SettingsMetrics.fieldInset, bottom: 0, trailing: 0))
     }
 }
 

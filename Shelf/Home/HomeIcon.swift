@@ -18,21 +18,21 @@ struct HomeIcon: View {
         // A long press means one thing at a time: the menu on a still Home
         // Screen, a drag once the icons are jiggling. (Offered together, the
         // menu's lifted preview swallows the drag and no drop target hears it.)
+        // The system lifts and drags a snapshot of the icon itself, cut to its
+        // own outline: one corner shape in every state, no label, and the
+        // system's own lift (a slight scale, a soft shadow, the rest dimmed).
         Group {
             if model.isEditing {
-                button.onDrag {
-                    model.lifted(app.slug)
-                    return NSItemProvider(object: app.slug as NSString)
-                } preview: {
-                    // Previews are drawn outside this view tree and inherit nothing from it.
-                    IconArt(face: face, size: geometry.iconSize).environment(settings)
-                }
+                button
+                    .contentShape(.dragPreview, IconOutline(size: geometry.iconSize))
+                    .onDrag {
+                        model.lifted(app.slug)
+                        return NSItemProvider(object: app.slug as NSString)
+                    }
             } else {
-                button.contextMenu {
-                    menu
-                } preview: {
-                    IconArt(face: face, size: geometry.iconSize * 2).environment(settings)
-                }
+                button
+                    .contentShape(.contextMenuPreview, IconOutline(size: geometry.iconSize))
+                    .contextMenu { menu }
             }
         }
         .modifier(Jiggle(isOn: model.isEditing))
@@ -57,13 +57,10 @@ struct HomeIcon: View {
     }
 
     private var art: some View {
-        IconArt(face: face, size: geometry.iconSize)
-            .modifier(IconPress())
-            .overlay {
-                PendingOverlay(isRunnable: app.isRunnable, isDownloading: library.downloading.contains(app.slug),
-                               size: geometry.iconSize)
-            }
-            .modifier(ZoomSource(id: app.slug, radius: geometry.iconRadius, namespace: zoom))
+        PendingIcon(face: face, size: geometry.iconSize, isRunnable: app.isRunnable,
+                    isDownloading: library.downloading.contains(app.slug))
+            .modifier(IconPress(size: geometry.iconSize))
+            .modifier(ZoomSource(id: app.slug, size: geometry.iconSize, namespace: zoom))
     }
 
     @ViewBuilder
@@ -93,7 +90,7 @@ struct HomeIcon: View {
 /// The icon an app grows out of and shrinks back into.
 struct ZoomSource: ViewModifier {
     var id: String
-    var radius: CGFloat
+    var size: CGFloat
     /// Nil takes this icon out of the running: another copy of it (a search
     /// result, say) is the one on screen.
     var namespace: Namespace.ID?
@@ -101,46 +98,52 @@ struct ZoomSource: ViewModifier {
 
     func body(content: Content) -> some View {
         content.matchedTransitionSource(id: id, in: namespace ?? nowhere) { source in
-            source.clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+            source.clipShape(HomeMetrics.iconShape(size))
         }
     }
 }
 
-/// Dims an icon and draws the install pie while its source is on the way.
+/// An icon whose source may still be on the way. While it is, the tile
+/// darkens and the install pie takes the glyph's place, so the two never
+/// draw over each other.
 ///
 /// A brand-new app has nothing else to show, so its pie appears at once. An
 /// update to an app that already runs shows nothing unless it is slow.
-private struct PendingOverlay: View {
+private struct PendingIcon: View {
+    var face: IconFace
+    var size: CGFloat
     var isRunnable: Bool
     var isDownloading: Bool
-    var size: CGFloat
     @State private var progress = 0.0
     @State private var isSlow = false
 
-    private var isVisible: Bool { !isRunnable || (isDownloading && isSlow) }
+    private var isPending: Bool { !isRunnable || (isDownloading && isSlow) }
 
     var body: some View {
-        ZStack {
-            if isVisible {
-                RoundedRectangle(cornerRadius: size * HomeMetrics.iconCornerRatio, style: .continuous)
-                    .fill(.black.opacity(HomeMetrics.pendingDim))
-                InstallPie(progress: progress, size: size * HomeMetrics.pieRatio)
+        IconArt(face: face, size: size, showsGlyph: !isPending)
+            .overlay {
+                if isPending {
+                    ZStack {
+                        HomeMetrics.iconShape(size).fill(.black.opacity(HomeMetrics.pendingDim))
+                        InstallPie(progress: progress, size: size * HomeMetrics.pieRatio)
+                    }
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+                }
             }
-        }
-        .animation(Motion.fade, value: isVisible)
-        .allowsHitTesting(false)
-        .task(id: isDownloading) {
-            guard isDownloading else {
-                isSlow = false
-                withAnimation(Motion.pie) { progress = isRunnable ? 1 : 0 }
-                return
+            .animation(Motion.fade, value: isPending)
+            .task(id: isDownloading) {
+                guard isDownloading else {
+                    isSlow = false
+                    withAnimation(Motion.pie) { progress = isRunnable ? 1 : 0 }
+                    return
+                }
+                // The real size is a few kilobytes, gone in one packet, so the pie
+                // creeps toward full and finishes when the download does.
+                progress = 0
+                withAnimation(Motion.pieCreep) { progress = Motion.pieCreepTarget }
+                try? await Task.sleep(for: Motion.spinnerDelay)
+                if !Task.isCancelled { isSlow = true }
             }
-            // The real size is a few kilobytes, gone in one packet, so the pie
-            // creeps toward full and finishes when the download does.
-            progress = 0
-            withAnimation(.easeOut(duration: Motion.pieCreepTime)) { progress = Motion.pieCreep }
-            try? await Task.sleep(for: Motion.spinnerDelay)
-            if !Task.isCancelled { isSlow = true }
-        }
     }
 }

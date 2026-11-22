@@ -41,57 +41,83 @@ struct IconArt: View {
     @Environment(\.colorScheme) private var scheme
     var face: IconFace
     var size: CGFloat
+    /// Off while an install pie stands where the glyph goes.
+    var showsGlyph = true
 
-    private var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: size * HomeMetrics.iconCornerRatio, style: .continuous)
-    }
+    private var shape: RoundedRectangle { HomeMetrics.iconShape(size) }
 
     var body: some View {
-        let style = settings.iconStyle.resolved(for: scheme)
+        let style = settings.iconStyle
         Image(systemName: face.symbol)
             // An icon's glyph is part of its artwork: it scales with the icon, not with text.
             .font(.system(size: size * HomeMetrics.glyphRatio, weight: .medium))
             .symbolRenderingMode(.hierarchical)
-            .foregroundStyle(style == .dark ? AnyShapeStyle(face.tint) : AnyShapeStyle(.white))
+            .foregroundStyle(glyphStyle(style))
+            .opacity(showsGlyph ? 1 : 0)
             .frame(width: size, height: size)
             .background { fill(style) }
-            .modifier(IconGlass(style: style, accent: settings.accent.color, shape: shape))
+            .modifier(IconGlass(isOn: style == .clear, scheme: scheme, shape: shape))
             .overlay { rim }
             .compositingGroup()
     }
 
+    /// Colour icons in dark mode are the system's dark variant: a near-black
+    /// tile with the glyph in the app's colour. Otherwise the glyph is white,
+    /// a shade darker at the foot.
+    private func glyphStyle(_ style: IconStyle) -> AnyShapeStyle {
+        if style == .color, scheme == .dark { return AnyShapeStyle(face.tint) }
+        return AnyShapeStyle(LinearGradient(colors: [.white, .white.opacity(HomeMetrics.glyphShade)],
+                                            startPoint: .top, endPoint: .bottom))
+    }
+
     @ViewBuilder
     private func fill(_ style: IconStyle) -> some View {
-        switch style {
-        case .dark:
-            shape.fill(LinearGradient(colors: [HomeMetrics.darkFillTop, HomeMetrics.darkFillBottom], startPoint: .top, endPoint: .bottom))
-        case .clear, .tinted:
+        switch (style, scheme) {
+        case (.clear, _):
             EmptyView()
-        case .standard, .automatic:
+        case (.color, .dark):
+            shape.fill(LinearGradient(colors: [HomeMetrics.darkFillTop, HomeMetrics.darkFillBottom], startPoint: .top, endPoint: .bottom))
+        case (.color, _):
             shape.fill(LinearGradient(colors: [face.tint.mix(with: .white, by: HomeMetrics.fillLift), face.tint],
                                       startPoint: .top, endPoint: .bottom))
         }
     }
 
-    /// The bright edge Liquid Glass icons carry, strongest at the top.
+    /// The bright edge Liquid Glass icons carry: strongest at the top, gone
+    /// at the sides, a faint return along the bottom.
     private var rim: some View {
         shape.strokeBorder(
-            LinearGradient(colors: [.white.opacity(HomeMetrics.rimOpacity), .white.opacity(0)], startPoint: .top, endPoint: .bottom),
+            LinearGradient(stops: [
+                .init(color: .white.opacity(HomeMetrics.rimOpacity), location: 0),
+                .init(color: .white.opacity(0), location: 0.5),
+                .init(color: .white.opacity(HomeMetrics.rimReturnOpacity), location: 1),
+            ], startPoint: .top, endPoint: .bottom),
             lineWidth: HomeMetrics.rimWidth)
     }
 }
 
-/// Clear and Tinted icons are system glass; the other styles are painted.
+/// The icon's outline inside a whole Home Screen cell: the icon sits at the
+/// top, centred, with its label below. The system lifts and drags a cell
+/// clipped to this, so its previews have the icon's own corners and no label.
+struct IconOutline: Shape {
+    var size: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        HomeMetrics.iconShape(size).path(in: CGRect(x: rect.midX - size / 2, y: rect.minY, width: size, height: size))
+    }
+}
+
+/// Clear icons are the Home Screen's own glass.
 private struct IconGlass: ViewModifier {
-    var style: IconStyle
-    var accent: Color
+    var isOn: Bool
+    var scheme: ColorScheme
     var shape: RoundedRectangle
 
     func body(content: Content) -> some View {
-        switch style {
-        case .clear: content.glassEffect(.clear, in: shape)
-        case .tinted: content.glassEffect(.regular.tint(accent), in: shape)
-        default: content
+        if isOn {
+            content.glassEffect(HomeMetrics.glass(scheme), in: shape)
+        } else {
+            content
         }
     }
 }
@@ -146,10 +172,17 @@ extension EnvironmentValues {
 
 struct IconPress: ViewModifier {
     @Environment(\.isIconPressed) private var isPressed
+    var size: CGFloat
 
     func body(content: Content) -> some View {
         content
-            .brightness(isPressed ? HomeMetrics.pressedBrightness : 0)
+            // Darkening by multiplying, as Springboard does, keeps the glyph
+            // and the fill in proportion instead of greying them.
+            .overlay {
+                HomeMetrics.iconShape(size)
+                    .fill(.black.opacity(isPressed ? HomeMetrics.pressedDim : 0))
+                    .allowsHitTesting(false)
+            }
             // Down is instant; only the release eases.
             .animation(isPressed ? nil : Motion.quick, value: isPressed)
     }

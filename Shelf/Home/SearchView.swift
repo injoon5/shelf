@@ -4,6 +4,9 @@ import SwiftUI
 struct SearchField: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
+    @Environment(\.colorScheme) private var scheme
+    /// Light or dark, after the stretch of wallpaper the field sits on.
+    var tone: ColorScheme
     @FocusState private var isFocused: Bool
 
     var body: some View {
@@ -37,7 +40,10 @@ struct SearchField: View {
         .padding(.leading, HomeMetrics.searchSideInset)
         .padding(.trailing, model.query.isEmpty ? HomeMetrics.searchSideInset : 0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .glassEffect(.regular.interactive(), in: .capsule)
+        // The glass lets the wallpaper through, so the text (and the keyboard)
+        // follow the wallpaper behind it, not the appearance setting.
+        .environment(\.colorScheme, tone)
+        .glassEffect(HomeMetrics.glass(scheme).interactive(), in: .capsule)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .onAppear { isFocused = true }
     }
@@ -55,7 +61,8 @@ struct SearchResults: View {
         let top = geometry.safeTop + HomeMetrics.searchTopGap * 2 + HomeMetrics.searchFieldHeight
         ScrollView {
             if results.isEmpty {
-                ContentUnavailableView.search(text: model.query)
+                // The title alone: the system's version adds a line of advice.
+                ContentUnavailableView("No Results for “\(model.query)”", systemImage: "magnifyingglass")
                     .environment(\.colorScheme, .dark)
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             } else {

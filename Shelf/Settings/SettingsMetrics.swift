@@ -10,8 +10,4 @@ enum SettingsMetrics {
     static let fieldInset: CGFloat = 18
     static let fieldRadius: CGFloat = 25
     static let glyphGap: CGFloat = 36
-    static let swatchSize: CGFloat = 28
-    static let swatchSpacing: CGFloat = 10
-    static let swatchRing: CGFloat = 2.5
-    static let swatchRingGap: CGFloat = 3
 }

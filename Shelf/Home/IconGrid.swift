@@ -24,12 +24,7 @@ struct IconGrid: View {
         }
     }
 
-    /// While editing there is always an empty page at the end to drop onto.
-    private var pageCount: Int {
-        let pages = library.layout.pages
-        let spare = model.isEditing && pages.last?.isEmpty == false && pages.count > 0
-        return max(pages.count + (spare ? 1 : 0), 1)
-    }
+    private var pageCount: Int { model.pageCount(library.layout.pages) }
 
     var body: some View {
         @Bindable var model = model
@@ -51,6 +46,8 @@ struct IconGrid: View {
                 }
             }
             .frame(width: CGFloat(pageCount) * width, height: geometry.size.height)
+            // Inside the content, so the scroll view is one of its ancestors.
+            .background(TouchesBeginAtOnce())
             .onDrop(of: [.text], delegate: GridDropDelegate(geometry: geometry, library: library, model: model, pageCount: pageCount))
         }
         .scrollTargetBehavior(.paging)
@@ -65,7 +62,6 @@ struct IconGrid: View {
         .onScrollPhaseChange { _, phase in
             if pageCount > 1 { model.pagesMoved(phase != .idle) }
         }
-        .background(TouchesBeginAtOnce())
         .sensoryFeedback(.impact(weight: .light), trigger: model.snaps)
     }
 }
@@ -84,7 +80,7 @@ private struct TouchesBeginAtOnce: UIViewRepresentable {
         DispatchQueue.main.async {
             var ancestor = view.superview
             while let current = ancestor {
-                if let scroll = current.subviews.compactMap({ $0 as? UIScrollView }).first ?? current as? UIScrollView {
+                if let scroll = current as? UIScrollView {
                     scroll.delaysContentTouches = false
                     return
                 }

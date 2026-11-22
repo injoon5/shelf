@@ -4,6 +4,7 @@ import SwiftUI
 /// page dots while the pages are moving.
 struct SearchPill: View {
     @Environment(HomeModel.self) private var model
+    @Environment(\.colorScheme) private var scheme
     var pageCount: Int
 
     var body: some View {
@@ -18,10 +19,12 @@ struct SearchPill: View {
                 } else {
                     HStack(spacing: HomeMetrics.pillGlyphGap) {
                         Image(systemName: "magnifyingglass")
+                            .imageScale(.small)
+                            .fontWeight(.bold)
                         Text("Search")
                     }
-                    .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.white.opacity(HomeMetrics.pillTextOpacity))
                     .transition(.opacity)
                 }
             }
@@ -30,6 +33,8 @@ struct SearchPill: View {
             .contentShape(.capsule)
         }
         .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .capsule)
+        .glassEffect(HomeMetrics.glass(scheme).interactive(), in: .capsule)
+        // Springboard's pill keeps its size at every text size; so does this one.
+        .dynamicTypeSize(.large)
     }
 }
