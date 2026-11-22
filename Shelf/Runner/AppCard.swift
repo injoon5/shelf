@@ -279,7 +279,8 @@ final class AppCard {
         guard let grab else { return (false, .zero, 0) }
         self.grab = nil
         let travelVelocity = grab.direction.travel(velocity)
-        let slope = CardMotion.scaleSlope(travel: travel, screenHeight: screen.height)
+        let slope = CardMotion.scaleSlope(travel: travel, screenHeight: screen.height,
+                                          floor: CardMotion.floor(startScale: grab.scale))
         let widthVelocity = grab.frame.size.width / max(grab.scale, .ulpOfOne) * slope * travelVelocity
         return (CardMotion.closes(travel: travel, velocity: travelVelocity), velocity, widthVelocity)
     }

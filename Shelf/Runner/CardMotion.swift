@@ -44,28 +44,33 @@ enum CardMotion {
         max(screenHeight * RunnerMetrics.trackTravel, 1)
     }
 
+    /// The smallest a card caught at `startScale` gets: `trackMinScale` for
+    /// one caught full screen, and as much smaller again for one caught
+    /// smaller, so a card caught near its icon never jumps to the floor.
+    static func floor(startScale: CGFloat) -> CGFloat {
+        min(RunnerMetrics.trackMinScale, startScale * RunnerMetrics.trackMinScale)
+    }
+
     /// The card's width, as a fraction of the screen's, after `travel`
     /// points toward closing. It shrinks quickly at first and ever more
-    /// slowly toward `trackMinScale`; pushed the other way it grows only a
-    /// little, resisting.
-    static func scale(travel: CGFloat, screenHeight: CGFloat) -> CGFloat {
+    /// slowly toward `floor`; pushed the other way it grows only a little,
+    /// resisting.
+    static func scale(travel: CGFloat, screenHeight: CGFloat, floor: CGFloat = RunnerMetrics.trackMinScale) -> CGFloat {
         let reach = reach(screenHeight)
-        let floor = RunnerMetrics.trackMinScale
         if travel >= 0 { return floor + (1 - floor) * exp(-travel / reach) }
         return 1 + RunnerMetrics.trackOvergrow * (1 - exp(travel / reach))
     }
 
     /// How fast the scale changes per point of travel at `travel`.
-    static func scaleSlope(travel: CGFloat, screenHeight: CGFloat) -> CGFloat {
+    static func scaleSlope(travel: CGFloat, screenHeight: CGFloat, floor: CGFloat = RunnerMetrics.trackMinScale) -> CGFloat {
         let reach = reach(screenHeight)
-        if travel >= 0 { return -(1 - RunnerMetrics.trackMinScale) / reach * exp(-travel / reach) }
+        if travel >= 0 { return -(1 - floor) / reach * exp(-travel / reach) }
         return -RunnerMetrics.trackOvergrow / reach * exp(travel / reach)
     }
 
     /// The travel that gives `scale`: where a drag on a card that is
     /// already smaller than the screen starts from.
-    static func travel(scale: CGFloat, screenHeight: CGFloat) -> CGFloat {
-        let floor = RunnerMetrics.trackMinScale
+    static func travel(scale: CGFloat, screenHeight: CGFloat, floor: CGFloat = RunnerMetrics.trackMinScale) -> CGFloat {
         guard scale < 1 else { return 0 }
         let fraction = max((scale - floor) / (1 - floor), .ulpOfOne)
         return -reach(screenHeight) * log(fraction)
@@ -76,8 +81,9 @@ enum CardMotion {
     /// began. The point under the finger stays under it as the card scales.
     static func tracked(start: CardFrame, startScale: CGFloat, finger: CGPoint, translation: CGPoint,
                         direction: CloseDirection, screenHeight: CGFloat) -> (frame: CardFrame, travel: CGFloat) {
-        let travel = travel(scale: startScale, screenHeight: screenHeight) + direction.travel(translation)
-        let ratio = scale(travel: travel, screenHeight: screenHeight) / max(startScale, .ulpOfOne)
+        let floor = floor(startScale: startScale)
+        let travel = travel(scale: startScale, screenHeight: screenHeight, floor: floor) + direction.travel(translation)
+        let ratio = scale(travel: travel, screenHeight: screenHeight, floor: floor) / max(startScale, .ulpOfOne)
         let center = CGPoint(x: finger.x + translation.x + (start.center.x - finger.x) * ratio,
                              y: finger.y + translation.y + (start.center.y - finger.y) * ratio)
         let size = CGSize(width: start.size.width * ratio, height: start.size.height * ratio)
