@@ -7,3 +7,8 @@ xcuserdata/
 *.xcresult
 Vendor/Kiln/
 Config/Local.xcconfig
+
+# Captures of the real Home Screen are large, can be made again, and some are
+# of a personal phone. Their README, which holds what was learned, is kept.
+design/reference/springboard/*
+!design/reference/springboard/README.md
