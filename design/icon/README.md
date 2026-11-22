@@ -7,8 +7,9 @@ orange tile echoes the horizon in Shelf's wallpaper.
 - `appearances.png`: Default, Dark, Clear (light and dark) and Tinted (light and
   dark), rendered with Xcode's `ictool`.
 - `sizes.png`: the size ladder.
-- `home-light.png`: on a Home Screen.
-- `rejected.png`: concepts that lost. A dock under a sunset read as a UFO, a
+- `home-light.png`, `home-dark.png`: on a Home Screen. The dark one still shows
+  the light icon; see the note below.
+- `rejected-concepts.png`: concepts that lost. A dock under a sunset read as a UFO, a
   small tile opening into a big one as "copy", a roof over a tile as Apple's
   Home, and a plain row of tiles as a toolbar until one of them leaned.
 
