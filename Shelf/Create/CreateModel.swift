@@ -108,7 +108,7 @@ final class CreateModel {
         }
         compileError = nil
         failure = nil
-        name = String((parsed.name ?? app?.meta.name ?? "").prefix(CreateMetrics.nameLimit))
+        name = Self.fitting(parsed.name ?? app?.meta.name ?? "")
         slug = app?.slug ?? freeSlug(parsed.slug, in: library)
         withAnimation(Motion.standard) { reply = parsed }
     }
@@ -119,6 +119,13 @@ final class CreateModel {
 
     func previewFailed(_ error: CompileError) {
         compileError = error
+    }
+
+    /// The longest name an app can have.
+    static let nameLimit = 32
+
+    static func fitting(_ name: String) -> String {
+        String(name.prefix(nameLimit))
     }
 
     /// `habits`, then `habits-2`, `habits-3`… until one is free.

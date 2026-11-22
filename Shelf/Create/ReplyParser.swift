@@ -25,7 +25,7 @@ enum ReplyParser {
         return ParsedReply(
             name: name,
             icon: header["icon"].flatMap(nonEmpty),
-            tint: header["tint"].flatMap { Tint(rawValue: $0.lowercased()) } ?? .blue,
+            tint: header["tint"].map(Tint.init(name:)) ?? .blue,
             slug: name.map(slug(from:)) ?? "app",
             source: source
         )

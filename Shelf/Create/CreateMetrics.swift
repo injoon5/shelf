@@ -2,7 +2,6 @@ import CoreGraphics
 
 /// The New App sheet's sizes, kept out of its views like the Home Screen's.
 enum CreateMetrics {
-    static let nameLimit = 32
     static let padding: CGFloat = 20
     static let spacing: CGFloat = 14
     static let buttonHeight: CGFloat = 36

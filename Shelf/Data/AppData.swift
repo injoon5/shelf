@@ -44,7 +44,6 @@ final class DBSession: Sendable {
         /// Each key's write number when the batch was taken. A key written
         /// again since stays dirty when the batch lands.
         fileprivate var marks: [String: Int]
-        var isEmpty: Bool { self.set.isEmpty && self.delete.isEmpty }
     }
 
     private struct State {

@@ -190,8 +190,10 @@ final class LibraryStore {
 
     // MARK: Account
 
-    /// Checks the token against the server before saving anything.
+    /// Checks the token against the server before saving anything. A
+    /// different site is a different library, so the old one goes first.
     func signIn(site: URL, token: String) async throws(API.Failure) {
+        if isSignedIn, site != Account.site { await signOut() }
         _ = try await API(origin: site, token: token).apps(ifNoneMatch: nil)
         Account.signIn(site: site, token: token)
         isSignedIn = true

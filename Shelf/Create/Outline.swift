@@ -84,17 +84,17 @@ enum Outline {
 
 extension Outline {
     struct Scan {
+        let text: SwiftText
+        /// The scalars, under the short name the scanner uses everywhere.
         let s: [Unicode.Scalar]
-        let kind: [SwiftText.Kind]
         var count: Int { s.count }
 
         init(_ source: String) {
-            let text = SwiftText(source)
+            text = SwiftText(source)
             s = text.scalars
-            kind = text.kinds
         }
 
-        func isCode(_ i: Int) -> Bool { i < count && kind[i] == .code }
+        func isCode(_ i: Int) -> Bool { text.isCode(i) }
 
         func isIdentifier(_ c: Unicode.Scalar) -> Bool { SwiftText.isIdentifier(c) }
 
@@ -162,7 +162,7 @@ extension Outline {
 
         /// Comments and whitespace; a string literal is significant.
         func isFiller(_ i: Int) -> Bool {
-            kind[i] == .comment || kind[i] == .code && isSpace(s[i])
+            text.kinds[i] == .comment || text.kinds[i] == .code && isSpace(s[i])
         }
 
         /// The last character before `i` that isn't a comment or whitespace.
@@ -186,7 +186,7 @@ extension Outline {
 
         func codeText(_ a: Int, _ b: Int) -> String {
             var v = String.UnicodeScalarView()
-            for k in a..<max(a, b) { v.append(kind[k] == .code ? s[k] : " ") }
+            for k in a..<max(a, b) { v.append(text.kinds[k] == .code ? s[k] : " ") }
             return String(v)
         }
 

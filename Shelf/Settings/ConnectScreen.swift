@@ -128,8 +128,6 @@ struct ConnectForm: View {
         Task {
             defer { isChecking = false }
             do throws(API.Failure) {
-                // A different site is a different library: start it clean.
-                if library.isSignedIn, siteURL != Account.site { await library.signOut() }
                 try await library.signIn(site: siteURL, token: token.trimmingCharacters(in: .whitespaces))
                 onConnected()
             } catch {

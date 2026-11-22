@@ -128,7 +128,7 @@ private struct PreviewView: View {
                         TextField("Name", text: $model.name)
                             .font(.headline)
                             .onChange(of: model.name) { _, name in
-                                if name.count > CreateMetrics.nameLimit { model.name = String(name.prefix(CreateMetrics.nameLimit)) }
+                                if name.count > CreateModel.nameLimit { model.name = CreateModel.fitting(name) }
                             }
                         if model.isChange {
                             Text(model.slug)
