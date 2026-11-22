@@ -1,34 +1,9 @@
 import Kiln
 import SwiftUI
 
-/// An app, full screen. It grows out of its icon behind a launch screen in the
-/// app's tint; once the zoom has settled, Kiln builds the app and it fades in.
-struct RunnerView: View {
-    // Kiln exports an `Environment` of its own.
-    @SwiftUI.Environment(\.dismiss) private var dismiss
-    var run: HomeModel.Run
-
-    var body: some View {
-        AppStage(app: run.app.meta, source: run.source, store: .synced)
-            .overlay {
-                // Apps with their own vertical drags can fight the system's
-                // pull-to-close. From the status bar, down always closes.
-                GeometryReader { proxy in
-                    Color.clear
-                        .frame(height: max(proxy.safeAreaInsets.top, RunnerMetrics.dismissStrip))
-                        .contentShape(.rect)
-                        .gesture(DragGesture(minimumDistance: RunnerMetrics.dismissDistance).onEnded { drag in
-                            if drag.translation.height > RunnerMetrics.dismissDistance { dismiss() }
-                        })
-                        .ignoresSafeArea()
-                }
-            }
-    }
-}
-
 /// Runs one app's source with Kiln and shows the result, a launch screen
-/// before it, or the error screen instead. Used full screen by the runner and
-/// inside the New App sheet as a preview.
+/// before it, or the error screen instead. Used full screen inside an app's
+/// card (`AppCard`) and inside the New App sheet as a preview.
 struct AppStage: View {
     /// Where the app's `DB` calls go.
     enum Store: Equatable {
@@ -41,41 +16,58 @@ struct AppStage: View {
     var app: AppMeta
     var source: String
     var store: Store
-    /// The launch screen waits out the zoom; a preview has no zoom to wait for.
-    var settle: Duration = Motion.launchSettle
+    /// A wait before building, for a caller that has motion to let finish.
+    var settle: Duration = .zero
+    /// Nothing is built until this is true. A card says so once its open has
+    /// come to rest, because Kiln parses on the main thread and would hitch
+    /// the motion; the data session opens meanwhile.
+    var isReady = true
+    /// Off when something else (a card's face) already is the launch screen:
+    /// the stage is then clear until the app is built.
+    var showsLaunchScreen = true
     var onError: (CompileError) -> Void = { _ in }
 
     @State private var result: KilnResult?
+    @State private var hasSession = false
     @State private var holder = SessionHolder()
+
+    private var version: String { app.version + source.count.description }
 
     var body: some View {
         ZStack {
-            // Many apps leave their background clear.
-            Color(.systemBackground).ignoresSafeArea()
             if let result {
-                if let view = result.view {
-                    view.transition(.opacity)
-                } else {
-                    ErrorScreen(face: IconFace(app), name: app.name, error: CompileError(errors: result.errors, source: source))
-                        .transition(.opacity)
+                ZStack {
+                    // Many apps leave their background clear.
+                    Color(.systemBackground).ignoresSafeArea()
+                    if let view = result.view {
+                        view
+                    } else {
+                        ErrorScreen(face: IconFace(app), name: app.name, error: CompileError(errors: result.errors, source: source))
+                    }
                 }
-            } else {
+                .transition(.opacity)
+            } else if showsLaunchScreen {
                 LaunchScreen(face: IconFace(app))
                     .transition(.opacity)
             }
         }
         // Once per open and once per version: a sync during a session swaps in
         // new code only after the app is closed and reopened, as on iOS.
-        .task(id: app.version + source.count.description) {
+        .task(id: version) {
             result = nil
-            async let opening = open()
-            try? await Task.sleep(for: settle)
-            let session = await opening
+            hasSession = false
+            let session = await open()
             guard !Task.isCancelled else {
                 await close(session)
                 return
             }
             await holder.replace(with: session, synced: store == .synced)
+            hasSession = true
+        }
+        .task(id: Build(version: version, isReady: isReady && hasSession)) {
+            guard isReady, hasSession, result == nil else { return }
+            try? await Task.sleep(for: settle)
+            guard !Task.isCancelled else { return }
             let built = Kiln.run(SourceRewriter.prepare(source, slug: app.slug))
             if built.view == nil { onError(CompileError(errors: built.errors, source: source)) }
             withAnimation(Motion.launch) { result = built }
@@ -95,6 +87,11 @@ struct AppStage: View {
     private func close(_ session: DBSession) async {
         if store == .synced { await AppData.shared.close(session) }
     }
+}
+
+private struct Build: Equatable {
+    var version: String
+    var isReady: Bool
 }
 
 /// Keeps the `db://` protocol pointed at whichever session is on screen, and

@@ -27,8 +27,16 @@ final class HomeModel {
         }
     }
 
+    /// The app that is open or opening. Its card (`AppCard`) may still be
+    /// on screen after this is cleared, on its way back to its icon.
     var run: Run?
     var sheet: Sheet?
+    /// Icons whose artwork is hidden because their app's card stands in for
+    /// them: open, or in flight. Their labels stay, as on Springboard.
+    var cardIcons: Set<String> = []
+    /// Where each icon's artwork is, in the stage's coordinates, as last laid
+    /// out: what a card grows out of and lands on.
+    @ObservationIgnored var iconFrames: [IconKey: CGRect] = [:]
 
     private(set) var isEditing = false
     /// The icon under the finger during a drag. Its place in the grid is kept
@@ -72,6 +80,24 @@ final class HomeModel {
         launches += 1
         library.opened(app.slug)
         run = Run(app: app, source: source)
+    }
+
+    /// A card on its way home was caught and sent back to full screen.
+    func reopen(_ again: Run) {
+        guard run == nil else { return }
+        launches += 1
+        run = again
+    }
+
+    func close() {
+        run = nil
+    }
+
+    /// Where a card should grow out of or land on for `slug`: the search
+    /// result while searching, otherwise its dock or grid icon.
+    func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
+        if preferResult, let frame = iconFrames[IconKey(slug: slug, place: .result)] { return frame }
+        return iconFrames[IconKey(slug: slug, place: .dock)] ?? iconFrames[IconKey(slug: slug, place: .grid)]
     }
 
     // MARK: Edit mode
@@ -160,18 +186,30 @@ final class HomeModel {
 
     // MARK: Search
 
+    // The stage (`SearchBar`) plays the warp; these only say where it goes.
+
     func beginSearch() {
-        guard !isEditing else { return }
+        guard !isEditing, !isSearching else { return }
         query = ""
-        withAnimation(Motion.search) { isSearching = true }
+        isSearching = true
     }
 
     func endSearch() {
-        withAnimation(Motion.search) { isSearching = false }
+        isSearching = false
     }
 }
 
+/// Which copy of an icon: the Home Screen shows an app once on a page or in
+/// the dock, and again among search results.
+enum IconPlace: Hashable, Sendable {
+    case grid, dock, result
+}
+
+struct IconKey: Hashable, Sendable {
+    var slug: String
+    var place: IconPlace
+}
+
 extension EnvironmentValues {
-    /// The namespace an app zooms out of its icon in.
-    @Entry var zoomNamespace: Namespace.ID?
+    @Entry var iconPlace = IconPlace.grid
 }

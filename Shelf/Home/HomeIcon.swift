@@ -6,7 +6,7 @@ struct HomeIcon: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
     @Environment(ShelfSettings.self) private var settings
-    @Environment(\.zoomNamespace) private var zoom
+    @Environment(\.iconPlace) private var place
     var app: CachedApp
     var geometry: HomeGeometry
     var labelSize: CGFloat
@@ -60,7 +60,7 @@ struct HomeIcon: View {
         PendingIcon(face: face, size: geometry.iconSize, isRunnable: app.isRunnable,
                     isDownloading: library.downloading.contains(app.slug))
             .modifier(IconPress(size: geometry.iconSize))
-            .modifier(ZoomSource(id: app.slug, size: geometry.iconSize, namespace: zoom))
+            .modifier(CardSource(key: IconKey(slug: app.slug, place: place)))
     }
 
     @ViewBuilder
@@ -87,19 +87,21 @@ struct HomeIcon: View {
     }
 }
 
-/// The icon an app grows out of and shrinks back into.
-struct ZoomSource: ViewModifier {
-    var id: String
-    var size: CGFloat
-    /// Nil takes this icon out of the running: another copy of it (a search
-    /// result, say) is the one on screen.
-    var namespace: Namespace.ID?
-    @Namespace private var nowhere
+/// The icon an app's card grows out of and shrinks back into. It tells the
+/// model where it is, and while the card stands in for it, it isn't drawn.
+struct CardSource: ViewModifier {
+    @Environment(HomeModel.self) private var model
+    var key: IconKey
 
     func body(content: Content) -> some View {
-        content.matchedTransitionSource(id: id, in: namespace ?? nowhere) { source in
-            source.clipShape(HomeMetrics.iconShape(size))
-        }
+        content
+            .opacity(model.cardIcons.contains(key.slug) ? 0 : 1)
+            .onGeometryChange(for: CGRect.self) { proxy in
+                proxy.frame(in: .named(StageLayout.space))
+            } action: { frame in
+                model.iconFrames[key] = frame
+            }
+            .onDisappear { model.iconFrames[key] = nil }
     }
 }
 

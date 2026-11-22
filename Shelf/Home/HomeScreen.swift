@@ -1,128 +1,113 @@
 import SwiftUI
 
-/// The Home Screen: icons on a wallpaper, a glass dock, and apps that zoom out
-/// of their icon. There is no navigation stack here; an app gets its own
-/// presentation, so its own stack never nests inside a launcher's.
+/// The Home Screen: icons on a wallpaper, a glass dock, and apps that open
+/// out of their icon. There is no navigation stack here; each app is a
+/// card with its own view controller (`AppCard`), so its own stack never
+/// nests inside a launcher's. The stage (`HomeStage`) does the motion; this
+/// view keeps the state and the sheets.
 struct HomeScreen: View {
     @Environment(LibraryStore.self) private var library
+    @Environment(ShelfSettings.self) private var settings
     @Environment(\.scenePhase) private var scenePhase
     @State private var model = HomeModel()
-    @Namespace private var zoom
-    @Namespace private var glass
 
     var body: some View {
         @Bindable var model = model
-        GeometryReader { outer in
-            let safeTop = outer.safeAreaInsets.top
-            GeometryReader { inner in
-                HomeContent(size: inner.size, safeTop: safeTop, glass: glass)
-                    // Labels stop growing here, as Springboard's do, so the grid never breaks.
-                    .dynamicTypeSize(...DynamicTypeSize.xLarge)
-            }
+        HomeStage(model: model, library: library, settings: settings,
+                  input: StageInput(run: model.run, isSearching: model.isSearching, isEditing: model.isEditing,
+                                    showsPageDots: model.showsPageDots,
+                                    pageCount: model.pageCount(library.layout.pages), page: model.page))
             .ignoresSafeArea()
-        }
-        .ignoresSafeArea(.keyboard)
-        .environment(model)
-        .environment(\.zoomNamespace, zoom)
-        .statusBarHidden(model.isEditing)
-        .fullScreenCover(item: $model.run) { run in
-            RunnerView(run: run)
-                .navigationTransition(.zoom(sourceID: run.id, in: zoom))
-        }
-        .sheet(item: $model.sheet) { sheet in
-            switch sheet {
-            case .settings: SettingsView()
-            case .newApp: NewAppSheet(app: nil, source: nil)
-            case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
+            .statusBarHidden(model.isEditing)
+            // With an app open, the first swipe up from the bottom edge is
+            // Shelf's, and takes the app back to the Home Screen; a second
+            // leaves Shelf. With none open, the system has the edge to itself.
+            .defersSystemGestures(on: model.run == nil ? [] : .bottom)
+            .sheet(item: $model.sheet) { sheet in
+                switch sheet {
+                case .settings: SettingsView()
+                case .newApp: NewAppSheet(app: nil, source: nil)
+                case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
+                }
             }
-        }
-        .sensoryFeedback(.impact(weight: .light), trigger: model.launches)
-        .sensoryFeedback(.impact(weight: .medium), trigger: model.editStarts)
-        .onChange(of: model.run) { _, run in
-            // An app opened from search closes back onto the Home Screen.
-            guard run != nil, model.isSearching else { return }
-            Task {
-                try? await Task.sleep(for: Motion.launchSettle)
-                model.isSearching = false
+            .sensoryFeedback(.impact(weight: .light), trigger: model.launches)
+            .sensoryFeedback(.impact(weight: .medium), trigger: model.editStarts)
+            .onChange(of: model.run) { _, run in
+                // An app opened from search closes back onto the Home Screen.
+                if run != nil, model.isSearching { model.endSearch() }
             }
-        }
-        .onChange(of: library.isSignedIn) { model.stopEditing() }
-        // A drag the system cancels never reaches a drop target, so nothing
-        // else would bring its icon back.
-        .onChange(of: scenePhase) { _, phase in
-            if phase != .active { model.endDrag() }
-        }
+            .onChange(of: library.isSignedIn) { model.stopEditing() }
+            // A drag the system cancels never reaches a drop target, so nothing
+            // else would bring its icon back.
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active { model.endDrag() }
+            }
     }
 }
 
-private struct HomeContent: View {
-    @Environment(LibraryStore.self) private var library
-    @Environment(HomeModel.self) private var model
-    @Environment(ShelfSettings.self) private var settings
-    @Environment(\.zoomNamespace) private var zoom
-    @ScaledMetric(relativeTo: .caption2) private var labelSize = HomeMetrics.labelSize
-    var size: CGSize
-    var safeTop: CGFloat
-    var glass: Namespace.ID
+/// What every layer of the stage reads.
+struct StageEnvironment {
+    var model: HomeModel
+    var library: LibraryStore
+    var settings: ShelfSettings
+    var layout: StageLayout
+}
 
-    private var geometry: HomeGeometry {
-        HomeGeometry(size: size, safeTop: safeTop, displayRadius: Display.cornerRadius,
-                     labelHeight: UIFont.systemFont(ofSize: labelSize, weight: .medium).lineHeight)
+extension View {
+    /// A layer of the stage, hosted on its own: the stage's objects, and the
+    /// coordinate space icons report their frames in. It ignores every safe
+    /// area, the keyboard's included: the stage gives it the geometry.
+    func stage(_ stage: StageEnvironment) -> some View {
+        ignoresSafeArea()
+            .environment(stage.model)
+            .environment(stage.library)
+            .environment(stage.settings)
+            .environment(stage.layout)
+            .coordinateSpace(.named(StageLayout.space))
     }
+}
 
-    /// Light or dark content for the search field, after the wallpaper behind it.
-    private var searchTone: ColorScheme {
-        let top = (safeTop + HomeMetrics.searchTopGap) / max(size.height, 1)
-        return Wallpaper.tone(settings, screen: size, band: top...(top + HomeMetrics.searchFieldHeight / max(size.height, 1)))
-    }
+struct WallpaperLayer: View {
+    var stage: StageEnvironment
 
     var body: some View {
-        let geometry = geometry
-        let isSearching = model.isSearching
-        ZStack {
-            Wallpaper(isPaused: model.run != nil)
-            Color.black.opacity(isSearching ? HomeMetrics.searchDim : 0)
+        // The gradient stops drifting while an app covers it.
+        Wallpaper(isPaused: stage.model.run != nil)
+            .stage(stage)
+    }
+}
 
+/// The grid, the dock and edit mode's buttons: what search fades away.
+struct IconsLayer: View {
+    var stage: StageEnvironment
+
+    var body: some View {
+        IconsContent()
+            .stage(stage)
+            // Labels stop growing here, as Springboard's do, so the grid never breaks.
+            .dynamicTypeSize(...DynamicTypeSize.xLarge)
+    }
+}
+
+private struct IconsContent: View {
+    @Environment(LibraryStore.self) private var library
+    @Environment(HomeModel.self) private var model
+    @Environment(StageLayout.self) private var layout
+
+    var body: some View {
+        let geometry = layout.geometry
+        ZStack {
             Group {
                 if library.apps.isEmpty {
                     EmptyLibrary(geometry: geometry)
                 } else {
-                    IconGrid(geometry: geometry, labelSize: labelSize)
-                        // While search is up, its results are what apps zoom out of.
-                        .environment(\.zoomNamespace, isSearching ? nil : zoom)
-                }
-            }
-            .opacity(isSearching ? 0 : 1)
-            .allowsHitTesting(!isSearching)
-
-            // One container, so the dock and the pill refract as one surface
-            // and the pill can become the search field.
-            GlassEffectContainer(spacing: HomeMetrics.pageDotGap) {
-                ZStack {
-                    DockGlass(geometry: geometry)
-                        .opacity(isSearching ? 0 : 1)
-                    if isSearching {
-                        SearchField(tone: searchTone)
-                            .glassEffectID("search", in: glass)
-                            .frame(width: size.width - 2 * HomeMetrics.searchSideInset, height: HomeMetrics.searchFieldHeight)
-                            .position(x: size.width / 2, y: safeTop + HomeMetrics.searchTopGap + HomeMetrics.searchFieldHeight / 2)
-                    } else {
-                        SearchPill(pageCount: model.pageCount(library.layout.pages))
-                            .glassEffectID("search", in: glass)
-                            .position(x: geometry.pillFrame.midX, y: geometry.pillFrame.midY)
-                    }
+                    IconGrid(geometry: geometry, labelSize: layout.labelSize)
                 }
             }
 
-            DockIcons(geometry: geometry, labelSize: labelSize)
-                .environment(\.zoomNamespace, isSearching ? nil : zoom)
-                .opacity(isSearching ? 0 : 1)
-                .allowsHitTesting(!isSearching)
-
-            if isSearching {
-                SearchResults(geometry: geometry, labelSize: labelSize)
-                    .transition(.opacity)
-            }
+            DockGlass(geometry: geometry)
+            DockIcons(geometry: geometry, labelSize: layout.labelSize)
+                .environment(\.iconPlace, .dock)
 
             if model.isEditing {
                 EditControls()
@@ -137,19 +122,32 @@ private struct HomeContent: View {
                     if banner == .tokenExpired { model.sheet = .settings }
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, safeTop + HomeMetrics.bannerTopGap)
+                .padding(.top, geometry.safeTop + HomeMetrics.bannerTopGap)
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
+        .frame(width: geometry.size.width, height: geometry.size.height)
         .animation(Motion.standard, value: library.banner)
-        // Pulling down anywhere on the grid opens search.
-        .simultaneousGesture(
-            DragGesture(minimumDistance: HomeMetrics.pageFlipEdge).onEnded { drag in
-                let down = drag.translation.height
-                guard !isSearching, down > HomeMetrics.searchPull, abs(drag.translation.width) < down / 2 else { return }
-                model.beginSearch()
-            }
-        )
+    }
+}
+
+/// Search results, which search fades in.
+struct ResultsLayer: View {
+    var stage: StageEnvironment
+
+    var body: some View {
+        ResultsContent()
+            .stage(stage)
+            .dynamicTypeSize(...DynamicTypeSize.xLarge)
+    }
+}
+
+private struct ResultsContent: View {
+    @Environment(StageLayout.self) private var layout
+
+    var body: some View {
+        SearchResults(geometry: layout.geometry, labelSize: layout.labelSize, bottom: layout.resultsBottom)
+            .frame(width: layout.geometry.size.width, height: layout.geometry.size.height)
     }
 }
 

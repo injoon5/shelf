@@ -1,64 +1,17 @@
 import SwiftUI
 
-/// The field the search pill turns into.
-struct SearchField: View {
-    @Environment(LibraryStore.self) private var library
-    @Environment(HomeModel.self) private var model
-    @Environment(\.colorScheme) private var scheme
-    /// Light or dark, after the stretch of wallpaper the field sits on.
-    var tone: ColorScheme
-    @FocusState private var isFocused: Bool
-
-    var body: some View {
-        @Bindable var model = model
-        HStack(spacing: HomeMetrics.bannerSpacing) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            TextField("Search", text: $model.query)
-                .focused($isFocused)
-                .submitLabel(.go)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-                .onSubmit {
-                    // Return opens the best match.
-                    guard let best = library.apps.matching(model.query).first else { return }
-                    Task { await model.open(best.slug, in: library) }
-                }
-            if !model.query.isEmpty {
-                Button {
-                    model.query = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.secondary)
-                        .frame(minWidth: HomeMetrics.minimumHit, minHeight: HomeMetrics.minimumHit)
-                        .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .font(.body)
-        .padding(.leading, HomeMetrics.searchSideInset)
-        .padding(.trailing, model.query.isEmpty ? HomeMetrics.searchSideInset : 0)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        // The glass lets the wallpaper through, so the text (and the keyboard)
-        // follow the wallpaper behind it, not the appearance setting.
-        .environment(\.colorScheme, tone)
-        .glassEffect(HomeMetrics.glass(scheme).interactive(), in: .capsule)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        .onAppear { isFocused = true }
-    }
-}
-
-/// Matching apps in the Home Screen's own four columns, best match first.
+/// Matching apps in the Home Screen's own four columns, best match first,
+/// between the status bar and the search field (`SearchBar`).
 struct SearchResults: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
     var geometry: HomeGeometry
     var labelSize: CGFloat
+    /// From the bottom of the screen to just above the field.
+    var bottom: CGFloat
 
     var body: some View {
         let results = library.apps.matching(model.query)
-        let top = geometry.safeTop + HomeMetrics.searchTopGap * 2 + HomeMetrics.searchFieldHeight
         ScrollView {
             if results.isEmpty {
                 // The title alone: the system's version adds a line of advice.
@@ -72,6 +25,7 @@ struct SearchResults: View {
                     ForEach(results) { app in
                         HomeIcon(app: app, geometry: geometry, labelSize: labelSize)
                             .frame(height: geometry.cellHeight, alignment: .top)
+                            .environment(\.iconPlace, .result)
                     }
                 }
                 .padding(.top, HomeMetrics.topInset)
@@ -85,8 +39,8 @@ struct SearchResults: View {
         } action: { _, pulled in
             if pulled { model.endSearch() }
         }
-        .padding(.top, top)
-        .padding(.bottom, geometry.size.height - geometry.dockFrame.maxY)
+        .padding(.top, geometry.safeTop)
+        .padding(.bottom, bottom)
         // Tapping anywhere that isn't a result closes search.
         .background {
             Color.clear.contentShape(.rect).onTapGesture { model.endSearch() }

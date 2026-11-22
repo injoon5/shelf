@@ -120,13 +120,33 @@ enum HomeMetrics {
 
     // MARK: Search
 
+    /// The field the pill turns into sits where iOS 27 puts it: just above
+    /// the keyboard, with the results above it.
     static let searchFieldHeight: CGFloat = 48
     static let searchSideInset: CGFloat = 16
-    static let searchTopGap: CGFloat = 8
+    /// Between the field and the top of the keyboard.
+    static let searchKeyboardGap: CGFloat = 8
+    /// Between the last row of results and the field.
+    static let searchResultsGap: CGFloat = 8
+    /// Between the magnifier and "Search", at the field's size.
+    static let searchGlyphGap: CGFloat = 6
+    /// Room kept at the field's trailing end for the clear button.
+    static let searchTextTrailing: CGFloat = 6
+    /// The placeholder, in the field. (In the pill it is `pillTextOpacity`.)
+    static let searchPlaceholderOpacity: Double = 0.6
     static let searchDim: Double = 0.35
     /// Above this average brightness, the wallpaper behind the search field
     /// counts as light, and the field's text turns dark.
     static let brightBackdrop: Double = 0.55
+    /// A pull down on the Home Screen this long takes the pill all the way
+    /// to the field.
+    static let searchPullDistance: CGFloat = 150
+    /// A pull let go of past this much of the warp opens search...
+    static let searchOpenProgress: CGFloat = 0.4
+    /// ...as does one let go of moving down faster than this (pt/s). One
+    /// moving up this fast goes back to the pill wherever it is.
+    static let searchOpenVelocity: CGFloat = 400
+    /// Pulling the results down this far past their top closes search.
     static let searchPull: CGFloat = 60
 
     // MARK: Edit mode and banner

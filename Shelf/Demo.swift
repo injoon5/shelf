@@ -45,6 +45,11 @@ enum Demo {
     static let wallpaperFile: UIImage? = UserDefaults.standard.string(forKey: "ShelfWallpaperFile")
         .flatMap(UIImage.init(contentsOfFile:))
 
+    /// Every UIKit spring this many times slower: `-ShelfSlowMotion 4`. For
+    /// recording a motion being caught mid-flight, which a test driver's own
+    /// latency can't do at full speed.
+    static let slowMotion: Double = max(UserDefaults.standard.double(forKey: "ShelfSlowMotion"), 1)
+
     static func library() -> LibraryStore {
         // `-ShelfDemoEmpty YES` shows the empty library instead.
         let defaults = UserDefaults.standard

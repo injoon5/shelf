@@ -41,11 +41,11 @@ struct Wallpaper: View {
     /// Whether what sits over a horizontal band of the screen (its top and
     /// bottom as fractions of the screen's height) wants light or dark
     /// content: the band's average brightness in the wallpaper, cropped the
-    /// way it is drawn. Worked out once per photo; the gradient is dark in
-    /// both modes.
-    static func tone(_ settings: ShelfSettings, screen: CGSize, band: ClosedRange<CGFloat>) -> ColorScheme {
+    /// way it is drawn, and darkened by `dim`. Worked out once per photo;
+    /// the gradient is dark in both modes.
+    static func tone(_ settings: ShelfSettings, screen: CGSize, band: ClosedRange<CGFloat>, dim: Double = 0) -> ColorScheme {
         guard let picture = picture(settings), let image = CIImage(image: picture) else { return .dark }
-        let key = "\(ObjectIdentifier(picture)) \(screen) \(band)"
+        let key = "\(ObjectIdentifier(picture)) \(screen) \(band) \(dim)"
         if let known = tones[key] { return known }
 
         let full = image.extent
@@ -63,7 +63,7 @@ struct Wallpaper: View {
         imaging.render(average, toBitmap: &pixel, rowBytes: 4, bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
                        format: .RGBA8, colorSpace: CGColorSpace(name: CGColorSpace.sRGB))
         let luminance = (0.2126 * Double(pixel[0]) + 0.7152 * Double(pixel[1]) + 0.0722 * Double(pixel[2])) / 255
-        let tone: ColorScheme = luminance > HomeMetrics.brightBackdrop ? .light : .dark
+        let tone: ColorScheme = luminance * (1 - dim) > HomeMetrics.brightBackdrop ? .light : .dark
         tones[key] = tone
         return tone
     }
