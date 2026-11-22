@@ -25,7 +25,7 @@ For a simulator, without opening Xcode:
 Scripts/run.sh <simulator-udid>     # builds, signs ad hoc, installs
 ```
 
-Tests (132, Swift Testing):
+Tests (Swift Testing):
 
 ```sh
 xcodebuild test -project Shelf.xcodeproj -scheme Shelf \
