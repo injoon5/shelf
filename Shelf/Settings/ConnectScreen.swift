@@ -4,7 +4,7 @@ import SwiftUI
 struct ConnectScreen: View {
     var body: some View {
         VStack(spacing: SettingsMetrics.glyphGap) {
-            IconArt(face: IconFace(symbol: "square.grid.2x2.fill", tint: .indigo), size: SettingsMetrics.glyphSize)
+            ShelfMark(size: SettingsMetrics.glyphSize)
                 .accessibilityHidden(true)
             ConnectForm(style: .glass)
         }
@@ -21,6 +21,46 @@ struct ConnectScreen: View {
     }
 
     @State private var isKeyboardUp = false
+}
+
+/// Shelf's own icon, drawn: three apps lifted just off a shelf, the last one
+/// leaning. The numbers are those of `Resources/AppIcon.icon` on its
+/// 1024-point canvas; only the real icon gets the system's glass.
+private struct ShelfMark: View {
+    @Environment(\.colorScheme) private var scheme
+    var size: CGFloat
+
+    private var dark: Bool { scheme == .dark }
+    private var paper: Color { dark ? Color(red: 0.87, green: 0.89, blue: 0.96) : .white }
+    private var accent: Color { dark ? Color(red: 1, green: 0.58, blue: 0.31) : Color(red: 1, green: 0.54, blue: 0.24) }
+    private var plank: Color { dark ? Color(red: 0.56, green: 0.60, blue: 0.77) : .white.opacity(0.9) }
+    private var sky: [Color] {
+        dark ? [Color(red: 0.12, green: 0.11, blue: 0.29), Color(red: 0.05, green: 0.04, blue: 0.11)]
+             : [Color(red: 0.43, green: 0.45, blue: 0.94), Color(red: 0.23, green: 0.21, blue: 0.72)]
+    }
+
+    var body: some View {
+        let k = size / 1024
+        ZStack {
+            LinearGradient(colors: sky, startPoint: .top, endPoint: .bottom)
+            Capsule().fill(plank)
+                .frame(width: 832 * k, height: 96 * k)
+                .position(x: 512 * k, y: 637 * k)
+            tile(x: 140, paper)
+            tile(x: 398, accent)
+            tile(x: 677, paper)
+                .rotationEffect(.degrees(-12), anchor: UnitPoint(x: 677 / 1024, y: 567 / 1024))
+        }
+        .frame(width: size, height: size)
+        .clipShape(HomeMetrics.iconShape(size))
+    }
+
+    private func tile(x: CGFloat, _ color: Color) -> some View {
+        let k = size / 1024
+        return RoundedRectangle(cornerRadius: 62 * k, style: .continuous).fill(color)
+            .frame(width: 228 * k, height: 228 * k)
+            .position(x: (x + 114) * k, y: 453 * k)
+    }
 }
 
 /// A site, a token and a Connect button. The token is checked against the
