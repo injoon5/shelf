@@ -14,11 +14,12 @@ final class CardState {
 struct CardRoot: View {
     var run: HomeModel.Run
     var state: CardState
+    var data: AppData
 
     var body: some View {
         // The card's own face is the launch screen, so the stage shows
         // nothing of its own until the app is built.
-        AppStage(app: run.app.meta, source: run.source, store: .synced,
+        AppStage(app: run.app.meta, source: run.source, store: .synced, data: data,
                  isReady: state.isSettled, showsLaunchScreen: false)
     }
 }
@@ -179,14 +180,15 @@ final class AppCard {
 
     var slug: String { run.id }
 
-    init(run: HomeModel.Run, face: CardFace, screen: CGSize, iconSize: CGFloat, fullRadius: CGFloat, from source: CGRect) {
+    init(run: HomeModel.Run, data: AppData, face: CardFace, screen: CGSize, iconSize: CGFloat, fullRadius: CGFloat,
+         from source: CGRect) {
         self.run = run
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
         startProgress = CardMotion.progress(width: source.width, iconSize: iconSize, screenWidth: screen.width)
         self.face = CardFaceView(face: face, screen: screen)
-        host = UIHostingController(rootView: CardRoot(run: run, state: state))
+        host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
         host.view.isHidden = true

@@ -88,7 +88,7 @@ struct SettingsView: View {
             .animation(Motion.quick, value: settings.iconStyle)
         }
         .presentationDetents([.medium, .large])
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
         .onChange(of: picked) { _, item in
             guard let item else { return }
             Task {
@@ -151,13 +151,13 @@ private struct AppDataList: View {
         }
         .navigationTitle("App Data")
         .navigationBarTitleDisplayMode(.inline)
-        .task { usage = await AppData.shared.usage() }
+        .task { usage = await library.data.usage() }
         .confirmationDialog(deleting.map { "Delete \($0.meta.name)’s Data" } ?? "", isPresented: Binding(
             get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
             Button("Delete Data", role: .destructive) {
                 guard let app = deleting else { return }
                 Task {
-                    await AppData.shared.deleteAll(for: app.slug)
+                    await library.data.deleteAll(for: app.slug)
                     withAnimation(Motion.quick) { usage?[app.slug] = 0 }
                 }
             }

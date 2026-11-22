@@ -87,7 +87,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
         field.addTarget(self, action: #selector(textChanged), for: .editingChanged)
         ride.addSubview(field)
 
-        maximumContentSizeCategory = .extraExtraExtraLarge
+        maximumContentSizeCategory = UIContentSizeCategory(ShelfMetrics.textSizeCap)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(_:)),
                                                name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         registerForTraitChanges([UITraitUserInterfaceStyle.self, UITraitPreferredContentSizeCategory.self]) { (bar: SearchBar, _) in
@@ -315,7 +315,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
         glassEffect.isInteractive = true
         glass.effect = glassEffect
 
-        let category = min(traitCollection.preferredContentSizeCategory, .extraExtraExtraLarge)
+        let category = min(traitCollection.preferredContentSizeCategory, UIContentSizeCategory(ShelfMetrics.textSizeCap))
         bodyFont = UIFont.preferredFont(forTextStyle: .body, compatibleWith: UITraitCollection(preferredContentSizeCategory: category))
         // Springboard's pill keeps its size at every text size.
         let pillFont = UIFont.preferredFont(forTextStyle: .caption1, compatibleWith: UITraitCollection(preferredContentSizeCategory: .large))

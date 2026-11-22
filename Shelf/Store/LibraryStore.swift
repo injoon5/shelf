@@ -32,21 +32,36 @@ final class LibraryStore {
     @ObservationIgnored private let cache: AppCache
     @ObservationIgnored private let engine: SyncEngine
     @ObservationIgnored private let server: @Sendable () -> API?
-    @ObservationIgnored private let data: AppData
+    /// Every app's data. The runner, the New App preview and Settings reach
+    /// it through the library, so the demo's apps write only to the demo's.
+    @ObservationIgnored let data: AppData
     @ObservationIgnored private let layoutURL: URL
     @ObservationIgnored private var generation = 0
     /// Which sync `isSyncing` is about: an abandoned one never clears it.
     @ObservationIgnored private var syncID = 0
     @ObservationIgnored private var bannerTask: Task<Void, Never>?
+    /// Bumped when the account changes, so a fetch begun for the old one
+    /// reports nothing about the new one.
+    @ObservationIgnored private var account = 0
     @ObservationIgnored private var isDemo = false
 
-    init() {
-        cache = .standard
-        data = .shared
-        layoutURL = URL.applicationSupportDirectory.appending(path: "layout.json")
-        server = { Account.api }
-        engine = SyncEngine(cache: cache, api: server)
-        isSignedIn = Account.api != nil
+    convenience init() {
+        self.init(cache: .standard,
+                  data: AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api }),
+                  layoutURL: URL.applicationSupportDirectory.appending(path: "layout.json"),
+                  server: { Account.api })
+    }
+
+    /// The library kept in `cache`, `data` and `layoutURL`, talking to
+    /// whatever `server` returns: nil while signed out. Tests pass their own.
+    init(cache: AppCache, data: AppData, layoutURL: URL, server: @escaping @Sendable () -> API?,
+         appStorage: AppStorageKeys = AppStorageKeys(.standard)) {
+        self.cache = cache
+        self.data = data
+        self.layoutURL = layoutURL
+        self.server = server
+        engine = SyncEngine(cache: cache, api: server, appStorage: appStorage)
+        isSignedIn = server() != nil
 
         // Read before the first frame, so the Home Screen never flashes empty.
         let index = cache.readIndex()
@@ -109,25 +124,47 @@ final class LibraryStore {
             // A sync cut short by Sign Out has nothing to report, even if
             // another account has signed in since.
             guard generation == current else { return }
-            let failure = error as? API.Failure ?? .offline
-            if failure == .unauthorized { tokenRejected = true }
-            if apps.isEmpty {
-                loadFailure = failure
-            } else {
-                show(Banner(failure))
-            }
+            report(error)
         }
     }
 
-    /// Downloads one app's source: the tap on an icon that has none yet.
-    /// Returns whether the app can run now.
+    /// Downloads one app's source: the tap on an icon that has none yet, and
+    /// Reload App. Returns whether the app can run now.
+    ///
+    /// A failure shows as a failed sync's does. A source the server no longer
+    /// has belongs to an app deleted elsewhere, so a sync takes its icon away.
     func fetch(_ slug: String) async -> Bool {
-        guard isSignedIn else { return false }
+        // The demo has no server to ask, and no token to call expired.
+        guard isSignedIn, !isDemo else { return false }
+        let account = self.account
         downloading.insert(slug)
         defer { downloading.remove(slug) }
-        guard let index = try? await engine.fetch(slug) else { return false }
-        apply(index)
-        return app(slug)?.isRunnable == true
+        do {
+            apply(try await engine.fetch(slug))
+            return app(slug)?.isRunnable == true
+        } catch {
+            // Signed out or into another account meanwhile: nothing to say.
+            guard account == self.account else { return false }
+            if case .rejected(status: 404, _)? = error as? API.Failure {
+                await sync()
+            } else {
+                report(error)
+            }
+            return false
+        }
+    }
+
+    /// The one rule for a request to the server that failed: a rejected
+    /// token is marked, so Settings says so, and the Home Screen shows the
+    /// banner, or the error in place of a grid it doesn't have yet.
+    private func report(_ error: any Error) {
+        let failure = error as? API.Failure ?? .offline
+        if failure == .unauthorized { tokenRejected = true }
+        if apps.isEmpty {
+            loadFailure = failure
+        } else {
+            show(Banner(failure))
+        }
     }
 
     /// Opening an app clears its blue dot.
@@ -235,6 +272,7 @@ final class LibraryStore {
     }
 
     private func abandonSync() async {
+        account += 1
         generation += 1
         syncID += 1
         isSyncing = false

@@ -16,6 +16,9 @@ struct AppStage: View {
     var app: AppMeta
     var source: String
     var store: Store
+    /// The library's data store (`LibraryStore.data`), which both kinds of
+    /// store come from.
+    var data: AppData
     /// Nothing is built until this is true. A card says so once its open has
     /// come to rest, because Kiln parses on the main thread and would hitch
     /// the motion; the data session opens meanwhile.
@@ -58,7 +61,7 @@ struct AppStage: View {
                 await close(session)
                 return
             }
-            await holder.replace(with: session, synced: store == .synced)
+            await holder.replace(with: session, closingIn: synced)
             hasSession = true
         }
         .task(id: isReady && hasSession) {
@@ -68,19 +71,22 @@ struct AppStage: View {
             withAnimation(Motion.launch) { result = built }
         }
         .onDisappear {
-            Task { await holder.replace(with: nil, synced: store == .synced) }
+            Task { await holder.replace(with: nil, closingIn: synced) }
         }
     }
 
+    /// Where a session is closed (saved and pushed): nowhere for a scratch one.
+    private var synced: AppData? { store == .synced ? data : nil }
+
     private func open() async -> DBSession {
         switch store {
-        case .synced: await AppData.shared.open(app.slug)
-        case .scratch(let slug): await AppData.shared.scratch(copying: slug)
+        case .synced: await data.open(app.slug)
+        case .scratch(let slug): await data.scratch(copying: slug)
         }
     }
 
     private func close(_ session: DBSession) async {
-        if store == .synced { await AppData.shared.close(session) }
+        await synced?.close(session)
     }
 }
 
@@ -90,13 +96,14 @@ struct AppStage: View {
 private final class SessionHolder {
     private var session: DBSession?
 
-    func replace(with next: DBSession?, synced: Bool) async {
+    /// `data` closes the replaced session; nil when it was a scratch one.
+    func replace(with next: DBSession?, closingIn data: AppData?) async {
         let previous = session
         session = next
         if let next { ShelfDBProtocol.activate(next) }
         if let previous {
             if next == nil { ShelfDBProtocol.deactivate(previous) }
-            if synced, previous !== next { await AppData.shared.close(previous) }
+            if let data, previous !== next { await data.close(previous) }
         }
     }
 }

@@ -312,7 +312,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
                                         pill: layout.geometry.pillFrame, iconSize: iconSize).frame
         let face = CardFace(IconFace(run.app.meta), style: settings.iconStyle,
                             dark: chosenStyle == .dark, iconSize: iconSize)
-        let card = AppCard(run: run, face: face, screen: bounds.size, iconSize: iconSize,
+        let card = AppCard(run: run, data: library.data, face: face, screen: bounds.size, iconSize: iconSize,
                            fullRadius: Display.cornerRadius, from: source)
         addChild(card.host)
         cardsView.addSubview(card.face)

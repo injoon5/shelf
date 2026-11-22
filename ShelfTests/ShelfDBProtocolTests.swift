@@ -1,7 +1,9 @@
 import Foundation
-import Kiln
+@testable import Kiln
+import SwiftUI
 import Synchronization
 import Testing
+import UIKit
 @testable import Shelf
 
 /// `db://` through the real `URLSession.shared`, the way Kiln reaches it.
@@ -102,6 +104,12 @@ struct ShelfDBProtocolTests {
         #expect(ShelfDBProtocol.answer(method: "POST", key: "k", body: { nil }, session: DBSession(slug: "x")).status == 405)
         #expect(ShelfDBProtocol.key(in: URL(string: "db://data")!) == "")
         #expect(ShelfDBProtocol.key(in: URL(string: "db://data/a%2Fb")!) == "a/b")
+
+        // The header, where `DB` puts the key, wins over the path.
+        var request = URLRequest(url: URL(string: "db://data/")!)
+        #expect(ShelfDBProtocol.key(for: request) == "")
+        request.setValue("a?b", forHTTPHeaderField: ShelfDBProtocol.keyHeader)
+        #expect(ShelfDBProtocol.key(for: request) == "a?b")
     }
 
     /// The whole path: an app run by Kiln, the appended prelude, this protocol
@@ -128,5 +136,93 @@ struct ShelfDBProtocolTests {
         #expect(first["done"] == .bool(false))
         guard case .string(let id)? = first["id"] else { Issue.record("\(first)"); return }
         #expect(UUID(uuidString: id) != nil)
+    }
+
+    /// The runner opens an app's data from the library's own store, so a
+    /// library with no server (the demo) never writes to the real one; and the
+    /// New App preview copies from that same store.
+    @Test func theStageUsesTheLibrarysStore() async throws {
+        let library = LibraryStore(demo: [], cache: AppCache(root: temporaryFolder()))
+        let slug = "stage-\(UUID().uuidString.lowercased())"
+        let stored = await library.data.open(slug)
+        try stored.write(.int(1), for: "k")
+        let source = "import SwiftUI\nstruct ContentView: View { var body: some View { Text(\"x\") } }"
+        let meta = AppMeta(slug: slug, name: "Stage", tint: .blue, version: "1")
+
+        // Opened for real: the very session the library's store holds.
+        let synced = try await showing(AppStage(app: meta, source: source, store: .synced, data: library.data))
+        #expect(synced === stored)
+
+        // The preview: a copy of what that store holds, not the store itself.
+        let scratch = try await showing(AppStage(app: meta, source: source, store: .scratch(copying: slug), data: library.data))
+        #expect(scratch !== stored)
+        #expect(scratch.value(for: "k") == .int(1))
+        await library.data.reset()
+    }
+
+    /// Shows `stage` in a window until it has opened a data session, and
+    /// returns that session.
+    private func showing(_ stage: AppStage) async throws -> DBSession {
+        let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
+        let window = UIWindow(windowScene: scene)
+        window.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
+        window.rootViewController = UIHostingController(rootView: stage)
+        window.isHidden = false
+        defer { window.isHidden = true }
+        let deadline = ContinuousClock.now + .seconds(5)
+        while ShelfDBProtocol.current == nil, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        let session = try #require(ShelfDBProtocol.current)
+        window.rootViewController = nil
+        // Closing the stage lets the protocol go before the next one.
+        while ShelfDBProtocol.current != nil, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        return session
+    }
+
+    /// Every key the server accepts comes back as itself through the prelude,
+    /// including the ones a URL would cut short, decode or collapse.
+    @Test func kilnKeepsEveryValidKeyWhole() {
+        let keys = ["a?b", "a#b", "a b", "100%", "q=1&r=2", "한글", "..", ".", "a%2Fb", " padded ", "a"]
+        let session = DBSession(slug: "keys")
+        ShelfDBProtocol.activate(session)
+        defer { ShelfDBProtocol.deactivate(session) }
+
+        let list = keys.map { "\"\($0)\"" }.joined(separator: ", ")
+        let (errors, console, _) = FeatureFixtureTests.probe(SourceRewriter.prepare(#"""
+            import SwiftUI
+
+            struct ContentView: View {
+                var body: some View {
+                    Text("x").onAppear {
+                        let keys = [\#(list)]
+                        for i in 0..<keys.count {
+                            DB.save(keys[i], "\(i)".data(using: .utf8)!)
+                        }
+                        for i in 0..<keys.count {
+                            if let data = DB.load(keys[i]), let n = try? JSONDecoder().decode(Int.self, from: data) {
+                                print("load", i, n)
+                            } else {
+                                print("load", i, "missing")
+                            }
+                        }
+                        DB.remove("a?b")
+                        print("removed", DB.load("a?b") == nil, DB.load("a") != nil)
+                    }
+                }
+            }
+            """#, slug: "keys"))
+        #expect(errors.isEmpty, "\(errors)")
+
+        var expected: [String: JSONValue] = [:]
+        for (i, key) in keys.enumerated() where key != "a?b" { expected[key] = .int(i) }
+        #expect(session.all() == expected)
+        for i in keys.indices {
+            #expect(console.contains("load \(i) \(i)\n"), "\(keys[i]): \(console)")
+        }
+        // The look-alike went alone.
+        #expect(console.contains("removed true true"), "\(console)")
     }
 }

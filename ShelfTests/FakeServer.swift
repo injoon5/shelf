@@ -5,6 +5,7 @@ import Foundation
 /// stored values, and every web request with a failure, so no fixture
 /// depends on the internet. Records every request.
 final class FakeServer: URLProtocol, @unchecked Sendable {
+    /// `path` is "/" and the key `ShelfDBProtocol` answered for.
     struct Seen: Sendable { var method: String; var path: String; var body: Data }
     private static let lock = NSLock()
     nonisolated(unsafe) private static var _seen: [Seen] = []
@@ -40,11 +41,12 @@ final class FakeServer: URLProtocol, @unchecked Sendable {
             client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
             return
         }
+        let key = ShelfDBProtocol.key(for: request)
         let session = Self.lock.withLock {
-            Self._seen.append(Seen(method: method, path: url.path, body: body))
+            Self._seen.append(Seen(method: method, path: "/" + key, body: body))
             return Self.session
         }
-        let reply = ShelfDBProtocol.answer(method: method, key: ShelfDBProtocol.key(in: url), body: { body }, session: session)
+        let reply = ShelfDBProtocol.answer(method: method, key: key, body: { body }, session: session)
         let response = HTTPURLResponse(url: url, statusCode: reply.status, httpVersion: "HTTP/1.1", headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         if let data = reply.body { client?.urlProtocol(self, didLoad: data) }

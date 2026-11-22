@@ -245,9 +245,9 @@ final class DBSession: Sendable {
 /// background.
 ///
 /// The open `DBSession` is the truth while an app runs; this actor saves it
-/// and syncs it.
+/// and syncs it. `LibraryStore` owns the one Shelf uses, so a library with
+/// no server (the demo) keeps its apps' data out of the real one.
 actor AppData {
-    static let shared = AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api })
 
     private let files: SlugFolder
     private let api: @Sendable () -> API?

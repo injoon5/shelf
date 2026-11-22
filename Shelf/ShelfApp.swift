@@ -42,7 +42,7 @@ private struct RootView: View {
                 // Writes made in the last two seconds haven't been pushed yet.
                 let task = UIApplication.shared.beginBackgroundTask()
                 Task {
-                    await AppData.shared.pushAll()
+                    await library.data.pushAll()
                     UIApplication.shared.endBackgroundTask(task)
                 }
             default:

@@ -16,7 +16,7 @@ struct SyncBanner: View {
         }
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: .capsule)
-        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
     }
 
     private var title: String {
