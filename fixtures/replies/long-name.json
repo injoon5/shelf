@@ -1,0 +1,7 @@
+{
+  "name": "An Extremely Long Application Name That Goes On And On Past Sixty-Four Characters",
+  "icon": "textformat.size",
+  "tint": "red",
+  "slug": "an-extremely-long-application-name-that-goes-on-and-on-past-sixt",
+  "source": "// Name: An Extremely Long Application Name That Goes On And On Past Sixty-Four Characters\n// Icon: textformat.size\n// Tint: red\n\nstruct ContentView: View {\n    var body: some View { Text(\"Long\") }\n}\n"
+}

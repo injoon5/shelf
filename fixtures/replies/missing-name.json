@@ -1,0 +1,7 @@
+{
+  "name": null,
+  "icon": "questionmark.app",
+  "tint": "gray",
+  "slug": "app",
+  "source": "// Icon: questionmark.app\n// Tint: gray\n\nstruct ContentView: View {\n    var body: some View { Text(\"No name\") }\n}\n"
+}

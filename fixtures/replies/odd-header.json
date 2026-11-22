@@ -1,0 +1,7 @@
+{
+  "name": "Weather Now",
+  "icon": "cloud.sun.fill",
+  "tint": "teal",
+  "slug": "weather-now",
+  "source": "//NAME :   Weather Now   \n  //   icon:cloud.sun.fill\n// TiNt :  TEAL\n\nstruct ContentView: View {\n    var body: some View { Text(\"Sunny\") }\n}\n"
+}

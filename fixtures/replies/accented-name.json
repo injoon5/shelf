@@ -1,0 +1,7 @@
+{
+  "name": "Café Crème — Déjà Vu!",
+  "icon": "cup.and.saucer.fill",
+  "tint": "brown",
+  "slug": "cafe-creme-deja-vu",
+  "source": "// Name: Café Crème — Déjà Vu!\n// Icon: cup.and.saucer.fill\n// Tint: brown\n\nstruct ContentView: View {\n    var body: some View { Text(\"Café\") }\n}\n"
+}

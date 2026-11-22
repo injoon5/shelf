@@ -1,0 +1,7 @@
+{
+  "name": "가계부",
+  "icon": "wonsign.circle",
+  "tint": "yellow",
+  "slug": "app",
+  "source": "// Name: 가계부\n// Icon: wonsign.circle\n// Tint: yellow\n\nstruct ContentView: View {\n    var body: some View { Text(\"가계부\") }\n}\n"
+}

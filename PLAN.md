@@ -4,6 +4,8 @@ An iPhone Home Screen for personal apps. Each app is a single Swift file stored 
 
 Two repos change. The prompts for making apps are in the [Appendix](#appendix-prompts).
 
+> **As built.** This is the plan as it was written. The [README](README.md#where-the-build-differs-from-the-plan) lists where the build departs from it: Kiln needed a patch before apps could save data, the Home Screen's numbers were measured from Springboard, and the prompts were corrected against what Kiln really runs.
+
 - **ij5.dev**: adds an apps table, an API, an admin editor, and a small key-value store that apps can use for their data. None of this exists yet.
 - **shelf**: adds the iOS app. It needs iOS 27 or later and uses Liquid Glass throughout.
 
@@ -784,7 +786,7 @@ These are checked with screenshots attached to the report:
 
 ## Appendix: prompts
 
-These are the prompts exactly as Shelf copies them. Text in `{{…}}` is filled in at copy time. When implementing, copy each block into `Resources/Prompts/` unchanged.
+These are the prompts as first written. The ones Shelf copies are in `Shelf/Resources/Prompts/`; they have since been corrected against Kiln, and those files are the source of truth. Text in `{{…}}` is filled in at copy time.
 
 ### A. New app
 

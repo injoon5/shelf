@@ -1,0 +1,7 @@
+{
+  "name": "Fences",
+  "icon": "rectangle.split.3x1",
+  "tint": "pink",
+  "slug": "fences",
+  "source": "// Name: Fences\n// Icon: rectangle.split.3x1\n// Tint: Pink\n\nstruct ContentView: View {\n    var body: some View { Text(\"Fences\") }\n}\n"
+}

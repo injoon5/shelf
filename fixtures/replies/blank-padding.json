@@ -1,0 +1,7 @@
+{
+  "name": "Padded",
+  "icon": "square.dashed",
+  "tint": "blue",
+  "slug": "padded",
+  "source": "// Name: Padded\n// Icon: square.dashed\n// Tint: blue\n\nstruct ContentView: View {\n    var body: some View { Text(\"Padded\") }\n}   \n"
+}

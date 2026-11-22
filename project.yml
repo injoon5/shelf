@@ -1,0 +1,77 @@
+name: Shelf
+options:
+  bundleIdPrefix: dev.ij5
+  deploymentTarget:
+    iOS: "27.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+configFiles:
+  Debug: Config/Shelf.xcconfig
+  Release: Config/Shelf.xcconfig
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+packages:
+  # Kiln 0.2.1 plus Vendor/kiln-0.2.1.patch, put in place by Scripts/bootstrap.sh.
+  Kiln:
+    path: Vendor/Kiln
+targets:
+  Shelf:
+    type: application
+    platform: iOS
+    sources:
+      - path: Shelf
+        excludes: ["Resources/Prompts"]
+      - path: Shelf/Resources/Prompts
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: Kiln
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ij5.shelf
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+    info:
+      path: Shelf/Info.plist
+      properties:
+        CFBundleDisplayName: Shelf
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        ITSAppUsesNonExemptEncryption: false
+        # Lets the site URL point at a dev server on this Mac or the LAN.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+  ShelfTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: ShelfTests
+      - path: fixtures
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: Shelf
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ij5.shelf.tests
+schemes:
+  Shelf:
+    build:
+      targets:
+        Shelf: all
+        ShelfTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [ShelfTests]

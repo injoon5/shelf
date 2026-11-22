@@ -1,0 +1,8 @@
+{
+  "error": "That app is not valid.",
+  "fields": {
+    "name": "Give the app a name.",
+    "tint": "Use one of: red, orange, yellow, green, mint, teal, cyan, blue, indigo, purple, pink, brown, gray.",
+    "source": "The source is empty."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Tip Jar",
+  "icon": "dollarsign.circle",
+  "tint": "mint",
+  "slug": "tip-jar",
+  "source": "// Name: Tip Jar\n// Icon: dollarsign.circle\n// Tint: mint\n\nimport SwiftUI\n\nstruct ContentView: View {\n    @AppStorage(\"bill\") private var bill = 0.0\n    var body: some View {\n        Form { TextField(\"Bill\", value: $bill, format: .number) }\n    }\n}\n"
+}
