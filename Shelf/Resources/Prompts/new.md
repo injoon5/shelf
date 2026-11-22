@@ -19,6 +19,7 @@ Reply with one ```swift block. Start it with these three comment lines:
 
 The app starts at `struct ContentView: View`. Don't add an `@main App`, a `#Preview` or a `PreviewProvider`.
 
+<!-- if install -->
 ## Installing
 
 If you can run shell commands, install the app yourself after writing it. Save the file as `App.swift`, then run:
@@ -40,17 +41,18 @@ The key installs one new app. It can't change existing apps, and it expires at {
 
 If you can't run commands, reply with the code as described above.
 
+<!-- end -->
 ## What works
 
 **Swift**
 - Structs (memberwise and custom `init`, `mutating`, `didSet`), classes, enums (raw values, associated values, `CaseIterable`, methods).
-- Closures, `switch` with patterns and `where`, tuples, ranges.
+- Closures, `switch` with patterns and `where`, tuples (write the labels in the literal: `return (min: a, max: b)`), ranges.
 - Optionals with `?.` and `??`, `if let` / `guard let` / `while let`, `defer`, `do` / `catch` / `throw`.
-- Extensions, `Codable` types, `Identifiable`, `UUID`, `Date`, `Calendar`, `DateFormatter`, `.formatted()`.
+- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `UUID`, `Date`, `Calendar`, `DateFormatter`, `.formatted()`.
 - `Int` and `Double` are distinct, as in compiled Swift.
 
 **State**
-- `@State`, `@Binding`, `@FocusState`.
+- `@State`, `@Binding`.
 - `ObservableObject` with `@Published`, used through `@StateObject`, `@ObservedObject` or `@EnvironmentObject`.
 - `@Observable` classes.
 - `@Environment(\.dismiss)`.
@@ -58,24 +60,25 @@ If you can't run commands, reply with the code as described above.
 **Views**
 - `NavigationStack` with `navigationDestination`, `NavigationSplitView`, `TabView`.
 - `List` (sections, `onDelete`, `onMove`, `swipeActions`), `Form`, `Section` with headers and footers.
-- Controls: `Picker` (segmented, menu, wheel), `Toggle`, `Stepper`, `Slider`, `TextField` (text or `value:format:`), `DatePicker`, `Menu`, `ShareLink`, `Gauge`, `ProgressView`.
+- Controls: `Picker` (segmented, menu, wheel), `Toggle`, `Stepper`, `Slider`, `TextField` (text or `value:format:`), `DatePicker`, `Menu`, `Gauge`, `ProgressView`.
 - `ContentUnavailableView`, `Label`, `LabeledContent`.
 - `.sheet`, `.alert`, `.confirmationDialog`, `.toolbar`, `.searchable`, `.contextMenu`, `.refreshable`.
 - `Grid` and `LazyVGrid`, `GeometryReader`, `ScrollView`.
-- Custom `Shape`s, `Path`, `Canvas`.
-- Swift Charts (`Chart`, `BarMark`, `LineMark` and so on).
-- `withAnimation`, transitions, `.sensoryFeedback`.
+- Custom `Shape`s that build a `Path` in `path(in:)`, and the built-in shapes with `fill`, `stroke` and `trim`.
+- Swift Charts: `Chart` with `BarMark`, `LineMark`, `PointMark`, `AreaMark`, `RuleMark`, `SectorMark` and `RectangleMark`.
+- `withAnimation`, `.animation(_:value:)`, transitions.
 
 **Time**
 - `Timer.publish(every:on:in:).autoconnect()` with `.onReceive`.
 - `TimelineView`.
+- `DispatchQueue.main.asyncAfter(deadline:)` for a one-off delay.
 
 **Network**
 - `URLSession.shared.dataTask(with:) { data, response, error in … }.resume()`. The completion handler runs on the main thread.
 - `JSONDecoder` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase` and `.iso8601`.
 - `URLComponents`, `URLQueryItem`, `URLRequest` (`httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)`).
 
-**Images:** SF Symbols, and `AsyncImage` for images on the web.
+**Images:** SF Symbols, and `AsyncImage` for images on the web, with a `phase in` closure for the loading and failed states.
 
 ## Saving data
 
@@ -112,16 +115,26 @@ Saved data has to survive future versions of the app:
 - Give every field of a saved type a default value, or make it optional, so older saved data still decodes.
 - If decoding fails, don't save over the stored data. Keep a flag such as `loadFailed`, and skip saving while it's set.
 
+Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
+- Don't write `init(from:)` or `encode(to:)`. Kiln ignores them.
+- Saved enums need raw values (`enum Priority: String, Codable`). An enum with associated values can't be saved.
+- Save arrays and dictionaries, not `Set`s. A `Set` comes back as an array.
+- To turn text into `Data`, use `text.data(using: .utf8)`. `Data(text.utf8)` comes out empty.
+
 ## What doesn't work
 
 - UIKit, `UIViewRepresentable`, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
-- `.gesture(…)` is ignored, so `DragGesture`, `MagnifyGesture` and `RotateGesture` do nothing. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
-- `matchedGeometryEffect` and `glassEffect`.
-- `Task.sleep` returns immediately. Use a `Timer` for anything timed.
+- Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
+- `Canvas`, and `Path` used directly as a view, draw nothing. Draw with a custom `Shape` instead.
+- `matchedGeometryEffect` and `glassEffect` are skipped. `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
+- `Task.sleep` returns immediately. Use a `Timer` or `DispatchQueue.main.asyncAfter` for anything timed.
 - `try await URLSession.shared.data(from:)` freezes the screen until the response arrives, for up to 20 seconds. Use `dataTask(with:)` instead.
-- Custom property wrappers and result builders.
-- Protocol conformance isn't checked. Avoid designs that depend on protocol extensions or default implementations.
-- Don't use `GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage`, `BarChart(`, `LineChart(` or `Map(latitude:`. They switch Kiln to an older engine where most of the above stops working.
+- Custom property wrappers (they're ignored) and result builders.
+- Protocol conformance isn't checked, and methods from a protocol extension don't exist. Avoid designs that depend on protocol extensions or default implementations.
+- A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.
+- Calling a method straight on `allCases` (`Kind.allCases.map { … }`) fails. Store it first: `let kinds = Kind.allCases`. `ForEach(Kind.allCases)` works.
+- `$value.animation()` on a binding. Use `.animation(_:value:)` on the view.
+- Don't write `GameCanvas(`, `.onTick(`, `.onSwipe`, `.dragToMove`, `Storage.save`, `Storage.load`, `BarChart(`, `LineChart(`, `Map(latitude:` or `Map(markers:` anywhere in the file, not even in a comment or a string. They switch Kiln to an older engine where most of the above stops working.
 
 ## Design
 

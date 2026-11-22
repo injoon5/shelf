@@ -12,6 +12,7 @@ Keep saved data loading:
 - Never rename or remove a field of a type that is saved. Add new fields only as optionals or with default values.
 - If the saved shape really must change, read the old key, convert it, and save it under a new key. Leave the old key in place.
 
+<!-- if install -->
 If you can run shell commands, install the change yourself. Save the file as `App.swift`, then run:
 
 ```sh
@@ -27,4 +28,5 @@ curl -sS -X PUT {{ORIGIN}}/api/apps/{{SLUG}} \
 
 The key updates this one app, `{{SLUG}}`, once, and expires at {{EXPIRES}}. Never print the key back, or store it anywhere else.
 
+<!-- end -->
 {{RULES}}
