@@ -90,6 +90,8 @@ final class LibraryStore {
             let slugs = apps.map(\.slug)
             Task { await data.pull(slugs) }
         } catch {
+            // A sync cut short by Sign Out has nothing to report.
+            guard isSignedIn else { return }
             let failure = error as? API.Failure ?? .offline
             if failure == .unauthorized { tokenRejected = true }
             if apps.isEmpty {
