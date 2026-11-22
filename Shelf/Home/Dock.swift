@@ -28,11 +28,10 @@ struct DockIcons: View {
 
     var body: some View {
         let pinned = library.layout.dock.compactMap { library.app($0) }
-        let count = pinned.count + 1
         ZStack {
             ForEach(Array(pinned.enumerated()), id: \.element.id) { index, app in
                 HomeIcon(app: app, geometry: geometry, labelSize: labelSize, showsLabel: false)
-                    .position(geometry.dockCenter(index, of: count))
+                    .position(geometry.pinnedCenter(index, pinned: pinned.count))
             }
             Button {
                 if model.isEditing { model.stopEditing() }
@@ -43,7 +42,7 @@ struct DockIcons: View {
             .buttonStyle(IconButtonStyle())
             .accessibilityLabel("Settings")
             .modifier(Jiggle(isOn: model.isEditing))
-            .position(geometry.dockCenter(count - 1, of: count))
+            .position(geometry.settingsCenter(pinned: pinned.count))
         }
     }
 }

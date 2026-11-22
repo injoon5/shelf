@@ -44,7 +44,7 @@ enum Prompts {
 
     /// Where the templates are: the app's bundle, found through a type in the
     /// app so tests (whose main bundle differs) read the same files.
-    nonisolated(unsafe) static var bundle = Bundle(for: BundleAnchor.self)
+    static let bundle = Bundle(for: BundleAnchor.self)
     private final class BundleAnchor {}
 
     static func template(_ name: String) -> String {

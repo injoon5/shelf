@@ -81,11 +81,11 @@ extension UIView {
     /// `velocity` is in spring lengths per second.
     /// Of `fading`, only the opacity is stopped and animated.
     static func retarget(_ views: [UIView], fading: [UIView] = [], _ spring: Motion.Spring, velocity: CGFloat = 0,
-                         changes: @escaping () -> Void, completion: ((Bool) -> Void)? = nil) {
+                         changes: @escaping () -> Void) {
         views.forEach { $0.freezeOnScreen() }
         fading.forEach { $0.freezeOpacityOnScreen() }
         UIView.animate(springDuration: spring.playedDuration, bounce: spring.bounce, initialSpringVelocity: spring.played(velocity: velocity),
-                       delay: 0, options: [.allowUserInteraction], animations: changes, completion: completion)
+                       delay: 0, options: [.allowUserInteraction], animations: changes, completion: nil)
     }
 }
 

@@ -110,11 +110,19 @@ enum ReplyParser {
 
     /// The first value of each header key, read from the comment lines at the top.
     static func header(of source: String) -> [String: String] {
-        var found: [String: String] = [:]
+        Dictionary(uniqueKeysWithValues: headerLines(of: source).map { ($0.key, $0.value) })
+    }
+
+    /// The comment lines at the top that are header lines, the first for
+    /// each key, with what they say.
+    static func headerLines(of source: String) -> [(key: String, value: String, line: String)] {
+        var found: [(key: String, value: String, line: String)] = []
         for line in source.components(separatedBy: "\n") {
             if isBlank(line) { continue }
             guard hasPrefix(trimmed(line), "//") else { break }
-            if let (key, value) = headerLine(line), found[key] == nil { found[key] = value }
+            if let (key, value) = headerLine(line), !found.contains(where: { $0.key == key }) {
+                found.append((key, value, line))
+            }
         }
         return found
     }

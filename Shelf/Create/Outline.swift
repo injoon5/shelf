@@ -45,16 +45,7 @@ enum Outline {
 
     /// The `// Name:`, `// Icon:` and `// Tint:` lines, read the way `ReplyParser` reads them.
     static func header(of source: String) -> [String] {
-        var lines: [String] = []
-        var seen: Set<String> = []
-        for line in ReplyParser.normalized(source).components(separatedBy: "\n") {
-            if ReplyParser.isBlank(line) { continue }
-            guard ReplyParser.hasPrefix(ReplyParser.trimmed(line), "//") else { break }
-            if let (key, _) = ReplyParser.headerLine(line), seen.insert(key).inserted {
-                lines.append(ReplyParser.trimmed(line))
-            }
-        }
-        return lines
+        ReplyParser.headerLines(of: ReplyParser.normalized(source)).map { ReplyParser.trimmed($0.line) }
     }
 
     /// Types that are saved: `Codable`, `Encodable` or `Decodable` ones, and

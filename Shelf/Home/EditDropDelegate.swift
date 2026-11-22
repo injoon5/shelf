@@ -59,10 +59,9 @@ struct DockDropDelegate: DropDelegate {
         guard library.layout.dockHasRoom(for: slug) else { return DropProposal(operation: .forbidden) }
         let isPinned = dock.contains(slug)
 
-        // Settings keeps the last place, so an app can take any place before it.
-        let apps = isPinned ? dock.count : dock.count + 1
+        let pinned = isPinned ? dock.count : dock.count + 1
         let x = info.location.x + geometry.dockFrame.minX
-        let target = Layout.Slot.dock(index: min(geometry.dockIndex(at: x, of: apps + 1), apps - 1))
+        let target = Layout.Slot.dock(index: geometry.pinnedIndex(at: x, pinned: pinned))
         if library.layout.slot(of: slug) != target {
             withAnimation(Motion.reorder) { _ = library.move(slug, to: target) }
         }
