@@ -255,7 +255,6 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         search.open()
     }
 
-    /// The results end a little above the search field's top.
     private func placeResults(aboveFieldAt top: CGFloat) {
         layout.resultsBottom = view.bounds.height - top + HomeMetrics.searchResultsGap
     }
@@ -401,7 +400,6 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         let scale = 1 - (1 - RunnerMetrics.backdropScale) * openness
         home.transform = CGAffineTransform(scaleX: scale, y: scale)
         backdropDim.alpha = openness * RunnerMetrics.backdropDim
-        // A full system blur, faded in with the cards.
         backdropBlur.alpha = openness * RunnerMetrics.backdropBlur
     }
 

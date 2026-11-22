@@ -196,7 +196,6 @@ struct IconPress: ViewModifier {
     }
 }
 
-/// The label under a Home Screen icon.
 struct IconLabel: View {
     var name: String
     var isNew: Bool

@@ -19,12 +19,10 @@ struct AppStorageKeys: @unchecked Sendable {
         self.defaults = defaults
     }
 
-    /// Every key of one app.
     func remove(slug: String) {
         remove(prefix: Self.kilnPrefix + Self.scope(slug))
     }
 
-    /// Every app's keys.
     func removeAll() {
         remove(prefix: Self.kilnPrefix)
     }

@@ -48,7 +48,6 @@ struct SlugFolder: Sendable {
         try? FileManager.default.removeItem(at: url)
     }
 
-    /// The slug of every file in the folder.
     func slugs() -> [String] {
         let suffix = "." + fileExtension
         let names = (try? FileManager.default.contentsOfDirectory(atPath: root.path(percentEncoded: false))) ?? []

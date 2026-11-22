@@ -1,7 +1,6 @@
 import Foundation
 
 /// The ij5.dev API, as Shelf uses it. One value per (site, token) pair.
-/// Every method throws `API.Failure` and nothing else.
 struct API: Sendable {
     var origin: URL
     var token: String

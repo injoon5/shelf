@@ -58,7 +58,6 @@ enum Demo {
             CachedApp(meta: AppMeta(slug: app.0, name: app.1, icon: app.2, tint: app.3, version: "demo"),
                       cachedVersion: index == 4 ? nil : "demo", isNew: index == 2)
         }
-        // Every app runs the same source.
         let cache = AppCache(root: URL.temporaryDirectory.appending(path: "shelf-demo"))
         for app in cached { try? cache.writeSource(source, for: app.slug) }
         return LibraryStore(demo: cached, dock: all.isEmpty ? [] : ["habits", "todos"], cache: cache)

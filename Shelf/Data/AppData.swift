@@ -13,13 +13,9 @@ final class DBSession: Sendable {
     /// Why a write was refused. The limits are the server's (ij5.dev
     /// `$lib/types`), enforced here so a push can never be refused for good.
     enum Refusal: Error, Equatable, Sendable {
-        /// Not 1–128 printable characters, or contains "/".
         case invalidKey
-        /// The value's JSON is over 64 KB.
         case valueTooLarge
-        /// The app already keeps 1,000 keys.
         case tooManyKeys
-        /// The app's values would total over 5 MB.
         case storeFull
     }
 
@@ -437,7 +433,6 @@ actor AppData {
         save(slug)
     }
 
-    /// The pull under way for an app, or a new one.
     private func startPull(_ slug: String) -> Task<Void, Never> {
         if let pull = pulls[slug] { return pull }
         let pull = Task { await self.pullOnce(slug) }
