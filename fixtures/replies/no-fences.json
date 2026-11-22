@@ -1,0 +1,7 @@
+{
+  "name": "Raw File",
+  "icon": "doc.text",
+  "tint": "orange",
+  "slug": "raw-file",
+  "source": "// Name: Raw File\n// Icon: doc.text\n// Tint: orange\n\nimport SwiftUI\n\nstruct ContentView: View {\n    var body: some View { Text(\"Raw\") }\n}\n"
+}

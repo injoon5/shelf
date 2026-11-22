@@ -1,0 +1,7 @@
+{
+  "name": "Counter",
+  "icon": null,
+  "tint": "purple",
+  "slug": "counter",
+  "source": "// Name: Counter\n// Tint: purple\n\nstruct ContentView: View {\n    @State private var n = 0\n    var body: some View { Button(\"\\(n)\") { n += 1 } }\n}\n"
+}

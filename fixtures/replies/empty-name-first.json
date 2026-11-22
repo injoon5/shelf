@@ -1,0 +1,7 @@
+{
+  "name": null,
+  "icon": null,
+  "tint": "green",
+  "slug": "app",
+  "source": "// Name:\n// Name: Second Name\n// Icon:   \n// Tint: green\n\nstruct ContentView: View {\n    var body: some View { Text(\"Empty\") }\n}\n"
+}

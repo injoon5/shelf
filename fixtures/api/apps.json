@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "slug": "habits",
+      "name": "Habits",
+      "icon": "checkmark.circle.fill",
+      "tint": "green",
+      "version": "Sq2UK0Jsbo62g16z",
+      "updated_at": 1795350589603,
+      "revertible": true
+    },
+    {
+      "slug": "tip-jar",
+      "name": "Tip Jar",
+      "icon": null,
+      "tint": "mint",
+      "version": "vCrkyDwzrwnv4QBv",
+      "updated_at": 1795350589604,
+      "revertible": false
+    }
+  ]
+}

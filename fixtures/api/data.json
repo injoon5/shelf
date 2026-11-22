@@ -1,0 +1,14 @@
+{
+  "entries": {
+    "habits": [
+      {
+        "name": "Read",
+        "done": false
+      }
+    ],
+    "settings": {
+      "theme": "dark"
+    }
+  },
+  "rev": 4
+}

@@ -1,0 +1,8 @@
+*.xcodeproj
+.DS_Store
+DerivedData/
+build/
+.build/
+xcuserdata/
+*.xcresult
+Vendor/Kiln/

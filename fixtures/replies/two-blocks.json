@@ -1,0 +1,7 @@
+{
+  "name": "Two Parts",
+  "icon": "square.split.2x1",
+  "tint": "indigo",
+  "slug": "two-parts",
+  "source": "// Name: Two Parts\n// Icon: square.split.2x1\n// Tint: indigo\n\nstruct Item: Codable, Identifiable {\n    var id = UUID()\n    var title = \"\"\n}\n\nstruct ContentView: View {\n    @State private var items: [Item] = []\n    var body: some View { List(items) { Text($0.title) } }\n}\n"
+}

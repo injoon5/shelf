@@ -1,0 +1,10 @@
+{
+  "slug": "habits",
+  "name": "Habits",
+  "icon": "checkmark.circle.fill",
+  "tint": "green",
+  "version": "Sq2UK0Jsbo62g16z",
+  "updated_at": 1795350589603,
+  "source": "// Name: Habits\n// Icon: checkmark.circle.fill\n// Tint: green\n\nimport SwiftUI\n\nstruct ContentView: View {\n    var body: some View { Text(\"Habits!\") }\n}\n",
+  "revertible": true
+}

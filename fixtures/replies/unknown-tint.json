@@ -1,0 +1,7 @@
+{
+  "name": "Magenta Thing",
+  "icon": "paintpalette",
+  "tint": "blue",
+  "slug": "magenta-thing",
+  "source": "// Name: Magenta Thing\n// Icon: paintpalette\n// Tint: magenta\n\nstruct ContentView: View {\n    var body: some View { Text(\"Color\") }\n}\n"
+}

@@ -1,0 +1,17 @@
+{
+  "changes": [
+    {
+      "key": "streak",
+      "value": null,
+      "rev": 3
+    },
+    {
+      "key": "settings",
+      "value": {
+        "theme": "dark"
+      },
+      "rev": 4
+    }
+  ],
+  "rev": 4
+}

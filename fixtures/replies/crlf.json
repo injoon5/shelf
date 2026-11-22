@@ -1,0 +1,7 @@
+{
+  "name": "Windows Notes",
+  "icon": "note.text",
+  "tint": "blue",
+  "slug": "windows-notes",
+  "source": "// Name: Windows Notes\n// Icon: note.text\n// Tint: blue\n\nstruct ContentView: View {\n    var body: some View { Text(\"CRLF\") }\n}\n"
+}

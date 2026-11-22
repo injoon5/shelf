@@ -1,0 +1,6 @@
+{
+  "error": "That app is not valid.",
+  "fields": {
+    "name": "Start the file with a // Name: line."
+  }
+}
