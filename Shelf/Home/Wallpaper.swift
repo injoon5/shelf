@@ -36,6 +36,9 @@ struct Wallpaper: View {
     }
 
     private static var tones: [String: ColorScheme] = [:]
+    /// The picture `tones` were worked out for. Held weakly and compared by
+    /// identity, so a new photo can never be read as one that is gone.
+    private static weak var tonesPicture: UIImage?
     private static let imaging = CIContext()
 
     /// Whether what sits over a horizontal band of the screen (its top and
@@ -45,7 +48,11 @@ struct Wallpaper: View {
     /// the gradient is dark in both modes.
     static func tone(_ settings: ShelfSettings, screen: CGSize, band: ClosedRange<CGFloat>, dim: Double = 0) -> ColorScheme {
         guard let picture = picture(settings), let image = CIImage(image: picture) else { return .dark }
-        let key = "\(ObjectIdentifier(picture)) \(screen) \(band) \(dim)"
+        if tonesPicture !== picture {
+            tones = [:]
+            tonesPicture = picture
+        }
+        let key = "\(screen) \(band) \(dim)"
         if let known = tones[key] { return known }
 
         let full = image.extent
