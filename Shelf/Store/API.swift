@@ -65,7 +65,7 @@ struct API: Sendable {
 
     // MARK: Apps
 
-    func apps(ifNoneMatch etag: String?) async throws -> Listing {
+    func apps(ifNoneMatch etag: String?) async throws(Failure) -> Listing {
         var headers: [String: String] = [:]
         if let etag { headers["If-None-Match"] = etag }
         let (data, response) = try await send("GET", ["apps"], headers: headers, accept: [304])
@@ -75,13 +75,13 @@ struct API: Sendable {
         return .apps(body.apps, etag: response.value(forHTTPHeaderField: "ETag"))
     }
 
-    func app(_ slug: String) async throws -> AppFull {
+    func app(_ slug: String) async throws(Failure) -> AppFull {
         let (data, response) = try await send("GET", ["apps", slug])
         return try decode(data, response)
     }
 
     /// `PUT /api/apps/{slug}`: creates or replaces the app.
-    func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws -> AppMeta {
+    func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws(Failure) -> AppMeta {
         let body: JSONValue = .object([
             "name": .string(name),
             "icon": icon.map(JSONValue.string) ?? .null,
@@ -92,21 +92,21 @@ struct API: Sendable {
         return try decode(data, response)
     }
 
-    func revert(_ slug: String) async throws -> AppMeta {
+    func revert(_ slug: String) async throws(Failure) -> AppMeta {
         let (data, response) = try await send("POST", ["apps", slug, "revert"])
         return try decode(data, response)
     }
 
     // MARK: App data
 
-    func changes(for slug: String, since rev: Int) async throws -> DataChanges {
+    func changes(for slug: String, since rev: Int) async throws(Failure) -> DataChanges {
         let query = [URLQueryItem(name: "since", value: String(max(rev, 0)))]
         let (data, response) = try await send("GET", ["apps", slug, "data"], query: query)
         return try decode(data, response)
     }
 
     /// The batch write. Returns the server's new `rev`.
-    func push(to slug: String, set: [String: JSONValue], delete: [String]) async throws -> Int {
+    func push(to slug: String, set: [String: JSONValue], delete: [String]) async throws(Failure) -> Int {
         let body: JSONValue = .object(["set": .object(set), "delete": .array(delete.map(JSONValue.string))])
         let (data, response) = try await send("POST", ["apps", slug, "data"], body: body)
         struct Body: Decodable { var rev: Int }
@@ -117,13 +117,13 @@ struct API: Sendable {
     // MARK: Install keys
 
     /// A key for one new app (`slug == nil`) or one update of `slug`.
-    func mintKey(for slug: String?) async throws -> InstallKey {
+    func mintKey(for slug: String?) async throws(Failure) -> InstallKey {
         let body: JSONValue = .object(slug.map { ["slug": .string($0)] } ?? [:])
         let (data, response) = try await send("POST", ["install-keys"], body: body)
         return try decode(data, response)
     }
 
-    func keyStatus(_ id: String) async throws -> InstallKey.Status {
+    func keyStatus(_ id: String) async throws(Failure) -> InstallKey.Status {
         let (data, response) = try await send("GET", ["install-keys", id], accept: [404])
         if response.statusCode == 404 { return .expired }
         struct Body: Decodable { var status: String; var slug: String? }
@@ -136,7 +136,7 @@ struct API: Sendable {
     }
 
     /// Revoking a key the server no longer knows is already done.
-    func revokeKey(_ id: String) async throws {
+    func revokeKey(_ id: String) async throws(Failure) {
         _ = try await send("DELETE", ["install-keys", id], accept: [404])
     }
 }

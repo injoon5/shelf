@@ -158,7 +158,7 @@ final class CreateModel {
         isInstalling = true
         failure = nil
         defer { isInstalling = false }
-        do {
+        do throws(API.Failure) {
             try await library.install(slug: slug, name: name.trimmingCharacters(in: .whitespaces), icon: meta.icon,
                                       tint: reply.tint, source: reply.source)
             // The app went in with the admin token; the key in the prompt is
@@ -170,10 +170,10 @@ final class CreateModel {
             installs += 1
             isFinished = true
         } catch {
-            switch error as? API.Failure {
+            switch error {
             case .rejected(_, let message): failure = message
             case .unauthorized: failure = "Token Expired"
-            default: failure = "Can’t Reach Server"
+            case .offline: failure = "Can’t Reach Server"
             }
         }
     }

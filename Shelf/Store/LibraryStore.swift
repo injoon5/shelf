@@ -10,6 +10,10 @@ final class LibraryStore {
     enum Banner: Equatable {
         case offline
         case tokenExpired
+
+        init(_ failure: API.Failure) {
+            self = failure == .unauthorized ? .tokenExpired : .offline
+        }
     }
 
     private(set) var apps: [CachedApp]
@@ -99,7 +103,7 @@ final class LibraryStore {
             if apps.isEmpty {
                 loadFailure = failure
             } else {
-                show(failure == .unauthorized ? .tokenExpired : .offline)
+                show(Banner(failure))
             }
         }
     }
@@ -192,7 +196,7 @@ final class LibraryStore {
     // MARK: Account
 
     /// Checks the token against the server before saving anything.
-    func signIn(site: URL, token: String) async throws {
+    func signIn(site: URL, token: String) async throws(API.Failure) {
         _ = try await API(origin: site, token: token).apps(ifNoneMatch: nil)
         Account.signIn(site: site, token: token)
         isSignedIn = true
@@ -221,19 +225,19 @@ final class LibraryStore {
 
     /// Saves an app to the server. It returns once the server has it; the sync
     /// that follows lands the icon like any other, pie and blue dot included.
-    func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws {
-        guard let api = Account.api else { throw API.Failure.unauthorized }
+    func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws(API.Failure) {
+        guard let api = Account.api else { throw .unauthorized }
         _ = try await api.install(slug: slug, name: name, icon: icon, tint: tint, source: source)
         Task { await sync() }
     }
 
     func revert(_ slug: String) async {
         guard let api = Account.api else { return }
-        do {
+        do throws(API.Failure) {
             _ = try await api.revert(slug)
             await sync()
         } catch {
-            show(error as? API.Failure == .unauthorized ? .tokenExpired : .offline)
+            show(Banner(error))
         }
     }
 

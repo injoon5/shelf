@@ -26,13 +26,9 @@ actor SyncEngine {
     /// Bumped by `reset`, so work begun before a sign-out writes nothing after it.
     private var generation = 0
 
-    /// `api` returns nil while signed out.
-    init(cache: AppCache, api: @escaping @Sendable () -> API?) {
-        self.init(cache: cache, api: api, appStorage: AppStorageKeys(.standard))
-    }
-
-    /// `appStorage` is where Kiln keeps apps' `@AppStorage`; tests pass their own suite.
-    init(cache: AppCache, api: @escaping @Sendable () -> API?, appStorage: AppStorageKeys) {
+    /// `api` returns nil while signed out. `appStorage` is where Kiln keeps
+    /// apps' `@AppStorage`; tests pass their own suite.
+    init(cache: AppCache, api: @escaping @Sendable () -> API?, appStorage: AppStorageKeys = AppStorageKeys(.standard)) {
         self.cache = cache
         self.api = api
         self.appStorage = appStorage
@@ -102,14 +98,7 @@ actor SyncEngine {
             uniquingKeysWith: { first, _ in first })
         let canSkip = onDisk.values.allSatisfy { $0 }
 
-        let listing: API.Listing
-        do {
-            listing = try await api.apps(ifNoneMatch: canSkip ? before.etag : nil)
-        } catch let failure as API.Failure {
-            throw failure
-        } catch {
-            throw API.Failure.offline
-        }
+        let listing = try await api.apps(ifNoneMatch: canSkip ? before.etag : nil)
         try checkGeneration(generation)
 
         guard case .apps(let listed, let etag) = listing else {
@@ -202,14 +191,7 @@ actor SyncEngine {
     private func performFetch(_ slug: String) async throws -> LibraryIndex {
         guard let api = api() else { throw API.Failure.unauthorized }
         let generation = self.generation
-        let full: AppFull
-        do {
-            full = try await api.app(slug)
-        } catch let failure as API.Failure {
-            throw failure
-        } catch {
-            throw API.Failure.offline
-        }
+        let full = try await api.app(slug)
         try checkGeneration(generation)
         try cache.writeSource(full.source, for: slug)
 
