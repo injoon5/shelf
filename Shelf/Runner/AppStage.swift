@@ -16,8 +16,6 @@ struct AppStage: View {
     var app: AppMeta
     var source: String
     var store: Store
-    /// A wait before building, for a caller that has motion to let finish.
-    var settle: Duration = .zero
     /// Nothing is built until this is true. A card says so once its open has
     /// come to rest, because Kiln parses on the main thread and would hitch
     /// the motion; the data session opens meanwhile.
@@ -66,8 +64,6 @@ struct AppStage: View {
         }
         .task(id: Build(version: version, isReady: isReady && hasSession)) {
             guard isReady, hasSession, result == nil else { return }
-            try? await Task.sleep(for: settle)
-            guard !Task.isCancelled else { return }
             let built = Kiln.run(SourceRewriter.prepare(source, slug: app.slug))
             if built.view == nil { onError(CompileError(errors: built.errors, source: source)) }
             withAnimation(Motion.launch) { result = built }

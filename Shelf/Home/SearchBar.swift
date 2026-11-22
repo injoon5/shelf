@@ -412,7 +412,7 @@ private final class DotsView: UIView {
     }
 
     private func recolor() {
-        UIView.animate(springDuration: Motion.pillResize.duration, bounce: Motion.pillResize.bounce,
+        UIView.animate(springDuration: Motion.pillResize.playedDuration, bounce: Motion.pillResize.bounce,
                        initialSpringVelocity: 0, delay: 0, options: [.beginFromCurrentState]) {
             for (index, dot) in self.dots.enumerated() {
                 dot.alpha = index == self.current ? 1 : HomeMetrics.pageDotDim
@@ -454,5 +454,13 @@ enum SearchWarp {
         let span = field.width - pill.width
         guard span > 0 else { return 0 }
         return min(max((width - pill.width) / span, 0), 1)
+    }
+}
+
+extension CGRect {
+    /// The rectangle `t` of the way from `self` to `other`.
+    func interpolated(to other: CGRect, _ t: CGFloat) -> CGRect {
+        CGRect(x: minX + (other.minX - minX) * t, y: minY + (other.minY - minY) * t,
+               width: width + (other.width - width) * t, height: height + (other.height - height) * t)
     }
 }

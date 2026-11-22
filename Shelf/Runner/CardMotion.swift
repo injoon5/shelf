@@ -135,11 +135,3 @@ enum CardMotion {
         return min(max(velocity / distance, -limit), limit)
     }
 }
-
-extension CGRect {
-    /// The rectangle `t` of the way from `self` to `other`.
-    func interpolated(to other: CGRect, _ t: CGFloat) -> CGRect {
-        CGRect(x: minX + (other.minX - minX) * t, y: minY + (other.minY - minY) * t,
-               width: width + (other.width - width) * t, height: height + (other.height - height) * t)
-    }
-}

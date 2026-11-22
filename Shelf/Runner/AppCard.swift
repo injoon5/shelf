@@ -117,8 +117,7 @@ final class CardFaceView: UIView {
 
     /// Stops the card where it is on screen and returns where that is.
     func freeze() -> CardFrame {
-        let shown = layer.presentation() ?? layer
-        let frame = CardFrame(center: shown.position, size: shown.bounds.size, radius: shown.cornerRadius)
+        let frame = CardFrame(layer: layer.presentation() ?? layer)
         layer.removeAllAnimationsDeeply()
         place(frame)
         return frame
@@ -127,21 +126,14 @@ final class CardFaceView: UIView {
     var isMoving: Bool { layer.isAnimating || content.layer.isAnimating }
 
     /// Where the card's springs are headed.
-    var targetFrame: CGRect {
-        CGRect(x: layer.position.x - layer.bounds.width / 2, y: layer.position.y - layer.bounds.height / 2,
-               width: layer.bounds.width, height: layer.bounds.height)
-    }
+    var targetFrame: CGRect { CardFrame(layer: layer).rect }
 
     /// Ends the springs at their targets, which the model already holds.
     func finishMoving() {
         layer.removeAllAnimationsDeeply()
     }
 
-    var shownFrame: CGRect {
-        let shown = layer.presentation() ?? layer
-        return CGRect(x: shown.position.x - shown.bounds.width / 2, y: shown.position.y - shown.bounds.height / 2,
-                      width: shown.bounds.width, height: shown.bounds.height)
-    }
+    var shownFrame: CGRect { CardFrame(layer: layer.presentation() ?? layer).rect }
 
     private static func centered(_ size: CGSize) -> CGRect {
         CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height)
@@ -176,7 +168,7 @@ final class AppCard {
     let face: CardFaceView
     private(set) var phase = Phase.opening
     /// What it was doing when a finger caught it.
-    private(set) var heldFrom = Phase.open
+    private var heldFrom = Phase.open
     private(set) var landingFades = false
 
     private let screen: CGSize
@@ -198,7 +190,7 @@ final class AppCard {
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
         host.view.isHidden = true
-        self.face.place(CardFrame(rect: source, radius: iconSize * HomeMetrics.iconCornerRatio))
+        self.face.place(CardFrame(rect: source, radius: HomeMetrics.iconRadius(iconSize)))
     }
 
     private var full: CardFrame {
@@ -243,12 +235,18 @@ final class AppCard {
         face.spring(to: full, spring, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
     }
 
+    /// Goes back to full screen after a finger let it go short of closing:
+    /// on the open's spring if it was caught on its way home.
+    func reopen(centerVelocity: CGPoint, widthVelocity: CGFloat) {
+        open(heldFrom == .closing ? Motion.cardOpen : Motion.cardReturn, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+    }
+
     /// Shrinks into `landing`, from wherever it is.
     func close(to landing: CGRect, fades: Bool, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
         if phase == .open { takePicture() }
         phase = .closing
         landingFades = fades
-        face.spring(to: CardFrame(rect: landing, radius: landing.width * HomeMetrics.iconCornerRatio), Motion.cardClose,
+        face.spring(to: CardFrame(rect: landing, radius: HomeMetrics.iconRadius(landing.width)), Motion.cardClose,
                     centerVelocity: centerVelocity, widthVelocity: widthVelocity)
     }
 
@@ -291,18 +289,21 @@ final class AppCard {
         if landingFades { face.alpha = min(progress / RunnerMetrics.landingFade, 1) }
     }
 
-    /// The card's spring has come to rest.
-    func settle() {
+    /// The card's spring has come to rest. Returns whether it has landed
+    /// on its icon.
+    func settle() -> Bool {
         switch phase {
         case .opening:
             phase = .open
             host.view.isHidden = false
             face.content.subviews.forEach { $0.removeFromSuperview() }
             state.isSettled = true
+            return false
         case .closing:
             phase = .landed
+            return true
         default:
-            break
+            return false
         }
     }
 
@@ -316,6 +317,13 @@ final class AppCard {
             face.content.alpha = 1
         }
         host.view.isHidden = true
+    }
+}
+
+extension CardFrame {
+    /// Where `layer` is: its position, size and corner.
+    init(layer: CALayer) {
+        self.init(center: layer.position, size: layer.bounds.size, radius: layer.cornerRadius)
     }
 }
 

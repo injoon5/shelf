@@ -88,20 +88,20 @@ struct HomeIcon: View {
 }
 
 /// The icon an app's card grows out of and shrinks back into. It tells the
-/// model where it is, and while the card stands in for it, it isn't drawn.
+/// stage where it is, and while the card stands in for it, it isn't drawn.
 struct CardSource: ViewModifier {
-    @Environment(HomeModel.self) private var model
+    @Environment(StageLayout.self) private var stage
     var key: IconKey
 
     func body(content: Content) -> some View {
         content
-            .opacity(model.cardIcons.contains(key.slug) ? 0 : 1)
+            .opacity(stage.cardIcons.contains(key.slug) ? 0 : 1)
             .onGeometryChange(for: CGRect.self) { proxy in
                 proxy.frame(in: .named(StageLayout.space))
             } action: { frame in
-                model.iconFrames[key] = frame
+                stage.iconFrames[key] = frame
             }
-            .onDisappear { model.iconFrames[key] = nil }
+            .onDisappear { stage.iconFrames[key] = nil }
     }
 }
 

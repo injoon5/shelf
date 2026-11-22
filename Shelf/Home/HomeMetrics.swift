@@ -28,10 +28,14 @@ enum HomeMetrics {
     /// 22.37% of iOS 18 and earlier is up to 6.6 pixels tighter.
     static let iconCornerRatio: CGFloat = 0.26
 
-    /// The icon's outline at `size`. Everything that draws or clips to an
-    /// icon uses this, so no state can show two different corners.
+    /// The icon's corner at `size`. Everything that draws, clips or moves
+    /// to an icon uses this, so no state can show two different corners.
+    static func iconRadius(_ size: CGFloat) -> CGFloat {
+        size * iconCornerRatio
+    }
+
     static func iconShape(_ size: CGFloat) -> RoundedRectangle {
-        RoundedRectangle(cornerRadius: size * iconCornerRatio, style: .continuous)
+        RoundedRectangle(cornerRadius: iconRadius(size), style: .continuous)
     }
 
     static let glyphRatio: CGFloat = 0.5
@@ -174,7 +178,7 @@ struct HomeGeometry: Equatable {
 
     var scale: CGFloat { size.width / HomeMetrics.referenceWidth }
     var iconSize: CGFloat { (HomeMetrics.iconSize * scale).rounded() }
-    var iconRadius: CGFloat { iconSize * HomeMetrics.iconCornerRatio }
+    var iconRadius: CGFloat { HomeMetrics.iconRadius(iconSize) }
     var sideInset: CGFloat { HomeMetrics.sideInset * scale }
     var columnPitch: CGFloat {
         (size.width - 2 * sideInset - iconSize) / CGFloat(Layout.columns - 1)

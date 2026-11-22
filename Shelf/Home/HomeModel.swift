@@ -31,12 +31,6 @@ final class HomeModel {
     /// on screen after this is cleared, on its way back to its icon.
     var run: Run?
     var sheet: Sheet?
-    /// Icons whose artwork is hidden because their app's card stands in for
-    /// them: open, or in flight. Their labels stay, as on Springboard.
-    var cardIcons: Set<String> = []
-    /// Where each icon's artwork is, in the stage's coordinates, as last laid
-    /// out: what a card grows out of and lands on.
-    @ObservationIgnored var iconFrames: [IconKey: CGRect] = [:]
 
     private(set) var isEditing = false
     /// The icon under the finger during a drag. Its place in the grid is kept
@@ -91,13 +85,6 @@ final class HomeModel {
 
     func close() {
         run = nil
-    }
-
-    /// Where a card should grow out of or land on for `slug`: the search
-    /// result while searching, otherwise its dock or grid icon.
-    func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
-        if preferResult, let frame = iconFrames[IconKey(slug: slug, place: .result)] { return frame }
-        return iconFrames[IconKey(slug: slug, place: .dock)] ?? iconFrames[IconKey(slug: slug, place: .grid)]
     }
 
     // MARK: Edit mode

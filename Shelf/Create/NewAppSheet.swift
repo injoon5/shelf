@@ -162,7 +162,7 @@ private struct PreviewView: View {
         let shape = RoundedRectangle(cornerRadius: CreateMetrics.previewRadius, style: .continuous)
         return AppStage(app: meta, source: source,
                         // A change is tried against a copy of the app's real data; nothing here is saved.
-                        store: .scratch(copying: model.app?.slug), settle: .zero) { error in
+                        store: .scratch(copying: model.app?.slug)) { error in
             model.previewFailed(error)
         }
         .clipShape(shape)

@@ -26,6 +26,19 @@ final class StageLayout {
     var labelSize = HomeMetrics.labelSize
     /// From the bottom of the screen to just above the search field.
     var resultsBottom: CGFloat = 0
+    /// Icons whose artwork is hidden because their app's card stands in for
+    /// them: open, or in flight. Their labels stay, as on Springboard.
+    var cardIcons: Set<String> = []
+    /// Where each icon's artwork is, in the stage's coordinates, as last laid
+    /// out: what a card grows out of and lands on.
+    @ObservationIgnored var iconFrames: [IconKey: CGRect] = [:]
+
+    /// Where a card should grow out of or land on for `slug`: the search
+    /// result while searching, otherwise its dock or grid icon.
+    func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
+        if preferResult, let frame = iconFrames[IconKey(slug: slug, place: .result)] { return frame }
+        return iconFrames[IconKey(slug: slug, place: .dock)] ?? iconFrames[IconKey(slug: slug, place: .grid)]
+    }
 }
 
 /// The Home Screen and the apps that open over it, in UIKit, where every
@@ -294,7 +307,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     private func present(_ run: HomeModel.Run) {
         let bounds = view.bounds
-        let icon = model.iconFrame(run.id, preferResult: input.isSearching || search.isOpen)
+        let icon = layout.iconFrame(run.id, preferResult: input.isSearching || search.isOpen)
         let source = CardMotion.landing(icon: icon, screenWidth: bounds.width,
                                         pill: layout.geometry.pillFrame, iconSize: iconSize).frame
         let face = CardFace(IconFace(run.app.meta), style: settings.iconStyle,
@@ -309,12 +322,12 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         cards.append(card)
         card.open()
         // Not during this view update: on the next turn of the run loop.
-        Task { @MainActor in self.model.cardIcons.insert(run.id) }
+        Task { @MainActor in self.layout.cardIcons.insert(run.id) }
         startTicking()
     }
 
     private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
-        let icon = model.iconFrame(card.slug, preferResult: false)
+        let icon = layout.iconFrame(card.slug, preferResult: false)
         let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
                                          pill: layout.geometry.pillFrame, iconSize: iconSize)
         card.close(to: landing.frame, fades: landing.fades, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
@@ -322,7 +335,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     private func land(_ card: AppCard) {
-        model.cardIcons.remove(card.slug)
+        layout.cardIcons.remove(card.slug)
         // The icon is drawn beneath the card on SwiftUI's next pass; the card
         // stays a moment longer so there is never a frame with neither.
         Task { @MainActor in
@@ -386,10 +399,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         for card in cards {
             card.tick()
             if card.phase != .landed { openness = max(openness, card.progress) }
-            if card.phase != .held, card.hasComeToRest() {
-                let was = card.phase
-                card.settle()
-                if was == .closing { land(card) }
+            if card.phase != .held, card.hasComeToRest(), card.settle() {
+                land(card)
             }
         }
         setBackdrop(openness)
@@ -471,8 +482,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     private func reopen(_ card: AppCard, centerVelocity: CGPoint, widthVelocity: CGFloat) {
-        let wasClosing = card.heldFrom == .closing
-        card.open(wasClosing ? Motion.cardOpen : Motion.cardReturn, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+        card.reopen(centerVelocity: centerVelocity, widthVelocity: widthVelocity)
         if model.run?.id != card.slug { model.reopen(card.run) }
         startTicking()
     }
