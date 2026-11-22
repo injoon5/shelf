@@ -11,10 +11,6 @@ enum HomeMetrics {
 
     // MARK: Grid
 
-    static let columns = 4
-    static let rows = 6
-    static var pageSize: Int { columns * rows }
-
     static let iconSize: CGFloat = 64
     /// From the screen edge to the first column.
     static let sideInset: CGFloat = 30.33
@@ -94,8 +90,6 @@ enum HomeMetrics {
 
     // MARK: Dock
 
-    /// Apps the user can pin. Settings takes the last of the four places.
-    static let dockApps = 3
     /// From the screen's edges, sides and bottom alike, which is what makes
     /// the dock concentric with the display.
     static let dockInset: CGFloat = 17
@@ -183,7 +177,7 @@ struct HomeGeometry: Equatable {
     var iconRadius: CGFloat { iconSize * HomeMetrics.iconCornerRatio }
     var sideInset: CGFloat { HomeMetrics.sideInset * scale }
     var columnPitch: CGFloat {
-        (size.width - 2 * sideInset - iconSize) / CGFloat(HomeMetrics.columns - 1)
+        (size.width - 2 * sideInset - iconSize) / CGFloat(Layout.columns - 1)
     }
     var labelWidth: CGFloat { min(iconSize + HomeMetrics.labelExtraWidth * scale, columnPitch - 2) }
     var cellHeight: CGFloat { iconSize + HomeMetrics.labelGap + labelHeight }
@@ -227,21 +221,21 @@ struct HomeGeometry: Equatable {
     /// Rows share the height between the status bar and the pill evenly, as
     /// Springboard's do, rather than sitting a fixed distance apart.
     var rowPitch: CGFloat {
-        (gridBottom - gridTop - cellHeight) / CGFloat(HomeMetrics.rows - 1)
+        (gridBottom - gridTop - cellHeight) / CGFloat(Layout.rows - 1)
     }
 
     /// The centre of the icon (not the cell) at `index` on its page.
     func iconCenter(_ index: Int) -> CGPoint {
-        let column = index % HomeMetrics.columns
-        let row = index / HomeMetrics.columns
+        let column = index % Layout.columns
+        let row = index / Layout.columns
         return CGPoint(x: sideInset + iconSize / 2 + CGFloat(column) * columnPitch,
                        y: gridTop + iconSize / 2 + CGFloat(row) * rowPitch)
     }
 
     /// The grid slot nearest a point on a page, clamped to `count` slots.
     func gridIndex(at point: CGPoint, count: Int) -> Int {
-        let column = min(max(Int(((point.x - sideInset - iconSize / 2) / columnPitch).rounded()), 0), HomeMetrics.columns - 1)
-        let row = min(max(Int(((point.y - gridTop - iconSize / 2) / rowPitch).rounded()), 0), HomeMetrics.rows - 1)
-        return min(row * HomeMetrics.columns + column, max(count, 0))
+        let column = min(max(Int(((point.x - sideInset - iconSize / 2) / columnPitch).rounded()), 0), Layout.columns - 1)
+        let row = min(max(Int(((point.y - gridTop - iconSize / 2) / rowPitch).rounded()), 0), Layout.rows - 1)
+        return min(row * Layout.columns + column, max(count, 0))
     }
 }

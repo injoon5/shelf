@@ -5,6 +5,13 @@ import Foundation
 /// The layout only ever holds slugs. It is reconciled against the library after
 /// every sync, so it never shows an app that is gone or misses one that is new.
 struct Layout: Codable, Equatable, Sendable {
+    /// Springboard's grid: four columns of six rows to a page.
+    static let columns = 4
+    static let rows = 6
+    static let pageSize = columns * rows
+    /// Apps the user can pin. Settings takes the last of the dock's four places.
+    static let dockSize = 3
+
     var dock: [String] = []
     var pages: [[String]] = [[]]
 
@@ -16,7 +23,7 @@ struct Layout: Codable, Equatable, Sendable {
 
     /// Makes the layout hold exactly `slugs`: unknown ones leave, and new ones
     /// go into the first empty slot on the last page, as on iOS.
-    mutating func reconcile(with slugs: [String], pageSize: Int) {
+    mutating func reconcile(with slugs: [String], pageSize: Int = Layout.pageSize) {
         let known = Set(slugs)
         var seen = Set<String>()
         func keep(_ slug: String) -> Bool { known.contains(slug) && seen.insert(slug).inserted }
@@ -26,7 +33,7 @@ struct Layout: Codable, Equatable, Sendable {
             if pages.isEmpty || pages[pages.count - 1].count >= pageSize { pages.append([]) }
             pages[pages.count - 1].append(slug)
         }
-        normalize(pageSize: pageSize)
+        normalize()
     }
 
     func slot(of slug: String) -> Slot? {
@@ -40,9 +47,9 @@ struct Layout: Codable, Equatable, Sendable {
     /// Moves an icon to `slot`, sliding the others aside. A full dock refuses a
     /// newcomer; a full page pushes its last icon onto the next one.
     @discardableResult
-    mutating func move(_ slug: String, to slot: Slot, pageSize: Int, dockSize: Int) -> Bool {
+    mutating func move(_ slug: String, to slot: Slot, pageSize: Int = Layout.pageSize, dockSize: Int = Layout.dockSize) -> Bool {
         guard let from = self.slot(of: slug), from != slot else { return false }
-        if case .dock = slot, case .page = from, dock.count >= dockSize { return false }
+        if case .dock = slot, !dockHasRoom(for: slug, dockSize: dockSize) { return false }
 
         dock.removeAll { $0 == slug }
         for p in pages.indices { pages[p].removeAll { $0 == slug } }
@@ -61,12 +68,17 @@ struct Layout: Codable, Equatable, Sendable {
                 page += 1
             }
         }
-        normalize(pageSize: pageSize)
+        normalize()
         return true
     }
 
+    /// Whether `slug` can be in the dock: it is already, or there is a place free.
+    func dockHasRoom(for slug: String, dockSize: Int = Layout.dockSize) -> Bool {
+        dock.contains(slug) || dock.count < dockSize
+    }
+
     /// Drops empty pages, always leaving one to show.
-    private mutating func normalize(pageSize: Int) {
+    private mutating func normalize() {
         pages.removeAll(where: \.isEmpty)
         if pages.isEmpty { pages = [[]] }
     }

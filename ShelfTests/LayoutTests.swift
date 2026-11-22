@@ -102,8 +102,8 @@ struct LayoutTests {
 
     @Test func geometryRoundTripsSlots() {
         let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, displayRadius: 62, labelHeight: 16)
-        for index in 0..<HomeMetrics.pageSize {
-            #expect(geometry.gridIndex(at: geometry.iconCenter(index), count: HomeMetrics.pageSize) == index)
+        for index in 0..<Layout.pageSize {
+            #expect(geometry.gridIndex(at: geometry.iconCenter(index), count: Layout.pageSize) == index)
         }
         // A point past the last icon lands after it, not in an empty slot beyond.
         #expect(geometry.gridIndex(at: geometry.iconCenter(23), count: 5) == 5)

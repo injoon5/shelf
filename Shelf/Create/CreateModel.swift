@@ -30,6 +30,7 @@ final class CreateModel {
     private(set) var rejections = 0
 
     @ObservationIgnored private var copiedTask: Task<Void, Never>?
+    private static let keyPoll: Duration = .seconds(3)
 
     init(app: CachedApp?, source: String?) {
         self.app = app
@@ -93,7 +94,7 @@ final class CreateModel {
                     break
                 }
             }
-            try? await Task.sleep(for: Motion.keyPoll)
+            try? await Task.sleep(for: Self.keyPoll)
         }
     }
 

@@ -56,8 +56,8 @@ struct DockDropDelegate: DropDelegate {
     func dropUpdated(info: DropInfo) -> DropProposal? {
         guard let slug = model.dragMoved() else { return DropProposal(operation: .cancel) }
         let dock = library.layout.dock
+        guard library.layout.dockHasRoom(for: slug) else { return DropProposal(operation: .forbidden) }
         let isPinned = dock.contains(slug)
-        guard isPinned || dock.count < HomeMetrics.dockApps else { return DropProposal(operation: .forbidden) }
 
         // Settings keeps the last place, so an app can take any place before it.
         let apps = isPinned ? dock.count : dock.count + 1

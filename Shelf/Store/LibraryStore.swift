@@ -46,7 +46,7 @@ final class LibraryStore {
         apps = index.apps
         lastSynced = index.syncedAt
         layout = (try? JSONDecoder().decode(Layout.self, from: Data(contentsOf: layoutURL))) ?? Layout()
-        layout.reconcile(with: apps.map(\.slug), pageSize: HomeMetrics.pageSize)
+        layout.reconcile(with: apps.map(\.slug))
     }
 
     func app(_ slug: String) -> CachedApp? {
@@ -62,9 +62,11 @@ final class LibraryStore {
 
     // MARK: Sync
 
-    /// Syncs when the last one is older than ten minutes.
+    /// How old a sync can be before coming back to Shelf syncs again.
+    private static let staleAfter: TimeInterval = 600
+
     func syncIfStale() async {
-        if let lastSynced, Date.now.timeIntervalSince(lastSynced) < Motion.syncStaleAfter { return }
+        if let lastSynced, Date.now.timeIntervalSince(lastSynced) < Self.staleAfter { return }
         await sync()
     }
 
@@ -162,7 +164,7 @@ final class LibraryStore {
     /// `commitLayout` does, when the icon is dropped.
     @discardableResult
     func move(_ slug: String, to slot: Layout.Slot) -> Bool {
-        layout.move(slug, to: slot, pageSize: HomeMetrics.pageSize, dockSize: HomeMetrics.dockApps)
+        layout.move(slug, to: slot)
     }
 
     func commitLayout() {
@@ -171,13 +173,13 @@ final class LibraryStore {
 
     func resetLayout() {
         layout = Layout()
-        layout.reconcile(with: apps.map(\.slug), pageSize: HomeMetrics.pageSize)
+        layout.reconcile(with: apps.map(\.slug))
         saveLayout()
     }
 
     private func reconcileLayout() {
         let before = layout
-        layout.reconcile(with: apps.map(\.slug), pageSize: HomeMetrics.pageSize)
+        layout.reconcile(with: apps.map(\.slug))
         if layout != before { saveLayout() }
     }
 
@@ -246,7 +248,7 @@ final class LibraryStore {
         isDemo = true
         self.apps = apps
         layout = Layout(dock: dock, pages: [[]])
-        layout.reconcile(with: apps.map(\.slug), pageSize: HomeMetrics.pageSize)
+        layout.reconcile(with: apps.map(\.slug))
     }
     #endif
 }

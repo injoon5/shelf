@@ -21,7 +21,7 @@ struct SearchResults: View {
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 } else {
                     LazyVGrid(columns: Array(repeating: GridItem(.fixed(geometry.labelWidth), spacing: geometry.columnPitch - geometry.labelWidth),
-                                             count: HomeMetrics.columns),
+                                             count: Layout.columns),
                               spacing: geometry.rowPitch - geometry.cellHeight) {
                         ForEach(results) { app in
                             HomeIcon(app: app, geometry: geometry, labelSize: labelSize)

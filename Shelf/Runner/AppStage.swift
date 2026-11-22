@@ -79,7 +79,7 @@ struct AppStage: View {
 
     private func open() async -> DBSession {
         switch store {
-        case .synced: await AppData.shared.open(app.slug, pullTimeout: Motion.dataPullTimeout)
+        case .synced: await AppData.shared.open(app.slug)
         case .scratch(let slug): await AppData.shared.scratch(copying: slug)
         }
     }

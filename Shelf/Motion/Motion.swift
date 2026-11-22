@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Every spring and duration in Shelf. Movement uses springs so it can be
-/// interrupted from wherever it is; the few timing curves here are for things
-/// that don't move (a fade, the jiggle's swing).
+/// Every spring, and every duration a person sees, in Shelf. Movement uses
+/// springs so it can be interrupted from wherever it is; the few timing
+/// curves here are for things that don't move (a fade, the jiggle's swing).
 enum Motion {
     // MARK: Springs
 
@@ -95,7 +95,4 @@ enum Motion {
     /// shown beneath it, so there is never a frame with neither.
     static let cardHandoff: Duration = .milliseconds(50)
     static let wallpaperDrift: Double = 20
-    static let syncStaleAfter: TimeInterval = 600
-    static let keyPoll: Duration = .seconds(3)
-    static let dataPullTimeout: Duration = .seconds(1)
 }
