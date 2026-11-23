@@ -14,6 +14,7 @@ final class NavigationBridges: KBridgeFamily {
         tabs(r)
         toolbars(r)
         presentations(r)
+        delegates(r)
     }
 
     // MARK: Stacks and links
