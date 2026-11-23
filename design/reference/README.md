@@ -68,3 +68,44 @@ From `longpress-menu-grid-photos.png` and `edit-mode-page1-light.png`, at 3x:
 | Menu rows | 42 pt; glyph centre 40.3 pt in, text 64.7 pt in; about 10 pt above the first and below the last |
 | Minus badge | 27 pt grey disc (149, 148, 148), centre 3.67 pt in from the icon's top-left corner; dark dash 11.67 × 2 pt |
 | Lift after touch-down | about 430 ms (`icon-press-lift-menu-frames.png`) |
+
+## Search (App Library's, PLAN.md §0.3)
+
+Measured from 3x captures of App Library search on the iPhone 17 simulator
+(iOS 27.0), empty query, light and dark, driven with `agent-device`: swipe
+past the last page, tap the field. The captures are kept outside git, like the
+others. The numbers are in `Shelf/Home/SearchMetrics.swift`.
+
+The simulator's App Library has no section letters, a Cancel button instead
+of the round ✕, and no cloud glyphs (all its apps are installed), and its
+search finds nothing when typed into (Spotlight's index isn't built there). So
+the letters, the ✕ and the cloud come from `app-library-search.png`, which,
+with its frame cropped off, is a 402 pt screen at 1.667 px/pt.
+
+| What | App Library | Shelf |
+|---|---|---|
+| Field | 25.67 pt in (77 px), 90 pt down, 281.67 × 48 pt, capsule | Same size and inset, on the pill's line (keyboard down) or 8 pt above the keyboard |
+| Magnifier | 17.33 pt of ink (132–184 px), centred 27 pt into the field, white | Same (SF magnifier at 0.84 × 22 pt) |
+| Placeholder | 22 pt regular (Title 2; an "L" 47 px tall, 5 px stem), white, its "A" at 222 px | "Search", same font and colour, its "S" on the same column |
+| Typed text, caret | Typed "c" at 219 px; caret 2 × 24 pt (6 × 72 px), centred on the text's start and the field | Same (`caretRect` override) |
+| ✕ (reference) | A 48 pt glass circle beside the field | Same, in Cancel's place, 25.67 pt from the trailing edge, 21 pt from the field |
+| Rows | 72 pt pitch (216 px between separators), first row 24 pt below the field | Same pitch; the list starts where App Library's bar does (90 pt), and its last row stops 24 pt above the field |
+| Icon | 48 pt, leading edge 26.33 pt (79 px), centred in the row | Same |
+| Name | 17 pt regular (Body), white, 90 pt in, centred in the row | Same |
+| Separator | 1 pt (3 px), 90 pt to 371.33 pt (270–1114 px), 25/255 lighter than what's behind it (46→72 dark, 96→121 light) | White at 14% (+19…+26 over those backdrops); none under a section's last row |
+| Section letter (reference) | 15 pt bold, in line with the icons, baseline 8.33 pt above the first row, in a 28.33 pt band | Same |
+| Cloud (reference) | `icloud.and.arrow.down`, 19.5 pt across, 10.33 pt inside the separator's end | Same |
+| Index | A–Z #, white, centred 7.67 pt from the edge (1183 px), 13.27 pt pitch (A at 1002 px, # at 2077), an "A" 20 × 22 px | 11.5 pt semibold, same pitch and column; centred on the list between its top and the field (App Library's is centred on its own list) |
+| Backdrop | The Home Screen under a Gaussian blur of σ = 40 pt, then 0.854x − 14/255 (dark) or 0.837x − 22/255 (light), fitted per pixel at 1x (rms 2–3 of 255) | `CABackdropLayer` with Core Animation's `gaussianBlur` (radius 40) and a colour matrix (0.85x − 14 or 22). Fitted the same way: σ 40, 0.859x − 11.6 (dark) |
+| While typing | (Can't be checked on the simulator.) App Library's results have no letters and no index | One list of matches, best first, no letters, no index; "No Results for “…”" with the system's advice line, as the simulator shows |
+
+How a 50% overlay against App Library came out (scratch captures, not in git):
+the field, magnifier, placeholder and caret coincide; the first row's icon,
+name baseline and separator coincide, and later rows are one section header
+(28.33 pt) apart, as the letters add; the index letters share their column and
+pitch.
+
+The backdrop darkens beyond App Library's over a wallpaper brighter than about
+0.6 on average, to 0.42, so white names still read (App Library's own captures
+average 0.09 and 0.27). That ceiling is Shelf's: Springboard over a white
+wallpaper wasn't captured.

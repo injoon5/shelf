@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 /// The Home Screen's icon (`IconArtView`) in SwiftUI, for the sheets that
-/// show one (the New App preview, the error screen) and search's results: one
+/// show one (the New App preview, the error screen): one
 /// renderer everywhere. It reads the icon tone from the window, as every
 /// icon does, unless the SwiftUI around it sets `\.iconTone`.
 struct IconImage: UIViewRepresentable {

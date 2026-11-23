@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 and §0.2 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1, §0.2 and §0.3 are built, and the data half of §0.4. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -91,7 +91,7 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 - **The spike** (step 1) went to the fallback. Once `UIContextMenuInteraction`'s menu is up, UIKit cancels the touch for every other recognizer, even one on the window, and there is no public way to get it back. So the long press is Shelf's own (`IconTouchRecognizer`), with its own glass menu (`IconMenuView`), measured from `longpress-menu-grid-photos.png`.
 - **`IconArtView`** is the one renderer. Its outline is a path, because Core Animation's continuous corner is rounder than Springboard's. Overlaid on the SwiftUI icon at 3x, the outline matched exactly and the glyphs matched for four symbols of five (`books.vertical.fill` is ⅓ pt off).
 - **Hooks for what comes next:**
-  - §0.3: `ResultsLayout` and `SearchResults` are what to delete. Results already draw with `IconImage`, and the menu is `HomeItem.menu(model:library:)`.
+  - §0.3: `ResultsLayout` and `SearchResults` are what to delete (done in §0.3). Results already draw with `IconImage`, and the menu is `HomeItem.menu(model:library:)`.
   - §0.4: `HomeView.onDelete` is called when a minus badge is tapped (today a no-op), and Delete App goes last in `HomeItem.menu`.
   - §0.5: set `window.traitOverrides.iconTone` in `StageController.holdAppearance()`; `IconImage` reads `\.iconTone` in SwiftUI.
   - §0.6: the dock's outline is set only in `DockView.place(_:)`.
@@ -153,6 +153,14 @@ Decided: everything the stage shows moves to UIKit and Core Animation. Today the
 - the jiggle with a full page holds 120 fps on an iPhone in Instruments (the README's open item).
 
 ### 0.3 Search, as App Library's, with the field at the bottom
+
+**Built.** What came out of it:
+
+- **Measured** from 3x captures of App Library search on the iPhone 17 simulator, light and dark (the table is in `design/reference/README.md`, the numbers in `SearchMetrics`). The simulator's App Library has no letters, a Cancel button and no clouds, so those three come from the reference mockup. Its search finds nothing when typed into, so whether sections stay while typing couldn't be checked there; Shelf follows App Library on a device, one list of matches with no letters and no index.
+- **The pull** is one progress on a spring stepped per frame (`ValueSpring`). Frames held at 25%, 50% and 75%, and frames from a recorded finger-driven pull, show one label and one set of icons: the grid and dock are gone by 50%, and the list starts after it.
+- **The backdrop** uses private Core Animation (`CABackdropLayer`, `CAFilter`), isolated in `PrivateBackdrop.swift`: App Library's 40 pt Gaussian, its radius following the pull. Over a bright wallpaper it darkens more than App Library's, so white names read.
+- **Decided:** Return does nothing with nothing typed. A card opened from a row closes back into the row, and search closes once it has landed. The index is Shelf's own view (the collection view's can't be coloured or sized), with a selection tick per letter. A row's long press is the system's context menu with the icon's actions, its preview cut to the icon.
+- **Not done:** App Library over a white wallpaper wasn't captured, so how much darker Shelf's backdrop goes there is Shelf's choice.
 
 **The target** is App Library's search, one-for-one (`design/reference/springboard/app-library-search.png`, kept locally like the other captures), with one change: the field stays at the bottom.
 

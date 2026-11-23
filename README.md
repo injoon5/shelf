@@ -53,7 +53,7 @@ DEVELOPMENT_TEAM = ABCDE12345
 Scripts/run.sh <simulator-udid>     # builds, signs ad hoc, installs
 ```
 
-**Without a server:** launch with `-ShelfDemo YES` (debug builds only) for a demo library.
+**Without a server:** launch with `-ShelfDemo YES` (debug builds only) for a demo library. `-ShelfSearchProgress 0.5` holds search's pull halfway, for pictures of it.
 
 ### Tests
 
@@ -64,7 +64,7 @@ xcodebuild test -project Shelf.xcodeproj -scheme Shelf \
   -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData
 ```
 
-They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the UIKit Home Screen (`HomeViewTests`: the icon outline against Springboard's, drops, page flips, the menu, the jiggle), the motion curves, and the feature apps in `fixtures/apps/`.
+They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the UIKit Home Screen (`HomeViewTests`: the icon outline against Springboard's, drops, page flips, the menu, the jiggle), search (`SearchTests`: sections, the index, Return, the list's rows, the warp's spring), the motion curves, and the feature apps in `fixtures/apps/`.
 
 ## The server
 
@@ -94,7 +94,7 @@ Then connect Shelf to `http://localhost:8787` with the token whose hash is `AUTH
 
 ```
 Shelf/
-  Home/       the Home Screen in UIKit: the icon renderer, pages, dock, long press and menu, drag, edit mode, search, wallpaper, the stage that owns it all
+  Home/       the Home Screen in UIKit: the icon renderer, pages, dock, long press and menu, drag, edit mode, search (App Library's list), wallpaper, the stage that owns it all
   Runner/     running an app: the card, its open and close motion, error screen, source rewriting
   Motion/     springs, and layer animation that starts from the presentation layer
   Create/     New App and Change…: prompts, reply parsing, preview, install keys
@@ -115,10 +115,11 @@ Decisions that aren't obvious from the code:
 
 - **Measured from Springboard.** The Home Screen's numbers come from screenshots of the real one on an iPhone 17 ([design/reference/](design/reference/)): 64 pt icons, a dock inset 17 pt on every side, a 26% icon corner (the rounder outline of iOS 26 and 27), the minus badge, and the long-press lift and menu. The dock, the search pill, the search field and the edit-mode buttons share one definition of clear system glass (`HomeGlass`), never a hand-made blur.
 - **The Home Screen is UIKit and Core Animation.** Everything the stage shows is UIKit; only the sheets, the error screen and the app inside a card are SwiftUI. The stage reads `HomeModel` and `LibraryStore` in `updateProperties()` and `layoutSubviews()`, which UIKit tracks for observation. Each icon is a sibling at an exact point, so a reorder is points changing on additive `UIView` springs, and a card opens from, and lands on, exactly where its icon is.
-- **One icon renderer.** `IconArtView` draws every icon in Core Animation: the grid, the dock, a card's face, search results, and the previews in sheets. Its outline is a path, not a layer's `cornerRadius`: Core Animation's continuous corner is up to 6 pixels rounder at 3x than Springboard's, and SwiftUI's continuous rounded rectangle matches Springboard's to the pixel. Light or dark icons come from one trait, `IconToneTrait`, set on the window.
+- **One icon renderer.** `IconArtView` draws every icon in Core Animation: the grid, the dock, a card's face, search's rows, and the previews in sheets. Its outline is a path, not a layer's `cornerRadius`: Core Animation's continuous corner is up to 6 pixels rounder at 3x than Springboard's, and SwiftUI's continuous rounded rectangle matches Springboard's to the pixel. Light or dark icons come from one trait, `IconToneTrait`, set on the window.
 - **The jiggle costs the main thread nothing.** Each icon's wobble is one repeating Core Animation animation that the render server plays by itself, each starting at its own moment. The icon is rasterized while it jiggles or pages, so its rim's mask and its label's shadow aren't drawn again every frame. Animations ask for 120 Hz, which an iPhone app only gets with `CADisableMinimumFrameDurationOnPhone` in Info.plist.
 - **Apps are cards Shelf drives in UIKit.** A SwiftUI `fullScreenCover` with a zoom transition closed like a sheet. Instead, `HomeStage` owns the layers. A card follows the finger over the live Home Screen and springs into its icon with the gesture's velocity. Every animation starts from the presentation layer, so a card can be caught mid-flight. The system's edge gestures are deferred only while an app is open.
-- **Search is the pill.** The pill is one piece of glass that stretches into the search field as you pull down (or tap) and rides up with the keyboard, as on iOS 27.
+- **Search is App Library's, with its bar at the bottom.** The pill is one piece of glass that stretches into App Library's field as you pull down (or tap), carrying one label (drawn at the field's size, scaled down to the pill's), and rides up with the keyboard. The whole pull is one number on a spring that a display link steps (`ValueSpring`): the glass, the label, the ✕, the Home Screen blurring and fading, the backdrop and the list are all set from it in the same frame, so nothing is ever shown twice, and a finger catches it exactly where it is. The list is a `UICollectionView` list: a section per letter, a cloud on apps not downloaded yet, and an A–Z # index of Shelf's own (the collection view's can't be coloured or sized). A row opens its app from its icon, the card closes back into it, and then search closes. Every number is measured from App Library ([design/reference/](design/reference/), "Search").
+- **One private API, in one file.** Search's backdrop is a `CABackdropLayer` with Core Animation's own `gaussianBlur` and `colorMatrix` filters (`Shelf/Home/PrivateBackdrop.swift`), because App Library's blur is a measured 40 pt Gaussian that has to follow the finger, and `UIBlurEffect` has a fixed radius and tint per style. Without those classes it falls back to a plain dim.
 - **Settings is an icon like any other.** It sits in the layout under `:settings`, which no slug can be, so it moves to any page or within the four-place dock and search finds it. It can't be deleted, its menu has only Edit Home Screen, and a tap opens the Settings sheet.
 - **Pages don't shift under a drag.** A page that a drag empties stays until Done, as on Springboard. Done drops it, and the page in view follows its icons.
 - **A long press is Springboard's.** Touch-down darkens the icon. Held still, it lifts and its menu opens beside it while everything else dims. Moving on closes the menu, starts edit mode and carries the icon. In edit mode a short hold picks an icon up, and a quicker swipe turns the page. The menu is Shelf's own glass panel: once `UIContextMenuInteraction`'s menu is up, UIKit cancels the touch for every other recognizer, the window's included, so the finger could never carry on into a drag. Edit mode also starts from a long press on the wallpaper.
