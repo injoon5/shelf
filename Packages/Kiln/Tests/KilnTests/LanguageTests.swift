@@ -1,6 +1,6 @@
 import XCTest
 import SwiftUI
-@testable import Kiln
+@_spi(KilnTesting) @testable import Kiln
 
 /// PLAN.md §1.6: Swift that should work in Kiln, one test per item.
 /// Each program runs headless; `print` is what it shows.
@@ -202,5 +202,114 @@ final class LanguageTests: XCTestCase {
         let p: Load? = nil
         print(p == nil)
         """, prints: "s,m true true 1\ntrue\n")
+    }
+
+    // MARK: Result builders
+
+    func testUserResultBuilder() {
+        expect("""
+        @resultBuilder
+        struct ListBuilder {
+            static func buildBlock(_ parts: [String]...) -> [String] { parts.flatMap { $0 } }
+            static func buildExpression(_ s: String) -> [String] { [s] }
+            static func buildExpression(_ n: Int) -> [String] { ["#\\(n)"] }
+            static func buildOptional(_ p: [String]?) -> [String] { p ?? [] }
+            static func buildEither(first p: [String]) -> [String] { p }
+            static func buildEither(second p: [String]) -> [String] { p }
+            static func buildArray(_ ps: [[String]]) -> [String] { ps.flatMap { $0 } }
+            static func buildFinalResult(_ p: [String]) -> String { p.joined(separator: ",") }
+        }
+        @ListBuilder func make(_ vip: Bool, _ n: Int) -> String {
+            "a"
+            7
+            if vip { "vip" }
+            if n > 1 { "many" } else if n == 1 { "one" } else { "none" }
+            for i in 0..<n { "i\\(i)" }
+            switch n { case 0: "zero"; case 1: "uno"; default: "lots" }
+            let tail = "z"
+            tail
+        }
+        struct Menu {
+            var vip = false
+            @ListBuilder var items: String {
+                "soup"
+                if vip { "caviar" }
+            }
+        }
+        func render(@ListBuilder _ content: () -> String) -> String { "[" + content() + "]" }
+        print(make(true, 2))
+        print(make(false, 0))
+        print(Menu().items, Menu(vip: true).items)
+        print(render { "x"; if true { "y" } })
+        """, prints: "a,#7,vip,many,i0,i1,lots,z\na,#7,none,zero,z\nsoup soup,caviar\n[x,y]\n")
+    }
+
+    func testBuildPartialBlockAndEitherTree() {
+        expect("""
+        @resultBuilder enum Sum {
+            static func buildPartialBlock(first: Int) -> Int { first }
+            static func buildPartialBlock(accumulated: Int, next: Int) -> Int { accumulated + next }
+            static func buildEither(first: Int) -> Int { first * 10 }
+            static func buildEither(second: Int) -> Int { second * 100 }
+        }
+        @Sum func pick(_ k: Int) -> Int {
+            1
+            switch k { case 0: 2; case 1: 3; default: 4 }
+        }
+        print(pick(0), pick(1), pick(2))
+        """, prints: "201 3001 401\n")
+    }
+
+    /// A builder a bridge registers (RegexBuilder's, §3.3) works the same way.
+    func testNativeResultBuilder() {
+        KRegistry.shared.resultBuilder("JoinBuilder", .language) { b in
+            b.method("buildBlock") { parts, _, interp in .string(parts.map { interp.describe($0) }.joined(separator: "+")) }
+            b.method("buildOptional") { args, _, _ in args.first.flatMap { $0.isNil ? nil : $0 } ?? .string("-") }
+        }
+        expect("""
+        func join(@JoinBuilder _ f: () -> String) -> String { f() }
+        print(join { "a"; 1; if true { "c" }; if false { "d" } })
+        """, prints: "a+1+c+-\n")
+    }
+
+    func testViewBuilderFunctionsPropertiesAndParameters() throws {
+        let code = """
+        import SwiftUI
+        struct Card<Content: View>: View {
+            @ViewBuilder let content: Content
+            var body: some View { VStack { content } }
+        }
+        struct Panel<Content: View>: View {
+            let title: String
+            let content: () -> Content
+            init(_ title: String, @ViewBuilder content: @escaping () -> Content) { self.title = title; self.content = content }
+            var body: some View { VStack { Text(title); content() } }
+        }
+        struct ContentView: View {
+            @State private var n = 2
+            var body: some View {
+                VStack {
+                    header(n > 1)
+                    rows
+                    Card { Text("in card"); Text("twice") }
+                    Panel("P") { Text("p1"); if n == 2 { Text("p2") } }
+                    labelled { Text("L") }
+                }
+            }
+            @ViewBuilder func header(_ big: Bool) -> some View {
+                if big { Text("big") } else { Text("small") }
+            }
+            @ViewBuilder var rows: some View {
+                ForEach(0..<n, id: \\.self) { i in Text("row \\(i)") }
+                switch n { case 2: Text("two"); default: Text("other") }
+            }
+            func labelled(@ViewBuilder _ content: () -> some View) -> some View { HStack { Text("label:"); content() } }
+        }
+        """
+        let t = Kiln.transcript(code, steps: 0)
+        for s in ["big", "row 1", "two", "in card", "twice", "p1", "p2", "label:", "\"L\""] {
+            XCTAssertTrue(t.contains(s), "missing \(s) in\n\(t)")
+        }
+        XCTAssertFalse(t.lowercased().contains("error"), t)
     }
 }

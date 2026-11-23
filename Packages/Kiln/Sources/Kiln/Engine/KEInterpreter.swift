@@ -41,6 +41,8 @@ final class KType {
     var customHash: ((KV) -> [KV]?)?
     /// Stands for a native type as `self` in an extension on it (`extension Array`).
     var standIn = false
+    /// For a `@resultBuilder` type: its static methods as a builder (KEBuilders).
+    var userBuilder: KUserBuilder?
 
     static func standIn(_ name: String) -> KType {
         let t = KType(name: name, kind: .structType)
@@ -340,7 +342,7 @@ final class KInterpreter {
         if decl.isComputed {
             let getter = decl
             globalEnv.vars[decl.name] = KBox(get: { [unowned self] in
-                (try? self.runAccessor(getter.getter ?? [], env: KEnv(parent: self.globalEnv), returns: getter.type)) ?? .nilValue
+                (try? self.runGetter(getter, env: KEnv(parent: self.globalEnv))) ?? .nilValue
             }, set: { _ in })
             return
         }
@@ -407,7 +409,7 @@ final class KInterpreter {
             if decl.isComputed {
                 let d = decl
                 env.vars[decl.name] = KBox(get: { [unowned self] in
-                    (try? self.runAccessor(d.getter ?? [], env: KEnv(parent: env), returns: d.type)) ?? .nilValue
+                    (try? self.runGetter(d, env: KEnv(parent: env))) ?? .nilValue
                 }, set: { _ in })
                 return .normal
             }
@@ -775,7 +777,7 @@ final class KInterpreter {
         if let p = t.computed[name] {
             // Run the getter with this same `self` (and its @State storage).
             return .computed(get: { [unowned self] in
-                try self.runAccessor(p.getter ?? [], env: KEnv(parent: self.globalEnv, selfContext: ctx), returns: p.type)
+                try self.runGetter(p, env: KEnv(parent: self.globalEnv, selfContext: ctx))
             }, set: { [unowned self] v in
                 guard let setter = p.setter else { throw self.fail("'\(name)' is a get-only property") }
                 let env = KEnv(parent: self.globalEnv, selfContext: ctx)
@@ -965,7 +967,7 @@ final class KInterpreter {
         }
         let ctx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
         if decl.isComputed {
-            return try runAccessor(decl.getter ?? [], env: KEnv(parent: globalEnv, selfContext: ctx), returns: decl.type)
+            return try runGetter(decl, env: KEnv(parent: globalEnv, selfContext: ctx))
         }
         let value = try decl.initial.map { try eval($0, KEnv(parent: globalEnv, selfContext: ctx), decl.type) } ?? .nilValue
         let box = KBox(coerce(value, to: decl.type), type: decl.type)
@@ -993,6 +995,17 @@ final class KInterpreter {
         case .ret(let v): return coerce(v, to: returns)
         default: return .void
         }
+    }
+
+    /// A computed property's getter; one marked with a result builder
+    /// (`@ViewBuilder var header: some View`, `@ListBuilder var items: [String]`) runs as one.
+    func runGetter(_ p: KEVarDecl, env: KEnv) throws -> KV {
+        let body = p.getter ?? []
+        if !p.attributes.isEmpty, let b = builder(p.attributes), !containsReturn(body) {
+            if case .custom = b { return try runBuilt(b, body, env, line: p.line) }
+            if !(body.count == 1), let r = p.type, !KEFuncDecl.isViewType(r) { return try runBuilt(b, body, env, line: p.line) }
+        }
+        return try runAccessor(body, env: env, returns: p.type)
     }
 
     func containsReturn(_ stmts: [KEStmt]) -> Bool {
@@ -1032,6 +1045,9 @@ final class KInterpreter {
         currentReturnType = decl.returnType
         defer { currentReturnType = saved }
         let body = decl.body
+        if !decl.attributes.isEmpty, case .custom(let b)? = builder(decl.attributes), !containsReturn(body) {
+            return try runBuilt(.custom(b), body, env, line: decl.line)
+        }
         if body.count == 1, case .expr(let e) = body[0], decl.returnType != nil || decl.isViewBuilder {
             return coerce(try eval(e, env, decl.returnType), to: decl.returnType)
         }
@@ -1066,6 +1082,7 @@ final class KInterpreter {
                 used[i] = true
                 next = i + 1
                 var v = coerce(args[i], to: p.type)
+                if !p.attributes.isEmpty, let b = builder(p.attributes) { v = builderClosure(v, b) }
                 if p.isInout, case .binding(let b) = v {
                     env.vars[p.name] = KBox(get: { b.get() }, set: { b.set($0) })
                     continue
@@ -1097,6 +1114,7 @@ final class KInterpreter {
             if callDepth > maxCallDepth { throw fail("Too much recursion in a closure.") }
             let env = KEnv(parent: captured)
             bindClosureParams(c, args, env)
+            if let b = f.builder { return try runBuilt(b, c.body, env, line: c.line) }
             if c.body.count == 1, case .expr(let e) = c.body[0] { return try eval(e, env) }
             switch try exec(c.body, env) {
             case .ret(let v): return v
@@ -1249,7 +1267,7 @@ final class KInterpreter {
     func describe(_ v: KV, quoted: Bool = false) -> String {
         // CustomStringConvertible: `print(x)` and `"\(x)"` use its `description`.
         if let t = v.userType, let p = t.computed["description"], t.conformances.contains("CustomStringConvertible"),
-           let d = try? runAccessor(p.getter ?? [], env: KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(v)))), returns: p.type),
+           let d = try? runGetter(p, env: KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(v))))),
            case .string(let text) = d {
             return text
         }

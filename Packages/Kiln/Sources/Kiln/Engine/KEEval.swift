@@ -299,7 +299,7 @@ extension KInterpreter {
         guard let ext = builtinExtensions[typeName] else { throw fail("\(typeName) has no member \(name)") }
         if let box = ext.staticBoxes[name] { return box.value }
         guard let decl = ext.staticDecls[name] else { throw fail("\(typeName) has no member \(name)") }
-        if decl.isComputed { return try runAccessor(decl.getter ?? [], env: KEnv(parent: globalEnv), returns: decl.type) }
+        if decl.isComputed { return try runGetter(decl, env: KEnv(parent: globalEnv)) }
         let v = try decl.initial.map { try eval($0, globalEnv, decl.type ?? .named(typeName, [])) } ?? .nilValue
         ext.staticBoxes[name] = KBox(v)
         return v
@@ -310,7 +310,7 @@ extension KInterpreter {
     func errorDescription(_ base: KV, _ t: KType) throws -> KV {
         if let p = t.computed["errorDescription"] {
             let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(base))))
-            let v = try runAccessor(p.getter ?? [], env: env, returns: p.type)
+            let v = try runGetter(p, env: env)
             if !v.isNil { return v }
         }
         var code = 1
@@ -324,7 +324,7 @@ extension KInterpreter {
             if let f = s.fields[name] { return unwrapField(s.type, name, f) }
             if let p = s.type.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: s.type, location: .box(KBox(base))))
-                return try runAccessor(p.getter ?? [], env: env, returns: p.type)
+                return try runGetter(p, env: env)
             }
             if let m = s.type.methods[name]?.first {
                 return .function(KFunction(.user(m, globalEnv, KSelfContext(type: s.type, location: .box(KBox(base))))))
@@ -334,7 +334,7 @@ extension KInterpreter {
             if name == "hashValue" { return .int(base.hashValue) }
             if s.type.isView, let ext = builtinExtensions["View"], let p = ext.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: s.type, location: .box(KBox(base))))
-                return try runAccessor(p.getter ?? [], env: env, returns: p.type)
+                return try runGetter(p, env: env)
             }
             if name == "localizedDescription" { return try errorDescription(base, s.type) }
             throw fail("Value of type '\(s.type.name)' has no member '\(name)'", line)
@@ -343,7 +343,7 @@ extension KInterpreter {
             if name == "self" { return base }
             if let p = e.type.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: e.type, location: .box(KBox(base))))
-                return try runAccessor(p.getter ?? [], env: env, returns: p.type)
+                return try runGetter(p, env: env)
             }
             if let m = e.type.methods[name]?.first {
                 return .function(KFunction(.user(m, globalEnv, KSelfContext(type: e.type, location: .box(KBox(base))))))
@@ -358,7 +358,7 @@ extension KInterpreter {
             if let f = o.fields[name] { return unwrapField(o.type, name, f) }
             if let p = o.type.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: o.type, location: .box(KBox(base))))
-                return try runAccessor(p.getter ?? [], env: env, returns: p.type)
+                return try runGetter(p, env: env)
             }
             if let m = o.type.methods[name]?.first {
                 return .function(KFunction(.user(m, globalEnv, KSelfContext(type: o.type, location: .box(KBox(base))))))
@@ -393,7 +393,7 @@ extension KInterpreter {
         default:
             if let p = builtinExtensionComputed(base, name) {
                 let ctx = KSelfContext(type: KType.standIn(base.typeName), location: .box(KBox(base)))
-                return try runAccessor(p.getter ?? [], env: KEnv(parent: globalEnv, selfContext: ctx), returns: p.type)
+                return try runGetter(p, env: KEnv(parent: globalEnv, selfContext: ctx))
             }
             return try nativeMember(base, name, line)
         }
@@ -961,6 +961,19 @@ extension KInterpreter {
             ?? (t.isClass || t.kind == .enumType ? nil : nil)
     }
 
+    /// A closure given to a memberwise initializer for `@ViewBuilder let content: Content`
+    /// (or a property whose type is a generic parameter constrained to `View`) is
+    /// built now; for `@ViewBuilder let content: () -> Content` it's kept, to build when called.
+    func storedBuilderValue(_ t: KType, _ p: KEVarDecl, _ v: KV) throws -> KV {
+        guard case .function(let f) = v, case .closure = f.kind else { return v }
+        var b = p.attributes.isEmpty ? nil : builder(p.attributes)
+        if b == nil, let tn = p.type?.name, t.generics.contains(where: { $0.name == tn && $0.constraints.contains("View") }) { b = .view }
+        if b == nil, let ty = p.type, KEFuncDecl.isViewType(ty) || ty.name == "AnyView" { b = .view }
+        guard let b else { return v }
+        if case .function = p.type?.core { return builderClosure(v, b) }
+        return try call(builderClosure(v, b).asFunction!, [], [])
+    }
+
     func memberwiseParams(_ t: KType) -> [KEVarDecl] {
         t.stored.filter { p in
             if p.isLet && p.initial != nil { return false }
@@ -1029,7 +1042,7 @@ extension KInterpreter {
             if let i = found {
                 used[i] = true
                 nextPositional = i + 1
-                values[p.name] = coerce(args[i], to: p.type)
+                values[p.name] = try storedBuilderValue(t, p, coerce(args[i], to: p.type))
             } else if values[p.name] == nil {
                 if p.wrapper == "Binding" || p.type.map({ if case .function = $0.core { return true }; return false }) == true {
                     values[p.name] = .nilValue

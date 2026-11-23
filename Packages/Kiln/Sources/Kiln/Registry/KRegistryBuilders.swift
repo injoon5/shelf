@@ -91,6 +91,19 @@ extension KRegistry {
         add(KWrapperBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file)))
     }
 
+    /// A result builder a bridge provides, used where code writes `@Name`
+    /// (Engine/KEBuilders.swift has the transform):
+    ///
+    ///     r.resultBuilder("RegexComponentBuilder", .text) { b in
+    ///         b.method("buildBlock") { parts, _, _ in … }
+    ///         b.method("buildEither") { args, labels, _ in … }   // labels: ["first"] or ["second"]
+    ///     }
+    func resultBuilder(_ name: String, _ family: KilnFamily, _ build: @MainActor (KNativeBuilder) -> Void) {
+        let b = KNativeBuilder(name: name, family: family)
+        build(b)
+        addResultBuilder(b)
+    }
+
     /// `Kiln/Bridges/Controls/Toggle.swift` → `Sources/Kiln/Bridges/Controls/Toggle.swift`.
     static func source(_ fileID: String) -> String {
         let path = fileID.split(separator: "/", maxSplits: 1).last.map(String.init) ?? fileID

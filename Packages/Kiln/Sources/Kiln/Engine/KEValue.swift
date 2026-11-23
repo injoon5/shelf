@@ -42,6 +42,7 @@ indirect enum KV {
     case native(KNative)
 
     var isNil: Bool { if case .nilValue = self { return true }; return false }
+    var asFunction: KFunction? { if case .function(let f) = self { return f }; return nil }
 
     var asBool: Bool? { if case .bool(let b) = self { return b }; return nil }
     var asInt: Int? {
@@ -338,6 +339,8 @@ final class KFunction {
         case native(String, ([KV], [String?]) throws -> KV)
     }
     let kind: Kind
+    /// A closure passed to a `@ViewBuilder` (or other result builder) parameter runs as one (KEBuilders).
+    var builder: KBuilderRef?
     init(_ kind: Kind) { self.kind = kind }
 
     var name: String {
