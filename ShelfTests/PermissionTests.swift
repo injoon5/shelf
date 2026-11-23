@@ -481,7 +481,8 @@ let habits = AppMeta(slug: "habits", name: "Habits", icon: "checkmark.circle.fil
         h.gate.ledger.set(.allowed, .camera, for: "habits", name: "Habits")
         h.gate.ledger.set(.allowed, .camera, for: "notes", name: "Notes")
         let cleanup = AppCleanup.library(cache: AppCache(root: h.folder.appending(path: "apps")),
-                                         appStorage: AppStorageKeys(.standard), permissions: h.gate)
+                                         defaults: AppDefaults(legacy: .standard, prefix: "shelf-tests.\(UUID().uuidString)."),
+                                         files: AppFiles(root: h.folder.appending(path: "files")), permissions: h.gate)
         await cleanup.remove("habits")
         await cleanup.remove("habits")
         #expect(h.reread().entries.keys.sorted() == ["notes"])

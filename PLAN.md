@@ -324,6 +324,8 @@ And the built app now fades in over its snapshot as one picture (`compositingGro
 4. **The built app** replaces the surface with a short crossfade, and so does the error screen. The New App preview uses the same surface, without a snapshot.
 5. **After the rewrite: build sooner.** With the VM, parsing and lowering can leave the main thread. Start them on touch-down, so the app is usually ready when the card comes to rest.
 
+**Item 5 built with §1.7.** `Kiln.parse` runs on any thread; Shelf starts it on touch-down (`HomeView.onPressApp` → `Prebuilds`), with the data's pull, and builds with the parse when the card comes to rest, which leaves 1–2 ms on the main thread (a cold build was 124 ms). The tree-walker has no lowering, and declaring types and running globals stay on the main actor. Kiln and SwiftUI are warmed offscreen 0.8 s after launch. Press to the app's first frame on the simulator (`LaunchTiming`, 18 opens of six demo apps): cold first open 959 → 675 ms; warm, median 623 → 625 ms, which is the card's 610 ms open.
+
 **Before merging:** screenshots of the open in light and dark, before and after, are approved. Items 1–4 come first; 5 lands after §1.
 
 ---
@@ -478,6 +480,8 @@ Built, except `@Generable` and `@Guide`, which are Round 4's.
 - **Capabilities:** a gate the host answers per app (§4.0), and a stub mode for checking, so `validate` fires actions without touching sensors, files or the network.
 - **Teardown:** when the card closes, Kiln cancels the app's tasks and stops motion, location, audio, WebSockets and web pages.
 - **Errors:** check errors and runtime errors both reach the host, with lines. Today a runtime error in a `body` shows as Kiln's own red label, which Shelf never sees.
+
+**Built.** `KilnContext` (`Packages/Kiln/Sources/Kiln/Context/`) and `Docs/bridges.md`, "The run's context", which is how Round 3's bridges use it: `c.context.files.resolve(url)` (or `FoundationBridges.file(c, "at")`), `.suspension(c.context.capabilities.request(.location))`, `c.context.onTearDown { … }` and `c.context.provided(FakeMotion.self)` / `isStub` for fakes. `Kiln.hostRequestHandler` is gone. Shelf's side is `RunContext`, `AppRun`, `DBBridge`, `AppDefaults` (the suite, and the move of old `kiln.app.<slug>.<key>` values into it) and `AppFiles`. A stub context never touches the network, awaited or with a handler.
 
 ### 1.8 Checking before running
 
@@ -791,11 +795,11 @@ Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later
 
 ## 7. Shelf, along the way
 
-- **Delete:** `SourceRewriter`'s `@AppStorage` rewriting, `Prelude`, `ShelfDBProtocol` and the `DB-Key` header path (§1.7). The server's `/api/apps/{slug}/data` API is unchanged.
+- **Delete:** `SourceRewriter`'s `@AppStorage` rewriting, `Prelude`, `ShelfDBProtocol` and the `DB-Key` header path (§1.7). The server's `/api/apps/{slug}/data` API is unchanged. Done.
 - **Prompts:** "What works" and "What doesn't work" are built from `kiln-manifest.json` plus a short hand-written part (format, design, saving data). New sections per round: Files, Photos and Camera, Motion, Location, Intelligence, Widgets (for Shelf's Home Screen). `PromptsTests` checks the result. ij5.dev's admin doesn't show the prompt, so the server needs no change.
 - **New App sheet:** runs `Kiln.check` and `Kiln.validate` on the pasted reply before Install, and shows the first error with its line.
-- **Card lifecycle:** closing a card calls the context's teardown (§1.7).
-- **Settings:** Permissions (§4.0), and per-app storage use (files plus `DB`).
+- **Card lifecycle:** closing a card calls the context's teardown (§1.7). Built: a card that lands tears its run down.
+- **Settings:** Permissions (§4.0), and per-app storage use (files plus `DB`). Built: App Data lists both per app, and Delete Data removes both.
 - **README:** updated at the end of each phase.
 
 ---

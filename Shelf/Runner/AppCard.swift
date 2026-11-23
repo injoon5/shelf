@@ -5,26 +5,32 @@ import UIKit
 @MainActor
 @Observable
 final class CardState {
-    /// The open has come to rest. Kiln parses on the main thread, so the app
-    /// is built only after this: never while anything is moving.
+    /// The open has come to rest. The source is parsed off the main thread
+    /// from the moment a finger lands on the icon (`Prebuilds`); the rest
+    /// of building is on the main thread, so it waits for this: never while
+    /// anything is moving.
     var isSettled = false
     /// The app (or its error screen) has finished fading in over the
     /// card's launch surface, which can go.
     @ObservationIgnored var onLaunched: () -> Void = {}
+    /// The app's run, which closing the card tears down.
+    @ObservationIgnored var run: AppRun?
 }
 
 /// The app inside a card.
 struct CardRoot: View {
     var run: HomeModel.Run
     var state: CardState
-    var data: AppData
+    var host: AppHost
+    var permissions: any AppPermissions
 
     var body: some View {
         // The card's own face is the launch surface, under the stage, so
         // the stage shows nothing of its own until the app is built, and
         // then fades the app in over it.
-        AppStage(app: run.app.meta, source: run.source, store: .synced, data: data,
-                 isReady: state.isSettled, showsLaunchScreen: false, onLaunched: { state.onLaunched() })
+        AppStage(app: run.app.meta, source: run.source, store: .synced, host: host, permissions: permissions,
+                 isReady: state.isSettled, showsLaunchScreen: false, onLaunched: { state.onLaunched() },
+                 onRun: { state.run = $0 })
     }
 }
 
@@ -314,7 +320,7 @@ final class AppCard {
 
     /// `surface` is what the app opens on: its snapshot, or a launch
     /// surface, at full-screen size.
-    init(run: HomeModel.Run, data: AppData, face: IconFace, surface: UIView, screen: CGSize, iconSize: CGFloat,
+    init(run: HomeModel.Run, runHost: AppHost, permissions: any AppPermissions, face: IconFace, surface: UIView, screen: CGSize, iconSize: CGFloat,
          fullRadius: CGFloat, from source: CGRect) {
         self.run = run
         self.screen = screen
@@ -322,7 +328,7 @@ final class AppCard {
         self.fullRadius = fullRadius
         icon = CGPoint(x: source.midX, y: source.midY)
         self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen, fullRadius: fullRadius)
-        host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
+        host = UIHostingController(rootView: CardRoot(run: run, state: state, host: runHost, permissions: permissions))
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
         host.view.isHidden = true
@@ -340,9 +346,18 @@ final class AppCard {
         face.show(view, fading: true)
     }
 
+    /// The card has landed and goes: the app's run stops (plan §1.7, §7).
+    /// Its tasks and timers are cancelled, whatever its bridges started
+    /// stops, and a permission sheet still up for it goes.
+    func tearDown() {
+        state.run?.tearDown()
+        state.run = nil
+    }
+
     /// The app has faded in over the launch surface.
     private func launched() {
         isLaunched = true
+        LaunchTiming.mark("launched", slug)
         guard phase == .open else { return }
         // Covered by the live app until a finger or a close needs it.
         face.isHidden = true
@@ -473,6 +488,7 @@ final class AppCard {
             phase = .open
             host.view.isHidden = false
             state.isSettled = true
+            LaunchTiming.mark("settled", slug)
             if isLaunched {
                 // Covered by the live app until a finger or a close needs it.
                 face.isHidden = true

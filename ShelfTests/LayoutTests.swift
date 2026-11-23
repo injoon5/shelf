@@ -303,7 +303,8 @@ struct LayoutTests {
                             data: AppData(root: h.folder.appending(path: "data"), api: { nil }),
                             layoutURL: h.folder.appending(path: "layout.json"),
                             server: { api },
-                            appStorage: AppStorageKeys(UserDefaults(suiteName: h.suite)!))
+                            defaults: AppDefaults(legacy: UserDefaults(suiteName: h.suite)!, prefix: h.suite + ".app."),
+                            files: AppFiles(root: h.folder.appending(path: "files")))
     }
 
     private func saved(_ h: StoreHarness) -> Layout? {

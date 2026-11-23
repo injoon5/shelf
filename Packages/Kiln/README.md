@@ -205,15 +205,19 @@ How to add a bridge, with an example of each kind: [Docs/bridges.md](Docs/bridge
 
 ```swift
 public enum Kiln {
-    @MainActor static func run(_ code: String) -> KilnResult
-    @MainActor static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000) -> KilnValidation
+    @MainActor static func run(_ code: String) -> KilnResult                              // KilnContext.standard()
+    /// One app's run: its settings, folder, capability gate, teardown and errors (PLAN.md §1.7).
+    @MainActor static func run(_ code: String, context: KilnContext) -> KilnResult
+    @MainActor static func run(_ parsed: KilnParsedSource, context: KilnContext) -> KilnResult
+    /// Any thread: parse before the screen is up, run on the main actor.
+    static func parse(_ code: String) -> KilnParsedSource
+    @MainActor static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000,
+                                    context: KilnContext? = nil) -> KilnValidation    // KilnContext.stub()
     static func swiftSource(fromMarkdown markdown: String) -> String
     static func swiftSource(running block: String, inReply markdown: String) -> String
     static func looksLikeApp(_ code: String) -> Bool
     @MainActor static var randomSeed: UInt64?
     @MainActor static var hostImageProvider: ((String) -> Image?)?
-    /// Requests the host answers at once, before the network (Shelf's db://; §1.7 replaces it).
-    @MainActor static var hostRequestHandler: ((URLRequest) -> KilnHostResponse?)?
     /// A host bridge: a native type the app's code can name (Docs/bridges.md).
     @MainActor static func registerType(_ name: String, family: KilnFamily = .host, notes: String? = nil, _ build: (KilnTypeBuilder) -> Void)
     @MainActor static func registerFunction(_ name: String, signature: String? = nil, family: KilnFamily = .host, notes: String? = nil,
@@ -234,9 +238,19 @@ public struct KilnValue {          // .void, .nil, (string:), (int:), (double:),
 }
 
 public struct KilnResult {
-    let view: AnyView?; let consoleOutput: String; let errors: [String]
-    @MainActor func tearDown()               // cancel every task, stop timers, run nothing more
+    let view: AnyView?; let consoleOutput: String; let errors: [String]; var context: KilnContext?
+    @MainActor func tearDown()               // cancel every task, stop timers and the context's stoppers, run nothing more
     @MainActor var activeTaskCount: Int
+}
+
+public final class KilnContext {           // one run of one app (Docs/bridges.md, "The run's context")
+    init(slug: String, name: String, defaults: UserDefaults, files: KilnFiles, capabilities: KilnCapabilityGate? = nil)
+    static func stub(slug:name:capabilities:) -> KilnContext     // throwaway settings and folder, answers at once
+    let slug: String; let name: String; var defaults: UserDefaults; let files: KilnFiles
+    let capabilities: KilnCapabilities; let isStub: Bool
+    func provide<T>(_ value: T); func provided<T>(_ type: T.Type) -> T?
+    func onTearDown(_ stop: @escaping () -> Void) -> KilnTeardownToken; func tearDown()
+    var onError: ((KilnError) -> Void)?    // .check, .body or .runtime, with its line
 }
 public struct KilnHostResponse { var statusCode: Int; var body: Data? }
 public struct KilnValidation { let errors: [String]; let warnings: [String]; var isValid: Bool }

@@ -118,7 +118,8 @@ struct SyncHarness {
         defaults = UserDefaults(suiteName: suite)!
         let api = library.server.api()
         engine = SyncEngine(cache: cache, api: { [signedIn] in signedIn.value ? api : nil },
-                            appStorage: AppStorageKeys(defaults))
+                            defaults: AppDefaults(legacy: defaults, prefix: suite + ".app."),
+                            files: AppFiles(root: cache.root.appending(path: "files")))
     }
 
     func sync(_ log: EventLog = EventLog()) async throws -> LibraryIndex {

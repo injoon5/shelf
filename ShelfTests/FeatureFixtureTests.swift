@@ -33,14 +33,12 @@ struct FeatureFixtureTests {
         #expect(ReplyParser.parse(source).name != nil)
         #expect(source.contains("struct ContentView: View"))
 
-        FakeServer.start()
-        defer { FakeServer.stop() }
-
-        let result = Kiln.run(source)
+        let result = Kiln.run(source, context: Self.check(name))
+        defer { result.tearDown() }
         #expect(result.errors.isEmpty, "\(name): \(result.errors)")
         #expect(result.hasView, "\(name) produced no view")
 
-        let validation = Kiln.validate(source)
+        let validation = Kiln.validate(source, context: Self.check(name))
         #expect(validation.errors.isEmpty, "\(name): \(validation.errors)")
         #expect(validation.warnings.isEmpty, "\(name): \(validation.warnings)")
         #expect(validation.renderedContent, "\(name) rendered nothing")
@@ -55,12 +53,12 @@ struct FeatureFixtureTests {
     // MARK: Saving data, end to end
 
     @Test func savingDataStartsEmptyAndSaves() throws {
-        let seen = try Self.validateSavingData(stored: [:])
+        let (seen, session) = try Self.validateSavingData(stored: [:])
         #expect(seen.contains("GET /books"))
         #expect(seen.contains("GET /notes"))
         // `Clear Notes` calls `DB.remove`.
         #expect(seen.contains("DELETE /notes"))
-        let books = try Self.savedBooks()
+        let books = try Self.savedBooks(session)
         #expect(books.map { $0["title"] as? String } == ["Untitled"])
         #expect(books.first?["tags"] as? [String] == ["new"])
         // `var id = UUID()` and `var added = Date()` are written as a UUID string and a number.
@@ -71,8 +69,8 @@ struct FeatureFixtureTests {
     @Test func oldDataGainsNewFieldsFromTheirDefaults() throws {
         // Saved by an earlier version that had only `id`, `title` and `added`.
         let old = #"[{"id":"8F1E2D3C-1111-2222-3333-444455556666","title":"Dune","added":700000000}]"#
-        _ = try Self.validateSavingData(stored: ["books": Data(old.utf8)])
-        let book = try #require(try Self.savedBooks().first)
+        let (_, session) = try Self.validateSavingData(stored: ["books": Data(old.utf8)])
+        let book = try #require(try Self.savedBooks(session).first)
         #expect(book["id"] as? String == "8F1E2D3C-1111-2222-3333-444455556666")
         #expect(book["title"] as? String == "Dune")
         #expect(book["added"] as? Double == 700000000)
@@ -86,8 +84,8 @@ struct FeatureFixtureTests {
 
     @Test func optionalsAndEnumsRoundTrip() throws {
         let saved = #"[{"id":"8F1E2D3C-1111-2222-3333-444455556666","title":"Emma","author":"Austen","rating":4,"shelf":"finished","added":1,"progress":{"page":3,"total":9},"tags":["x"]}]"#
-        _ = try Self.validateSavingData(stored: ["books": Data(saved.utf8)])
-        let book = try #require(try Self.savedBooks().first)
+        let (_, session) = try Self.validateSavingData(stored: ["books": Data(saved.utf8)])
+        let book = try #require(try Self.savedBooks(session).first)
         #expect(book["author"] as? String == "Austen")
         #expect(book["rating"] as? Int == 4)
         #expect(book["shelf"] as? String == "finished")
@@ -95,7 +93,7 @@ struct FeatureFixtureTests {
     }
 
     @Test func unreadableDataIsNeverOverwritten() throws {
-        let seen = try Self.validateSavingData(stored: ["books": Data(#"[{"title":42}]"#.utf8)])
+        let (seen, _) = try Self.validateSavingData(stored: ["books": Data(#"[{"title":42}]"#.utf8)])
         #expect(seen.contains("GET /books"))
         #expect(!seen.contains("PUT /books"), "\(seen)")
     }
@@ -111,7 +109,7 @@ struct FeatureFixtureTests {
     ])
     func doesntWork(_ claim: String, _ body: String, _ mentioned: String) {
         let source = Self.claimSource(body)
-        let errors = Kiln.validate(source).errors
+        let errors = Kiln.validate(source, context: Self.check()).errors
         #expect(errors.contains { $0.contains(mentioned) }, "\(claim) now works? errors: \(errors)")
     }
 
@@ -227,23 +225,33 @@ struct FeatureFixtureTests {
 
     // MARK: Helpers
 
-    /// The fixture as Shelf runs it.
+    /// The fixture as Shelf runs it: as written (plan §1.7 left nothing to rewrite).
     static func source(_ name: String) throws -> String {
-        SourceRewriter.prepare(try Fixture.app(name), slug: name)
+        try Fixture.app(name)
     }
 
-    static func validateSavingData(stored: [String: Data]) throws -> [String] {
+    /// A check's context for a fixture, as Shelf's `validate` would give it:
+    /// Kiln's stub, a `DB` session, and permissions that answer at once.
+    static func check(_ name: String = "fixture", session: DBSession = DBSession(slug: "fixture"), trace: DBTrace? = nil) -> KilnContext {
+        let context = RunContext.check(AppMeta(slug: name, name: name, tint: .blue, version: "1"), session: session)
+        if let trace { context.provide(trace) }
+        return context
+    }
+
+    /// The saving-data fixture checked over a store holding `stored`: every
+    /// `DB` call it made, and the store after.
+    static func validateSavingData(stored: [String: Data]) throws -> ([String], DBSession) {
         let source = try self.source("saving-data")
-        FakeServer.start(stored: stored)
-        defer { FakeServer.stop() }
-        let validation = Kiln.validate(source)
+        let session = DBSession(slug: "saving-data", entries: stored.compactMapValues(JSONValue.init(json:)))
+        let trace = DBTrace()
+        let validation = Kiln.validate(source, context: check("saving-data", session: session, trace: trace))
         #expect(validation.errors.isEmpty, "\(validation.errors)")
-        return FakeServer.seen.map { "\($0.method) \($0.path)" }
+        return (trace.calls, session)
     }
 
-    static func savedBooks() throws -> [[String: Any]] {
-        let put = try #require(FakeServer.seen.last { $0.method == "PUT" && $0.path == "/books" }, "books were never saved")
-        return try #require(try JSONSerialization.jsonObject(with: put.body) as? [[String: Any]])
+    static func savedBooks(_ session: DBSession) throws -> [[String: Any]] {
+        let books = try #require(session.value(for: "books"), "books were never saved")
+        return try #require(try JSONSerialization.jsonObject(with: books.json) as? [[String: Any]])
     }
 
     static func claimSource(_ body: String) -> String {
@@ -293,7 +301,8 @@ struct FeatureFixtureTests {
     /// What `Kiln.validate` does, keeping what the code printed.
     static func probe(_ source: String) -> (errors: [String], console: String, warnings: [String]) {
         do {
-            let compiled = try KilnEngine.compile(source)
+            let compiled = try KilnEngine.compile(source, context: check())
+            defer { compiled.interp.context.tearDown() }
             KProbe(interp: compiled.interp, ticks: 1).run(compiled.root)
             return (compiled.interp.errors, compiled.interp.console, compiled.interp.warnings)
         } catch {
@@ -304,9 +313,9 @@ struct FeatureFixtureTests {
     /// Shows the app in a window, as Shelf does, and returns what Kiln's
     /// renderer reported while drawing it.
     static func render(_ source: String) throws -> (errors: [String], warnings: [String]) {
-        let compiled = try KilnEngine.compile(source)
+        let compiled = try KilnEngine.compile(source, context: check())
         // What the app started (`.task`) stops with the window, as when Shelf closes it.
-        defer { compiled.interp.tearDown() }
+        defer { compiled.interp.tearDown(); compiled.interp.context.tearDown() }
         let window = try show(compiled)
         for _ in 0..<5 {
             window.rootViewController?.view.setNeedsLayout()

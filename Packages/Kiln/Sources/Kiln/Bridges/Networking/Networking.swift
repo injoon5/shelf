@@ -4,9 +4,9 @@
 //
 //  `try await URLSession.shared.data(from:)` (or `for:` a request) waits
 //  without blocking; `dataTask(with:) { data, response, error in }.resume()`
-//  calls back on the main thread. A request the host answers itself
-//  (`Kiln.hostRequestHandler`, Shelf's `db://` until §1.7) comes back at once.
-//  `validate` never touches the network: a request fails at once, as offline.
+//  calls back on the main thread, and is cancelled when the app's screen
+//  closes. `validate` (and any stub context) never touches the network: a
+//  request fails at once, as offline.
 //
 
 import SwiftUI
@@ -30,9 +30,17 @@ final class NetworkingBridges: KBridgeFamily {
 
         r.type("URLSessionDataTask", .networking) { t in
             t.method("resume") { c in
-                guard let box = c.object(KDataTask.self), box.task == nil else { return .void }
+                guard let box = c.object(KDataTask.self), box.task == nil, !box.started else { return .void }
+                box.started = true
                 let completion = box.completion
                 let interp = c.interp
+                if interp.headless || interp.context.isStub {
+                    // A check: the request fails at once, as offline.
+                    interp.perform(completion, [.nilValue, .nilValue,
+                                                KBuiltins.errorValue(URLError(.notConnectedToInternet).localizedDescription)])
+                    return .void
+                }
+                c.context.onTearDown { [weak box] in box?.task?.cancel() }
                 box.task = URLSession.shared.dataTask(with: box.request) { data, response, error in
                     let d = data, resp = response, e = error?.localizedDescription
                     DispatchQueue.main.async {

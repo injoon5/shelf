@@ -19,6 +19,7 @@ extension LanguageBridges {
                     return .string(String(repeating: c.interp.describe(rep), count: c.arg("count")?.asInt ?? 0))
                 }
                 if let d = c.arg("describing") { return .string(c.interp.describe(d)) }
+                if c.has("contentsOf") || c.has("contentsOfFile") { return try FoundationBridges.stringContents(c) }
                 if let d = c.arg("data") { return KBuiltins.dataValue(d).flatMap { String(data: $0, encoding: .utf8) }.map { .string($0) } ?? .nilValue }
                 if case .array(let chars)? = c.first { return .string(chars.map { c.interp.describe($0) }.joined()) }
                 return .string(c.first.map { c.interp.describe($0) } ?? "")

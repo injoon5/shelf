@@ -1979,6 +1979,23 @@
     },
     {
       "family" : "Foundation",
+      "id" : "member:Data.write",
+      "kind" : "member",
+      "name" : "write",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "options"
+          ]
+        }
+      ],
+      "owner" : "Data",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
       "id" : "member:Date.addingTimeInterval",
       "kind" : "member",
       "name" : "addingTimeInterval",
@@ -2699,6 +2716,247 @@
       "owner" : "Error",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.attributesOfItem",
+      "kind" : "member",
+      "name" : "attributesOfItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "atPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.contents",
+      "kind" : "member",
+      "name" : "contents",
+      "overloads" : [
+        {
+          "labels" : [
+            "atPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.contentsOfDirectory",
+      "kind" : "member",
+      "name" : "contentsOfDirectory",
+      "overloads" : [
+        {
+          "labels" : [
+            "at",
+            "includingPropertiesForKeys",
+            "options"
+          ]
+        },
+        {
+          "labels" : [
+            "atPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.copyItem",
+      "kind" : "member",
+      "name" : "copyItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "at",
+            "to"
+          ]
+        },
+        {
+          "labels" : [
+            "atPath",
+            "toPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.createDirectory",
+      "kind" : "member",
+      "name" : "createDirectory",
+      "overloads" : [
+        {
+          "labels" : [
+            "at",
+            "withIntermediateDirectories",
+            "attributes"
+          ]
+        },
+        {
+          "labels" : [
+            "atPath",
+            "withIntermediateDirectories",
+            "attributes"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.createFile",
+      "kind" : "member",
+      "name" : "createFile",
+      "overloads" : [
+        {
+          "labels" : [
+            "atPath",
+            "contents",
+            "attributes"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.default",
+      "kind" : "member",
+      "name" : "default",
+      "overloads" : [
+
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.fileExists",
+      "kind" : "member",
+      "name" : "fileExists",
+      "overloads" : [
+        {
+          "labels" : [
+            "atPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.moveItem",
+      "kind" : "member",
+      "name" : "moveItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "at",
+            "to"
+          ]
+        },
+        {
+          "labels" : [
+            "atPath",
+            "toPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.removeItem",
+      "kind" : "member",
+      "name" : "removeItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "at"
+          ]
+        },
+        {
+          "labels" : [
+            "atPath"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.temporaryDirectory",
+      "kind" : "member",
+      "name" : "temporaryDirectory",
+      "overloads" : [
+
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.url",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "in",
+            "appropriateFor",
+            "create"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:FileManager.urls",
+      "kind" : "member",
+      "name" : "urls",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "in"
+          ]
+        }
+      ],
+      "owner" : "FileManager",
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
     },
     {
       "family" : "Language",
@@ -5698,6 +5956,31 @@
     },
     {
       "family" : "Language",
+      "id" : "member:String.write",
+      "kind" : "member",
+      "name" : "write",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "atomically",
+            "encoding"
+          ]
+        },
+        {
+          "labels" : [
+            "toFile",
+            "atomically",
+            "encoding"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
       "id" : "member:Swift.abs",
       "kind" : "member",
       "name" : "abs",
@@ -6423,6 +6706,158 @@
     },
     {
       "family" : "Foundation",
+      "id" : "member:URL.appending",
+      "kind" : "member",
+      "name" : "appending",
+      "overloads" : [
+        {
+          "labels" : [
+            "component",
+            "directoryHint"
+          ]
+        },
+        {
+          "labels" : [
+            "path",
+            "directoryHint"
+          ]
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.appendingPathComponent",
+      "kind" : "member",
+      "name" : "appendingPathComponent",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isDirectory"
+          ]
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.appendingPathExtension",
+      "kind" : "member",
+      "name" : "appendingPathExtension",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.applicationSupportDirectory",
+      "kind" : "member",
+      "name" : "applicationSupportDirectory",
+      "notes" : "In the app's own folder.",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.cachesDirectory",
+      "kind" : "member",
+      "name" : "cachesDirectory",
+      "notes" : "In the app's own folder.",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.deletingLastPathComponent",
+      "kind" : "member",
+      "name" : "deletingLastPathComponent",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.deletingPathExtension",
+      "kind" : "member",
+      "name" : "deletingPathExtension",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.documentsDirectory",
+      "kind" : "member",
+      "name" : "documentsDirectory",
+      "notes" : "In the app's own folder.",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.hasDirectoryPath",
+      "kind" : "member",
+      "name" : "hasDirectoryPath",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.homeDirectory",
+      "kind" : "member",
+      "name" : "homeDirectory",
+      "notes" : "In the app's own folder.",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
       "id" : "member:URL.host",
       "kind" : "member",
       "name" : "host",
@@ -6435,9 +6870,106 @@
     },
     {
       "family" : "Foundation",
+      "id" : "member:URL.isFileURL",
+      "kind" : "member",
+      "name" : "isFileURL",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
       "id" : "member:URL.lastPathComponent",
       "kind" : "member",
       "name" : "lastPathComponent",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.path",
+      "kind" : "member",
+      "name" : "path",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.pathComponents",
+      "kind" : "member",
+      "name" : "pathComponents",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.pathExtension",
+      "kind" : "member",
+      "name" : "pathExtension",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.relativePath",
+      "kind" : "member",
+      "name" : "relativePath",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.scheme",
+      "kind" : "member",
+      "name" : "scheme",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.standardizedFileURL",
+      "kind" : "member",
+      "name" : "standardizedFileURL",
+      "overloads" : [
+
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.temporaryDirectory",
+      "kind" : "member",
+      "name" : "temporaryDirectory",
+      "notes" : "In the app's own folder.",
       "overloads" : [
 
       ],
@@ -6849,7 +7381,7 @@
       "id" : "member:UserDefaults.array",
       "kind" : "member",
       "name" : "array",
-      "notes" : "Always nil: store strings, numbers or Bools.",
+      "notes" : "Strings, numbers, Bools, dates, Data, and arrays and dictionaries of them.",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -6868,7 +7400,6 @@
       "id" : "member:UserDefaults.data",
       "kind" : "member",
       "name" : "data",
-      "notes" : "Always nil: store strings, numbers or Bools.",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -6878,7 +7409,16 @@
       "id" : "member:UserDefaults.dictionary",
       "kind" : "member",
       "name" : "dictionary",
-      "notes" : "Always nil: store strings, numbers or Bools.",
+      "notes" : "Strings, numbers, Bools, dates, Data, and arrays and dictionaries of them.",
+      "owner" : "UserDefaults",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UserDefaults.dictionaryRepresentation",
+      "kind" : "member",
+      "name" : "dictionaryRepresentation",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -6888,6 +7428,15 @@
       "id" : "member:UserDefaults.double",
       "kind" : "member",
       "name" : "double",
+      "owner" : "UserDefaults",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UserDefaults.float",
+      "kind" : "member",
+      "name" : "float",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -6906,7 +7455,16 @@
       "id" : "member:UserDefaults.object",
       "kind" : "member",
       "name" : "object",
-      "notes" : "Always nil: store strings, numbers or Bools.",
+      "notes" : "Strings, numbers, Bools, dates, Data, and arrays and dictionaries of them.",
+      "owner" : "UserDefaults",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UserDefaults.register",
+      "kind" : "member",
+      "name" : "register",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -6955,7 +7513,16 @@
       "id" : "member:UserDefaults.stringArray",
       "kind" : "member",
       "name" : "stringArray",
-      "notes" : "Always nil: store strings, numbers or Bools.",
+      "notes" : "Strings, numbers, Bools, dates, Data, and arrays and dictionaries of them.",
+      "owner" : "UserDefaults",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UserDefaults.url",
+      "kind" : "member",
+      "name" : "url",
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
@@ -11229,6 +11796,18 @@
       "support" : "partial"
     },
     {
+      "family" : "Foundation",
+      "id" : "type:FileManager",
+      "kind" : "type",
+      "name" : "FileManager",
+      "notes" : "Inside the app's own folder; a path that leaves it is an error.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Language",
       "id" : "type:Float",
       "kind" : "type",
@@ -11878,7 +12457,7 @@
       "id" : "type:UserDefaults",
       "kind" : "type",
       "name" : "UserDefaults",
-      "notes" : "Each key is kept apart from Shelf's own settings.",
+      "notes" : "The app's own settings: `standard` is the app's suite, which its `@AppStorage` shares.",
       "overloads" : [
 
       ],

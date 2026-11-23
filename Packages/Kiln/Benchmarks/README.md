@@ -17,7 +17,7 @@ The inputs:
 - `Examples/Apps/*.swift`: Kiln's example apps.
 - `Examples/AppleIntelligence/*.md`: model replies, merged into one source the way Haplo AI runs them.
 - `Examples/Networking/*.swift`.
-- `fixtures/apps/*.swift` (Shelf's, at the repo root): one app per section of Shelf's prompt. An app that uses `DB.` gets `shelf-db-prelude.swift` appended, as Shelf's `SourceRewriter` does.
+- `fixtures/apps/*.swift` (Shelf's, at the repo root): one app per section of Shelf's prompt. An app that uses `DB.` reaches a `DB` host bridge over an in-memory store, as Shelf's since PLAN.md §1.7 (before it, KilnBench appended `shelf-db-prelude.swift`, as Shelf's `SourceRewriter` did; `Tools/diff.sh` still does for its baseline engine).
 - `Workloads/*.swift`: loops and arithmetic, collections, objects and closures. Their work runs in `onAppear`, so they time the interpreter rather than the parser. The apps above spend most of their time parsing.
 
 Two calls per input:
@@ -27,7 +27,7 @@ Two calls per input:
 
 Each call is timed once cold, then in 21 samples. A sample repeats the call until it has lasted about 20 ms and divides, so a 1 ms app isn't lost in the clock's noise. The JSON has the cold time, the median and the minimum per call. **Comparisons use the minimum.** It's the steadiest number on a busy machine: on identical code, minimums moved by up to ±12% between two runs here, medians by up to ±46%. An input that comes out more than 10% slower is timed twice more and the fastest kept, before it counts.
 
-Nothing touches the network. Every http(s) request fails at once with "not connected", as in Shelf's fixture tests, and `db://` requests are answered from memory, as Shelf's `ShelfDBProtocol` does.
+Nothing touches the network. Every http(s) request fails at once with "not connected", as in Shelf's fixture tests, and `DB` is answered from memory.
 
 ## Results
 
@@ -245,3 +245,12 @@ The second evaluator isn't Swift `async`, which would have been shorter. I measu
 **Where the VM's speed would come from.** Sampling the Arithmetic workload: most of the time is `swift_retain`/`swift_release`, copies of `KV`, and array copies of the tree's indirect enums as the walker switches over them. Lowering to instructions with slots removes exactly that. **Recommendation:** build the VM after §1.4, when the bridges take decoded values; lower all code to it then, keeping `KEAsync`'s frame and suspension model, and retire the tree-walker.
 
 **Differential:** [differential.md](differential.md): 49 inputs (Kiln's example apps and model replies, Networking, LibraryApp, Shelf's `fixtures/apps`, the workloads, and the SwiftUI sources in Kiln's tests), 47 identical to the engine before §1.3, 2 different as expected and listed in `Tools/diff-expected.txt` (a button calling a non-`async` function that awaits is now an error with its line instead of blocking the main thread on the request; and the new async fixture, which the old engine couldn't run).
+
+### after-1.7-context.json
+
+After §1.7 (a context for each run). Every input still passes as before. `Tools/iterate.sh` now compares against this file.
+
+- Command: `Benchmarks/run.sh Benchmarks/after-1.7-context.json --compare <the base commit's run, the same session>` (21 samples): the base (`08fd535`) was benched minutes before, on the same machine, so the two differ only by the change. Load average about 4. Date: 24 November 2026.
+- **No input is slower than 10%.** Each check now has a stub context, which costs nothing until the app uses it: its folder is named only when a file is touched, and its settings are in memory (`KilnMemoryDefaults`), not a suite cfprefsd has to make and remove. A first version made both every time, and small inputs were 5 to 12% slower.
+- **Apps that use `DB` are faster again** (saving-data −24%, todos-db −47%): `DB` is a host bridge now, with no `URLRequest` built and answered per call. saving-data's `@AppStorage` is in memory during a check.
+- KilnBench registers an in-memory `DB` host bridge instead of appending the old prelude.

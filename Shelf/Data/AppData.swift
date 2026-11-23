@@ -2,11 +2,10 @@ import Foundation
 import Synchronization
 
 /// One app's key-value store while it is in use: the values in memory, behind
-/// a lock, so `ShelfDBProtocol` can answer from any thread without waiting.
+/// a lock, so `DB` (`DBBridge`) answers at once, without waiting.
 ///
-/// It never touches the main actor or the network. Kiln blocks the main thread
-/// while an app's `await URLSession.shared.data(…)` runs, so every answer has
-/// to come from here, at once, on the loading thread.
+/// It never touches the main actor or the network: every answer comes from
+/// here, at once.
 final class DBSession: Sendable {
     let slug: String
 
@@ -286,6 +285,18 @@ actor AppData {
         let session = session(slug)
         await Self.wait(for: startPull(slug), atMost: pullTimeout)
         return session
+    }
+
+    /// A finger is down on the app's icon: start pulling its changes now,
+    /// so `open` usually finds them already here.
+    func prefetch(_ slug: String) {
+        _ = startPull(slug)
+    }
+
+    /// Bytes stored for one app, for Settings.
+    func usage(of slug: String) -> Int {
+        save(slug)
+        return files.size(of: slug)
     }
 
     /// The app closed: save, and push what is dirty.

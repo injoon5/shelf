@@ -6,16 +6,20 @@ import Foundation
 //
 //   KilnDiff [--prelude FILE] input.swift|reply.md …
 //
-// Nothing touches the network: http(s) fails at once with "not connected",
-// and `db://` is answered from memory (by URLProtocol for an engine that
-// blocks on URLSession, by Kiln.hostRequestHandler for one that doesn't).
+// Nothing touches the network: http(s) fails at once with "not connected".
+// `DB` is answered from memory: since §1.7 by a `DB` host bridge, as Shelf's;
+// in a baseline engine from before it (built with -DKILN_BASELINE by
+// Tools/diff.sh), by the `--prelude` helper's `db://` requests, which
+// Kiln.hostRequestHandler (or URLProtocol, before §1.3) answers.
 
 @MainActor func source(of path: String, prelude: String?) -> String {
     let text = (try? String(contentsOfFile: path, encoding: .utf8)) ?? ""
     var code = path.hasSuffix(".md") ? Kiln.swiftSource(fromMarkdown: text) : text
+    #if KILN_BASELINE
     if let prelude, code.contains("DB."), code.range(of: #"\b(enum|struct|class)\s+DB\b"#, options: .regularExpression) == nil {
         code += "\n\n" + prelude + "\n"
     }
+    #endif
     return code
 }
 
@@ -75,11 +79,32 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
         args.removeFirst(2)
     }
     URLProtocol.registerClass(OfflineProtocol.self)
+    #if KILN_BASELINE
     Kiln.hostRequestHandler = { request in
         guard request.url?.scheme == "db" else { return nil }
         let (status, body) = Store.answer(request)
         return KilnHostResponse(statusCode: status, body: body)
     }
+    #else
+    Kiln.registerType("DB") { t in
+        t.staticMethod("load", "_:string") { call in
+            let key = try call.string(0)
+            return Store.lock.withLock { Store.values[key] }.map { KilnValue(data: $0) } ?? .nil
+        }
+        t.staticMethod("save", "_:string _:any") { call in
+            let key = try call.string(0)
+            guard let data = call.value(1)?.data else { throw call.error("needs Data") }
+            Store.lock.withLock { Store.values[key] = data }
+            return .void
+        }
+        t.staticMethod("remove", "_:string") { call in
+            let key = try call.string(0)
+            Store.lock.withLock { Store.values[key] = nil }
+            return .void
+        }
+    }
+    _ = prelude
+    #endif
     for path in args {
         Store.lock.withLock { Store.values = [:] }
         Kiln.randomSeed = 1

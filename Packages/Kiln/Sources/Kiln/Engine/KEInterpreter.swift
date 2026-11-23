@@ -167,10 +167,13 @@ final class KInterpreter {
     let runtime = KRuntime()
     /// The bridges (Registry/, Bridges/).
     let registry = KRegistry.shared
+    /// The run's context: the app's defaults, folder, gate and teardown (§1.7).
+    let context: KilnContext
 
-    init(program: KEProgram, headless: Bool = false) throws {
+    init(program: KEProgram, headless: Bool = false, context: KilnContext? = nil) throws {
         self.program = program
         self.headless = headless
+        self.context = context ?? .standard()
         registerProtocols(program.types)
         register(program.types, parent: nil)
         for t in program.types where t.kind == .extensionType { applyExtension(t) }
@@ -198,7 +201,10 @@ final class KInterpreter {
         case let t as KEThrown: msg = "Uncaught error: \(describe(t.value))"
         default: msg = "\(error)"
         }
-        if seen.insert(msg).inserted { errors.append(msg) }
+        if seen.insert(msg).inserted {
+            errors.append(msg)
+            context.record(KilnError(phase: context.bodyDepth > 0 ? .body : .runtime, reported: msg))
+        }
     }
 
     func warn(_ message: String) {
