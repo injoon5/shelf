@@ -33,10 +33,26 @@ public final class KilnContext {
     public let slug: String
     /// The app's name as people see it: "Run Tracker".
     public let name: String
-    /// What `@AppStorage` and `UserDefaults.standard` read and write.
-    public let defaults: UserDefaults
-    /// The app's own folder.
-    public let files: KilnFiles
+    /// What `@AppStorage` and `UserDefaults.standard` read and write. A stub
+    /// context's are in memory, made when the app first uses them.
+    public var defaults: UserDefaults {
+        if let made = madeDefaults { return made }
+        let made = makeDefaults()
+        madeDefaults = made
+        return made
+    }
+    private var madeDefaults: UserDefaults?
+    private var makeDefaults: () -> UserDefaults
+    /// The app's own folder. A stub context names its throwaway one only
+    /// when the app first uses it.
+    public var files: KilnFiles {
+        if let made = madeFiles { return made }
+        let made = makeFiles()
+        madeFiles = made
+        return made
+    }
+    private var madeFiles: KilnFiles?
+    private var makeFiles: () -> KilnFiles
     /// The gate every API that needs permission goes through.
     public let capabilities: KilnCapabilities
     /// A check, not a real run: bridges use their fakes (fake motion, fake
@@ -63,7 +79,7 @@ public final class KilnContext {
     private var undelivered: [KilnError] = []
     private var flushScheduled = false
     /// What a stub context made for itself and removes when it's torn down.
-    private var throwaway: (suite: String?, folder: URL?) = (nil, nil)
+    private var throwaway: (folder: URL?, Void) = (nil, ())
     /// While > 0, errors are a view's `body` failing.
     var bodyDepth = 0
 
@@ -79,21 +95,33 @@ public final class KilnContext {
                 capabilities: (any KilnCapabilityGate)? = nil) {
         self.slug = slug
         self.name = name
-        self.defaults = defaults
-        self.files = files
+        self.madeDefaults = defaults
+        self.makeDefaults = { defaults }
+        self.madeFiles = files
+        self.makeFiles = { files }
         self.isStub = false
         self.capabilities = KilnCapabilities(gate: capabilities ?? KilnUngatedCapabilities(), isStub: false)
     }
 
-    private init(stubSlug slug: String, name: String, suite: String, folder: URL, capabilities: any KilnCapabilityGate) {
+    private init(stubSlug slug: String, name: String, capabilities: any KilnCapabilityGate) {
         self.slug = slug
         self.name = name
-        self.defaults = UserDefaults(suiteName: suite) ?? UserDefaults()
-        self.files = KilnFiles(root: folder)
+        self.makeDefaults = { KilnMemoryDefaults() }
+        self.makeFiles = { KilnFiles(root: FileManager.default.temporaryDirectory) }
         self.isStub = true
         self.capabilities = KilnCapabilities(gate: capabilities, isStub: true)
-        throwaway = (suite, folder)
+        // Named when first used: most checks touch neither, and a check is
+        // run often enough that making them every time shows in its time.
+        // In memory: a check's settings never outlive it (KilnMemoryDefaults).
+        makeDefaults = { KilnMemoryDefaults() }
+        makeFiles = { [unowned self] in
+            let folder = FileManager.default.temporaryDirectory.appending(path: "kiln-check-\(throwawayID)", directoryHint: .isDirectory)
+            throwaway.folder = folder
+            return KilnFiles(root: folder)
+        }
     }
+
+    private lazy var throwawayID = UUID().uuidString
 
     /// A context for checking (`Kiln.validate`): throwaway defaults and a
     /// throwaway folder, both empty, removed when the check ends; and
@@ -101,18 +129,20 @@ public final class KilnContext {
     /// allowed, so a check goes down the path where the fakes answer).
     public static func stub(slug: String = "check", name: String = "App",
                             capabilities: (any KilnCapabilityGate)? = nil) -> KilnContext {
-        let id = UUID().uuidString
-        let folder = FileManager.default.temporaryDirectory.appending(path: "kiln-check-\(id)", directoryHint: .isDirectory)
-        return KilnContext(stubSlug: slug, name: name, suite: "kiln.check.\(id)", folder: folder,
-                           capabilities: capabilities ?? KilnStubCapabilities())
+        KilnContext(stubSlug: slug, name: name, capabilities: capabilities ?? KilnStubCapabilities())
     }
 
     /// What `Kiln.run(_:)` without a context uses: an app called "App",
     /// with defaults and a folder of its own under the host's (`kiln.app`,
     /// `Application Support/Kiln/app`), and no gate of its own.
     public static func standard() -> KilnContext {
-        KilnContext(slug: "app", name: "App", defaults: UserDefaults(suiteName: "kiln.app") ?? .standard,
-                    files: KilnFiles(root: URL.applicationSupportDirectory.appending(path: "Kiln/app", directoryHint: .isDirectory)))
+        let context = KilnContext(slug: "app", name: "App", defaults: .standard, files: KilnFiles(root: URL(fileURLWithPath: "/")))
+        // Made when first used, as a stub's are.
+        context.madeDefaults = nil
+        context.makeDefaults = { UserDefaults(suiteName: "kiln.app") ?? .standard }
+        context.madeFiles = nil
+        context.makeFiles = { KilnFiles(root: URL.applicationSupportDirectory.appending(path: "Kiln/app", directoryHint: .isDirectory)) }
+        return context
     }
 
     // MARK: The host's values
@@ -160,9 +190,7 @@ public final class KilnContext {
         stoppers = []
         for s in running.reversed() { s.stop() }
         capabilities.cancelRequests()
-        if let suite = throwaway.suite {
-            UserDefaults.standard.removePersistentDomain(forName: suite)
-        }
+        (madeDefaults as? KilnMemoryDefaults)?.removeAll()
         if let folder = throwaway.folder {
             try? FileManager.default.removeItem(at: folder)
         }

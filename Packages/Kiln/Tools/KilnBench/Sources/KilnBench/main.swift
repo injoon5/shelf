@@ -19,18 +19,16 @@ import Kiln
 //
 // The network is never touched: every http(s) request fails at once with
 // "not connected", as in Shelf's fixture tests (and `validate` is headless, so
-// it fails them itself), and `db://` requests are answered from an in-memory
-// store keyed by the `DB-Key` header, through `Kiln.hostRequestHandler`, as
-// Shelf answers them. `--prelude FILE` appends FILE to every source that
-// uses `DB.`, the way Shelf's `SourceRewriter` appends its `DB` helper.
+// it fails them itself). `DB` is a host bridge over an in-memory store, as
+// Shelf's is since PLAN.md §1.7. `--prelude FILE` (the helper Shelf appended
+// before §1.7) is accepted and ignored.
 
 /// The Swift source to run from a file: a .swift file as is, or a model reply
 /// (.md) merged the way Haplo AI runs it (Kiln.swiftSource(fromMarkdown:)).
 @MainActor func source(of path: String, prelude: String?) -> String {
     let text = (try? String(contentsOfFile: path, encoding: .utf8)) ?? ""
-    var code = path.hasSuffix(".md") ? Kiln.swiftSource(fromMarkdown: text) : text
-    if let prelude, code.contains("DB.") { code += "\n\n" + prelude + "\n" }
-    return code
+    _ = prelude
+    return path.hasSuffix(".md") ? Kiln.swiftSource(fromMarkdown: text) : text
 }
 
 /// Answers every request without the network (see the header).
@@ -39,6 +37,8 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) private static var store: [String: Data] = [:]
 
     static func reset() { lock.withLock { store = [:] } }
+    static func value(_ key: String) -> Data? { lock.withLock { store[key] } }
+    static func set(_ data: Data?, _ key: String) { lock.withLock { store[key] = data } }
 
     override class func canInit(with request: URLRequest) -> Bool {
         ["db", "http", "https"].contains(request.url?.scheme ?? "")
@@ -138,11 +138,20 @@ func round2(_ x: Double) -> Double { (x * 100).rounded() / 100 }
         }
     }
     URLProtocol.registerClass(OfflineProtocol.self)
-    // Since §1.3 `DB` asks the host, at once, instead of blocking on URLSession.
-    Kiln.hostRequestHandler = { request in
-        guard request.url?.scheme == "db" else { return nil }
-        let (status, body) = OfflineProtocol.answer(request)
-        return KilnHostResponse(statusCode: status, body: body)
+    // Since §1.7 `DB` is a host bridge, native and synchronous, as Shelf's.
+    Kiln.registerType("DB") { t in
+        t.staticMethod("load", "_:string") { call in
+            OfflineProtocol.value(try call.string(0)).map { KilnValue(data: $0) } ?? .nil
+        }
+        t.staticMethod("save", "_:string _:any") { call in
+            guard let data = call.value(1)?.data else { throw call.error("needs Data") }
+            OfflineProtocol.set(data, try call.string(0))
+            return .void
+        }
+        t.staticMethod("remove", "_:string") { call in
+            OfflineProtocol.set(nil, try call.string(0))
+            return .void
+        }
     }
     Kiln.randomSeed = 1
 
