@@ -20,6 +20,7 @@ final class KViewStorage: ObservableObject {
     private(set) var boxes: [String: KBox] = [:]
     private var prepared = false
     private var subscriptions: [ObjectIdentifier: AnyCancellable] = [:]
+    private var defaultsWatch: AnyCancellable?
 
     func box(_ name: String) -> KBox? { boxes[name] }
 
@@ -39,13 +40,17 @@ final class KViewStorage: ObservableObject {
                     boxes[p.name] = KBox(value.fields[p.name] ?? .nilValue, type: p.type)
                 }
             case "AppStorage":
-                let key = "kiln.app." + (p.wrapperAttribute?.args.first.flatMap { arg -> String? in
+                // The run's own defaults (§1.7): each app has a suite, so the
+                // key is the app's as written, and `UserDefaults.standard`
+                // in the same app reads the same value.
+                let key = p.wrapperAttribute?.args.first.flatMap { arg -> String? in
                     if case .string(let segs) = arg.value, case .text(let t)? = segs.first { return t }
                     return nil
-                } ?? p.name)
+                } ?? p.name
+                let defaults = interp.context.defaults
                 let fallback = value.fields[p.name] ?? .nilValue
                 let box = KBox(get: {
-                    guard let stored = UserDefaults.standard.object(forKey: key) else { return fallback }
+                    guard let stored = defaults.object(forKey: key) else { return fallback }
                     switch fallback {
                     case .int: return .int((stored as? Int) ?? 0)
                     case .double: return .double((stored as? Double) ?? 0)
@@ -54,19 +59,29 @@ final class KViewStorage: ObservableObject {
                     }
                 }, set: { [weak self] v in
                     switch v {
-                    case .int(let i): UserDefaults.standard.set(i, forKey: key)
-                    case .double(let d): UserDefaults.standard.set(d, forKey: key)
-                    case .bool(let b): UserDefaults.standard.set(b, forKey: key)
-                    case .string(let s): UserDefaults.standard.set(s, forKey: key)
+                    case .int(let i): defaults.set(i, forKey: key)
+                    case .double(let d): defaults.set(d, forKey: key)
+                    case .bool(let b): defaults.set(b, forKey: key)
+                    case .string(let s): defaults.set(s, forKey: key)
                     default: break
                     }
                     self?.objectWillChange.send()
                 })
                 boxes[p.name] = box
+                watch(defaults)
             default:
                 break
             }
         }
+    }
+
+    /// Another view, or `UserDefaults.standard` in an action, changed a
+    /// setting: views showing an `@AppStorage` value redraw, as SwiftUI's do.
+    private func watch(_ defaults: UserDefaults) {
+        guard defaultsWatch == nil else { return }
+        defaultsWatch = NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification, object: defaults)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
     }
 
     /// @Environment and @EnvironmentObject values, refreshed every render.
@@ -186,7 +201,9 @@ extension KInterpreter {
         let env = KEnv(parent: globalEnv, selfContext: ctx)
         let saved = readTracker
         readTracker = tracker
-        defer { readTracker = saved }
+        // An error from here on is the body's: the host shows its error screen.
+        context.bodyDepth += 1
+        defer { readTracker = saved; context.bodyDepth -= 1 }
         guard let bodyDecl = value.type.computed["body"] else {
             if value.type.isApp, let scenes = value.type.computed["body"] { _ = scenes }
             return AnyView(KErrorView(message: "\(value.type.name) has no body"))

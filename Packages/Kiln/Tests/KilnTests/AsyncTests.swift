@@ -410,23 +410,30 @@ final class AsyncTests: XCTestCase {
         XCTAssertTrue(mainRan, "the main thread wasn't held while the request was in flight")
     }
 
-    func testHostAnswersARequestWithoutWaiting() throws {
-        Kiln.hostRequestHandler = { request in
-            request.url?.scheme == "db" ? KilnHostResponse(statusCode: 200, body: Data("[1,2]".utf8)) : nil
-        }
-        defer { Kiln.hostRequestHandler = nil }
-        let v = Kiln.validate("""
+    /// A check never touches the network: a request fails at once, as
+    /// offline, both awaited and with a completion handler.
+    func testAStubContextNeverTouchesTheNetwork() throws {
+        let c = try KilnEngine.compile("""
         struct ContentView: View {
-            @State private var n = 0
             var body: some View {
-                Text("\\(n)").onAppear {
-                    let r = try? URLSession.shared.data(for: URLRequest(url: URL(string: "db://data/")!))
-                    if let (data, _) = r, let xs = try? JSONDecoder().decode([Int].self, from: data) { n = xs.count; print(n) }
-                }
+                Text("x")
+                    .task {
+                        do { _ = try await URLSession.shared.data(from: URL(string: "https://example.com")!); print("loaded") }
+                        catch { print("offline") }
+                    }
+                    .onAppear {
+                        URLSession.shared.dataTask(with: URL(string: "https://example.com")!) { data, _, error in
+                            print(data == nil && error != nil ? "handler offline" : "handler loaded")
+                        }.resume()
+                    }
             }
         }
-        """)
-        XCTAssertEqual(v.errors, [])
+        """, headless: true, context: .stub())
+        KProbe(interp: c.interp, ticks: 1).run(c.root)
+        c.interp.tearDown()
+        XCTAssertEqual(c.interp.errors, [])
+        XCTAssertTrue(c.interp.console.contains("offline\n"), c.interp.console)
+        XCTAssertTrue(c.interp.console.contains("handler offline"), c.interp.console)
     }
 
     // MARK: Code that can't wait

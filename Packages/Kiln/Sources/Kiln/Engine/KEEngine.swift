@@ -30,14 +30,20 @@ enum KilnEngine {
         case noView(String)
     }
 
-    static func compile(_ code: String, headless: Bool = false) throws -> Compiled {
+    static func compile(_ code: String, headless: Bool = false, context: KilnContext? = nil) throws -> Compiled {
+        try compile(KilnParsedSource(code), headless: headless, context: context)
+    }
+
+    /// Builds the interpreter for source already parsed (`Kiln.parse`, off
+    /// the main thread): declares its types and runs its globals.
+    static func compile(_ parsed: KilnParsedSource, headless: Bool = false, context: KilnContext? = nil) throws -> Compiled {
+        let code = parsed.source
         let program: KEProgram
-        do {
-            program = try KEParser.parse(code)
-        } catch let e as KESyntaxError {
-            throw Failure.syntax(formatSyntaxError(e, code))
+        switch parsed.program {
+        case .success(let p): program = p
+        case .failure(let e): throw Failure.syntax(formatSyntaxError(e, code))
         }
-        let interp = try KInterpreter(program: program, headless: headless)
+        let interp = try KInterpreter(program: program, headless: headless, context: context)
         guard let root = findRoot(program, interp, code) else {
             let views = program.types.filter { $0.inherits.contains("View") }.map(\.name)
             if views.isEmpty {
@@ -85,36 +91,52 @@ enum KilnEngine {
 
     // MARK: - Run
 
-    static func run(_ code: String) -> KilnResult {
+    static func run(_ parsed: KilnParsedSource, context: KilnContext) -> KilnResult {
+        context.begin()
         do {
-            let compiled = try compile(code)
+            let compiled = try compile(parsed, context: context)
+            let interp = compiled.interp
+            // Closing the app's screen stops its tasks and timers first.
+            context.onTearDown { [weak interp] in interp?.tearDown() }
             let view = AnyView(KRootView(compiled: compiled))
-            var result = KilnResult(view: view, consoleOutput: compiled.interp.console, errors: [])
-            result.interp = compiled.interp
+            var result = KilnResult(view: view, consoleOutput: interp.console, errors: [])
+            result.interp = interp
+            result.context = context
             return result
-        } catch let f as Failure {
-            switch f {
-            case .syntax(let m), .noView(let m): return KilnResult(view: nil, consoleOutput: "", errors: [m])
-            }
         } catch {
-            return KilnResult(view: nil, consoleOutput: "", errors: ["\(error)"])
+            let message: String
+            switch error {
+            case Failure.syntax(let m), Failure.noView(let m): message = m
+            default: message = "\(error)"
+            }
+            context.record(KilnError(phase: .check, reported: message))
+            var result = KilnResult(view: nil, consoleOutput: "", errors: [message])
+            result.context = context
+            return result
         }
     }
 
     // MARK: - Validate
 
-    static func validate(_ code: String, ticks: Int, fuel: Int) -> KilnValidation {
+    static func validate(_ code: String, ticks: Int, fuel: Int, context: KilnContext) -> KilnValidation {
+        context.begin()
+        // Whatever happens, nothing the check started runs after it, and a
+        // stub context's throwaway folder and defaults go.
+        defer { context.tearDown() }
         let compiled: Compiled
         do {
-            compiled = try compile(code, headless: true)
-        } catch let f as Failure {
-            switch f {
-            case .syntax(let m), .noView(let m): return KilnValidation(errors: [m], warnings: [], renderedContent: false, hasView: false)
-            }
+            compiled = try compile(code, headless: true, context: context)
         } catch {
-            return KilnValidation(errors: ["\(error)"], warnings: [], renderedContent: false, hasView: false)
+            let message: String
+            switch error {
+            case Failure.syntax(let m), Failure.noView(let m): message = m
+            default: message = "\(error)"
+            }
+            context.record(KilnError(phase: .check, reported: message))
+            return KilnValidation(errors: [message], warnings: [], renderedContent: false, hasView: false)
         }
         let interp = compiled.interp
+        context.onTearDown { [weak interp] in interp?.tearDown() }
         interp.budget = fuel
         let probe = KProbe(interp: interp, ticks: ticks)
         probe.run(compiled.root)
@@ -157,18 +179,30 @@ struct KRootView: View {
     private var rootContent: some View {
         switch compiled.root {
         case .app(let t), .view(let t):
-            if case .structV(let s)? = try? compiled.interp.entry({ try compiled.interp.instantiate(t, args: [], labels: [], line: 0) }) {
-                if t.isApp {
-                    KHostView(value: s, interp: compiled.interp)
-                } else {
-                    KHostView(value: s, interp: compiled.interp)
-                }
+            if case .structV(let s)? = instantiateRoot(t) {
+                KHostView(value: s, interp: compiled.interp)
             } else {
                 KErrorView(message: compiled.interp.errors.first ?? "Couldn't create \(t.name)")
             }
         default:
             let views = (try? KilnEngine.rootViews(compiled.root, compiled.interp)) ?? []
             KRenderer(interp: compiled.interp).render(.group(views))
+        }
+    }
+}
+
+extension KRootView {
+    /// The root view's value. Failing to make it (its `init` throws, a
+    /// property's default fails) is the body failing: the host hears of it.
+    func instantiateRoot(_ t: KType) -> KV? {
+        let interp = compiled.interp
+        interp.context.bodyDepth += 1
+        defer { interp.context.bodyDepth -= 1 }
+        do {
+            return try interp.entry { try interp.instantiate(t, args: [], labels: [], line: 0) }
+        } catch {
+            interp.report(error)
+            return nil
         }
     }
 }

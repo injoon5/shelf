@@ -16,6 +16,7 @@ final class FoundationBridges: KBridgeFamily {
         dates(r)
         json(r)
         system(r)
+        fileSystem(r)
         formatStyles(r)
     }
 
@@ -40,7 +41,7 @@ final class FoundationBridges: KBridgeFamily {
         r.type("URL", .foundation) { t in
             t.initializer { c in
                 if let s = c.arg("string")?.asString { return URL(string: s).map { .native(.url($0)) } ?? .nilValue }
-                if let s = c.arg("fileURLWithPath")?.asString { return .native(.url(URL(fileURLWithPath: s))) }
+                if let s = (c.arg("fileURLWithPath") ?? c.arg("filePath"))?.asString { return .native(.url(URL(fileURLWithPath: s))) }
                 return .nilValue
             }
             @MainActor func u(_ c: KCall) -> URL? { if case .native(.url(let u)) = c.receiver { return u }; return nil }
@@ -50,7 +51,10 @@ final class FoundationBridges: KBridgeFamily {
         }
 
         r.type("Data", .foundation, notes: "`Data()` is empty; `String(data:encoding:)` and `JSONDecoder` read it.") { t in
-            t.initializer { _ in .native(.object("Data", KRef(NSData()))) }
+            t.initializer { c in
+                if c.has("contentsOf") { return try dataContents(c) }
+                return .native(.object("Data", KRef(NSData())))
+            }
             t.property("count") { c in .int(c.object(Data.self)?.count ?? 0) }
             t.property("isEmpty") { c in .bool(c.object(Data.self)?.isEmpty ?? true) }
         }
@@ -79,29 +83,83 @@ final class FoundationBridges: KBridgeFamily {
 
     // MARK: The system
 
+    /// An app value as a property list, for `UserDefaults`.
+    @MainActor static func plist(_ v: KV, _ interp: KInterpreter) -> Any? {
+        switch v {
+        case .bool(let b): return b
+        case .int(let i): return i
+        case .double(let d): return d
+        case .string(let s): return s
+        case .native(.date(let d)): return d
+        case .native(.url(let u)): return u.absoluteString
+        case .array(let xs): return xs.compactMap { plist($0, interp) }
+        case .dict(let pairs):
+            var out: [String: Any] = [:]
+            for (k, x) in pairs { if let k = k.asString, let p = plist(x, interp) { out[k] = p } }
+            return out
+        default: return KBuiltins.dataValue(v)
+        }
+    }
+
+    /// A property list read back as an app value.
+    @MainActor static func fromPlist(_ any: Any) -> KV {
+        switch any {
+        case let n as NSNumber:
+            if CFGetTypeID(n) == CFBooleanGetTypeID() { return .bool(n.boolValue) }
+            if CFNumberIsFloatType(n) { return .double(n.doubleValue) }
+            return .int(n.intValue)
+        case let s as String: return .string(s)
+        case let d as Date: return .native(.date(d))
+        case let d as Data: return KBuiltins.data(d)
+        case let xs as [Any]: return .array(xs.map(fromPlist))
+        case let m as [String: Any]:
+            return .dict(Dictionary(uniqueKeysWithValues: m.map { (KV.string($0.key), fromPlist($0.value)) }))
+        default: return .nilValue
+        }
+    }
+
     static func system(_ r: KRegistry) {
-        r.type("UserDefaults", .foundation, notes: "Each key is kept apart from Shelf's own settings.") { t in
-            t.staticProperty("standard") { _ in .native(.object("UserDefaults", KRef(UserDefaults.standard))) }
-            @MainActor func key(_ c: KCall) -> String { "kiln." + (c.arg("forKey")?.asString ?? "") }
+        r.type("UserDefaults", .foundation, notes: "The app's own settings: `standard` is the app's suite, which its `@AppStorage` shares.") { t in
+            // The run's defaults (§1.7): each app has its own suite.
+            t.staticProperty("standard") { c in .native(.object("UserDefaults", KRef(c.context.defaults))) }
+            @MainActor func d(_ c: KCall) -> UserDefaults { c.object(UserDefaults.self) ?? c.context.defaults }
+            @MainActor func key(_ c: KCall) -> String { c.arg("forKey")?.asString ?? "" }
             t.method("set") { c in
-                let k = key(c)
+                let k = key(c), defaults = d(c)
                 switch c.first ?? .nilValue {
-                case .int(let i): UserDefaults.standard.set(i, forKey: k)
-                case .double(let d): UserDefaults.standard.set(d, forKey: k)
-                case .string(let s): UserDefaults.standard.set(s, forKey: k)
-                case .bool(let b): UserDefaults.standard.set(b, forKey: k)
-                case let v: UserDefaults.standard.set(c.interp.describe(v), forKey: k)
+                case .nilValue: defaults.removeObject(forKey: k)
+                case .int(let i): defaults.set(i, forKey: k)
+                case .double(let v): defaults.set(v, forKey: k)
+                case .string(let s): defaults.set(s, forKey: k)
+                case .bool(let b): defaults.set(b, forKey: k)
+                case let v:
+                    if let data = KBuiltins.dataValue(v) { defaults.set(data, forKey: k) }
+                    else if let plist = plist(v, c.interp) { defaults.set(plist, forKey: k) }
+                    else { defaults.set(c.interp.describe(v), forKey: k) }
                 }
                 return .void
             }
-            t.method("integer") { c in .int(UserDefaults.standard.integer(forKey: key(c))) }
-            t.method("double") { c in .double(UserDefaults.standard.double(forKey: key(c))) }
-            t.method("bool") { c in .bool(UserDefaults.standard.bool(forKey: key(c))) }
-            t.method("string") { c in UserDefaults.standard.string(forKey: key(c)).map { .string($0) } ?? .nilValue }
-            for name in ["object", "data", "array", "stringArray", "dictionary"] {
-                t.method(name, notes: "Always nil: store strings, numbers or Bools.") { _ in .nilValue }
+            t.method("integer") { c in .int(d(c).integer(forKey: key(c))) }
+            t.method("double") { c in .double(d(c).double(forKey: key(c))) }
+            t.method("float") { c in .double(Double(d(c).float(forKey: key(c)))) }
+            t.method("bool") { c in .bool(d(c).bool(forKey: key(c))) }
+            t.method("string") { c in d(c).string(forKey: key(c)).map { .string($0) } ?? .nilValue }
+            t.method("data") { c in d(c).data(forKey: key(c)).map { KBuiltins.data($0) } ?? .nilValue }
+            t.method("url") { c in d(c).url(forKey: key(c)).map { .native(.url($0)) } ?? .nilValue }
+            for name in ["object", "array", "stringArray", "dictionary"] {
+                t.method(name, notes: "Strings, numbers, Bools, dates, Data, and arrays and dictionaries of them.") { c in
+                    d(c).object(forKey: key(c)).map { fromPlist($0) } ?? .nilValue
+                }
             }
-            t.method("removeObject") { c in UserDefaults.standard.removeObject(forKey: key(c)); return .void }
+            t.method("removeObject") { c in d(c).removeObject(forKey: key(c)); return .void }
+            t.method("register") { c in
+                guard case .dict(let pairs)? = c.arg("defaults") ?? c.first else { return .void }
+                var values: [String: Any] = [:]
+                for (k, v) in pairs { if let k = k.asString, let p = plist(v, c.interp) { values[k] = p } }
+                d(c).register(defaults: values)
+                return .void
+            }
+            t.method("dictionaryRepresentation") { c in fromPlist(d(c).dictionaryRepresentation()) }
         }
 
         r.type("DispatchQueue", .foundation, notes: "Everything runs on the main queue.") { t in
