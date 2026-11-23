@@ -1,9 +1,12 @@
 import Kiln
 import SwiftUI
 
-/// Runs one app's source with Kiln and shows the result, a launch screen
+/// Runs one app's source with Kiln and shows the result, its launch surface
 /// before it, or the error screen instead. Used full screen inside an app's
 /// card (`AppCard`) and inside the New App sheet as a preview.
+///
+/// The app and the error screen replace the launch surface with a short
+/// crossfade (`Motion.launch`), as a native app replaces its launch screen.
 struct AppStage: View {
     /// Where the app's `DB` calls go.
     enum Store: Equatable {
@@ -23,17 +26,30 @@ struct AppStage: View {
     /// come to rest, because Kiln parses on the main thread and would hitch
     /// the motion; the data session opens meanwhile.
     var isReady = true
-    /// Off when something else (a card's face) already is the launch screen:
-    /// the stage is then clear until the app is built.
+    /// Off when something else (a card's face) already is the launch
+    /// surface: the stage is then clear until the app is built, and fades
+    /// it in over whatever is under it.
     var showsLaunchScreen = true
+    /// The app, or the error screen, has finished fading in.
+    var onLaunched: () -> Void = {}
     var onError: (CompileError) -> Void = { _ in }
 
     @State private var result: KilnResult?
+    /// The app has faded in, so the launch surface under it can go.
+    @State private var isLaunched = false
     @State private var hasSession = false
     @State private var holder = SessionHolder()
 
     var body: some View {
         ZStack {
+            // Under the app as it fades in, so the two cross without the
+            // sheet showing through between them.
+            if showsLaunchScreen, !isLaunched {
+                // The New App preview: what is being tried has never run,
+                // so it has no snapshot.
+                LaunchSurface(layout: LaunchLayout(source: source))
+                    .ignoresSafeArea()
+            }
             if let result {
                 ZStack {
                     // Many apps leave their background clear.
@@ -45,9 +61,6 @@ struct AppStage: View {
                     }
                 }
                 .transition(.opacity)
-            } else if showsLaunchScreen {
-                LaunchScreen(face: IconFace(app))
-                    .transition(.opacity)
             }
         }
         // Once per open, with the source the app was opened with: a sync
@@ -55,6 +68,7 @@ struct AppStage: View {
         // reopened, as on iOS.
         .task {
             result = nil
+            isLaunched = false
             hasSession = false
             let session = await open()
             guard !Task.isCancelled else {
@@ -68,7 +82,12 @@ struct AppStage: View {
             guard isReady, hasSession, result == nil else { return }
             let built = Kiln.run(SourceRewriter.prepare(source, slug: app.slug))
             if built.view == nil { onError(CompileError(errors: built.errors, source: source)) }
-            withAnimation(Motion.launch) { result = built }
+            withAnimation(Motion.launch, completionCriteria: .removed) {
+                result = built
+            } completion: {
+                isLaunched = true
+                onLaunched()
+            }
         }
         .onDisappear {
             Task { await holder.replace(with: nil, closingIn: synced) }
@@ -104,21 +123,6 @@ private final class SessionHolder {
         if let previous {
             if next == nil { ShelfDBProtocol.deactivate(previous) }
             if let data, previous !== next { await data.close(previous) }
-        }
-    }
-}
-
-/// Like a native app's launch screen: the tint, and the glyph where the icon's was.
-private struct LaunchScreen: View {
-    var face: IconFace
-
-    var body: some View {
-        ZStack {
-            face.tint.ignoresSafeArea()
-            Image(systemName: face.symbol)
-                .font(.system(size: HomeMetrics.iconSize * HomeMetrics.glyphRatio, weight: .medium))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(.white)
         }
     }
 }

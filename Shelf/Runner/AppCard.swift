@@ -8,6 +8,9 @@ final class CardState {
     /// The open has come to rest. Kiln parses on the main thread, so the app
     /// is built only after this: never while anything is moving.
     var isSettled = false
+    /// The app (or its error screen) has finished fading in over the
+    /// card's launch surface, which can go.
+    @ObservationIgnored var onLaunched: () -> Void = {}
 }
 
 /// The app inside a card.
@@ -17,22 +20,26 @@ struct CardRoot: View {
     var data: AppData
 
     var body: some View {
-        // The card's own face is the launch screen, so the stage shows
-        // nothing of its own until the app is built.
+        // The card's own face is the launch surface, under the stage, so
+        // the stage shows nothing of its own until the app is built, and
+        // then fades the app in over it.
         AppStage(app: run.app.meta, source: run.source, store: .synced, data: data,
-                 isReady: state.isSettled, showsLaunchScreen: false)
+                 isReady: state.isSettled, showsLaunchScreen: false, onLaunched: { state.onLaunched() })
     }
 }
 
 /// The moving part of a card: the app's icon (`IconArtView`, the same
 /// renderer as the Home Screen's, so a card at icon size is the icon), with a
-/// picture of the app over it. At full screen the icon's tile and glyph are
-/// the app's launch screen; every size between is both.
+/// picture over it: the app's launch surface as it opens (`LaunchSurfaceView`,
+/// or its last snapshot), the app itself as it closes. Which shows, and how
+/// much, follows the card's size (`CardLook`).
 ///
-/// As Springboard's, the card is one picture stretched to its frame: the
-/// app's picture and the icon's glyph are squashed to the card's width and
-/// height, not cropped, and the corners stay the display's until the card is
-/// nearly an icon. On its way to an icon below it, it leans back.
+/// As Springboard's, growing and shrinking alike, everything on the card
+/// keeps its shape and is scaled by the card's width from its top: the
+/// picture is cropped at the bottom, and the glyph is where it would be on
+/// a square icon at the card's top (`fitArt`). Only the tile's fill
+/// stretches to the card. The corners stay the display's until the card is
+/// nearly an icon. It leans in depth by where its icon is (`CardLean`).
 ///
 /// Like every `IconArtView`, its bounds are centred on its own origin, so
 /// the glyph and the picture sit at (0, 0) and stay centred while the
@@ -52,12 +59,14 @@ final class CardFaceView: IconArtView {
     /// Where it is headed, if it is moving by itself.
     private(set) var flight: CardFlight?
     private var springs = Motion.cardOpen
-    /// The lean, in radians about the horizontal axis, and what the
-    /// current flight does with it.
-    private(set) var lean: CGFloat = 0
-    private var leanFrom: CGFloat = 0
+    /// The lean, about the card's horizontal and vertical axes, and what
+    /// the current flight does with it.
+    private(set) var lean = CardLean.none
+    private var leanFrom = CardLean.none
     private var flightStartProgress: CGFloat = 1
     private var leans = false
+    /// The middle of the icon a growing card left, while it leans by it.
+    private var leansFrom: CGPoint?
 
     init(face: IconFace, iconSize: CGFloat, screen: CGSize, fullRadius: CGFloat) {
         self.screen = screen
@@ -82,10 +91,15 @@ final class CardFaceView: IconArtView {
     func place(_ frame: CardFrame) {
         let size = frame.size
         shown = CardFrame(center: frame.center, size: size, radius: CardMotion.cornerRadius(size: size, full: fullRadius))
+        let wide = size.width / screen.width
+        // As tall as its width makes it, from the card's top; never shorter
+        // than the card (one growing past the screen's shape).
+        let tall = max(wide, size.height / screen.height)
         withoutActions {
             layer.position = frame.center
-            content.layer.transform = CATransform3DMakeScale(size.width / screen.width, size.height / screen.height, 1)
-            stretchArt(to: size)
+            content.layer.transform = CATransform3DMakeScale(wide, tall, 1)
+            content.layer.position = CGPoint(x: 0, y: (screen.height * tall - size.height) / 2)
+            fitArt(to: size)
             setOutline(size, radius: shown.radius)
         }
     }
@@ -93,23 +107,30 @@ final class CardFaceView: IconArtView {
     /// Sends the card to `target` on `springs`, from where it is on screen,
     /// at `velocity` (per second, of played time), or at the speed it is
     /// already moving. A card that `leans` leans toward an icon below it on
-    /// the way; one that doesn't straightens up as it goes.
+    /// the way, landing; one that `leansFrom` an icon's height leans the
+    /// same way growing out of it, less as it grows; any other straightens
+    /// up as it goes. It leans from the angle it has, without a jolt.
     func fly(to target: CardFrame, _ springs: Motion.CardSprings, velocity: CardVelocity? = nil, leans: Bool = false,
-             at time: Double = CACurrentMediaTime()) {
+             leansFrom icon: CGPoint? = nil, at time: Double = CACurrentMediaTime()) {
         let velocity = velocity ?? flight?.velocity(at: time) ?? .zero
         self.springs = springs
-        if flight == nil || leans != self.leans { flightStartProgress = progress(shown) }
+        if flight == nil || leans != self.leans || (icon == nil) != (leansFrom == nil) { flightStartProgress = progress(shown) }
         self.leans = leans
-        leanFrom = lean
-        flight = CardFlight(from: shown, velocity: velocity, to: target, springs: springs,
-                            slowdown: Motion.Spring.slowdown, at: time)
+        leansFrom = icon
+        let flight = CardFlight(from: shown, velocity: velocity, to: target, springs: springs,
+                                slowdown: Motion.Spring.slowdown, at: time)
+        self.flight = flight
+        // What it leans by now, less what this flight's own lean is here,
+        // fading out as it goes.
+        let left = remaining(progress(shown), in: flight)
+        leanFrom = left > 0 ? (lean - ownLean(for: shown, in: flight)) * (1 / left) : .none
     }
 
     /// The same flight, to where its target has moved, carrying on at the
     /// speed it has.
     func retarget(_ target: CardFrame, at time: Double) {
         guard let flight, !flight.target.isClose(to: target, within: RunnerMetrics.restTolerance) else { return }
-        fly(to: target, springs, leans: leans, at: time)
+        fly(to: target, springs, leans: leans, leansFrom: leansFrom, at: time)
     }
 
     /// Moves the card to where its flight has it at `time`. Returns whether
@@ -121,31 +142,52 @@ final class CardFaceView: IconArtView {
         let arrived = flight.isSettled(at: time)
         let frame = arrived ? flight.target : flight.frame(at: time)
         place(frame)
-        setLean(arrived ? 0 : lean(for: frame, in: flight))
+        setLean(arrived ? .none : lean(for: frame, in: flight))
         if arrived { self.flight = nil }
         return arrived
     }
 
     /// The lean for `frame` on `flight`: what it had when the flight began,
-    /// fading out as the card gets where it is going, plus, landing, the
-    /// lean toward its icon.
-    private func lean(for frame: CardFrame, in flight: CardFlight) -> CGFloat {
-        let now = progress(frame), start = flightStartProgress, end = progress(flight.target)
-        let left = abs(start - end) > 0.001 ? min(max((now - end) / (start - end), 0), 1) : 0
-        var lean = leanFrom * left
-        if leans {
-            lean += CardMotion.lean(centerY: frame.center.y, height: frame.size.height, targetY: flight.target.center.y,
-                                    startProgress: start, progress: now)
-        }
-        return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
+    /// fading out as the card gets where it is going, plus its own: landing,
+    /// toward its icon; growing, away from the one it left.
+    private func lean(for frame: CardFrame, in flight: CardFlight) -> CardLean {
+        (leanFrom * remaining(progress(frame), in: flight) + ownLean(for: frame, in: flight)).limited
     }
 
-    private func setLean(_ angle: CGFloat) {
-        guard angle != lean else { return }
-        lean = angle
+    /// How much of the way from where the flight started to its target the
+    /// card still has to go, at `progress`: 1 setting off, 0 there.
+    private func remaining(_ progress: CGFloat, in flight: CardFlight) -> CGFloat {
+        let start = flightStartProgress, end = self.progress(flight.target)
+        return abs(start - end) > 0.001 ? min(max((progress - end) / (start - end), 0), 1) : 0
+    }
+
+    private func ownLean(for frame: CardFrame, in flight: CardFlight) -> CardLean {
+        let now = progress(frame)
+        if leans {
+            let lost = max(flightStartProgress - now, 0)
+            return CardLean(back: CardMotion.lean(centerY: frame.center.y, height: frame.size.height,
+                                                  targetY: flight.target.center.y,
+                                                  startProgress: flightStartProgress, progress: now),
+                            side: CardMotion.sideLean(centerX: frame.center.x, width: frame.size.width,
+                                                      iconX: flight.target.center.x, amount: lost))
+        }
+        if let icon = leansFrom {
+            return CardLean(back: CardMotion.openingLean(centerY: frame.center.y, height: frame.size.height,
+                                                         iconY: icon.y, progress: now),
+                            side: CardMotion.sideLean(centerX: frame.center.x, width: frame.size.width,
+                                                      iconX: icon.x, amount: 1 - now))
+        }
+        return .none
+    }
+
+    private func setLean(_ lean: CardLean) {
+        guard lean != self.lean else { return }
+        self.lean = lean
         var transform = CATransform3DIdentity
         transform.m34 = -1 / RunnerMetrics.leanPerspective
-        withoutActions { layer.transform = CATransform3DRotate(transform, angle, 1, 0, 0) }
+        transform = CATransform3DRotate(transform, lean.back, 1, 0, 0)
+        transform = CATransform3DRotate(transform, lean.side, 0, 1, 0)
+        withoutActions { layer.transform = transform }
     }
 
     /// Stops the card where it is on screen and returns where that is. It
@@ -157,6 +199,22 @@ final class CardFaceView: IconArtView {
 
     var isMoving: Bool { flight != nil }
     var shownFrame: CGRect { shown.rect }
+
+    /// Shows `picture` over the icon, full-screen size, in place of what
+    /// was there: a crossfade when any of it is showing.
+    func show(_ picture: UIView, fading: Bool = false) {
+        picture.frame = content.bounds
+        let swap = { [content] in
+            content.subviews.forEach { $0.removeFromSuperview() }
+            content.addSubview(picture)
+        }
+        if fading, content.alpha > 0.01, !isHidden {
+            UIView.transition(with: content, duration: Motion.fadeDuration * Motion.Spring.slowdown,
+                              options: [.transitionCrossDissolve, .allowUserInteraction], animations: swap)
+        } else {
+            swap()
+        }
+    }
 }
 
 /// One open app: a card that grows out of its icon, the live app over it
@@ -166,6 +224,11 @@ final class CardFaceView: IconArtView {
 /// and the card shows a picture of it instead. So the app never lays out
 /// again mid-flight (a scaled view's safe area changes every frame), and
 /// its own presentations, keyboard and navigation are untouched.
+///
+/// Opening, the picture is the launch surface. The card's face stays
+/// under the live app, showing it, until the app has been built and has
+/// faded in over it (`launched`). Closing, the picture is the app as it
+/// was, which is also kept as its launch snapshot for next time.
 @MainActor
 final class AppCard {
     enum Phase {
@@ -189,28 +252,64 @@ final class AppCard {
     /// What it was doing when a finger caught it.
     private var heldFrom = Phase.open
     private(set) var landingFades = false
+    /// The app has been built and has faded in over the launch surface.
+    private(set) var isLaunched = false
+    /// It has set off for full screen once: only that first open grows out
+    /// of its icon.
+    private var wasOpened = false
+    /// What the card shows and the Home Screen's look, this frame.
+    private(set) var look = CardMotion.look(progress: 0, opening: true)
+    private var handoff = LookHandoff.fromIcon
+    /// Given the app's picture as the card leaves it, to keep as its
+    /// launch snapshot.
+    var keepsPicture: (UIImage) -> Void = { _ in }
 
     private let screen: CGSize
     private let iconSize: CGFloat
     private let fullRadius: CGFloat
+    /// The middle of the icon it opened from.
+    private let icon: CGPoint
     private var grab: (frame: CardFrame, scale: CGFloat, finger: CGPoint, direction: CloseDirection)?
     private var travel: CGFloat = 0
     private var translation: CGPoint = .zero
 
     var slug: String { run.id }
 
-    init(run: HomeModel.Run, data: AppData, face: IconFace, screen: CGSize, iconSize: CGFloat, fullRadius: CGFloat,
-         from source: CGRect) {
+    /// `surface` is what the app opens on: its snapshot, or a launch
+    /// surface, at full-screen size.
+    init(run: HomeModel.Run, data: AppData, face: IconFace, surface: UIView, screen: CGSize, iconSize: CGFloat,
+         fullRadius: CGFloat, from source: CGRect) {
         self.run = run
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
+        icon = CGPoint(x: source.midX, y: source.midY)
         self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen, fullRadius: fullRadius)
         host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
         host.view.isHidden = true
         self.face.place(CardFrame(rect: source, radius: HomeMetrics.iconRadius(iconSize)))
+        self.face.show(surface)
+        state.onLaunched = { [weak self] in self?.launched() }
+    }
+
+    /// The app's last snapshot has been read from disk: it takes the place
+    /// of the launch surface, if the app isn't there yet.
+    func showSnapshot(_ picture: UIImage) {
+        guard !isLaunched, phase == .opening || phase == .open || phase == .held else { return }
+        let view = UIImageView(image: picture)
+        view.contentMode = .scaleToFill
+        face.show(view, fading: true)
+    }
+
+    /// The app has faded in over the launch surface.
+    private func launched() {
+        isLaunched = true
+        guard phase == .open else { return }
+        // Covered by the live app until a finger or a close needs it.
+        face.isHidden = true
+        face.content.subviews.forEach { $0.removeFromSuperview() }
     }
 
     private var full: CardFrame {
@@ -231,11 +330,15 @@ final class AppCard {
     /// Grows (or goes back) to full screen from wherever it is, at
     /// `velocity`, or at the speed it is already moving.
     func open(_ springs: Motion.CardSprings = Motion.cardOpen, velocity: CardVelocity? = nil) {
+        turn(opening: true)
         phase = .opening
         landingFades = false
         face.isHidden = false
         face.alpha = 1
-        face.fly(to: full, springs, velocity: velocity)
+        // Out of its icon, it leans away from it; back from a finger or a
+        // landing, it straightens up.
+        face.fly(to: full, springs, velocity: velocity, leansFrom: wasOpened ? nil : icon)
+        wasOpened = true
     }
 
     /// Goes back to full screen after a finger let it go short of closing:
@@ -248,6 +351,7 @@ final class AppCard {
     /// speed it already has.
     func close(to landing: CGRect, fades: Bool, velocity: CardVelocity? = nil) {
         if phase == .open { takePicture() }
+        if phase != .closing { turn(opening: false) }
         phase = .closing
         landingFades = fades
         face.fly(to: Self.landed(landing), Motion.cardClose, velocity: velocity, leans: true)
@@ -270,6 +374,8 @@ final class AppCard {
     func hold(finger: CGPoint, direction: CloseDirection) {
         heldFrom = phase
         if phase == .open { takePicture() }
+        // A finger shrinks it: the close's look, from what it shows now.
+        turn(opening: false)
         phase = .held
         let frame = face.freeze()
         grab = (frame, frame.size.width / screen.width, finger, direction)
@@ -311,8 +417,15 @@ final class AppCard {
     /// its size on screen.
     func tick() {
         let progress = progress
-        face.content.alpha = CardMotion.contentOpacity(progress: progress)
+        look = handoff.look(at: progress)
+        face.content.alpha = look.content
         if landingFades { face.alpha = min(progress / RunnerMetrics.landingFade, 1) }
+    }
+
+    /// The card sets off growing or shrinking: its look carries on from
+    /// what it is now toward that direction's (`LookHandoff`).
+    private func turn(opening: Bool) {
+        handoff = LookHandoff(from: look, at: progress, opening: opening)
     }
 
     /// The card's spring has come to rest. Returns whether it has landed
@@ -322,10 +435,14 @@ final class AppCard {
         case .opening:
             phase = .open
             host.view.isHidden = false
-            // Covered by the live app until a finger or a close needs it.
-            face.isHidden = true
-            face.content.subviews.forEach { $0.removeFromSuperview() }
             state.isSettled = true
+            if isLaunched {
+                // Covered by the live app until a finger or a close needs it.
+                face.isHidden = true
+                face.content.subviews.forEach { $0.removeFromSuperview() }
+            }
+            // Otherwise the face stays, full screen, as the launch surface
+            // under the app (clear until it is built), until it fades in.
             return false
         case .closing:
             phase = .landed
@@ -335,17 +452,36 @@ final class AppCard {
         }
     }
 
-    /// Swaps the live app for a picture of it, which can move.
+    /// Swaps the live app for a picture of it, which can move, and keeps
+    /// that picture as its launch snapshot. An app not yet built has
+    /// nothing to take: the launch surface the face still shows stays.
     private func takePicture() {
         face.isHidden = false
+        guard isLaunched else {
+            host.view.isHidden = true
+            return
+        }
         host.view.endEditing(true)
+        if let snapshot = snapshot() { keepsPicture(snapshot) }
         if let picture = host.view.snapshotView(afterScreenUpdates: false) {
-            face.content.subviews.forEach { $0.removeFromSuperview() }
-            picture.frame = face.content.bounds
-            face.content.addSubview(picture)
+            face.show(picture)
             face.content.alpha = 1
         }
         host.view.isHidden = true
+    }
+
+    /// The app as it is on screen, as an image to keep. `drawHierarchy`
+    /// rather than `snapshotView`, whose view can't be drawn into a file,
+    /// or `layer.render`, which misses what SwiftUI draws on the GPU.
+    private func snapshot() -> UIImage? {
+        let view = host.view!
+        let format = UIGraphicsImageRendererFormat(for: view.traitCollection)
+        format.opaque = true
+        var drawn = false
+        let image = UIGraphicsImageRenderer(bounds: view.bounds, format: format).image { _ in
+            drawn = view.drawHierarchy(in: view.bounds, afterScreenUpdates: false)
+        }
+        return drawn ? image : nil
     }
 }
 

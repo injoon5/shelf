@@ -11,7 +11,7 @@ import UIKit
 /// (0, 0) and stays centred while the outline changes (a card growing out
 /// of its icon) with nothing of its own to keep in step: the outline's
 /// layers take new paths and bounds, and the glyph and the pie keep their
-/// size (a card's face stretches its glyph to the card, `stretchArt`).
+/// size (a card's face scales its glyph with the card, `fitArt`).
 ///
 /// The outline is a path, not a layer's `cornerRadius`: Core Animation's
 /// continuous corner is rounder than Springboard's by up to 6 pixels at 3x,
@@ -134,11 +134,17 @@ class IconArtView: UIView {
         }
     }
 
-    /// Stretches the glyph to an outline of `size`, as a card's face is one
-    /// picture stretched to the card. An icon's glyph is drawn at its size.
-    func stretchArt(to size: CGSize) {
+    /// Scales the glyph for an outline of `size` without changing its
+    /// shape, as Springboard's card does: only the tile's fill stretches to
+    /// the card. The glyph is as big as the outline's width makes it, where
+    /// it would be on a square icon at the outline's top, as the app's
+    /// picture on a card is drawn from its top. An icon's glyph is drawn at
+    /// its size.
+    func fitArt(to size: CGSize) {
+        let scale = size.width / iconSize
+        let y = (size.width - size.height) / 2
         withoutActions {
-            glyph.transform = CATransform3DMakeScale(size.width / iconSize, size.height / iconSize, 1)
+            glyph.transform = CATransform3DScale(CATransform3DMakeTranslation(0, min(y, 0), 0), scale, scale, 1)
         }
     }
 

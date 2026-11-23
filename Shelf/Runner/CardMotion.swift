@@ -244,11 +244,55 @@ enum CardMotion {
         return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
     }
 
+    /// The angle a card growing out of an icon at `iconY` leans by, at
+    /// `center` and `height` and `progress`: the side toward the icon
+    /// away, as the landing's does, by as much again as its distance from
+    /// the icon in card heights, less as it grows. Negative leans its bottom
+    /// away, from an icon below. It starts at nothing, centred on its icon.
+    static func openingLean(centerY: CGFloat, height: CGFloat, iconY: CGFloat, progress: CGFloat) -> CGFloat {
+        let below = (iconY - centerY) / max(height, 1)
+        let lean = -RunnerMetrics.launchLean * below * (1 - min(max(progress, 0), 1))
+        return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
+    }
+
+    /// The angle, in radians about its vertical axis, a card at `centerX`
+    /// and `width` turns by with an icon at `iconX`: the side away from the
+    /// icon goes back, by `amount` (how far it has gone since it set off,
+    /// landing; how far it still has to grow, opening). Negative brings
+    /// its right side forward, toward an icon on the right.
+    static func sideLean(centerX: CGFloat, width: CGFloat, iconX: CGFloat, amount: CGFloat) -> CGFloat {
+        let toward = (iconX - centerX) / max(width, 1)
+        let lean = -RunnerMetrics.sideLean * toward * min(max(amount, 0), 1)
+        return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
+    }
+
     /// How much of the app's own picture shows at `progress`; below the
     /// range it has given way to the icon's face.
     static func contentOpacity(progress: CGFloat) -> CGFloat {
         let range = RunnerMetrics.contentFade
         return min(max((progress - range.lowerBound) / (range.upperBound - range.lowerBound), 0), 1)
+    }
+
+    /// How much of the launch surface shows over the icon on the way out
+    /// of it at `progress`: it comes in fast and eases out, done within
+    /// the first half of the growth.
+    static func launchOpacity(progress: CGFloat) -> CGFloat {
+        let range = RunnerMetrics.launchFade
+        let x = min(max((progress - range.lowerBound) / (range.upperBound - range.lowerBound), 0), 1)
+        return 1 - (1 - x) * (1 - x)
+    }
+
+    /// What a card at `progress` shows, and how the Home Screen behind it
+    /// looks, growing (`opening`) or shrinking.
+    static func look(progress: CGFloat, opening: Bool) -> CardLook {
+        let p = min(max(progress, 0), 1)
+        if opening {
+            return CardLook(content: launchOpacity(progress: p),
+                            blur: RunnerMetrics.backdropBlurRadius * pow(p, RunnerMetrics.openBlurCurve),
+                            dim: RunnerMetrics.backdropDim * p)
+        }
+        return CardLook(content: contentOpacity(progress: p),
+                        blur: backdropBlurRadius(progress: p), dim: backdropDim(progress: p))
     }
 
     /// A speed in points per second, bounded for a spring from `from` to
@@ -257,5 +301,82 @@ enum CardMotion {
     static func boundedVelocity(_ velocity: CGFloat, from: CGFloat, to: CGFloat) -> CGFloat {
         let limit = RunnerMetrics.maxSpringVelocity * abs(to - from)
         return min(max(velocity, -limit), limit)
+    }
+}
+
+/// What a card shows over its icon face, and the Home Screen behind it.
+///
+/// Springboard's open and close aren't mirror images: growing, the app's
+/// surface replaces the icon early and the Home Screen blurs late;
+/// shrinking, the app's picture gives way to the icon late, and the blur
+/// stays until the card is small.
+struct CardLook: Equatable, Sendable {
+    /// The opacity of the picture (the launch surface, or the app) over the icon.
+    var content: CGFloat
+    /// The blur's radius over the Home Screen, in points.
+    var blur: CGFloat
+    /// How dark the Home Screen is.
+    var dim: CGFloat
+
+    static func + (a: CardLook, b: CardLook) -> CardLook {
+        CardLook(content: a.content + b.content, blur: a.blur + b.blur, dim: a.dim + b.dim)
+    }
+
+    static func - (a: CardLook, b: CardLook) -> CardLook {
+        CardLook(content: a.content - b.content, blur: a.blur - b.blur, dim: a.dim - b.dim)
+    }
+
+    static func * (a: CardLook, k: CGFloat) -> CardLook {
+        CardLook(content: a.content * k, blur: a.blur * k, dim: a.dim * k)
+    }
+
+    /// Each part kept in range.
+    var clamped: CardLook {
+        CardLook(content: min(max(content, 0), 1), blur: max(blur, 0), dim: min(max(dim, 0), 1))
+    }
+}
+
+/// A card's look from the moment it set off in one direction: the
+/// direction's own (`CardMotion.look`), plus whatever difference it had
+/// from that when it turned, fading out over `lookHandoff` of progress. So
+/// a card caught growing and swiped away carries on from what it showed,
+/// and settles onto the close's curves on its way down.
+struct LookHandoff: Equatable, Sendable {
+    var opening: Bool
+    var startProgress: CGFloat
+    private var offset: CardLook
+
+    init(from look: CardLook, at progress: CGFloat, opening: Bool) {
+        self.opening = opening
+        startProgress = progress
+        offset = look - CardMotion.look(progress: progress, opening: opening)
+    }
+
+    /// An open from the icon, with nothing to carry.
+    static let fromIcon = LookHandoff(from: CardMotion.look(progress: 0, opening: true), at: 0, opening: true)
+
+    func look(at progress: CGFloat) -> CardLook {
+        let left = max(1 - abs(progress - startProgress) / RunnerMetrics.lookHandoff, 0)
+        return (CardMotion.look(progress: progress, opening: opening) + offset * left).clamped
+    }
+}
+
+/// How a card is turned in depth, in radians: `back` about its horizontal
+/// axis (negative takes its bottom away), `side` about its vertical axis
+/// (negative brings its right side forward).
+struct CardLean: Equatable, Sendable {
+    var back: CGFloat
+    var side: CGFloat
+
+    static let none = CardLean(back: 0, side: 0)
+
+    static func + (a: CardLean, b: CardLean) -> CardLean { CardLean(back: a.back + b.back, side: a.side + b.side) }
+    static func - (a: CardLean, b: CardLean) -> CardLean { CardLean(back: a.back - b.back, side: a.side - b.side) }
+    static func * (a: CardLean, k: CGFloat) -> CardLean { CardLean(back: a.back * k, side: a.side * k) }
+
+    /// Each within `maxLean`.
+    var limited: CardLean {
+        CardLean(back: min(max(back, -RunnerMetrics.maxLean), RunnerMetrics.maxLean),
+                 side: min(max(side, -RunnerMetrics.maxLean), RunnerMetrics.maxLean))
     }
 }

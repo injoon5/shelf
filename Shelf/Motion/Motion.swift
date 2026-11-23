@@ -43,8 +43,15 @@ enum Motion {
         }
     }
 
-    /// An app's card growing out of its icon to full screen.
-    static let cardOpen = CardSprings(Spring(duration: 0.4, bounce: 0.04))
+    /// An app's card growing out of its icon to full screen, fitted to
+    /// Springboard's opens on an iPhone 17 (`real-device-open-close-swipe-up.mp4`,
+    /// both Settings opens, which trace the same sizes frame for frame):
+    /// critically damped, the width and the centre each within about 6
+    /// points a frame, the height a little slower, so the card is squat
+    /// (1.7 high per wide at half size) and reaches the screen's shape last.
+    static let cardOpen = CardSprings(position: Spring(duration: 0.3, bounce: 0),
+                                      width: Spring(duration: 0.29, bounce: 0),
+                                      height: Spring(duration: 0.33, bounce: 0))
     /// The card shrinking into its icon after a swipe up lets go, fitted to
     /// Springboard's on an iPhone 17 (`real-device-open-close-swipe-up.mp4`,
     /// the second Developer close, started from its measured release: see
@@ -117,8 +124,11 @@ enum Motion {
     // MARK: Fades
 
     static let fadeDuration: TimeInterval = 0.2
-    /// The app replacing its launch screen.
-    static let launch = Animation.easeOut(duration: 0.18)
+    /// The built app (or the error screen) replacing the launch surface.
+    /// Measured from Weather's on an iPhone 17 (`real-device-open-close-swipe-up.mp4`
+    /// at 17.19 s): half way at 100 ms, 90% at 210, done by 330, which is
+    /// this spring.
+    static let launch = Animation.spring(duration: 0.38, bounce: 0)
     /// The pill's label and page dots trading places.
     static let pillFade: TimeInterval = 0.2
 

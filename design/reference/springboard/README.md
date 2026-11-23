@@ -91,7 +91,7 @@ Default text size ("Large"), default icon style, default (not tinted) appearance
 
 - Each property was fitted on its own (least absolute error over these frames): width 0.44 s with bounce 0.16, height 0.35 s with 0.10, centre x 0.46 s with 0.2, centre y 0.38 s with 0.16, mean errors of 2.6, 5.4, 0.5 and 1.1 pt. Shelf takes the centre at 0.38 s with bounce 0.05, which fits as well (1.3 and 3.7 pt) and never overshoots an icon below.
 - **The card doesn't fly at the icon.** Its centre keeps the little speed it had (here up, at 450 pt/s, so it rises 8 pt) and stays near the middle of the screen while it shrinks, then glides into the slot. Its height closes faster than its width: portrait (2.0) at release, 1.7 at 100 ms, square as it lands.
-- **The picture is stretched, not cropped.** Squashed to the card's height, the whole app shows, home indicator included, and after the crossfade the icon's glyph is stretched to the tile in the same way.
+- ~~**The picture is stretched, not cropped.**~~ **Corrected in §0.8:** the picture is drawn at the card's width from its top and cropped at the bottom, closing as opening, and the glyph keeps its shape. In the Developer close at 15.04 s "Sign Out" sits 0.88 of the way down the card, where a width-fitted picture puts it (0.87), not 0.63 where a squashed one would; the home indicator at the card's bottom is the system's own, drawn on the card, which is what read as "the whole app shows". The glyph is where it would be on a square icon at the card's top (its centre within about 5 pt of that through the Developer close at 15.0 s).
 - **The crossfade** from the app to its icon takes two frames, at about 0.4 of the way from icon to screen width (`RunnerMetrics.contentFade` 0.28–0.42).
 - **It leans toward an icon below.** For both Developer closes (icon about 100 pt below the card) the card's bottom edge is narrower than its top, by 0.7% at 33 ms, 2.8% at 50, 4.7% at 67, 5.6% at 83 and 7.8% at 100: a lean back about its horizontal axis, growing as it closes. For both Settings closes (icon level with the card) there is none (within ±0.5%). Shelf leans by `RunnerMetrics.landingLean` (fitted, 50° per unit of drop over card height × progress lost), at most 8°, with a 500 pt perspective.
 - **Behind it**, the settled Home Screen, scaled, blurred with a Gaussian and darkened, was fitted to each frame (outside the card):
@@ -108,6 +108,66 @@ Default text size ("Large"), default icon style, default (not tinted) appearance
   So the blur is a real radius that shrinks with the card, not a fade (`RunnerMetrics.backdropBlurRadius` 20 pt, full down to 0.45 progress), and the dim lightens all the way down (`backdropDim` 0.5, as progress to the 0.6). Shelf draws it with §0.3's `BackdropView`.
 
 **Compared on the simulator.** A flick on Shelf (Packing, the same slot as Developer) recorded with `agent-device record` and laid beside the Developer close frame for frame: the card shrinks almost in place with the display's corners, crossfades at about 1.5× the icon to a stretched glyph, glides down into the slot and lands on it, while the Home Screen comes into focus. XCTest's injected pan isn't a finger (it moves in jumps and its release speed is its own), so the timing is judged by the table above, not by that recording.
+
+## Real-device recording: opening (PLAN.md §0.8)
+
+| File | State | How produced | Notable |
+|---|---|---|---|
+| `real-device-open-close-swipe-up.mp4` | as above | as above | **Measured from:** the opens of Settings at 6.2 and 7.95 s (column 1, row 4, level with the card), Developer at 11.55 s (cold: black, then the Account screen) and 13.85 s (resumed: its snapshot), Weather at 16.75 s (cold: its blue launch screen, then content). Both Settings opens trace the same sizes frame for frame. |
+| `real-device-photos-open-close.mp4` | Springboard on the owner's iPhone 17, Photos (top-right corner) opened and closed several times, dark mode | iOS screen recording, 1206×2622, ≈60 fps | The sideways lean: **measured from** the close at 2.05–2.5 s and the open at 1.3–1.4 s. |
+
+**Method.** As for the closes: every frame at full resolution with its pts. A black card (dark mode, cold or Settings) is found by flood fill over pixels under 8–10 of 255 on a 1-pt grid. Where an app's content breaks that (the resumed Developer, Photos' share sheet), the outline is read off a 10-pt grid over the full-resolution frame. The backdrop is fitted as for the close (the settled Home Screen, scaled, Gaussian-blurred, darkened) on strips the card never covers.
+
+**The growth** (Settings at 6.2 s; a frame of the recording repeats at 6.218, so the times are the frames' pts; Shelf's column is `Motion.cardOpen` started from the icon 28 ms before the first frame):
+
+| ms | width SB / Shelf | height SB |
+|---|---|---|
+| 0 | 111 / 111 | 142 |
+| 33 | 180 / 193 | 276 |
+| 50 | 225 / 235 | 381 |
+| 67 | 266 / 270 | 482 |
+| 83 | 300 / 299 | 574 |
+| 100 | 328 / 323 | 650 |
+| 133 | 363 / 356 | 755 |
+| 167 | 382 / 378 | |
+| 200 | 393 / 390 | |
+
+- **Critically damped**, the width and the centre on about 0.29–0.3 s, the height on about 0.33 s: the card is squat as it grows (1.7 high per wide at half the screen's width, 2.0 at 0.8) and reaches the screen's shape last. The Developer opens trace the same widths 7 ms earlier. The first frame of every open is already 0.14–0.3 of the way: the recording loses a frame or two as the app launches.
+
+**The icon gives way to the surface** early (the icon's share of what the card shows, judged from its glyph's contrast):
+
+| open | width | progress | icon |
+|---|---|---|---|
+| Settings 6.2 | 111 | 0.14 | all |
+| Settings 6.2 | 180 | 0.34 | ≈ 15% |
+| Settings 6.2 | 225 | 0.48 | ≈ 0–5% |
+| Developer 11.55 | 169 | 0.31 | ≈ 15% |
+| Developer 11.55 | 192 | 0.38 | ≈ 7% |
+| Developer 11.55 | 238 | 0.51 | none |
+| Developer 13.85 | ≈ 170 | ≈ 0.31 | ≈ 25% |
+| Developer 13.85 | 227 | 0.48 | ≈ 5% |
+
+  So `RunnerMetrics.launchFade` is 0.12–0.5, easing out (a quarter left at 0.31, a tenth at 0.38). The close's crossfade (two frames at about 0.4) is later and shorter.
+
+- **The surface is drawn at the card's width, from its top**, cropped at the bottom, not squashed: at 13.85 s with the card 350 wide (0.87 of the screen), "Sign Out" is 12.3 pt tall (14.3 full screen, × 0.86) at 567 pt, where a width-fitted picture from the card's top puts it (566), not where a squashed one would (519). The status bar and the home indicator are drawn on the card from its first frame. The icon's glyph keeps its shape too, scaled by the card's width and sitting where it would on a square icon at the card's top (Weather's cloud, Developer's "A").
+- **Behind it**, the Home Screen blurs late and darkens early, unlike the close:
+
+  | progress | blur σ (pt) | brightness |
+  |---|---|---|
+  | 0.14 | 2 | 0.91 |
+  | 0.48 | 3–4 | 0.80 |
+  | 0.60 | 4 | 0.75 |
+  | 0.66 | 6–10 | 0.68 |
+  | 0.75 | 8–14 | 0.62 |
+  | 0.82 | 16 | 0.59 |
+  | 0.87 | 18 | 0.55 |
+
+  Shelf: blur 20 × progress² (`openBlurCurve`), dim 0.5 × progress. Its scale stays within 2% of 1 on the strips measured.
+- **It leans away from its icon**, as the landing leans toward it. The cold Developer open (icon about 60 pt below the card's centre): the bottom edge is narrower than the top by 4.8% at 0.51, 4.1% at 0.63, 3.7% at 0.73, 3.1% at 0.80, 2.6% at 0.86, 1.7% at 0.90, which is 1.3–1.6 radians per unit of (the icon's drop in card heights) × (1 − progress) (`launchLean` 1.4). The Settings opens, level with their icon, don't lean.
+- **And sideways.** The Photos close at 2.45 s (card 197 × 293 at (288, 290), its icon at (343, 126)): the top is 2.5% narrower than the bottom (about 0.06 rad), and the right edge is 2.3% taller than the left (about 0.086 rad): the side away from the icon goes back. Its opens turn the same way (the top-left corner farthest). `sideLean` 0.65 per unit of (the icon's offset in card widths) × (progress lost, landing; still to grow, opening). One close, so fitted, not checked across the grid.
+- **The app replaces its launch screen** with a crossfade (Weather at 17.19 s, the blue channel of the middle of the screen going from the launch screen's to the app's): 2% at 17 ms, 15% at 50, 39% at 83, 59% at 117, 74% at 150, 88% at 200, 93% at 233, done by 330. A critically damped spring of 0.38 s (`Motion.launch`).
+
+**Compared on the simulator.** Weather (grouped list, `NavigationStack`) opened cold and from its snapshot, light and dark, at normal speed and at a quarter speed (`-ShelfSlowMotion 4`), and opened and closed from the top-left, top-right, middle-left and dock places: the icon gives way to the surface by half way, the glyph keeps its shape at the top of the card opening and closing, the card leans by where its icon is, and the app crossfades in over the surface with nothing between. Before §0.8 the tint and a white glyph filled the card until the app was built, and the blurred Home Screen showed for 2–5 frames between that and the app.
 
 ### Still to record: a slow, long swipe
 

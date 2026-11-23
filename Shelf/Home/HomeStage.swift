@@ -54,6 +54,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private let cardBackdrop = BackdropView(resolution: 0.5)
     private let cardsView = PassthroughView()
     private var cards: [AppCard] = []
+    /// Each app's last snapshot, which its card opens on (plan §0.8).
+    private lazy var snapshots = LaunchSnapshotStore(files: library.snapshots)
     private var heldCard: AppCard?
     private var displayLink: CADisplayLink?
     private var openRun: HomeModel.Run?
@@ -344,8 +346,24 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         let size = row == nil ? iconSize : SearchMetrics.iconSize
         let source = CardMotion.landing(icon: icon, screenWidth: bounds.width,
                                         pill: geometry.pillFrame, iconSize: size).frame
-        let card = AppCard(run: run, data: library.data, face: IconFace(run.app.meta), screen: bounds.size, iconSize: size,
-                           fullRadius: Display.cornerRadius, from: source)
+        let key = snapshotKey(run.source)
+        let cached = snapshots.cached(run.id, key)
+        let card = AppCard(run: run, data: library.data, face: IconFace(run.app.meta),
+                           surface: cached.map(Self.snapshotView) ?? launchSurface(run.source), screen: bounds.size,
+                           iconSize: size, fullRadius: Display.cornerRadius, from: source)
+        card.keepsPicture = { [unowned self, slug = run.id, source = run.source] picture in
+            // Under the appearance and text size it was taken in.
+            snapshots.save(picture, for: slug, snapshotKey(source))
+        }
+        if cached == nil {
+            // Off the main thread: usually here while the icon still covers
+            // the surface.
+            let scale = traitCollection.displayScale
+            Task { [weak card, snapshots] in
+                guard let picture = await snapshots.load(run.id, key, scale: scale) else { return }
+                card?.showSnapshot(picture)
+            }
+        }
         launchImpact.impactOccurred(at: CGPoint(x: source.midX, y: source.midY))
         addChild(card.host)
         cardsView.addSubview(card.face)
@@ -356,6 +374,29 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         card.open()
         setCardIcons()
         startTicking()
+    }
+
+    /// What a snapshot of an app with `source` must match to be shown now:
+    /// the appearance the person chose (not one an app forced) and the
+    /// text size.
+    private func snapshotKey(_ source: String) -> LaunchSnapshots.Key {
+        let traits = traitCollection.modifyingTraits { $0.userInterfaceStyle = chosenStyle }
+        return LaunchSnapshots.Key(source: source, traits: traits)
+    }
+
+    /// The surface an app opens on with no snapshot: shaped like its first
+    /// screen, in the chosen appearance unless the app forces one.
+    private func launchSurface(_ source: String) -> UIView {
+        let layout = LaunchLayout(source: source)
+        let surface = LaunchSurfaceView(layout: layout, top: view.safeAreaInsets.top)
+        if layout.dark == nil { surface.overrideUserInterfaceStyle = chosenStyle }
+        return surface
+    }
+
+    private static func snapshotView(_ picture: UIImage) -> UIView {
+        let view = UIImageView(image: picture)
+        view.contentMode = .scaleToFill
+        return view
     }
 
     private func close(_ card: AppCard, velocity: CardVelocity? = nil) {
@@ -464,6 +505,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         defer { CATransaction.commit() }
         let time = displayLink?.targetTimestamp ?? CACurrentMediaTime()
         var openness: CGFloat = 0
+        var look: CardLook?
         for card in cards {
             if card.phase == .closing {
                 let landing = landing(for: card.slug)
@@ -471,12 +513,15 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             }
             let arrived = card.phase != .held && card.step(at: time)
             card.tick()
-            if card.phase != .landed { openness = max(openness, card.progress) }
+            if card.phase != .landed, card.progress >= openness {
+                openness = card.progress
+                look = card.look
+            }
             if arrived, card.settle() {
                 land(card)
             }
         }
-        setBackdrop(openness)
+        setBackdrop(openness, look: look)
         coverChanged()
         if cards.allSatisfy({ $0.phase == .open }) {
             displayLink?.invalidate()
@@ -484,13 +529,15 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
-    func setBackdrop(_ openness: CGFloat) {
+    /// The Home Screen behind the card that is most open, at `openness`,
+    /// blurred and dimmed by that card's `look`: a real radius and a dim
+    /// that come in late as it grows and go late as it lands, as
+    /// Springboard's. With no card, itself.
+    func setBackdrop(_ openness: CGFloat, look: CardLook? = nil) {
         let scale = 1 - (1 - RunnerMetrics.backdropScale) * openness
         home.transform = CGAffineTransform(scaleX: scale, y: scale)
-        // A real radius that shrinks as the card lands, and a dim that
-        // lightens with it, as Springboard's.
-        cardBackdrop.set(radius: CardMotion.backdropBlurRadius(progress: openness),
-                         scale: 1 - CardMotion.backdropDim(progress: openness), offset: 0)
+        let look = look ?? CardMotion.look(progress: openness, opening: false)
+        cardBackdrop.set(radius: look.blur, scale: 1 - look.dim, offset: 0)
     }
 
     // MARK: Gestures

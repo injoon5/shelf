@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 to §0.4 and §0.7 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1 to §0.4, §0.7, and items 1–4 of §0.8 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -263,7 +263,7 @@ The real-device captures use non-default glass, so compare against the simulator
 
 - **Under the finger:** the point under the finger holds and the width shrinks at Springboard's measured 0.0016 per point (`trackTravel` 0.5). The leading edge is rubber-banded (`CardMotion.EdgeBand`) toward `trackEdge`, the screen's edge, starting `trackResistance` (62 pt) short of it, or where the edge turns back if nearer, so its speed never jumps. A card caught nearer the edge than that (full screen, or growing past it) has its own position as the limit. **Inferred, not measured:** every recorded swipe is a flick whose top edge only moves down, so the limit and the resistance wait for the slow, long swipe the reference README describes.
 - **The release** is decided by the finger's travel and speed, as before. The springs start at the card's own speed (`CardMotion.trackedVelocity`), not the finger's.
-- **The landing** is a spring per property (`CardFlight`, `Motion.cardClose`), fitted to the Developer close within a few points a frame: the card shrinks almost in place, height first, then glides onto its icon. The picture and glyph are stretched to the card, the corners stay the display's until it is nearly an icon, it leans toward an icon below, and the Home Screen comes into focus behind it (`BackdropView`).
+- **The landing** is a spring per property (`CardFlight`, `Motion.cardClose`), fitted to the Developer close within a few points a frame: the card shrinks almost in place, height first, then glides onto its icon. The picture and glyph keep their shape, drawn at the card's width from its top (corrected in §0.8: only the tile's fill stretches), the corners stay the display's until it is nearly an icon, it leans in depth by where its icon is, and the Home Screen comes into focus behind it (`BackdropView`).
 - **The user's "it goes down, not to the icon":** the card landed where its icon was drawn on the Home Screen scaled back behind it (Timer: 37 pt low and 13 pt in, at 58 pt), sat there, and then swapped for the icon above it. It now lands where the icon will be (fixed the same way in §0.3, merged). Also, the card's outline was committed a frame after its picture, so a tile-coloured rim flickered around a shrinking app. And the springs carried the finger's speed, so a flick could carry the card up past the screen before it fell to its icon.
 - **Interruptible:** the card is placed every frame, so a finger catches it where it is, and it heads for its icon's place that frame: turn the pages while it lands and it follows the icon.
 
@@ -281,6 +281,17 @@ The real-device captures use non-default glass, so compare against the simulator
   - a card caught mid-flight above the limit is picked up where it is.
 
 ### 0.8 The app's launch screen
+
+**Items 1–4 built**, measured from the owner's iPhone 17 opens (`design/reference/springboard/README.md`, "Opening"). What came out of it:
+
+- **The crossfade** from the icon to the surface runs through 0.12–0.5 of the card's growth, easing out: Springboard's card shows its whole icon at 0.14, a fifth of it at 0.31, none by 0.5 (`RunnerMetrics.launchFade`).
+- **Growing, the Home Screen blurs late and dims early** (blur 20 × progress², dim 0.5 × progress), unlike the close; a card that turns back carries its look over without a jump (`LookHandoff`).
+- **The picture is drawn at the card's width from its top, cropped at the bottom**, opening and closing; the glyph keeps its shape, where it would be on a square icon at the card's top. Only the tile's fill stretches. This corrects §0.7, which read the close as stretched.
+- **The card leans in depth by where its icon is**, opening as landing: the side toward an icon above or below goes back, and the side away from an icon to the left or right (`CardLean`).
+- **The open's springs** are fitted to Springboard's: 0.29 s for the width, 0.3 for the centre, 0.33 for the height, critically damped.
+- **The snapshot** is taken with `drawHierarchy` as the card closes, written in `Caches/Snapshots/<slug>/{revision}-{light|dark}-{text size}.jpg`, kept in memory for the last three apps, and read back off the main thread. The surface without one is `LaunchSurfaceView` (`LaunchLayout` reads the source).
+- **The face stays under the app** until the built app or the error screen has crossfaded in (`Motion.launch`, fitted to Weather's), which also removes the blurred Home Screen that used to show between the two.
+- **Item 5** waits for the rewrite, as planned.
 
 **Today:** opening an app fills the screen with its tint and a white glyph (`AppStage.LaunchScreen`, and the card's face at full size). Kiln only starts building once the open has come to rest, because parsing on the main thread would make the motion stutter. So every open shows a saturated slab for at least the build time, then cuts to an app that's usually plain white or black. No system app opens like that.
 
