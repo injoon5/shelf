@@ -450,7 +450,7 @@ struct CardReleaseTests {
         window.isHidden = false
         defer { window.isHidden = true }
         stage.view.layoutIfNeeded()
-        let geometry = stage.layout.geometry
+        let geometry = stage.geometry
         try #require(geometry.size.width > 0)
 
         for slug in ["timer", "habits"] {
@@ -465,34 +465,26 @@ struct CardReleaseTests {
     }
 }
 
-struct SpringCurveTests {
-    @Test(arguments: [0.0, 0.1, 0.3, -0.2])
+struct SpringValueTests {
+    // The card's springs never bounce negatively (overdamped), where
+    // SwiftUI's velocity and value disagree.
+    @Test(arguments: [0.0, 0.05, 0.16, 0.3])
     func itStartsWhereAndAsFastAsItWasToldAndSettles(bounce: Double) {
-        let curve = SpringCurve(duration: 0.3, bounce: bounce)
-        let start = curve.state(displacement: 100, velocity: -400, at: 0)
-        #expect(abs(start.displacement - 100) < 1e-9)
-        #expect(abs(start.velocity + 400) < 1e-6)
-        let late = curve.state(displacement: 100, velocity: -400, at: 3)
-        #expect(abs(late.displacement) < 0.01)
-        // Its velocity is its displacement's derivative.
-        let t = 0.07, dt = 1e-6
-        let a = curve.state(displacement: 100, velocity: -400, at: t)
-        let b = curve.state(displacement: 100, velocity: -400, at: t + dt)
-        #expect(abs((b.displacement - a.displacement) / dt - a.velocity) < 0.01)
+        let value = SpringValue(from: 100, to: 0, velocity: -400, curve: .init(duration: 0.3, bounce: bounce), at: 2)
+        #expect(abs(value.value(at: 2) - 100) < 1e-9)
+        #expect(abs(value.velocity(at: 2) + 400) < 1e-6)
+        #expect(value.isSettled(at: 5, tolerance: 0.5))
+        #expect(!value.isSettled(at: 2.05, tolerance: 0.5))
+        // Its velocity is its value's derivative.
+        let t = 2.07, dt = 1e-6
+        #expect(abs((value.value(at: t + dt) - value.value(at: t)) / dt - value.velocity(at: t)) < 0.01)
     }
 
     @Test func noBounceNeverOvershootsFromRest() {
-        let curve = SpringCurve(duration: 0.3, bounce: 0)
+        let value = SpringValue(from: 100, to: 0, velocity: 0, curve: .init(duration: 0.3, bounce: 0), at: 0)
         for t in stride(from: 0.0, through: 2, by: 0.01) {
-            #expect(curve.state(displacement: 100, velocity: 0, at: t).displacement >= 0)
+            #expect(value.value(at: t) >= -1e-9)
         }
-    }
-
-    @Test func itIsSwiftUIsSpring() {
-        // Spring(duration: 0.5, bounce: 0.2): stiffness (2π/0.5)², damping ratio 0.8.
-        let curve = SpringCurve(duration: 0.5, bounce: 0.2)
-        #expect(abs(curve.omega - 4 * .pi) < 1e-9)
-        #expect(abs(curve.dampingRatio - 0.8) < 1e-9)
     }
 }
 
@@ -501,42 +493,37 @@ struct SearchWarpTests {
 
     @Test func aPullMovesTheWarpInProportionAndStopsAtTheField() {
         #expect(SearchWarp.progress(pull: 0, from: 0) == 0)
-        #expect(abs(SearchWarp.progress(pull: HomeMetrics.searchPullDistance / 2, from: 0) - 0.5) < 0.0001)
-        #expect(SearchWarp.progress(pull: HomeMetrics.searchPullDistance * 3, from: 0) == 1)
+        #expect(abs(SearchWarp.progress(pull: SearchMetrics.pullDistance / 2, from: 0) - 0.5) < 0.0001)
+        #expect(SearchWarp.progress(pull: SearchMetrics.pullDistance * 3, from: 0) == 1)
         #expect(SearchWarp.progress(pull: -50, from: 0) == 0)
         // A warp caught halfway carries on from there.
         #expect(abs(SearchWarp.progress(pull: 0, from: 0.5) - 0.5) < 0.0001)
     }
 
     @Test func releasesOpenByFlickOrByDistance() {
-        #expect(SearchWarp.opens(progress: 0.05, velocity: HomeMetrics.searchOpenVelocity + 1))
-        #expect(!SearchWarp.opens(progress: 0.95, velocity: -HomeMetrics.searchOpenVelocity - 1))
-        #expect(SearchWarp.opens(progress: HomeMetrics.searchOpenProgress + 0.01, velocity: 0))
-        #expect(!SearchWarp.opens(progress: HomeMetrics.searchOpenProgress - 0.01, velocity: 0))
+        #expect(SearchWarp.opens(progress: 0.05, velocity: SearchMetrics.openVelocity + 1))
+        #expect(!SearchWarp.opens(progress: 0.95, velocity: -SearchMetrics.openVelocity - 1))
+        #expect(SearchWarp.opens(progress: SearchMetrics.openProgress + 0.01, velocity: 0))
+        #expect(!SearchWarp.opens(progress: SearchMetrics.openProgress - 0.01, velocity: 0))
     }
 
-    @Test func theFieldIsFullWidthOnThePillsLine() {
+    /// App Library's field and round ✕, on the pill's line.
+    @Test func theFieldAndItsCloseButtonSitOnThePillsLine() {
         let field = SearchWarp.field(screenWidth: 402, pill: pill)
-        #expect(field.minX == HomeMetrics.searchSideInset)
-        #expect(field.maxX == 402 - HomeMetrics.searchSideInset)
-        #expect(abs(field.midY - pill.midY) < 0.0001)
-        #expect(field.height == HomeMetrics.searchFieldHeight)
+        let close = SearchWarp.close(screenWidth: 402, field: field)
+        #expect(field.minX == SearchMetrics.sideInset)
+        #expect(abs(close.maxX - (402 - SearchMetrics.sideInset)) < 0.0001)
+        #expect(abs(close.minX - field.maxX - SearchMetrics.closeGap) < 0.0001)
+        #expect(abs(field.midY - pill.midY) < 0.0001 && abs(close.midY - pill.midY) < 0.0001)
+        #expect(field.height == SearchMetrics.fieldHeight && close.height == SearchMetrics.closeSize)
     }
 
     @Test func theKeyboardLiftsTheFieldJustAboveItself() {
         let field = SearchWarp.field(screenWidth: 402, pill: pill)
         #expect(SearchWarp.lift(field: field, keyboardTop: nil) == 0)
         let lift = SearchWarp.lift(field: field, keyboardTop: 520)
-        #expect(abs(field.maxY + lift - (520 - HomeMetrics.searchKeyboardGap)) < 0.0001)
+        #expect(abs(field.maxY + lift - (520 - SearchMetrics.keyboardGap)) < 0.0001)
         // A keyboard below the field leaves it where it is.
         #expect(SearchWarp.lift(field: field, keyboardTop: 870) == 0)
-    }
-
-    @Test func theGlassWidthGivesTheProgressBack() {
-        let field = SearchWarp.field(screenWidth: 402, pill: pill)
-        for p: CGFloat in [0, 0.25, 0.6, 1] {
-            let glass = pill.interpolated(to: field, p)
-            #expect(abs(SearchWarp.progress(width: glass.width, pill: pill, field: field) - p) < 0.0001)
-        }
     }
 }

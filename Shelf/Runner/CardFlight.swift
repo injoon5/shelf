@@ -1,5 +1,5 @@
 import CoreGraphics
-import Foundation
+import SwiftUI
 
 /// How fast each part of a card is changing, per second: its centre, its
 /// width and height, and its corner radius.
@@ -20,6 +20,14 @@ struct CardVelocity: Equatable, Sendable {
 /// A card on its way somewhere with no finger on it: each of its centre's
 /// x and y, its width, its height and its corner on a spring of its own,
 /// solved for any moment. The stage reads it every frame.
+///
+/// Core Animation runs one spring per key path, and a path or a bounds
+/// changes width and height together. Springboard's card shrinks faster
+/// than it travels, and its height faster than its width
+/// (`design/reference/springboard/README.md`, the real-device close), so
+/// the card's flight is several springs, one per property, solved in closed
+/// form. Caught anywhere, it says exactly where it is and how fast it is
+/// going, so nothing jumps when a finger catches it or its target moves.
 struct CardFlight: Equatable, Sendable {
     let target: CardFrame
     private let x, y, width, height, radius: SpringValue
@@ -30,8 +38,8 @@ struct CardFlight: Equatable, Sendable {
     init(from start: CardFrame, velocity: CardVelocity, to target: CardFrame, springs: Motion.CardSprings,
          slowdown: Double = 1, at time: Double) {
         self.target = target
-        func curve(_ spring: Motion.Spring) -> SpringCurve {
-            SpringCurve(duration: spring.duration * slowdown, bounce: spring.bounce)
+        func curve(_ spring: Motion.Spring) -> SwiftUI.Spring {
+            SwiftUI.Spring(duration: spring.duration * slowdown, bounce: spring.bounce)
         }
         func value(_ from: CGFloat, _ to: CGFloat, _ speed: CGFloat, _ spring: Motion.Spring) -> SpringValue {
             SpringValue(from: from, to: to, velocity: CardMotion.boundedVelocity(speed, from: from, to: to),
@@ -60,5 +68,37 @@ struct CardFlight: Equatable, Sendable {
     /// Every part within `tolerance` points of its target and all but still.
     func isSettled(at time: Double, tolerance: CGFloat = RunnerMetrics.restTolerance) -> Bool {
         [x, y, width, height, radius].allSatisfy { $0.isSettled(at: time, tolerance: tolerance) }
+    }
+}
+
+/// One value on its way to `target` on a spring, from `start` at `time`:
+/// SwiftUI's spring, solved for any moment, as `ValueSpring` does.
+struct SpringValue: Equatable, Sendable {
+    let target: Double
+    let spring: SwiftUI.Spring
+    let start: Double
+    let time: Double
+    let velocity: Double
+
+    init(from start: Double, to target: Double, velocity: Double, curve spring: SwiftUI.Spring, at time: Double) {
+        self.target = target
+        self.spring = spring
+        self.start = start
+        self.time = time
+        self.velocity = velocity
+    }
+
+    func value(at now: Double) -> Double {
+        start + spring.value(target: target - start, initialVelocity: velocity, time: max(now - time, 0))
+    }
+
+    func velocity(at now: Double) -> Double {
+        spring.velocity(target: target - start, initialVelocity: velocity, time: max(now - time, 0))
+    }
+
+    /// Within `tolerance` of its target, and moving less than that in a
+    /// frame at 120 Hz.
+    func isSettled(at now: Double, tolerance: Double) -> Bool {
+        abs(value(at: now) - target) <= tolerance && abs(velocity(at: now)) / 120 <= tolerance
     }
 }

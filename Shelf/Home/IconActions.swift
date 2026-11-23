@@ -13,7 +13,7 @@ extension HomeItem {
     /// The icon's menu, in groups: an app's own actions, then Edit Home
     /// Screen. Settings has only Edit Home Screen: it can't be changed,
     /// reloaded, copied, reverted or deleted. The Home Screen's menu
-    /// (`IconMenuView`) and search's (`SearchResults`) are both this list.
+    /// (`IconMenuView`) and a search row's (`SearchList`) are both this list.
     @MainActor
     func menu(model: HomeModel, library: LibraryStore) -> [[IconAction]] {
         var groups: [[IconAction]] = []

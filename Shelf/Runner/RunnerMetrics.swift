@@ -79,9 +79,6 @@ enum RunnerMetrics {
     /// 0.8 at twice the icon, 0.9 just before it lands.
     static let backdropDim: CGFloat = 0.5
     static let backdropDimCurve: CGFloat = 0.6
-    /// Where `PrivateLayerBlur` is unavailable: how strongly the system's
-    /// regular blur shows instead, at full strength.
-    static let backdropFallbackBlur: CGFloat = 0.85
     /// The app's picture gives way to its icon face as the card shrinks
     /// through this range of its progress (1 full screen, 0 the icon).
     /// Measured: Springboard's card shows only the app at 0.52, both at

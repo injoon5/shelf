@@ -47,7 +47,7 @@ struct WallpaperBackground: UIViewRepresentable {
     func updateUIView(_ view: WallpaperView, context: Context) {}
 }
 
-/// The wallpaper's picture, and what it says about the content over it.
+/// The wallpaper's picture, and how bright it is.
 @MainActor
 enum Wallpaper {
     private static let shipped = UIImage(resource: .wallpaper)
@@ -64,44 +64,40 @@ enum Wallpaper {
         }
     }
 
-    private static var tones: [String: ColorScheme] = [:]
-    /// The picture `tones` were worked out for. Held weakly and compared by
-    /// identity, so a new photo can never be read as one that is gone.
-    private static weak var tonesPicture: UIImage?
+    private static var brightnesses: [String: CGFloat] = [:]
+    /// The picture `brightnesses` were worked out for. Held weakly and
+    /// compared by identity, so a new photo can never be read as one that is gone.
+    private static weak var brightnessPicture: UIImage?
     private static let imaging = CIContext()
 
-    /// Whether what sits over a horizontal band of the screen (its top and
-    /// bottom as fractions of the screen's height) wants light or dark
-    /// content: the band's average brightness in the wallpaper, cropped the
-    /// way it is drawn, and darkened by `dim`. Worked out once per photo;
-    /// the gradient is dark in both modes.
-    static func tone(_ settings: ShelfSettings, screen: CGSize, band: ClosedRange<CGFloat>, dim: Double = 0) -> ColorScheme {
-        guard let picture = picture(settings), let image = CIImage(image: picture) else { return .dark }
-        if tonesPicture !== picture {
-            tones = [:]
-            tonesPicture = picture
+    /// How bright the wallpaper is on average, 0 to 1, as much of it as the
+    /// screen shows (cropped the way it is drawn): what search's backdrop
+    /// darkens to suit. Worked out once per picture and screen.
+    static func brightness(_ settings: ShelfSettings, screen: CGSize, dark: Bool) -> CGFloat {
+        guard screen.width > 0, screen.height > 0,
+              let picture = picture(settings) ?? gradient(dark: dark, size: screen),
+              let image = CIImage(image: picture) else { return 0 }
+        if brightnessPicture !== picture {
+            brightnesses = [:]
+            brightnessPicture = picture
         }
-        let key = "\(screen) \(band) \(dim)"
-        if let known = tones[key] { return known }
+        let key = "\(screen)"
+        if let known = brightnesses[key] { return known }
 
         let full = image.extent
-        let aspect = screen.width / max(screen.height, 1)
+        let aspect = screen.width / screen.height
         let visible = full.width / full.height > aspect
             ? CGSize(width: full.height * aspect, height: full.height)
             : CGSize(width: full.width, height: full.width / aspect)
-        // Core Image counts up from the bottom.
-        let region = CGRect(x: full.midX - visible.width / 2,
-                            y: full.midY + visible.height / 2 - band.upperBound * visible.height,
-                            width: visible.width,
-                            height: (band.upperBound - band.lowerBound) * visible.height)
+        let region = CGRect(x: full.midX - visible.width / 2, y: full.midY - visible.height / 2,
+                            width: visible.width, height: visible.height)
         var pixel = [UInt8](repeating: 0, count: 4)
         let average = image.applyingFilter("CIAreaAverage", parameters: [kCIInputExtentKey: CIVector(cgRect: region)])
         imaging.render(average, toBitmap: &pixel, rowBytes: 4, bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
                        format: .RGBA8, colorSpace: CGColorSpace(name: CGColorSpace.sRGB))
-        let luminance = (0.2126 * Double(pixel[0]) + 0.7152 * Double(pixel[1]) + 0.0722 * Double(pixel[2])) / 255
-        let tone: ColorScheme = luminance * (1 - dim) > HomeMetrics.brightBackdrop ? .light : .dark
-        tones[key] = tone
-        return tone
+        let luminance = (0.2126 * CGFloat(pixel[0]) + 0.7152 * CGFloat(pixel[1]) + 0.0722 * CGFloat(pixel[2])) / 255
+        brightnesses[key] = luminance
+        return luminance
     }
 
     private static var gradients: [String: UIImage] = [:]
