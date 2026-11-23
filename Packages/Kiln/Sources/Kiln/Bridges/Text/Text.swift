@@ -30,7 +30,7 @@ final class KTextBridges: KBridgeFamily {
             v.make { c in
                 var labels = c.labels
                 if c.syntax.first == .stringLiteral, labels.first == .some(nil) { labels[0] = "_literal" }
-                return .view(KView(.primitive("Text", c.args, labels, line: c.line), bound: c.overload.map { KBound(overload: $0, slots: c.slots) }))
+                return .view(KView(.primitive("Text", c.args, labels, line: c.line), bound: c.overload.map { KBound(overload: $0, binding: c.binding) }))
             }
         }
     }

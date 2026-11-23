@@ -17,7 +17,7 @@ extension DrawingBridges {
             // `Image(uiImage:)` made natively arrives as an image already.
             v.make { c in
                 if c.args.count == 1, (c.labels.first ?? nil) == nil, case .view = c.args[0] { return c.args[0] }
-                return .view(KView(.primitive("Image", c.args, c.labels, line: c.line), bound: c.overload.map { KBound(overload: $0, slots: c.slots) }))
+                return .view(KView(.primitive("Image", c.args, c.labels, line: c.line), bound: c.overload.map { KBound(overload: $0, binding: c.binding) }))
             }
         }
         r.view("AsyncImage", .drawing, support: .partial) { v in

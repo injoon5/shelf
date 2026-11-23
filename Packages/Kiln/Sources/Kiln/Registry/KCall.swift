@@ -39,16 +39,20 @@ enum KArgRef: ExpressibleByStringLiteral, ExpressibleByIntegerLiteral, Equatable
 @MainActor
 struct KCall {
     let interp: KInterpreter
-    /// For messages: `Toggle`, `.padding`, `Date.addingTimeInterval`.
-    let name: String
+    /// For messages: the type a member belongs to (`Date`), if any, and the
+    /// member or view (`addingTimeInterval`, `Toggle`, `.padding`). Kept apart
+    /// so a call doesn't build a string it only needs for an error.
+    let owner: String?
+    let member: String
+    var name: String { owner.map { $0 + "." + member } ?? member }
     let line: Int
     /// The arguments as written, evaluated, in order.
     let args: [KV]
     let labels: [String?]
     /// The overload picked (nil for calls the engine makes itself).
     let overload: KOverload?
-    /// Parameter index → argument index, -1 when the argument was left out.
-    let slots: [Int]
+    /// The parameter each argument binds to (empty when lenient).
+    let binding: [Int]
     /// What a method or property is called on.
     var receiver: KV = .void
     /// A mutating method's new receiver, written back to where it came from.
@@ -59,25 +63,26 @@ struct KCall {
     /// call came from code.
     var syntax: [KArgSyntax] = []
 
-    init(interp: KInterpreter, name: String, line: Int, args: [KV], labels: [String?], overload: KOverload?, slots: [Int],
+    init(interp: KInterpreter, owner: String? = nil, name: String, line: Int, args: [KV], labels: [String?], overload: KOverload?, binding: [Int],
          receiver: KV = .void, base: KView? = nil) {
         self.interp = interp
-        self.name = name
+        self.owner = owner
+        self.member = name
         self.line = line
         self.args = args
         self.labels = labels
         self.overload = overload
-        self.slots = slots
+        self.binding = binding
         self.receiver = receiver
         self.base = base
     }
 
     /// A call the engine builds from values (`Image` rendered from a value,
     /// a member read).
-    static func values(_ interp: KInterpreter, _ name: String, _ args: [KV] = [], _ labels: [String?] = [], line: Int = 0,
-                       receiver: KV = .void) -> KCall {
-        KCall(interp: interp, name: name, line: line, args: args, labels: labels.isEmpty ? args.map { _ in nil } : labels,
-              overload: nil, slots: [], receiver: receiver)
+    static func values(_ interp: KInterpreter, _ name: String, owner: String? = nil, _ args: [KV] = [], _ labels: [String?] = [],
+                       line: Int = 0, receiver: KV = .void) -> KCall {
+        KCall(interp: interp, owner: owner, name: name, line: line, args: args, labels: labels.isEmpty ? args.map { _ in nil } : labels,
+              overload: nil, binding: [], receiver: receiver)
     }
 
     /// The renderer, for bridges that show views.
@@ -96,15 +101,15 @@ struct KCall {
         case .receiver: return receiver
         case .label(let l):
             if let o = overload, !o.lenient {
-                guard let p = o.params.firstIndex(where: { $0.label == l }), slots[p] >= 0 else { return nil }
-                return args[slots[p]]
+                guard let p = o.params.firstIndex(where: { $0.label == l }), let i = binding.firstIndex(of: p) else { return nil }
+                return args[i]
             }
             return labels.firstIndex(of: l).map { args[$0] }
         case .position(let n):
             if let o = overload, !o.lenient {
                 var k = 0
                 for (p, param) in o.params.enumerated() where param.label == nil {
-                    if k == n { return slots[p] >= 0 ? args[slots[p]] : nil }
+                    if k == n { return binding.firstIndex(of: p).map { args[$0] } }
                     k += 1
                 }
                 return nil
@@ -126,7 +131,9 @@ struct KCall {
     /// The value of the first parameter of a kind (the content closure).
     func param(ofKind kind: KArgKind) -> KV? {
         guard let o = overload, !o.lenient else { return nil }
-        for (p, param) in o.params.enumerated() where param.kind == kind && slots[p] >= 0 { return args[slots[p]] }
+        for (p, param) in o.params.enumerated() where param.kind == kind {
+            if let i = binding.firstIndex(of: p) { return args[i] }
+        }
         return nil
     }
 
@@ -358,7 +365,7 @@ extension ClosedRange: KBridgeable where Bound: KBridgeable & Comparable {
 
 extension KCall {
     /// The member's own name: `count` in `String.count`.
-    var memberName: String { name.split(separator: ".").last.map(String.init) ?? name }
+    var memberName: String { member.hasPrefix(".") ? String(member.dropFirst()) : member }
 
     /// "Value of type 'Range' has no member 'count'": for a member that
     /// doesn't apply to this value.

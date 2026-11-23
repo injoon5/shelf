@@ -45,12 +45,14 @@ struct KManifest: Codable, Equatable {
 }
 
 extension KRegistry {
-    /// The manifest of everything registered (host bridges included).
-    func manifest() -> KManifest {
+    /// The manifest of everything registered: Kiln's own bridges, and the
+    /// host's unless `includeHost` is false (the checked-in file has Kiln's).
+    func manifest(includeHost: Bool = true) -> KManifest {
         var symbols: [KManifest.Symbol] = []
 
         func symbol(_ kind: String, _ name: String, owner: String?, _ b: KBridge, overloads: [KManifest.Overload]?,
                     support: KilnSupport? = nil, notes: String? = nil) {
+            if !includeHost && b.family == .host { return }
             let id = kind + ":" + (owner.map { $0 + "." } ?? "") + name
             symbols.append(.init(id: id, kind: kind, name: name, owner: owner, family: b.family.rawValue,
                                  support: (support ?? b.support).rawValue, introduced: b.introduced,

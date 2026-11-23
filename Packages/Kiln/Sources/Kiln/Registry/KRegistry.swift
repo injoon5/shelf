@@ -248,9 +248,19 @@ enum KArgSyntax: Equatable {
 
 struct KParam: Equatable {
     var label: String?
-    var kind: KArgKind
+    var kind: KArgKind { didSet { expected = kind.expected } }
     var optional = false
     var variadic = false
+    /// The kind's expected type, made once.
+    private(set) var expected: KETypeRef?
+
+    init(label: String?, kind: KArgKind, optional: Bool = false, variadic: Bool = false) {
+        self.label = label
+        self.kind = kind
+        self.optional = optional
+        self.variadic = variadic
+        self.expected = kind.expected
+    }
 
     var display: String { (label ?? "_") + ":" }
 }
@@ -322,13 +332,16 @@ final class KOverload {
 
     /// Which parameter each argument binds to, or nil if this overload doesn't
     /// take these arguments.
-    func bind(_ labels: [String?], _ syntax: [KArgSyntax]) -> [Int]? {
+    func bind(_ labels: [String?], _ syntax: [KArgSyntax]) -> [Int]? { bind(labels) { syntax[$0] } }
+
+    func bind(_ labels: [String?], _ syntaxOf: (Int) -> KArgSyntax) -> [Int]? {
         if lenient { return Array(labels.indices) }
         var out = [Int](repeating: -1, count: labels.count)
         var p = 0                 // the next parameter that can take an argument
         var variadicOpen = -1     // a variadic parameter still taking unlabeled arguments
         for (i, label) in labels.enumerated() {
-            if variadicOpen >= 0, label == nil, params[variadicOpen].kind.accepts(syntax[i]) {
+            let syntax = syntaxOf(i)
+            if variadicOpen >= 0, label == nil, params[variadicOpen].kind.accepts(syntax) {
                 out[i] = variadicOpen
                 continue
             }
@@ -340,10 +353,10 @@ final class KOverload {
                 // A trailing closure (unlabeled) binds a labeled closure parameter;
                 // one with a default is passed over when a later closure parameter
                 // needs an argument (Swift's forward scan, SE-0286).
-                let trailing = label == nil && syntax[i] == .closureLiteral && param.kind.isClosure && param.label != nil
+                let trailing = label == nil && syntax == .closureLiteral && param.kind.isClosure && param.label != nil
                     && !(param.optional && params[(j + 1)...].contains { $0.kind.isClosure && !$0.optional })
                 let labelMatches = param.label == label || trailing
-                if labelMatches && param.kind.accepts(syntax[i]) { found = j; break }
+                if labelMatches && param.kind.accepts(syntax) { found = j; break }
                 // Only a parameter with a default can be skipped.
                 if !param.optional { return nil }
                 j += 1
@@ -358,19 +371,14 @@ final class KOverload {
         return out
     }
 
-    /// Parameter index → argument index (-1 when absent).
-    func slots(_ binding: [Int]) -> [Int] {
-        var s = [Int](repeating: -1, count: params.count)
-        for (arg, param) in binding.enumerated() where param >= 0 && s[param] < 0 { s[param] = arg }
-        return s
-    }
 }
 
 /// An overload picked for a call, kept on the view or modifier it made so the
 /// renderer doesn't pick again.
 struct KBound {
     let overload: KOverload
-    let slots: [Int]
+    /// The parameter each argument binds to.
+    let binding: [Int]
 }
 
 // MARK: - Bridges
@@ -418,6 +426,8 @@ final class KViewBridge: KBridge {
 
 /// A modifier: how its arguments are taken, and how it changes a view.
 final class KModifierBridge: KBridge {
+    /// `.name`, for messages.
+    lazy var display = "." + name
     struct Form {
         let overload: KOverload
         /// The view with the modifier applied. `c.base` is the description of

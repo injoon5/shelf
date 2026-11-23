@@ -116,6 +116,8 @@ final class KInterpreter {
     var currentTask: KTask?
     /// Tasks, timers and teardown (KEAsync).
     let runtime = KRuntime()
+    /// The bridges (Registry/, Bridges/).
+    let registry = KRegistry.shared
 
     init(program: KEProgram, headless: Bool = false) throws {
         self.program = program

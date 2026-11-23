@@ -117,6 +117,12 @@ final class DrawingBridges: KBridgeFamily {
         r.type("Color", .drawing, notes: "Named and system colors, `Color(red:green:blue:)`, `Color(hue:…)`, `Color(white:)`, hex strings, and `.opacity`.") { t in
             t.manifestKind = "view"
             t.membersInManifest = true
+            for sig in ["red:number green:number blue:number opacity:number?", "_:any red:number green:number blue:number opacity:number?",
+                        "hue:number saturation:number brightness:number opacity:number?", "white:number opacity:number?",
+                        "_:UIColor", "uiColor:UIColor", "_:string bundle:any?"] {
+                t.initializer(sig) { c in KDrawing.color(c) }
+            }
+            // And whatever else models write (`Color(hex:)`, `alpha:`), read loosely.
             t.initializer(kinds: [nil: .typed("UIColor")]) { c in KDrawing.color(c) }
             t.staticProperties(KDrawing.colorNames.mapValues { .native(.color($0)) })
             for (name, col) in KDrawing.systemColors { t.staticProperty(name) { _ in .native(.color(col)) } }

@@ -36,12 +36,12 @@ extension KInterpreter {
     /// description (shown later by its bridge's `render`).
     func makeView(_ b: KViewBridge, _ argExprs: [KEArg], _ env: KEnv, _ line: Int) throws -> KV {
         let labels = argExprs.map(\.label)
-        let (i, binding) = try pick(b.forms, { $0.overload }, b.name, labels: labels, syntax: argExprs.map { KArgSyntax($0.value) }, line: line)
+        let (i, binding) = try pick(b.forms, { $0.overload }, b.name, labels: labels, syntax: { KArgSyntax(argExprs[$0].value) }, line: line)
         let o = b.forms[i].overload
         let args = try evalBridgeArgs(o, binding, argExprs, env, name: b.name, line: line)
-        let bound = KBound(overload: o, slots: o.slots(binding))
+        let bound = KBound(overload: o, binding: binding)
         if let make = b.make {
-            var c = KCall(interp: self, name: b.name, line: line, args: args, labels: labels, overload: o, slots: bound.slots)
+            var c = KCall(interp: self, name: b.name, line: line, args: args, labels: labels, overload: o, binding: bound.binding)
             c.syntax = argExprs.map { KArgSyntax($0.value) }
             return try make(c)
         }
@@ -69,11 +69,11 @@ extension KInterpreter {
             throw fail("Kiln doesn't support the .\(name)() modifier", line)
         }
         let labels = argExprs.map(\.label)
-        let display = "." + name
-        let (i, binding) = try pick(b.forms, { $0.overload }, display, labels: labels, syntax: argExprs.map { KArgSyntax($0.value) }, line: line)
+        let display = b.display
+        let (i, binding) = try pick(b.forms, { $0.overload }, display, labels: labels, syntax: { KArgSyntax(argExprs[$0].value) }, line: line)
         let o = b.forms[i].overload
         let args = try evalBridgeArgs(o, binding, argExprs, env, name: display, line: line)
-        return .view(.modified(v, KModifier(name: name, args: args, labels: labels, line: line, bound: KBound(overload: o, slots: o.slots(binding)))))
+        return .view(.modified(v, KModifier(name: name, args: args, labels: labels, line: line, bound: KBound(overload: o, binding: binding))))
     }
 
     // MARK: Static members of native types
@@ -83,7 +83,7 @@ extension KInterpreter {
     func nativeStatic(_ typeName: String, _ name: String, _ line: Int) throws -> KV {
         if let t = registry.type(typeName) {
             if let p = t.staticProperties[name] {
-                var c = KCall.values(self, "\(typeName).\(name)", line: line)
+                var c = KCall.values(self, name, owner: typeName, line: line)
                 return try p.get(&c)
             }
             if name == "init", !t.inits.isEmpty {
@@ -93,7 +93,7 @@ extension KInterpreter {
                 }))
             }
             if let any = t.anyStatic {
-                var c = KCall.values(self, "\(typeName).\(name)", line: line)
+                var c = KCall.values(self, name, owner: typeName, line: line)
                 if let v = try any(&c, name) { return v }
             }
         }
@@ -107,14 +107,14 @@ extension KInterpreter {
                           _ expected: KETypeRef?) throws -> KV {
         if let t = registry.type(typeName) {
             if let ms = t.staticMethods[name] {
-                return try runBridge(ms, "\(typeName).\(name)", argExprs, env, line: line).0
+                return try runBridge(ms, name, owner: typeName, argExprs, env, line: line).0
             }
             if name == "init", !t.inits.isEmpty {
                 return try runBridge(t.inits, typeName, argExprs, env, line: line).0
             }
             if let any = t.anyStaticMethod {
                 let args = try evalArgs(argExprs, env)
-                var c = KCall.values(self, "\(typeName).\(name)", args, argExprs.map(\.label), line: line)
+                var c = KCall.values(self, name, owner: typeName, args, argExprs.map(\.label), line: line)
                 if let v = try any(&c, name) { return v }
             }
         }
@@ -126,32 +126,23 @@ extension KInterpreter {
 
     // MARK: Members of native values
 
-    /// The bridge for a value's type, then its fallbacks (a `String` is also
-    /// a sequence of characters), each with the value as that type.
-    private func bridgeChain(_ base: KV) throws -> [(KTypeBridge, KV, String)] {
-        var out: [(KTypeBridge, KV, String)] = []
-        var name = KRegistry.typeName(of: base)
-        var value = base
-        while let t = registry.type(name) {
-            out.append((t, value, name))
-            guard let fb = t.fallback, let conv = t.asFallback else { break }
-            value = try conv(value, self)
-            name = fb
-        }
-        return out
-    }
-
-    /// `value.name` on a native value.
+    /// `value.name` on a native value: its type's property, else a fallback's
+    /// (a `String` is also a sequence of characters), converted only then.
     func nativeMember(_ base: KV, _ name: String, _ line: Int) throws -> KV {
-        for (t, value, tn) in try bridgeChain(base) {
+        var tn = KRegistry.typeName(of: base)
+        var value = base
+        while let t = registry.type(tn) {
             if let p = t.properties[name] {
-                var c = KCall.values(self, "\(tn).\(name)", line: line, receiver: value)
+                var c = KCall.values(self, name, owner: tn, line: line, receiver: value)
                 return try p.get(&c)
             }
             if let any = t.anyProperty {
-                var c = KCall.values(self, "\(tn).\(name)", line: line, receiver: value)
+                var c = KCall.values(self, name, owner: tn, line: line, receiver: value)
                 if let v = try any(&c, name) { return v }
             }
+            guard let fb = t.fallback, let conv = t.asFallback else { break }
+            value = try conv(value, self)
+            tn = fb
         }
         // `[Todo].self` and `[String: Todo].self`: the literal is already the type's description.
         if name == "self" { return base }
@@ -172,20 +163,30 @@ extension KInterpreter {
             }
         }
         if case .nilValue = base { _ = try evalArgs(argExprs, env); return (.nilValue, nil) }
-        let chain = try bridgeChain(base)
-        for (k, (t, value, tn)) in chain.enumerated() {
+        // The type's own methods, then each fallback's (converted only when reached).
+        var tn = KRegistry.typeName(of: base)
+        var value = base
+        var own = true
+        var dynamic: [(KTypeBridge, KV, String, Bool)] = []
+        while let t = registry.type(tn) {
             if let ms = t.methods[name] {
-                let (v, mutated) = try runBridge(ms, "\(tn).\(name)", argExprs, env, line: line, receiver: value)
+                let (v, mutated) = try runBridge(ms, name, owner: tn, argExprs, env, line: line, receiver: value)
                 // A fallback's methods don't mutate: the value was converted.
-                return (v, k == 0 ? mutated : nil)
+                return (v, own ? mutated : nil)
             }
+            if t.anyMethod != nil { dynamic.append((t, value, tn, own)) }
+            guard let fb = t.fallback, let conv = t.asFallback else { break }
+            value = try conv(value, self)
+            tn = fb
+            own = false
         }
-        for (k, (t, value, tn)) in chain.enumerated() {
-            if let any = t.anyMethod {
-                let args = try evalArgs(argExprs, env)
-                var c = KCall.values(self, "\(tn).\(name)", args, argExprs.map(\.label), line: line, receiver: value)
-                if let v = try any(&c, name) { return (v, k == 0 ? c.mutated : nil) }
+        if !dynamic.isEmpty {
+            let args = try evalArgs(argExprs, env)
+            for (t, value, tn, own) in dynamic {
+                var c = KCall.values(self, name, owner: tn, args, argExprs.map(\.label), line: line, receiver: value)
+                if let v = try t.anyMethod!(&c, name) { return (v, own ? c.mutated : nil) }
             }
+            throw fail("Value of type '\(KRegistry.typeName(of: base))' has no method '\(name)'", line)
         }
         _ = try evalArgs(argExprs, env)
         throw fail("Value of type '\(KRegistry.typeName(of: base))' has no method '\(name)'", line)
@@ -198,12 +199,12 @@ extension KInterpreter {
         let tn = KRegistry.typeName(of: base)
         if let t = registry.type(tn) {
             if let set = t.properties[name]?.set {
-                var c = KCall.values(self, "\(tn).\(name)", [value], line: 0, receiver: base)
+                var c = KCall.values(self, name, owner: tn, [value], line: 0, receiver: base)
                 try set(&c)
                 return true
             }
             if let any = t.anySetter {
-                var c = KCall.values(self, "\(tn).\(name)", [value], line: 0, receiver: base)
+                var c = KCall.values(self, name, owner: tn, [value], line: 0, receiver: base)
                 if try any(&c, name) { return true }
             }
         }
@@ -215,7 +216,7 @@ extension KInterpreter {
         let base = KV.native(n)
         let tn = KRegistry.typeName(of: base)
         if let ms = registry.type(tn)?.methods["callAsFunction"] {
-            return try runBridge(ms, "\(tn)()", argExprs, env, line: line, receiver: base).0
+            return try runBridge(ms, "callAsFunction", owner: tn, argExprs, env, line: line, receiver: base).0
         }
         _ = try evalArgs(argExprs, env)
         throw fail("\(n.kindName) is not a function", line)
@@ -249,12 +250,14 @@ extension KInterpreter {
 extension KInterpreter {
     /// `pick` over any list whose elements carry an overload.
     func pick<C: RandomAccessCollection>(_ items: C, _ overload: (C.Element) -> KOverload, _ name: String, labels: [String?],
-                                         syntax: [KArgSyntax], line: Int) throws -> (Int, [Int]) where C.Index == Int {
-        if items.count == 1, let only = items.first {
-            let o = overload(only)
-            if let b = o.bind(labels, syntax), o.availability?.isAvailable ?? true { return (0, b) }
+                                         syntax: (Int) -> KArgSyntax, line: Int) throws -> (Int, [Int]) where C.Index == Int {
+        // The first overload that takes these arguments and the OS has; the
+        // slow path only to say why none does.
+        for (i, item) in items.enumerated() {
+            let o = overload(item)
+            if let b = o.bind(labels, syntax), o.availability?.isAvailable ?? true { return (i, b) }
         }
-        return try pick(items.map(overload), name, labels: labels, syntax: syntax, line: line)
+        return try pick(items.map(overload), name, labels: labels, syntax: labels.indices.map(syntax), line: line)
     }
 }
 
@@ -272,23 +275,23 @@ extension KRenderer {
     /// views the engine made) picked now from the values.
     func renderBridge(_ b: KViewBridge, _ a: KArgs, _ line: Int, _ bound: KBound?) -> AnyView {
         let form: KViewBridge.Form
-        let slots: [Int]
+        let argParams: [Int]
         if let bound, let f = b.forms.first(where: { $0.overload === bound.overload }) {
             form = f
-            slots = bound.slots
+            argParams = bound.binding
         } else {
             do {
                 let (i, binding) = try interp.pick(b.forms, { $0.overload }, b.name, labels: a.labels,
-                                                   syntax: a.args.map { KArgSyntax(value: $0) }, line: line)
+                                                   syntax: { KArgSyntax(value: a.args[$0]) }, line: line)
                 form = b.forms[i]
-                slots = form.overload.slots(binding)
+                argParams = binding
             } catch {
                 interp.report(error)
                 return AnyView(KErrorView(message: interp.describeError(error)))
             }
         }
         return form.render(KCall(interp: interp, name: b.name, line: line, args: a.args, labels: a.labels,
-                                 overload: form.overload, slots: slots))
+                                 overload: form.overload, binding: argParams))
     }
 
     /// A modifier's bridge applied to the view it's on.
@@ -309,23 +312,23 @@ extension KRenderer {
 
     func modifierCall(_ b: KModifierBridge, _ base: KView, _ m: KModifier) -> (KModifierBridge.Form, KCall)? {
         let form: KModifierBridge.Form
-        let slots: [Int]
+        let argParams: [Int]
         if let bound = m.bound, let f = b.forms.first(where: { $0.overload === bound.overload }) {
             form = f
-            slots = bound.slots
+            argParams = bound.binding
         } else {
             do {
-                let (i, binding) = try interp.pick(b.forms, { $0.overload }, "." + m.name, labels: m.labels,
-                                                   syntax: m.args.map { KArgSyntax(value: $0) }, line: m.line)
+                let (i, binding) = try interp.pick(b.forms, { $0.overload }, b.display, labels: m.labels,
+                                                   syntax: { KArgSyntax(value: m.args[$0]) }, line: m.line)
                 form = b.forms[i]
-                slots = form.overload.slots(binding)
+                argParams = binding
             } catch {
                 interp.report(error)
                 return nil
             }
         }
-        return (form, KCall(interp: interp, name: "." + m.name, line: m.line, args: m.args, labels: m.labels,
-                            overload: form.overload, slots: slots, base: base))
+        return (form, KCall(interp: interp, name: b.display, line: m.line, args: m.args, labels: m.labels,
+                            overload: form.overload, binding: argParams, base: base))
     }
 
     /// A modifier on a `Text` that keeps it one, or nil.
