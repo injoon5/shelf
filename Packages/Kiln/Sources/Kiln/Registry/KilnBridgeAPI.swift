@@ -27,7 +27,7 @@ extension Kiln {
     /// a host type again replaces it.
     @MainActor
     public static func registerType(_ name: String, family: KilnFamily = .host, notes: String? = nil,
-                                    _ build: (KilnTypeBuilder) -> Void) {
+                                    _ build: @MainActor (KilnTypeBuilder) -> Void) {
         let r = KRegistry.shared
         let b = KTypeBridge(name: name, family: family, support: .full, introduced: nil, notes: notes, source: "host")
         build(KilnTypeBuilder(bridge: b))

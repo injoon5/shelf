@@ -352,3 +352,51 @@ extension ClosedRange: KBridgeable where Bound: KBridgeable & Comparable {
     func encode(like old: KV) -> KV { .range(lowerBound.encode(like: .void), upperBound.encode(like: .void), closed: true) }
     static var kilnTypeName: String { "ClosedRange<\(Bound.kilnTypeName)>" }
 }
+
+extension KCall {
+    /// The member's own name: `count` in `String.count`.
+    var memberName: String { name.split(separator: ".").last.map(String.init) ?? name }
+
+    /// "Value of type 'Range' has no member 'count'": for a member that
+    /// doesn't apply to this value.
+    func noMember() -> KERuntimeError {
+        KERuntimeError(message: "Value of type '\(receiver.typeName)' has no member '\(memberName)'", line: line)
+    }
+
+    /// The `n`th argument as written (labels ignored), or nil.
+    func at(_ n: Int) -> KV? { n < args.count ? args[n] : nil }
+
+    /// The argument with this label as written, or nil (for lenient overloads
+    /// that also take it unlabeled: `arg("of") ?? at(0)`).
+    func arg(_ label: String) -> KV? { labels.firstIndex(of: label).map { args[$0] } }
+}
+
+extension KInterpreter {
+    /// A closure argument as something to call on each element: a closure, a
+    /// key path (`\.name`), an initializer (`String.init`), a type.
+    func applier(_ f: KV, _ line: Int) throws -> (KV) throws -> KV {
+        switch f {
+        case .function(let fun): return { [unowned self] x in try self.call(fun, [x], [nil]) }
+        case .native(.keyPath(let comps)):
+            return { [unowned self] x in
+                var v = x
+                for c in comps where c != "self" { v = try self.member(v, c, line: line) }
+                return v
+            }
+        case .type(.user(let t)):
+            return { [unowned self] x in try self.instantiate(t, args: [x], labels: [nil], line: line) }
+        case .type(.builtin(let n)):
+            return { [unowned self] x in try self.callNamedValues(n, [x], [nil], line) }
+        default:
+            throw fail("Expected a closure, found \(describe(f))", line)
+        }
+    }
+
+    /// `Name(values…)` for a native type or function, with values in hand.
+    func callNamedValues(_ name: String, _ args: [KV], _ labels: [String?], _ line: Int) throws -> KV {
+        if let f = registry.function(name) { return try runBridge(f.forms, name, values: args, labels: labels, line: line).0 }
+        if let t = registry.type(name), !t.inits.isEmpty { return try runBridge(t.inits, name, values: args, labels: labels, line: line).0 }
+        if let style = Self.styleName(name) { return .native(.implicit(style, args)) }
+        return try KBuiltins.construct(name, args, labels, self, line)
+    }
+}

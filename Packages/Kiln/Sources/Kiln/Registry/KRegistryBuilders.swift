@@ -27,7 +27,7 @@ import SwiftUI
 extension KRegistry {
     @discardableResult
     func view(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, introduced: String? = nil,
-              notes: String? = nil, file: String = #fileID, _ build: (KViewBuilder) -> Void) -> KViewBridge {
+              notes: String? = nil, file: String = #fileID, _ build: @MainActor (KViewBuilder) -> Void) -> KViewBridge {
         let b = KViewBridge(name: name, family: family, support: support, introduced: introduced, notes: notes, source: Self.source(file))
         build(KViewBuilder(b))
         add(b)
@@ -36,7 +36,7 @@ extension KRegistry {
 
     @discardableResult
     func modifier(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, introduced: String? = nil,
-                  notes: String? = nil, file: String = #fileID, _ build: (KModifierBuilder) -> Void) -> KModifierBridge {
+                  notes: String? = nil, file: String = #fileID, _ build: @MainActor (KModifierBuilder) -> Void) -> KModifierBridge {
         let b = KModifierBridge(name: name, family: family, support: support, introduced: introduced, notes: notes, source: Self.source(file))
         build(KModifierBuilder(b))
         add(b)
@@ -45,7 +45,7 @@ extension KRegistry {
 
     @discardableResult
     func type(_ name: String, _ family: KilnFamily, support: KilnSupport = .partial, introduced: String? = nil,
-              notes: String? = nil, file: String = #fileID, _ build: (KTypeBuilder) -> Void) -> KTypeBridge {
+              notes: String? = nil, file: String = #fileID, _ build: @MainActor (KTypeBuilder) -> Void) -> KTypeBridge {
         let b = KTypeBridge(name: name, family: family, support: support, introduced: introduced, notes: notes, source: Self.source(file))
         build(KTypeBuilder(b))
         add(b)
@@ -54,7 +54,7 @@ extension KRegistry {
 
     /// More members for a type another file declared (in the same family, or
     /// a later family adding to a type: `URL` gains file members in Files).
-    func extend(_ name: String, _ build: (KTypeBuilder) -> Void) {
+    func extend(_ name: String, _ build: @MainActor (KTypeBuilder) -> Void) {
         guard let b = types[name] else { preconditionFailure("Kiln: extend(\(name)) before \(name) is registered") }
         build(KTypeBuilder(b))
     }
@@ -234,4 +234,6 @@ struct KTypeBuilder {
     var manifestKind: String { get { bridge.manifestKind } nonmutating set { bridge.manifestKind = newValue } }
     var membersInManifest: Bool { get { bridge.membersInManifest } nonmutating set { bridge.membersInManifest = newValue } }
     func namespace() { bridge.isNamespace = true }
+    /// Engine-made: kept out of the manifest.
+    func `internal`() { bridge.isInternal = true }
 }

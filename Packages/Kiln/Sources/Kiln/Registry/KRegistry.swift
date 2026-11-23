@@ -657,6 +657,7 @@ final class KRegistry {
 ///     }
 ///
 /// So families never share a file. The folder is `KilnFamily.folder`.
+@MainActor
 class KBridgeFamily: NSObject {
     @MainActor class func register(into r: KRegistry) {}
 }

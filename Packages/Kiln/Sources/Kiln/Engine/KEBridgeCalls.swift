@@ -156,7 +156,7 @@ extension KInterpreter {
         if name == "map" || name == "flatMap", argExprs.count == 1 {
             switch base {
             case .int, .double, .bool, .structV, .enumV, .object, .native(.date), .native(.url), .native(.uuid), .native(.color):
-                let f = try KBuiltins.applier(try eval(argExprs[0].value, env), self, line)
+                let f = try applier(try eval(argExprs[0].value, env), line)
                 return (try f(base), nil)
             default: break
             }
