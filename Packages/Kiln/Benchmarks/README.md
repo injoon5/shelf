@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.7-context.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.6-language.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step (now `after-1.7-context.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.6-language.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -197,3 +197,57 @@ After §1.7 (a context for each run). Every input still passes as before. `Tools
 - **No input is slower than 10%.** Each check now has a stub context, which costs nothing until the app uses it: its folder is named only when a file is touched, and its settings are in memory (`KilnMemoryDefaults`), not a suite cfprefsd has to make and remove. A first version made both every time, and small inputs were 5 to 12% slower.
 - **Apps that use `DB` are faster again** (saving-data −24%, todos-db −47%): `DB` is a host bridge now, with no `URLRequest` built and answered per call. saving-data's `@AppStorage` is in memory during a check.
 - KilnBench registers an in-memory `DB` host bridge instead of appending the old prelude.
+
+### after-1.6-language.json
+
+PLAN.md §1.6: protocols, result builders, property wrappers, custom Codable, regex literals, macros as declarations, and errors about the app's own types. Measured after merging §1.7, so the base is `after-1.7-context.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.6-language.json --compare Benchmarks/after-1.7-context.json` (21 samples). Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is Chess, 8% slower. Apps are 0 to 6% slower, and the compute workloads are within 2%.
+- **What it costs.** Loading a program now does two more things:
+  - closing each type's conformances over inheritance;
+  - adopting default implementations.
+
+  Each call to one of the app's functions now checks its labels as Swift does.
+- **How it was made cheap.** The first version was 10 to 28% slower than the engine before it, timed the same hour; Objects, method calls and memberwise inits, was the 28%. These brought it back:
+  - Closure flags are built only when a call has a closure literal.
+  - The memberwise labels are kept per type.
+  - The wrapped-property check runs only for types that have wrapped properties.
+  - The nested-type lookup runs only for names that are nested somewhere.
+  - The extension-on-a-native-type `self` check runs only after the registry has no such name.
+  - Loading skips conformance walks, adoption, hooks and requirement checks when the program has nothing for them.
+
+Validate, minimum per call, in ms:
+
+| Input | §1.7 | §1.6 | Change |
+|---|---:|---:|---:|
+| Apps/Chess.swift | 11.47 | 12.40 | +8% |
+| Apps/ExpenseTracker.swift | 0.74 | 0.77 | +4% |
+| Apps/FocusTimer.swift | 0.50 | 0.51 | +2% |
+| Apps/HabitTracker.swift | 0.72 | 0.75 | +4% |
+| Apps/MemoryMatch.swift | 0.53 | 0.55 | +4% |
+| Apps/ReadingList.swift | 0.99 | 1.04 | +5% |
+| Apps/TipCalculator.swift | 0.31 | 0.32 | +3% |
+| AppleIntelligence/expense.md | 0.33 | 0.34 | +3% |
+| AppleIntelligence/habit.md | 0.26 | 0.27 | +4% |
+| AppleIntelligence/memory.md | 0.30 | 0.31 | +3% |
+| AppleIntelligence/timer.md | 0.45 | 0.46 | +2% |
+| AppleIntelligence/tip.md | 0.46 | 0.47 | +2% |
+| Networking/OpenLibrarySearch.swift | 0.30 | 0.31 | +3% |
+| apps/async.swift | 0.56 | 0.58 | +4% |
+| apps/images.swift | 0.39 | 0.40 | +3% |
+| apps/network.swift | 0.63 | 0.65 | +3% |
+| apps/saving-data.swift | 0.58 | 0.60 | +3% |
+| apps/state.swift | 0.47 | 0.50 | +6% |
+| apps/swift-builders.swift (new) | | 0.67 | |
+| apps/swift-codable.swift (new) | | 0.89 | |
+| apps/swift-language.swift | 1.08 | 1.13 | +5% |
+| apps/swift-protocols.swift (new) | | 0.74 | |
+| apps/time.swift | 0.46 | 0.48 | +4% |
+| apps/todos-db.swift | 0.17 | 0.17 | +0% |
+| apps/views-layout-drawing.swift | 1.08 | 1.11 | +3% |
+| apps/views-lists-controls.swift | 0.75 | 0.77 | +3% |
+| apps/views-navigation.swift | 0.74 | 0.77 | +4% |
+| Workloads/Arithmetic.swift | 303.31 | 303.99 | +0% |
+| Workloads/Collections.swift | 30.43 | 30.56 | +0% |
+| Workloads/Objects.swift | 30.56 | 31.09 | +2% |

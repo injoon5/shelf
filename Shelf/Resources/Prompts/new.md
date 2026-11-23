@@ -50,7 +50,12 @@ Kiln runs Swift, and the parts of SwiftUI, Foundation, Charts and Swift concurre
 - Structs (memberwise and custom `init`, `mutating`, `didSet`), classes, enums (raw values, associated values, `CaseIterable`, methods).
 - Closures, `switch` with patterns and `where`, tuples, ranges.
 - Optionals with `?.` and `??`, `if let` / `guard let` / `while let`, `defer`, `do` / `catch` / `throw`.
-- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `@Observable` classes.
+- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`.
+- Protocols with extensions and default implementations (`extension P where Self: Q` too), `any P` and `some P`, generics, and classes that inherit with `super`.
+- `Equatable`, `Hashable`, `Comparable` and `CaseIterable` as Swift synthesizes them, or with your own `==`, `hash(into:)` and `<`. Declare them: `==`, `sorted()`, `allCases` and `ForEach` without `id:` need them.
+- `@ViewBuilder` functions, properties and parameters (with `if`, `switch` and `for`), and your own `@resultBuilder` and `@propertyWrapper` types.
+- Regex literals (`/\d+/`, `#/…/#`) with `firstMatch(of:)`, `wholeMatch(of:)`, `matches(of:)`, `contains` and `replacing`.
+- `@Observable` classes, also passed down with `.environment(model)` and read with `@Environment(Model.self)`; your own environment values declared with `@Entry` in `extension EnvironmentValues`.
 - `Int` and `Double` are distinct, as in compiled Swift.
 
 **Waiting**
@@ -99,7 +104,8 @@ Saved data has to survive future versions of the app:
 - Give every field of a saved type a default value, or make it optional, so older saved data still decodes.
 - If decoding fails, don't save over the stored data. Keep a flag such as `loadFailed`, and skip saving while it's set.
 
-What Kiln can't encode yet is under "What doesn't work".
+Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, or by your own `init(from:)` and `encode(to:)`:
+- Saved enums need raw values (`enum Priority: String, Codable`). An enum with associated values needs its own `init(from:)` and `encode(to:)`.
 
 ## What doesn't work
 

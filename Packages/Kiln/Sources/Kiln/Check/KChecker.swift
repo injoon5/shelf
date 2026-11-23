@@ -71,6 +71,17 @@ struct KCCtx {
     var wait: KCWait
     /// Inside an `await`: calls to `async` functions are fine.
     var covered = false
+    /// In an extension on a native type (`extension Collection`): a bare
+    /// name may be one of its members, which the checker doesn't list.
+    var nativeSelf = false
+}
+
+extension KCCtx {
+    static func make(nativeSelf: Bool, scope: KCScope, selfType: KCType?, isStatic: Bool = false, wait: KCWait) -> KCCtx {
+        var c = KCCtx(scope: scope, selfType: selfType, isStatic: isStatic, wait: wait)
+        c.nativeSelf = nativeSelf
+        return c
+    }
 }
 
 @MainActor
@@ -364,6 +375,10 @@ final class KChecker {
         guard visited.insert(ObjectIdentifier(t)).inserted else { return .none }
         if let d = t.stored[name] ?? t.computed[name] { return .value(propertyType(d, owner: t)) }
         if let fs = t.methods[name] { return .function(fs, t) }
+        // A property wrapper's projection and storage: `recipe.$servings`, `_servings`.
+        if let f = name.first, f == "$" || f == "_", let d = t.stored[String(name.dropFirst())], !d.attributes.isEmpty {
+            return .value(.unknown)
+        }
         var unsure = false
         for i in t.inherits {
             if let a = decls.type(i, from: t.parent), a !== t {
@@ -475,8 +490,14 @@ final class KChecker {
 
     // MARK: - Walking declarations
 
+    /// Walking an extension on a type the app doesn't declare.
+    private var inNativeExtension = false
+
     private func walkType(_ d: KETypeDecl, _ t: KCType?) {
         let owner = t
+        let saved = inNativeExtension
+        inNativeExtension = t == nil && d.kind == .extensionType
+        defer { inNativeExtension = saved }
         for p in d.properties { property(p, owner: owner) }
         for m in d.methods { function(m, owner: owner, scope: globalScope, isStatic: m.isStatic) }
         for i in d.inits { function(i, owner: owner, scope: globalScope, isStatic: false, kind: .initializer) }
@@ -488,17 +509,17 @@ final class KChecker {
     }
 
     private func property(_ p: KEVarDecl, owner: KCType?) {
-        let base = KCCtx(scope: KCScope(globalScope), selfType: owner, isStatic: p.isStatic,
+        let base = KCCtx.make(nativeSelf: inNativeExtension, scope: KCScope(globalScope), selfType: owner, isStatic: p.isStatic,
                          wait: .forbidden("a stored property's initial value", suggestion: "Load it in .task { … } instead"))
         if let initial = p.initial { _ = expr(initial, base) }
         let isBody = p.name == "body" && owner.map(isViewType) == true
         let place = isBody ? "a view's `body`" : "a computed property"
         let wait = KCWait.forbidden(place, suggestion: "A view's body and computed properties run to the end without waiting. Do the work in Task { … } or .task { … }, or in an async function called from one")
-        if let g = p.getter { block(g, KCCtx(scope: KCScope(globalScope), selfType: owner, isStatic: p.isStatic, wait: wait)) }
+        if let g = p.getter { block(g, KCCtx.make(nativeSelf: inNativeExtension, scope: KCScope(globalScope), selfType: owner, isStatic: p.isStatic, wait: wait)) }
         for (param, body) in [p.setter, p.willSet, p.didSet].compactMap({ $0 }) {
             let s = KCScope(globalScope)
             s.names[param] = .unknown
-            block(body, KCCtx(scope: s, selfType: owner, isStatic: p.isStatic,
+            block(body, KCCtx.make(nativeSelf: inNativeExtension, scope: s, selfType: owner, isStatic: p.isStatic,
                               wait: .forbidden("a property's observer", suggestion: "Start a Task { … } there instead")))
         }
     }
@@ -517,12 +538,12 @@ final class KChecker {
             wait = f.isAsync ? .allowed
                 : .forbidden("`\(f.name)()`, which isn't `async`", suggestion: "Mark it `async` (`func \(f.name)(…) async`), and call it with `await`")
         }
-        let outer = KCCtx(scope: scope, selfType: owner, isStatic: isStatic, wait: .unknown)
+        let outer = KCCtx.make(nativeSelf: inNativeExtension, scope: scope, selfType: owner, isStatic: isStatic, wait: .unknown)
         for p in f.params {
             if let dv = p.defaultValue { _ = expr(dv, outer) }
             s.names[p.name] = stype(p.type, from: owner)
         }
-        block(f.body, KCCtx(scope: s, selfType: owner, isStatic: isStatic, wait: wait))
+        block(f.body, KCCtx.make(nativeSelf: inNativeExtension, scope: s, selfType: owner, isStatic: isStatic, wait: wait))
     }
 
     // MARK: - Statements
@@ -780,7 +801,7 @@ final class KChecker {
             _ = expr(target, c)
             _ = expr(value, c)
             return .unknown
-        case .value:
+        case .value, .regex:
             return .unknown
         }
     }
@@ -844,6 +865,7 @@ final class KChecker {
         if decls.genericNames.contains(name) || decls.typeAliases[name] != nil { return .unknown }
         if registry.function(name) != nil || registry.constant(name) != nil { return .unknown }
         if let f = name.first, !(f.isLetter || f == "_" || f == "$") { return .unknown }      // an operator: reduce(0, +)
+        if c.nativeSelf { return .unknown }
         if let b = registry.type(name) { return .nativeMeta(b.name) }
         if isKnownTypeName(name) { return .nativeMeta(name) }
         if name.first?.isUppercase == true {
@@ -1114,6 +1136,7 @@ final class KChecker {
         if KInterpreter.styleName(name) != nil { walkArgs(args, c, wait: .unknown); return .unknown }
         walkArgs(args, c, wait: .unknown)
         if let s = c.selfType, isOpen(s) { return .unknown }
+        if c.nativeSelf { return .unknown }
         if name.first?.isUppercase == true {
             if registry.type(name) != nil {
                 report(.unknownName, line, "Kiln can't make a \(name) with \(name)(…)", needle: name)

@@ -51,7 +51,7 @@
     },
     {
       "name" : "Focus & Keyboard",
-      "stubs" : 3,
+      "stubs" : 5,
       "summary" : "keyboard focus, submit and keyboard types",
       "supported" : 6
     },
@@ -59,7 +59,7 @@
       "name" : "Environment",
       "stubs" : 5,
       "summary" : "state, bindings, observable models and environment values",
-      "supported" : 25
+      "supported" : 26
     },
     {
       "name" : "Accessibility",
@@ -167,13 +167,13 @@
       "name" : "Language",
       "stubs" : 0,
       "summary" : "Swift's standard library",
-      "supported" : 249
+      "supported" : 265
     },
     {
       "name" : "Foundation",
       "stubs" : 3,
       "summary" : "dates, formatters, JSON, files and settings",
-      "supported" : 145
+      "supported" : 201
     },
     {
       "name" : "Concurrency",
@@ -190,52 +190,12 @@
   ],
   "gaps" : [
     {
-      "id" : "one-sided-case-range",
-      "what" : "A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`."
-    },
-    {
-      "id" : "allcases-method",
-      "what" : "Calling a method straight on `allCases` (`Kind.allCases.map { … }`) fails. Store it first: `let kinds = Kind.allCases`. `ForEach(Kind.allCases)` works."
-    },
-    {
-      "id" : "binding-animation",
-      "what" : "`$value.animation()` on a binding. Use `.animation(_:value:)` on the view."
-    },
-    {
-      "id" : "protocol-extensions",
-      "what" : "Methods from a protocol extension (default implementations) don't exist. Put the method on each type, or in a function that takes the value."
-    },
-    {
-      "id" : "property-wrappers",
-      "what" : "Custom property wrappers (`@propertyWrapper`) are ignored: the property is a plain stored value. Use `didSet` or a computed property."
-    },
-    {
-      "id" : "result-builders",
-      "what" : "Result builders (`@resultBuilder`) of your own. SwiftUI's `@ViewBuilder` works."
-    },
-    {
-      "id" : "custom-codable",
-      "what" : "Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, and ignores `init(from:)` and `encode(to:)`: don't write them."
-    },
-    {
       "id" : "payload-enum-codable",
-      "what" : "An enum with associated values can't be encoded or decoded. Give saved enums raw values (`enum Priority: String, Codable`)."
-    },
-    {
-      "id" : "set-round-trip",
-      "what" : "A `Set` encoded as JSON decodes as an array: save arrays and dictionaries, not `Set`s."
-    },
-    {
-      "id" : "data-utf8",
-      "what" : "`Data(text.utf8)` comes out empty: use `text.data(using: .utf8)`."
+      "what" : "An enum with associated values isn't `Codable` by itself: give a saved enum raw values (`enum Priority: String, Codable`), or write its `init(from:)` and `encode(to:)`."
     },
     {
       "id" : "tuple-labels",
       "what" : "A tuple doesn't take its labels from the declared type: write them in the literal (`return (min: a, max: b)`)."
-    },
-    {
-      "id" : "regex-literals",
-      "what" : "Regex literals (`/\\d+/`) don't parse. Check text with `String` methods instead."
     }
   ],
   "generator" : "kiln-registry",
@@ -1143,6 +1103,22 @@
       "name" : "makeStream",
       "owner" : "AsyncThrowingStream",
       "source" : "Sources/Kiln/Concurrency.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Environment",
+      "id" : "member:Binding.animation",
+      "kind" : "member",
+      "name" : "animation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Binding",
+      "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
     {
@@ -2409,6 +2385,111 @@
       "support" : "full"
     },
     {
+      "family" : "Foundation",
+      "id" : "member:Decoder.codingPath",
+      "kind" : "member",
+      "name" : "codingPath",
+      "overloads" : [
+
+      ],
+      "owner" : "Decoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Decoder.container",
+      "kind" : "member",
+      "name" : "container",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy"
+          ]
+        }
+      ],
+      "owner" : "Decoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Decoder.singleValueContainer",
+      "kind" : "member",
+      "name" : "singleValueContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Decoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Decoder.unkeyedContainer",
+      "kind" : "member",
+      "name" : "unkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Decoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:DecodingError.dataCorrupted",
+      "kind" : "member",
+      "name" : "dataCorrupted",
+      "owner" : "DecodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:DecodingError.dataCorruptedError",
+      "kind" : "member",
+      "name" : "dataCorruptedError",
+      "owner" : "DecodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:DecodingError.keyNotFound",
+      "kind" : "member",
+      "name" : "keyNotFound",
+      "owner" : "DecodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:DecodingError.typeMismatch",
+      "kind" : "member",
+      "name" : "typeMismatch",
+      "owner" : "DecodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:DecodingError.valueNotFound",
+      "kind" : "member",
+      "name" : "valueNotFound",
+      "owner" : "DecodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Language",
       "id" : "member:Dictionary.compactMapValues",
       "kind" : "member",
@@ -2740,6 +2821,75 @@
       "owner" : "Double",
       "source" : "Sources/Kiln/Language.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Encoder.codingPath",
+      "kind" : "member",
+      "name" : "codingPath",
+      "overloads" : [
+
+      ],
+      "owner" : "Encoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Encoder.container",
+      "kind" : "member",
+      "name" : "container",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy"
+          ]
+        }
+      ],
+      "owner" : "Encoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Encoder.singleValueContainer",
+      "kind" : "member",
+      "name" : "singleValueContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Encoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Encoder.unkeyedContainer",
+      "kind" : "member",
+      "name" : "unkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Encoder",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:EncodingError.invalidValue",
+      "kind" : "member",
+      "name" : "invalidValue",
+      "owner" : "EncodingError",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
     },
     {
       "family" : "Foundation",
@@ -3548,6 +3698,38 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "member:Hasher.combine",
+      "kind" : "member",
+      "name" : "combine",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Hasher",
+      "source" : "Sources/Kiln/Hashing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Hasher.finalize",
+      "kind" : "member",
+      "name" : "finalize",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Hasher",
+      "source" : "Sources/Kiln/Hashing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:IndexSet.contains",
       "kind" : "member",
@@ -3813,6 +3995,244 @@
       "owner" : "JSONEncoder",
       "source" : "Sources/Kiln/JSON.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.allKeys",
+      "kind" : "member",
+      "name" : "allKeys",
+      "overloads" : [
+
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.codingPath",
+      "kind" : "member",
+      "name" : "codingPath",
+      "overloads" : [
+
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.contains",
+      "kind" : "member",
+      "name" : "contains",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.decode",
+      "kind" : "member",
+      "name" : "decode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.decodeIfPresent",
+      "kind" : "member",
+      "name" : "decodeIfPresent",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.decodeNil",
+      "kind" : "member",
+      "name" : "decodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.nestedContainer",
+      "kind" : "member",
+      "name" : "nestedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.nestedUnkeyedContainer",
+      "kind" : "member",
+      "name" : "nestedUnkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedDecodingContainer.superDecoder",
+      "kind" : "member",
+      "name" : "superDecoder",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "KeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.encode",
+      "kind" : "member",
+      "name" : "encode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.encodeIfPresent",
+      "kind" : "member",
+      "name" : "encodeIfPresent",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.encodeNil",
+      "kind" : "member",
+      "name" : "encodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.nestedContainer",
+      "kind" : "member",
+      "name" : "nestedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy",
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.nestedUnkeyedContainer",
+      "kind" : "member",
+      "name" : "nestedUnkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "forKey"
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:KeyedEncodingContainer.superEncoder",
+      "kind" : "member",
+      "name" : "superEncoder",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "KeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
     },
     {
       "family" : "Foundation",
@@ -4101,6 +4521,94 @@
       "owner" : "Range",
       "source" : "Sources/Kiln/Collections.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.Match.output",
+      "kind" : "member",
+      "name" : "output",
+      "overloads" : [
+
+      ],
+      "owner" : "Regex.Match",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.Match.range",
+      "kind" : "member",
+      "name" : "range",
+      "overloads" : [
+
+      ],
+      "owner" : "Regex.Match",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.firstMatch",
+      "kind" : "member",
+      "name" : "firstMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.ignoresCase",
+      "kind" : "member",
+      "name" : "ignoresCase",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.prefixMatch",
+      "kind" : "member",
+      "name" : "prefixMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.wholeMatch",
+      "kind" : "member",
+      "name" : "wholeMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
     },
     {
       "family" : "Foundation",
@@ -4985,6 +5493,70 @@
       "support" : "full"
     },
     {
+      "family" : "Foundation",
+      "id" : "member:SingleValueDecodingContainer.decode",
+      "kind" : "member",
+      "name" : "decode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "SingleValueDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:SingleValueDecodingContainer.decodeNil",
+      "kind" : "member",
+      "name" : "decodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "SingleValueDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:SingleValueEncodingContainer.encode",
+      "kind" : "member",
+      "name" : "encode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "SingleValueEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:SingleValueEncodingContainer.encodeNil",
+      "kind" : "member",
+      "name" : "encodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "SingleValueEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Language",
       "id" : "member:String.append",
       "kind" : "member",
@@ -5103,6 +5675,22 @@
       "id" : "member:String.firstIndex",
       "kind" : "member",
       "name" : "firstIndex",
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.firstMatch",
+      "kind" : "member",
+      "name" : "firstMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
@@ -5313,6 +5901,22 @@
     },
     {
       "family" : "Language",
+      "id" : "member:String.matches",
+      "kind" : "member",
+      "name" : "matches",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
       "id" : "member:String.padding",
       "kind" : "member",
       "name" : "padding",
@@ -5325,6 +5929,22 @@
       "id" : "member:String.prefix",
       "kind" : "member",
       "name" : "prefix",
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.prefixMatch",
+      "kind" : "member",
+      "name" : "prefixMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
@@ -5361,6 +5981,31 @@
       "id" : "member:String.removeLast",
       "kind" : "member",
       "name" : "removeLast",
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.replacing",
+      "kind" : "member",
+      "name" : "replacing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "maxReplacements",
+            "with"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "with",
+            "maxReplacements"
+          ]
+        }
+      ],
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
@@ -5478,6 +6123,22 @@
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.wholeMatch",
+      "kind" : "member",
+      "name" : "wholeMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
     },
     {
       "family" : "Language",
@@ -6715,6 +7376,203 @@
       "owner" : "UUID",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.count",
+      "kind" : "member",
+      "name" : "count",
+      "overloads" : [
+
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.currentIndex",
+      "kind" : "member",
+      "name" : "currentIndex",
+      "overloads" : [
+
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.decode",
+      "kind" : "member",
+      "name" : "decode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.decodeIfPresent",
+      "kind" : "member",
+      "name" : "decodeIfPresent",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.decodeNil",
+      "kind" : "member",
+      "name" : "decodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.isAtEnd",
+      "kind" : "member",
+      "name" : "isAtEnd",
+      "overloads" : [
+
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.nestedContainer",
+      "kind" : "member",
+      "name" : "nestedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy"
+          ]
+        }
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedDecodingContainer.nestedUnkeyedContainer",
+      "kind" : "member",
+      "name" : "nestedUnkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UnkeyedDecodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedEncodingContainer.count",
+      "kind" : "member",
+      "name" : "count",
+      "overloads" : [
+
+      ],
+      "owner" : "UnkeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedEncodingContainer.encode",
+      "kind" : "member",
+      "name" : "encode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "contentsOf"
+          ]
+        }
+      ],
+      "owner" : "UnkeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedEncodingContainer.encodeNil",
+      "kind" : "member",
+      "name" : "encodeNil",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UnkeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedEncodingContainer.nestedContainer",
+      "kind" : "member",
+      "name" : "nestedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+            "keyedBy"
+          ]
+        }
+      ],
+      "owner" : "UnkeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:UnkeyedEncodingContainer.nestedUnkeyedContainer",
+      "kind" : "member",
+      "name" : "nestedUnkeyedContainer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UnkeyedEncodingContainer",
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
     },
     {
       "family" : "Foundation",
@@ -7980,13 +8838,13 @@
       "id" : "modifier:environment",
       "kind" : "modifier",
       "name" : "environment",
-      "notes" : "`\\.colorScheme` only.",
+      "notes" : "`\\.colorScheme`, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.",
       "overloads" : [
         {
           "labels" : [
             "_"
           ],
-          "notes" : "An `@Observable` object; not read by `@Environment` yet."
+          "notes" : "An `@Observable` object, read with `@Environment(Model.self)`."
         },
         {
           "labels" : [
@@ -8067,6 +8925,23 @@
           "labels" : [
             "_",
             "equals"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Focus.swift",
+      "support" : "stub"
+    },
+    {
+      "family" : "Focus & Keyboard",
+      "id" : "modifier:focusedValue",
+      "kind" : "modifier",
+      "name" : "focusedValue",
+      "notes" : "Accepted; `@FocusedValue` reads its `@Entry` default.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
           ]
         }
       ],
@@ -10152,6 +11027,7 @@
       "id" : "protocol:CaseIterable",
       "kind" : "protocol",
       "name" : "CaseIterable",
+      "notes" : "Synthesized for enums without payloads; `allCases` needs it.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10160,7 +11036,7 @@
       "id" : "protocol:Codable",
       "kind" : "protocol",
       "name" : "Codable",
-      "notes" : "Stored properties, with `CodingKeys`.",
+      "notes" : "Stored properties with `CodingKeys`, or your own `init(from:)` and `encode(to:)`.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10169,6 +11045,7 @@
       "id" : "protocol:Comparable",
       "kind" : "protocol",
       "name" : "Comparable",
+      "notes" : "`<`, `sorted()`, `min()` and `max()` on your types need it.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10201,7 +11078,7 @@
       "id" : "protocol:Equatable",
       "kind" : "protocol",
       "name" : "Equatable",
-      "notes" : "Synthesized from stored properties.",
+      "notes" : "Synthesized from stored properties, or your own `==`; `==` needs it.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10218,7 +11095,7 @@
       "id" : "protocol:Hashable",
       "kind" : "protocol",
       "name" : "Hashable",
-      "notes" : "Synthesized from stored properties.",
+      "notes" : "Synthesized from stored properties, or your own `hash(into:)`.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10227,7 +11104,7 @@
       "id" : "protocol:Identifiable",
       "kind" : "protocol",
       "name" : "Identifiable",
-      "notes" : "`id` is read by `ForEach` and `List`; conformance isn't checked.",
+      "notes" : "`id` is read by `ForEach` and `List`, which need it (or `id:`).",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10850,7 +11727,7 @@
       "id" : "type:Binding",
       "kind" : "type",
       "name" : "Binding",
-      "notes" : "`Binding(get:set:)` and `.constant(_:)`.",
+      "notes" : "`Binding(get:set:)`, `.constant(_:)` and `.animation(_:)`.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -10969,7 +11846,7 @@
       "id" : "type:Data",
       "kind" : "type",
       "name" : "Data",
-      "notes" : "`Data()` is empty; `String(data:encoding:)` and `JSONDecoder` read it.",
+      "notes" : "`Data()`, `Data(text.utf8)` and `Data([UInt8])`; `String(data:encoding:)` and `JSONDecoder` read it.",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
     },
@@ -10997,6 +11874,30 @@
       "name" : "DateFormatter",
       "notes" : "`dateStyle`, `timeStyle` and `dateFormat`; other settings are ignored.",
       "source" : "Sources/Kiln/Dates.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:Decoder",
+      "kind" : "type",
+      "name" : "Decoder",
+      "notes" : "In your own `init(from:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:DecodingError",
+      "kind" : "type",
+      "name" : "DecodingError",
+      "notes" : "Thrown from your own `init(from:)`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
       "support" : "partial"
     },
     {
@@ -11055,6 +11956,30 @@
       "kind" : "type",
       "name" : "EdgeInsets",
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:Encoder",
+      "kind" : "type",
+      "name" : "Encoder",
+      "notes" : "In your own `encode(to:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:EncodingError",
+      "kind" : "type",
+      "name" : "EncodingError",
+      "notes" : "Thrown from your own `encode(to:)`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
       "support" : "partial"
     },
     {
@@ -11157,6 +12082,15 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:Hasher",
+      "kind" : "type",
+      "name" : "Hasher",
+      "notes" : "In your own `hash(into:)`: `hasher.combine(id)`.",
+      "source" : "Sources/Kiln/Hashing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Layout",
       "id" : "type:HorizontalAlignment",
       "kind" : "type",
@@ -11250,6 +12184,30 @@
     },
     {
       "family" : "Foundation",
+      "id" : "type:KeyedDecodingContainer",
+      "kind" : "type",
+      "name" : "KeyedDecodingContainer",
+      "notes" : "In your own `init(from:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:KeyedEncodingContainer",
+      "kind" : "type",
+      "name" : "KeyedEncodingContainer",
+      "notes" : "In your own `encode(to:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
       "id" : "type:Locale",
       "kind" : "type",
       "name" : "Locale",
@@ -11303,6 +12261,34 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:Regex",
+      "kind" : "type",
+      "name" : "Regex",
+      "notes" : "From `/…/`, `#/…/#` or `try Regex(\"…\")`. §1.6 has the basics: `firstMatch`, `wholeMatch`, `contains`, `replacing`, `matches(of:)`, `case /…/:`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Regex.Match",
+      "kind" : "type",
+      "name" : "Regex.Match",
+      "notes" : "`match.0`, `match.1`, `match.name`, `match.output`, `match.range` (character offsets).",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:RelativeDateTimeFormatter",
       "kind" : "type",
@@ -11349,6 +12335,30 @@
 
       ],
       "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:SingleValueDecodingContainer",
+      "kind" : "type",
+      "name" : "SingleValueDecodingContainer",
+      "notes" : "In your own `init(from:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:SingleValueEncodingContainer",
+      "kind" : "type",
+      "name" : "SingleValueEncodingContainer",
+      "notes" : "In your own `encode(to:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
       "support" : "partial"
     },
     {
@@ -11605,6 +12615,30 @@
 
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:UnkeyedDecodingContainer",
+      "kind" : "type",
+      "name" : "UnkeyedDecodingContainer",
+      "notes" : "In your own `init(from:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "type:UnkeyedEncodingContainer",
+      "kind" : "type",
+      "name" : "UnkeyedEncodingContainer",
+      "notes" : "In your own `encode(to:)`: keyed, unkeyed and single-value containers.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Coding.swift",
       "support" : "partial"
     },
     {
@@ -13463,6 +14497,18 @@
       ],
       "source" : "Sources/Kiln/Environment.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Focus & Keyboard",
+      "id" : "wrapper:FocusedValue",
+      "kind" : "wrapper",
+      "name" : "FocusedValue",
+      "notes" : "Reads its `@Entry` default; focused views don't set it yet.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Focus.swift",
+      "support" : "stub"
     },
     {
       "family" : "Gestures",

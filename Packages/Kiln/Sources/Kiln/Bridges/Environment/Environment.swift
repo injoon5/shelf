@@ -50,15 +50,24 @@ final class EnvironmentBridges: KBridgeFamily {
     }
 
     static func modifiers(_ r: KRegistry) {
-        r.modifier("environment", .environment, support: .partial, notes: "`\\.colorScheme` only.") { m in
+        r.modifier("environment", .environment, support: .partial, notes: "`\\.colorScheme`, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.") { m in
             m.form("_:any _:any") { c, view in
                 if case .native(.keyPath(let comps))? = c[0], comps.last == "colorScheme", let n = c.symbol(1) {
                     view.environment(\.colorScheme, n == "dark" ? .dark : .light)
+                } else if case .native(.keyPath(let comps))? = c[0], let key = comps.last, c.interp.registry.environment[key] == nil {
+                    // The app's own value (`@Entry var accent`), for the `@Environment(\.accent)` below.
+                    view.transformEnvironment(\.kilnObjects) { $0["\\." + key] = c.interp.coerce(c[1] ?? .nilValue, to: c.interp.userEnvironmentType(key)) }
                 } else {
                     view
                 }
             }
-            m.form("_:any", notes: "An `@Observable` object; not read by `@Environment` yet.") { _, view in view }
+            m.form("_:any", notes: "An `@Observable` object, read with `@Environment(Model.self)`.") { c, view in
+                if let obj = c[0], let typeName = obj.userType?.name {
+                    view.transformEnvironment(\.kilnObjects) { $0[typeName] = obj }
+                } else {
+                    view
+                }
+            }
         }
         r.modifier("environmentObject", .environment) { m in
             m.form("_:any") { c, view in

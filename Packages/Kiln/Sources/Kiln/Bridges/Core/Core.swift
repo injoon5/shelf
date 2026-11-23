@@ -137,12 +137,12 @@ final class CoreBridges: KBridgeFamily {
         r.protocolBridge("PreviewProvider", .core, requirements: ["previews"])
         r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full, notes: "`path(in:)` runs whenever SwiftUI draws it.")
         r.protocolBridge("InsettableShape", .drawing, requirements: ["path(in:)", "inset(by:)"])
-        r.protocolBridge("Identifiable", .language, requirements: ["id"], notes: "`id` is read by `ForEach` and `List`; conformance isn't checked.")
-        r.protocolBridge("Hashable", .language, notes: "Synthesized from stored properties.")
-        r.protocolBridge("Equatable", .language, notes: "Synthesized from stored properties.")
-        r.protocolBridge("Comparable", .language, requirements: ["<"])
-        r.protocolBridge("CaseIterable", .language, requirements: ["allCases"])
-        r.protocolBridge("Codable", .foundation, notes: "Stored properties, with `CodingKeys`.")
+        r.protocolBridge("Identifiable", .language, requirements: ["id"], notes: "`id` is read by `ForEach` and `List`, which need it (or `id:`).")
+        r.protocolBridge("Hashable", .language, notes: "Synthesized from stored properties, or your own `hash(into:)`.")
+        r.protocolBridge("Equatable", .language, notes: "Synthesized from stored properties, or your own `==`; `==` needs it.")
+        r.protocolBridge("Comparable", .language, requirements: ["<"], notes: "`<`, `sorted()`, `min()` and `max()` on your types need it.")
+        r.protocolBridge("CaseIterable", .language, requirements: ["allCases"], notes: "Synthesized for enums without payloads; `allCases` needs it.")
+        r.protocolBridge("Codable", .foundation, notes: "Stored properties with `CodingKeys`, or your own `init(from:)` and `encode(to:)`.")
         r.protocolBridge("Decodable", .foundation)
         r.protocolBridge("Encodable", .foundation)
         r.protocolBridge("Error", .language)
@@ -183,7 +183,7 @@ final class CoreBridges: KBridgeFamily {
             }
         }
 
-        r.type("Binding", .environment, notes: "`Binding(get:set:)` and `.constant(_:)`.") { t in
+        r.type("Binding", .environment, notes: "`Binding(get:set:)`, `.constant(_:)` and `.animation(_:)`.") { t in
             t.initializer { c in
                 if case .function(let g)? = c.arg("get"), case .function(let s)? = c.arg("set") {
                     let interp = c.interp
@@ -193,6 +193,14 @@ final class CoreBridges: KBridgeFamily {
                 return .binding(.constant(c.first ?? .nilValue))
             }
             t.staticMethod("constant") { c in .binding(.constant(c.first ?? .nilValue)) }
+            // `Toggle("On", isOn: $on.animation())`: writes through it animate.
+            t.method("animation", "_:Animation?") { c in
+                guard case .binding(let b) = c.receiver else { return c.receiver }
+                var anim: Animation? = .default
+                if case .native(.animation(let a))? = c.first { anim = a.value }
+                else if case .native(.implicit(let n, let a))? = c.first { anim = KDrawing.animation(n, a, []) ?? .default }
+                return .binding(KBinding(get: b.get, set: { v in withAnimation(anim) { b.set(v) } }))
+            }
             t.implicit { name, args, _ in name == "constant" ? .binding(.constant(args.first ?? .void)) : nil }
         }
     }

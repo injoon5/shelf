@@ -25,10 +25,46 @@ final class KType {
     var subscripts: [KEFuncDecl] = []
     var nested: [String: KType] = [:]
     var attributes: [KEAttribute] = []
+    /// What the declaration and its extensions wrote after `:`, before the
+    /// closure over protocol inheritance (KEProtocols).
+    var declaredInherits: Set<String> = []
+    var line = 0
+    var generics: [KEGenericParam] = []
+    /// Initializers from protocol extensions: unlike the type's own, they keep the memberwise one.
+    var extensionInits: [KEFuncDecl] = []
+    var superclass: KType?
+    var finalized = false
+    var inherited = false
+    /// A custom `==` (Equatable): nil when it couldn't run.
+    var customEquals: ((KV, KV) -> Bool?)?
+    /// A custom `hash(into:)`: the values it combined.
+    var customHash: ((KV) -> [KV]?)?
+    /// Stands for a native type as `self` in an extension on it (`extension Array`).
+    var standIn = false
+    /// For a `@resultBuilder` type: its static methods as a builder (KEBuilders).
+    var userBuilder: KUserBuilder?
+    /// `@Animatable`: the stored properties it animates (KEMacros), for §1.5's proxy.
+    var animatableProperties: [String] = []
+    /// Stored properties with the app's own property wrapper (KEWrappers), set when the program loads.
+    var wrappedNames: Set<String> = []
+    /// The memberwise initializer's labels, once asked for (KEDiagnostics).
+    var memberwiseNames: Set<String>?
+
+    static func standIn(_ name: String) -> KType {
+        let t = KType(name: name, kind: .structType)
+        t.standIn = true
+        return t
+    }
 
     init(name: String, kind: KETypeKind) {
         self.name = name
         self.kind = kind
+    }
+
+    /// The superclass a class declares: its first inherited name that's one of `types`' classes.
+    func declaredSuperclass(in types: [String: KType]) -> String? {
+        guard isClass else { return nil }
+        return declaredInherits.first { types[$0]?.isClass == true && types[$0] !== self }
     }
 
     var isView: Bool { conformances.contains("View") }
@@ -60,6 +96,11 @@ final class KType {
 /// Members added by `extension` to a built-in type (View, Color, Double, …).
 final class KBuiltinExtension {
     var computed: [String: KEVarDecl] = [:]
+    /// Every computed property by name, when constrained extensions declare
+    /// the same one (`extension Array where Element == A`, `… == B`).
+    var computedAll: [String: [KEVarDecl]] = [:]
+    /// A member's `where` clause.
+    var constraints: [ObjectIdentifier: [KEConstraint]] = [:]
     var staticDecls: [String: KEVarDecl] = [:]
     var staticBoxes: [String: KBox] = [:]
     var methods: [String: [KEFuncDecl]] = [:]
@@ -88,6 +129,14 @@ final class KInterpreter {
     var builtinExtensions: [String: KBuiltinExtension] = [:]
     let globalEnv = KEnv(parent: nil)
     var functions: [String: [KEFuncDecl]] = [:]
+    /// The app's protocols (KEProtocols).
+    var protocols: [String: KProtocol] = [:]
+    /// `extension Int: Describable {}`: native types and the app's protocols they adopt.
+    var builtinConformances: [String: Set<String>] = [:]
+    /// `@Entry var accent = Color.blue` in `extension EnvironmentValues` (KEMacros), by owner and name.
+    var entries: [String: [String: KEVarDecl]] = [:]
+    /// The short names of nested types (`CodingKeys`), so other names skip that lookup.
+    var nestedNames: Set<String> = []
 
     /// What the code has printed.
     var console = ""
@@ -125,9 +174,11 @@ final class KInterpreter {
         self.program = program
         self.headless = headless
         self.context = context ?? .standard()
+        registerProtocols(program.types)
         register(program.types, parent: nil)
         for t in program.types where t.kind == .extensionType { applyExtension(t) }
         for t in program.types { applyNestedExtensions(t) }
+        finalizeTypes()
         for f in program.functions { functions[f.name, default: []].append(f) }
         fuel = budget
         for stmt in program.globals {
@@ -184,7 +235,7 @@ final class KInterpreter {
 
     private var declSource: [String: ObjectIdentifier] = [:]
 
-    private func register(_ decls: [KETypeDecl], parent: KType?) {
+    func register(_ decls: [KETypeDecl], parent: KType?) {
         for d in decls where d.kind != .extensionType && d.kind != .protocolType {
             let full = parent.map { "\($0.name).\(d.name)" } ?? d.name
             var t = types[full] ?? KType(name: full, kind: d.kind)
@@ -193,9 +244,12 @@ final class KInterpreter {
                 if types[d.name]?.name == full { types[d.name] = t }
             }
             declSource[full] = ObjectIdentifier(d)
+            t.line = d.line
+            t.generics = d.generics
             types[full] = t
             if types[d.name] == nil || parent == nil { types[d.name] = t }      // short name for nested types
             parent?.nested[d.name] = t
+            if parent != nil { nestedNames.insert(d.name) }
             absorb(d, into: t)
             register(d.nested, parent: t)
         }
@@ -203,8 +257,8 @@ final class KInterpreter {
 
     private func absorb(_ d: KETypeDecl, into t: KType) {
         t.conformances.formUnion(d.inherits)
+        t.declaredInherits.formUnion(d.inherits)
         t.attributes += d.attributes
-        if d.attributes.contains(where: { $0.name == "Observable" }) { t.conformances.insert("ObservableObject") }
         for p in d.properties {
             if p.isStatic { t.staticDecls[p.name] = p }
             else if p.isComputed { t.computed[p.name] = p }
@@ -218,9 +272,16 @@ final class KInterpreter {
         t.inits += d.inits
         t.cases += d.cases
         t.subscripts += d.subscripts
+        // `@Observable`, `@Animatable`… (KEMacros).
+        KMacros.applyTypeMacros(t, d.attributes, self)
     }
 
-    private func applyExtension(_ d: KETypeDecl) {
+    func applyExtension(_ d: KETypeDecl) {
+        if let proto = protocols[d.name] {
+            // `extension P { … }`: default implementations (KEProtocols).
+            proto.extensions.append(d)
+            return
+        }
         if let t = types[d.name] {
             absorb(d, into: t)
             register(d.nested, parent: t)
@@ -230,11 +291,15 @@ final class KInterpreter {
         let key = d.name.split(separator: ".").last.map(String.init) ?? d.name
         let ext = builtinExtensions[key] ?? KBuiltinExtension()
         builtinExtensions[key] = ext
+        if !d.inherits.isEmpty { builtinConformances[key, default: []].formUnion(d.inherits) }
         for p in d.properties {
-            if p.isStatic { ext.staticDecls[p.name] = p } else { ext.computed[p.name] = p }
+            if KMacros.applyPropertyMacros(p, owner: key, self) { continue }   // `@Entry` (KEMacros)
+            if p.isStatic { ext.staticDecls[p.name] = p } else { ext.computed[p.name] = p; ext.computedAll[p.name, default: []].append(p) }
+            if !d.constraints.isEmpty { ext.constraints[ObjectIdentifier(p)] = d.constraints }
         }
         for m in d.methods {
             if m.isStatic { ext.staticMethods[m.name, default: []].append(m) } else { ext.methods[m.name, default: []].append(m) }
+            if !d.constraints.isEmpty { ext.constraints[ObjectIdentifier(m)] = d.constraints }
         }
         ext.inits += d.inits
         register(d.nested, parent: nil)
@@ -254,6 +319,48 @@ final class KInterpreter {
     }
 
     /// Pick an overload by argument labels (falls back to the first).
+    /// Whether arguments with these labels bind to `params` as Swift binds
+    /// them: in order, skipping defaulted and variadic parameters; an
+    /// unlabeled argument (a trailing closure) may bind a labeled closure.
+    nonisolated static func labelsFit(_ params: [KEParam], _ labels: [String?], closures: [Bool]? = nil) -> Bool {
+        var pi = 0
+        var lastVariadic = -1
+        for (ai, l) in labels.enumerated() {
+            let isClosure = closures.map { ai < $0.count && $0[ai] } ?? false
+            var matched = false
+            while pi < params.count {
+                let p = params[pi]
+                let closureParam: Bool = { if case .function? = p.type?.core { return true }; return false }()
+                // An unlabeled closure (a trailing one) skips defaulted and variadic
+                // parameters that can't take it, as Swift's forward scan does.
+                if isClosure, l == nil, !closureParam, p.defaultValue != nil || p.isVariadic, params[(pi + 1)...].contains(where: {
+                    if case .function? = $0.type?.core { return true }; return false
+                }) {
+                    pi += 1
+                    continue
+                }
+                if p.label == l || (l == nil && closureParam) {
+                    matched = true
+                    if p.isVariadic { lastVariadic = pi } else { pi += 1 }
+                    break
+                }
+                if p.defaultValue != nil || p.isVariadic { pi += 1; continue }
+                return false
+            }
+            if !matched {
+                // More values for the variadic just passed: `f(1, 2, 3)`.
+                if lastVariadic >= 0, params[lastVariadic].label == l, pi == lastVariadic { continue }
+                return false
+            }
+        }
+        return params[min(pi, params.count)...].allSatisfy { $0.defaultValue != nil || $0.isVariadic }
+    }
+
+    /// The first declaration that takes these labels.
+    nonisolated static func fit(_ decls: [KEFuncDecl], _ labels: [String?], closures: [Bool]? = nil) -> KEFuncDecl? {
+        decls.first { labelsFit($0.params, labels, closures: closures) }
+    }
+
     nonisolated static func pick(_ decls: [KEFuncDecl], labels: [String?]?) -> KEFuncDecl? {
         guard decls.count > 1, let labels else { return decls.first }
         let exact = decls.first { d in
@@ -268,7 +375,7 @@ final class KInterpreter {
         if decl.isComputed {
             let getter = decl
             globalEnv.vars[decl.name] = KBox(get: { [unowned self] in
-                (try? self.runAccessor(getter.getter ?? [], env: KEnv(parent: self.globalEnv), returns: getter.type)) ?? .nilValue
+                (try? self.runGetter(getter, env: KEnv(parent: self.globalEnv))) ?? .nilValue
             }, set: { _ in })
             return
         }
@@ -335,8 +442,12 @@ final class KInterpreter {
             if decl.isComputed {
                 let d = decl
                 env.vars[decl.name] = KBox(get: { [unowned self] in
-                    (try? self.runAccessor(d.getter ?? [], env: KEnv(parent: env), returns: d.type)) ?? .nilValue
+                    (try? self.runGetter(d, env: KEnv(parent: env))) ?? .nilValue
                 }, set: { _ in })
+                return .normal
+            }
+            if let w = customWrapper(decl) {
+                try declareWrappedLocal(decl, w, env)
                 return .normal
             }
             let value = try decl.initial.map { try eval($0, env, decl.type) } ?? .nilValue
@@ -435,8 +546,10 @@ final class KInterpreter {
             case .function(let f):
                 env.declare(f.name, .function(KFunction(.user(f, env, env.nearestSelf))))
             case .type(let t):
+                registerProtocols([t])
                 register([t], parent: nil)
                 if t.kind == .extensionType { applyExtension(t) }
+                if let kt = types[t.name] { finalize(kt) }
             default: break
             }
             return .normal
@@ -566,6 +679,8 @@ final class KInterpreter {
         case .expression(let e):
             let target = try eval(e, env, typeRef(of: value))
             if case .range = target { return rangeContains(target, value) }
+            // `case /\d+/:` matches the whole string.
+            if let r = KBuiltins.regexBox(target), case .string(let s) = value { return (try? r.regex.wholeMatch(in: s)) != nil }
             if case .function(let f) = target { return truthy(try call(f, [value], [nil])) }
             return target == value
         case .typeCheck(let t):
@@ -584,6 +699,7 @@ final class KInterpreter {
         case .int: return .named("Int", [])
         case .double: return .named("Double", [])
         case .string: return .named("String", [])
+        case .set: return .named("Set", [])   // `tags == ["a", "b"]`: the literal is a Set
         case .native(.color): return .named("Color", [])
         default: return nil
         }
@@ -594,10 +710,11 @@ final class KInterpreter {
         switch (v, n) {
         case (.int, "Int"), (.double, "Double"), (.double, "CGFloat"), (.string, "String"), (.bool, "Bool"),
              (.array, "Array"), (.dict, "Dictionary"): return true
-        case (.int, _), (.double, _), (.string, _), (.bool, _): return false
+        case (.int, _), (.double, _), (.string, _), (.bool, _): return valueConforms(v, n)
         case (.native(.object("Error", _)), "CancellationError"): return KAsync.isCancellation(KEThrown(value: v))
         default:
-            if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) }
+            if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) || (n == "AnyObject" && ut.isClass) }
+            if protocols[n] != nil || builtinConformances.values.contains(where: { $0.contains(n) }) { return valueConforms(v, n) }
             return true
         }
     }
@@ -700,7 +817,7 @@ final class KInterpreter {
         if let p = t.computed[name] {
             // Run the getter with this same `self` (and its @State storage).
             return .computed(get: { [unowned self] in
-                try self.runAccessor(p.getter ?? [], env: KEnv(parent: self.globalEnv, selfContext: ctx), returns: p.type)
+                try self.runGetter(p, env: KEnv(parent: self.globalEnv, selfContext: ctx))
             }, set: { [unowned self] v in
                 guard let setter = p.setter else { throw self.fail("'\(name)' is a get-only property") }
                 let env = KEnv(parent: self.globalEnv, selfContext: ctx)
@@ -757,7 +874,13 @@ final class KInterpreter {
                 return
             }
             if case .binding(let b)? = o.fields[name] { b.set(newValue); return }
+            if o.fields[name] == nil, let w = wrapped(o.type, name) {
+                try writeWrapped(.box(KBox(.object(o))), w, name, coerce(newValue, to: o.type.storedDecl(name)?.type), exists: o.fields[wrapperField(name)] != nil)
+                o.didChange()
+                return
+            }
             let decl = o.type.storedDecl(name)
+            if decl == nil, o.fields[name] == nil, o.type.computed[name] == nil, !isWrapperStorage(o.type, name) { throw noMember(o.type, name, line: 0) }
             let old = o.fields[name] ?? .nilValue
             let v = coerce(newValue, to: decl?.type)
             if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: .box(KBox(.object(o))), type: o.type) }
@@ -797,7 +920,15 @@ final class KInterpreter {
                     return
                 }
                 if case .binding(let b)? = s.fields[name], s.type.wrapper(of: name) == "Binding" { b.set(newValue); return }
+                if s.fields[name] == nil, let w = wrapped(s.type, name) {
+                    let decl = s.type.storedDecl(name)
+                    let old = decl?.didSet == nil ? KV.nilValue : ((try? readWrapped(s.fields[wrapperField(name)], name, line: 0)) ?? .nilValue)
+                    try writeWrapped(base, w, name, coerce(newValue, to: decl?.type), exists: s.fields[wrapperField(name)] != nil)
+                    if let ds = decl?.didSet { try runObserver(ds, old, selfLoc: base, type: s.type) }
+                    return
+                }
                 let decl = s.type.storedDecl(name)
+                if decl == nil, s.fields[name] == nil, !isWrapperStorage(s.type, name) { throw noMember(s.type, name, line: 0) }
                 let old = s.fields[name] ?? .nilValue
                 let v = coerce(newValue, to: decl?.type)
                 if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: base, type: s.type) }
@@ -885,11 +1016,12 @@ final class KInterpreter {
         if let box = t.staticBoxes[name] { return box.value }
         guard let decl = t.staticDecls[name] else {
             if let c = t.enumCase(name) { return .enumV(KEnumValue(type: t, caseName: c.name, payload: [])) }
-            throw fail("Type '\(t.name)' has no member '\(name)'")
+            // What Swift synthesizes (`allCases`), static methods, nested types: `Kind.allCases.map { … }`.
+            return try staticMember(t, name, 0)
         }
         let ctx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
         if decl.isComputed {
-            return try runAccessor(decl.getter ?? [], env: KEnv(parent: globalEnv, selfContext: ctx), returns: decl.type)
+            return try runGetter(decl, env: KEnv(parent: globalEnv, selfContext: ctx))
         }
         let value = try decl.initial.map { try eval($0, KEnv(parent: globalEnv, selfContext: ctx), decl.type) } ?? .nilValue
         let box = KBox(coerce(value, to: decl.type), type: decl.type)
@@ -917,6 +1049,17 @@ final class KInterpreter {
         case .ret(let v): return coerce(v, to: returns)
         default: return .void
         }
+    }
+
+    /// A computed property's getter; one marked with a result builder
+    /// (`@ViewBuilder var header: some View`, `@ListBuilder var items: [String]`) runs as one.
+    func runGetter(_ p: KEVarDecl, env: KEnv) throws -> KV {
+        let body = p.getter ?? []
+        if !p.attributes.isEmpty, let b = builder(p.attributes), !containsReturn(body) {
+            if case .custom = b { return try runBuilt(b, body, env, line: p.line) }
+            if !(body.count == 1), let r = p.type, !KEFuncDecl.isViewType(r) { return try runBuilt(b, body, env, line: p.line) }
+        }
+        return try runAccessor(body, env: env, returns: p.type)
     }
 
     func containsReturn(_ stmts: [KEStmt]) -> Bool {
@@ -951,10 +1094,14 @@ final class KInterpreter {
         }
         let env = KEnv(parent: parent, selfContext: selfContext)
         try bindParameters(decl.params, args: args, labels: labels, into: env, name: decl.name)
+        bindGenerics(decl, env)
         let saved = currentReturnType
         currentReturnType = decl.returnType
         defer { currentReturnType = saved }
         let body = decl.body
+        if !decl.attributes.isEmpty, case .custom(let b)? = builder(decl.attributes), !containsReturn(body) {
+            return try runBuilt(.custom(b), body, env, line: decl.line)
+        }
         if body.count == 1, case .expr(let e) = body[0], decl.returnType != nil || decl.isViewBuilder {
             return coerce(try eval(e, env, decl.returnType), to: decl.returnType)
         }
@@ -973,7 +1120,12 @@ final class KInterpreter {
         for (pi, p) in params.enumerated() {
             if p.isVariadic {
                 var rest: [KV] = []
-                while next < args.count, labels[next] == nil || labels[next] == p.label { rest.append(args[next]); used[next] = true; next += 1 }
+                // A trailing closure is for a closure parameter after the variadic one.
+                let closureLater = params[(pi + 1)...].contains { if case .function? = $0.type?.core { return true }; return false }
+                while next < args.count, labels[next] == nil || labels[next] == p.label {
+                    if closureLater, case .function = args[next], labels[next] == nil { break }
+                    rest.append(args[next]); used[next] = true; next += 1
+                }
                 env.declare(p.name, .array(rest))
                 continue
             }
@@ -989,6 +1141,7 @@ final class KInterpreter {
                 used[i] = true
                 next = i + 1
                 var v = coerce(args[i], to: p.type)
+                if !p.attributes.isEmpty, let b = builder(p.attributes) { v = builderClosure(v, b) }
                 if p.isInout, case .binding(let b) = v {
                     env.vars[p.name] = KBox(get: { b.get() }, set: { b.set($0) })
                     continue
@@ -1020,6 +1173,7 @@ final class KInterpreter {
             if callDepth > maxCallDepth { throw fail("Too much recursion in a closure.") }
             let env = KEnv(parent: captured)
             bindClosureParams(c, args, env)
+            if let b = f.builder { return try runBuilt(b, c.body, env, line: c.line) }
             if c.body.count == 1, case .expr(let e) = c.body[0] { return try eval(e, env) }
             switch try exec(c.body, env) {
             case .ret(let v): return v
@@ -1163,13 +1317,29 @@ final class KInterpreter {
             let l = lo.asDouble ?? -.infinity, h = hi.asDouble ?? .infinity
             return x >= l && (closed ? x <= h : x < h)
         }
-        if let s = v.asString, let l = lo.asString, let h = hi.asString { return s >= l && (closed ? s <= h : s < h) }
+        if let s = v.asString, lo.asString != nil || hi.asString != nil {
+            // One-sided string ranges too: `case "n"...:`.
+            if let l = lo.asString, s < l { return false }
+            if let h = hi.asString { return closed ? s <= h : s < h }
+            return true
+        }
+        if case .native(.date(let d)) = v {
+            if case .native(.date(let l)) = lo, d < l { return false }
+            if case .native(.date(let h)) = hi { return closed ? d <= h : d < h }
+            return true
+        }
         return false
     }
 
     // MARK: - Description
 
     func describe(_ v: KV, quoted: Bool = false) -> String {
+        // CustomStringConvertible: `print(x)` and `"\(x)"` use its `description`.
+        if let t = v.userType, let p = t.computed["description"], t.conformances.contains("CustomStringConvertible"),
+           let d = try? runGetter(p, env: KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(v))))),
+           case .string(let text) = d {
+            return text
+        }
         switch v {
         case .void: return "()"
         case .nilValue: return "nil"
@@ -1187,8 +1357,9 @@ final class KInterpreter {
         case .range(let a, let b, let closed): return "\(describe(a))\(closed ? "..." : "..<")\(describe(b))"
         case .structV(let s):
             let parts = s.type.stored.compactMap { d -> String? in
-                guard let f = s.fields[d.name] else { return nil }
-                return "\(d.name): \(describe(f, quoted: true))"
+                if let f = s.fields[d.name] { return "\(d.name): \(describe(f, quoted: true))" }
+                if let f = s.fields["_" + d.name] { return "_\(d.name): \(describe(f, quoted: true))" }
+                return nil
             }
             return "\(s.type.name)(\(parts.joined(separator: ", ")))"
         case .enumV(let e):

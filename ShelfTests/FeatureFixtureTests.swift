@@ -25,7 +25,7 @@ struct FeatureFixtureTests {
     /// When a round's first bridge puts a family in the prompt, this fails
     /// until a fixture covers it.
     @Test func everyPromptSectionHasAFixture() throws {
-        for name in ["swift-language", "async", "saving-data"] {
+        for name in ["swift-language", "swift-protocols", "swift-builders", "swift-codable", "async", "saving-data"] {
             #expect(Self.apps.contains(name), "missing fixtures/apps/\(name).swift")
         }
         let manifest = try #require(PromptCatalog.manifest)
@@ -129,10 +129,7 @@ struct FeatureFixtureTests {
     /// passing, Kiln has improved and the prompt can say so.
     @Test(arguments: [
         ("gesture", #"Text("x").gesture(DragGesture().onChanged { _ in })"#, "DragGesture"),
-        ("protocol extension", #"Text(Person().greeting())"#, "greeting"),
         ("tuple labels from the type", #"Text("\(bounds().max)")"#, "max"),
-        ("method on allCases", #"Text(Size.allCases.map { "\($0)" }.joined())"#, "allCases"),
-        ("binding animation", #"Toggle("On", isOn: $on.animation())"#, "animation"),
     ])
     func doesntWork(_ claim: String, _ body: String, _ mentioned: String) {
         let source = Self.claimSource(body)
@@ -140,20 +137,19 @@ struct FeatureFixtureTests {
         #expect(errors.contains { $0.contains(mentioned) }, "\(claim) now works? errors: \(errors)")
     }
 
-    @Test func oneSidedRangeInCaseIsASyntaxError() {
-        let source = Self.claimSource(#"Text("x")"#) + """
-
-            func grade(_ score: Int) -> String {
-                switch score {
-                case 90...: return "A"
-                default: return "B"
-                }
-            }
-            """
-        let errors = Kiln.run(source).errors
-        #expect(errors.contains { $0.contains("case 90...:") }, "one-sided ranges in case patterns now work? \(errors)")
-        // The closed range a model should write instead.
-        #expect(Kiln.run(source.replacingOccurrences(of: "case 90...:", with: "case 90...100:")).errors.isEmpty)
+    /// PLAN.md §1.6: what the prompt used to warn against, now working.
+    @Test(arguments: [
+        ("protocol extension", #"Text(Person().greeting()).onAppear { print(Person().greeting()) }"#, "Hi Ann"),
+        ("method on allCases", #"Text("x").onAppear { print(Size.allCases.map { "\($0)" }.joined(separator: "+")) }"#, "small+large"),
+        ("binding animation", #"Toggle("On", isOn: $on.animation()).onAppear { print("animated", on) }"#, "animated false"),
+        ("one-sided range in case", #"Text("x").onAppear { print(grade(95), grade(3)) }"#, "A B"),
+        ("Data from a UTF-8 view", #"Text("x").onAppear { print("bytes", Data("abc".utf8).count) }"#, "bytes 3"),
+        ("custom init(from:)", #"Text("x").onAppear { print("custom", (try? JSONDecoder().decode(Custom.self, from: Data("{\"name\":\"x\"}".utf8)))?.count ?? -1) }"#, "custom 99"),
+    ])
+    func nowWorks(_ claim: String, _ body: String, _ printed: String) {
+        let (errors, console, _) = Self.probe(Self.claimSource(body))
+        #expect(errors.isEmpty, "\(claim): \(errors)")
+        #expect(console.contains(printed), "\(claim): \(console)")
     }
 
     @Test(arguments: [
@@ -239,30 +235,15 @@ struct FeatureFixtureTests {
         #expect(compiled.interp.console == printed)
     }
 
-    @Test func dataFromUTF8ViewIsEmpty() {
-        // `Data(text.utf8)` comes out empty in Kiln; `text.data(using: .utf8)` works.
+    @Test func payloadEnumsNeedTheirOwnCodable() {
+        // An enum with associated values is saved by its own `init(from:)` and `encode(to:)` (as
+        // `Custom` is read by its own); without them it can't be.
         let (errors, console, _) = Self.probe(Self.claimSource(#"""
             Text("x").onAppear {
-                print("view", Data("abc".utf8).count)
-                print("using", "abc".data(using: .utf8)!.count)
-            }
-            """#))
-        #expect(errors.isEmpty, "\(errors)")
-        #expect(console.contains("view 0"), "\(console)")
-        #expect(console.contains("using 3"), "\(console)")
-    }
-
-    @Test func customCodableAndPayloadEnumsAreNotSupported() {
-        let (errors, console, _) = Self.probe(Self.claimSource(#"""
-            Text("x").onAppear {
-                let custom = try? JSONDecoder().decode(Custom.self, from: "{\"name\":\"x\"}".data(using: .utf8)!)
-                print("custom", custom?.count ?? -1)
                 do { _ = try JSONEncoder().encode([Payload.some(1)]) } catch { print("payload", error.localizedDescription) }
             }
             """#))
         #expect(errors.isEmpty, "\(errors)")
-        // Kiln ignores `init(from:)`, so the missing `count` fails the decode instead of becoming 99.
-        #expect(console.contains("custom -1"), "\(console)")
         #expect(console.contains("has associated values"), "\(console)")
     }
 
@@ -321,6 +302,13 @@ struct FeatureFixtureTests {
 
         func bounds() -> (min: Int, max: Int) {
             return (1, 9)
+        }
+
+        func grade(_ score: Int) -> String {
+            switch score {
+            case 90...: return "A"
+            default: return "B"
+            }
         }
 
         struct ContentView: View {

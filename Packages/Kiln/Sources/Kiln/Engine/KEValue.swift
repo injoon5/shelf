@@ -42,6 +42,7 @@ indirect enum KV {
     case native(KNative)
 
     var isNil: Bool { if case .nilValue = self { return true }; return false }
+    var asFunction: KFunction? { if case .function(let f) = self { return f }; return nil }
 
     var asBool: Bool? { if case .bool(let b) = self { return b }; return nil }
     var asInt: Int? {
@@ -119,11 +120,17 @@ extension KV: Hashable {
         case (.set(let x), .set(let y)): return x == y
         case (.tuple(let x, _), .tuple(let y, _)): return x == y
         case (.range(let a1, let b1, let c1), .range(let a2, let b2, let c2)): return a1 == a2 && b1 == b2 && c1 == c2
-        case (.structV(let x), .structV(let y)): return x.type === y.type && x.fields == y.fields
-        case (.enumV(let x), .enumV(let y)): return x.type === y.type && x.caseName == y.caseName && x.payload == y.payload
+        case (.structV(let x), .structV(let y)):
+            if x.type === y.type, let eq = x.type.customEquals, let r = eq(a, b) { return r }
+            return x.type === y.type && x.fields == y.fields
+        case (.enumV(let x), .enumV(let y)):
+            if x.type === y.type, let eq = x.type.customEquals, let r = eq(a, b) { return r }
+            return x.type === y.type && x.caseName == y.caseName && x.payload == y.payload
         case (.enumV(let x), .native(.implicit(let name, _))): return x.caseName == name
         case (.native(.implicit(let name, _)), .enumV(let y)): return y.caseName == name
-        case (.object(let x), .object(let y)): return x === y
+        case (.object(let x), .object(let y)):
+            if x.type === y.type, let eq = x.type.customEquals, let r = eq(a, b) { return r }
+            return x === y
         case (.function(let x), .function(let y)): return x === y
         case (.type(let x), .type(let y)): return x.name == y.name
         case (.binding(let x), .binding(let y)): return x === y
@@ -148,9 +155,14 @@ extension KV: Hashable {
         case .range(let a, let b, let c): h.combine(a); h.combine(b); h.combine(c)
         case .structV(let s):
             h.combine(s.type.name)
+            if let custom = s.type.customHash, let parts = custom(self) { h.combine(parts); return }
             for k in s.fields.keys.sorted() { h.combine(k); h.combine(s.fields[k]!) }
-        case .enumV(let e): h.combine(e.caseName); h.combine(e.payload)
-        case .object(let o): h.combine(ObjectIdentifier(o))
+        case .enumV(let e):
+            if let custom = e.type.customHash, let parts = custom(self) { h.combine(parts); return }
+            h.combine(e.caseName); h.combine(e.payload)
+        case .object(let o):
+            if let custom = o.type.customHash, let parts = custom(self) { h.combine(parts); return }
+            h.combine(ObjectIdentifier(o))
         case .function(let f): h.combine(ObjectIdentifier(f))
         case .type(let t): h.combine(t.name)
         case .binding(let b): h.combine(ObjectIdentifier(b))
@@ -327,6 +339,8 @@ final class KFunction {
         case native(String, ([KV], [String?]) throws -> KV)
     }
     let kind: Kind
+    /// A closure passed to a `@ViewBuilder` (or other result builder) parameter runs as one (KEBuilders).
+    var builder: KBuilderRef?
     init(_ kind: Kind) { self.kind = kind }
 
     var name: String {

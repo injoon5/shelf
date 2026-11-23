@@ -108,7 +108,7 @@ enum KLanguageGaps {
                      """,
                      check: #"print(letters() == "a,b" ? "ok" : "no")"#),
         KLanguageGap(id: "custom-codable",
-                     what: "Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, and ignores `init(from:)` and `encode(to:)`: don't write them.",
+                     what: "Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, and ignores `init(from:)` and `encode(to:)`.",
                      decls: """
                      struct Custom: Codable {
                          var name: String
@@ -126,7 +126,7 @@ enum KLanguageGaps {
                      print(custom?.count == 99 ? "ok" : "no")
                      """),
         KLanguageGap(id: "payload-enum-codable",
-                     what: "An enum with associated values can't be encoded or decoded. Give saved enums raw values (`enum Priority: String, Codable`).",
+                     what: "An enum with associated values isn't `Codable` by itself: give a saved enum raw values (`enum Priority: String, Codable`), or write its `init(from:)` and `encode(to:)`.",
                      decls: "enum Payload: Codable { case some(Int) }",
                      check: """
                      do {

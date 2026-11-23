@@ -236,9 +236,19 @@ extension KInterpreter {
     // MARK: Environment and globals
 
     /// What `@Environment(\.key)` reads before SwiftUI's own values arrive.
-    func environmentDefault(_ decl: KEVarDecl) -> KV {
-        guard case .keyPath(_, let comps)? = decl.wrapperAttribute?.args.first?.value.keyPathComponents else { return .nilValue }
-        return registry.environment[comps.last ?? ""]?.value(self) ?? .nilValue
+    /// `overrides` is what views above set (`.environment(\.accent, .red)`,
+    /// `.environment(model)`), keyed `\.accent` and by type name.
+    func environmentDefault(_ decl: KEVarDecl, overrides: [String: KV] = [:]) -> KV {
+        guard let arg = decl.wrapperAttribute?.args.first?.value else { return .nilValue }
+        if case .keyPath(_, let comps) = arg {
+            let key = comps.last ?? ""
+            if let b = registry.environment[key] { return b.value(self) }
+            // The app's own: `@Entry` or an EnvironmentValues extension (KEMacros).
+            return userEnvironmentValue(key, owner: decl.wrapper == "FocusedValue" ? "FocusedValues" : "EnvironmentValues", overrides: overrides) ?? .nilValue
+        }
+        // `@Environment(Model.self)`: the object `.environment(model)` put there.
+        if case .member(.ident(let typeName, _), "self", _) = arg { return overrides[typeName] ?? .nilValue }
+        return .nilValue
     }
 
     /// A bare name the registry knows as a constant (`pi`).

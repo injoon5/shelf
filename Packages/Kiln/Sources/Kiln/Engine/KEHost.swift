@@ -88,7 +88,7 @@ final class KViewStorage: ObservableObject {
     func setEnvironment(_ value: KStructValue, dismiss: DismissAction, colorScheme: ColorScheme, objects: [String: KV], interp: KInterpreter) {
         for p in value.type.stored {
             if p.wrapper == "Environment" {
-                var v = interp.environmentDefault(p)
+                var v = interp.environmentDefault(p, overrides: objects)
                 if case .native(.dismiss) = v { v = .native(.dismiss(KRef({ dismiss() }))) }
                 if case .keyPath(_, let comps)? = p.wrapperAttribute?.args.first?.value, comps.last == "colorScheme" {
                     v = .native(.implicit(colorScheme == .dark ? "dark" : "light", []))

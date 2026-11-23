@@ -122,6 +122,14 @@ final class KCDecls {
             }
         }
         genericNames = Self.genericNames(in: source)
+        // And as the parser keeps them (§1.6).
+        func add(_ d: KETypeDecl) {
+            genericNames.formUnion(d.generics.map(\.name))
+            for m in d.methods + d.inits + d.subscripts { genericNames.formUnion(m.generics.map(\.name)) }
+            d.nested.forEach(add)
+        }
+        program.types.forEach(add)
+        for f in functions.values.joined() { genericNames.formUnion(f.generics.map(\.name)) }
     }
 
     // MARK: Building

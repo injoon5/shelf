@@ -362,6 +362,10 @@ struct KRenderer {
         }
         switch e {
         case .structV, .object, .enumV:
+            // ForEach and List need `id:` or Identifiable elements (an enum without payloads is its own id via `id: \.self`).
+            if let t = e.userType, !t.conformances.contains("Identifiable") {
+                interp.report(interp.fail("ForEach needs `id:` or Identifiable elements: '\(t.name)' isn't Identifiable. Add `: Identifiable` and an `id`, or pass `id: \\.self`"))
+            }
             if let id = try? interp.member(e, "id", line: 0) { return id }
             return e
         default:
