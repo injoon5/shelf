@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.6-language.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.8-check.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step (now `after-1.6-language.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.8-check.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -251,3 +251,12 @@ Validate, minimum per call, in ms:
 | Workloads/Arithmetic.swift | 303.31 | 303.99 | +0% |
 | Workloads/Collections.swift | 30.43 | 30.56 | +0% |
 | Workloads/Objects.swift | 30.56 | 31.09 | +2% |
+
+### after-1.8-check.json
+
+PLAN.md §1.8: `Kiln.check`, the static checker, measured with §1.6 merged, so the base is `after-1.6-language.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.8-check.json --compare Benchmarks/after-1.6-language.json` (21 samples). Date: 24 November 2026.
+- **No input is slower.** Every input is within 3% of §1.6. `check` isn't on the path `run` and `validate` take; what §1.8 adds to it is the parser keeping `async` on functions and two flags on each overload.
+- Against `after-1.7-context.json` one run showed `apps/images.swift` 10.3% slower (0.39 to 0.43 ms) and the next 2.6%: noise at that size.
+- **`check` itself** takes a few milliseconds on the largest app (`CheckTests.testCheckIsFast`), and Shelf's slowest fixture checks and validates in about 12 ms on the simulator (`NewAppCheckTests.checkAndValidateAreFastEnough`).

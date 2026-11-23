@@ -9,14 +9,14 @@ Shelf needs iOS 27.
 ## How it works
 
 1. **Make.** Tap **New App** (top left in edit mode, or on an empty Home Screen), describe the app, and copy the prompt Shelf writes into any chat model or coding agent. The prompt tells the model exactly what Kiln can run.
-2. **Install.** Either the agent installs the app itself, with a one-time key in the prompt (`PUT /api/apps/<slug>`), or you paste the model's reply back into Shelf, try it in a live preview, and tap Install.
+2. **Install.** Either the agent installs the app itself, with a one-time key in the prompt (`PUT /api/apps/<slug>`), or you paste the model's reply back into Shelf, try it in a live preview, and tap Install. Before Install, Shelf checks the reply with `Kiln.check` and `Kiln.validate`: an API Kiln doesn't have, wrong labels, an `await` where nothing can wait, or an action that fails is shown in the preview's place with its line, and Install stays off until it's fixed; what Kiln accepts but doesn't do yet is listed and doesn't block ([light](design/shots/new-app-check-light.jpg), [dark](design/shots/new-app-check-dark.jpg)).
 3. **Sync.** Shelf keeps a copy of every app's source on the phone, so the library works offline, and syncs with ij5.dev on launch, on returning to Shelf when the last sync is stale, and from **Sync Now** in Settings.
 4. **Run.** Tapping an icon runs the source through Kiln. The app opens as a card that grows out of its icon, and closes with a swipe up from the bottom edge or a drag down from the status bar.
 5. **Keep data.** Apps save through `DB`, a small key-value store Shelf provides. It works offline and syncs to your other devices through ij5.dev. `@AppStorage` is for preferences that wouldn't matter if lost.
 
 **Changing an app:** long-press its icon for **Change…** (the same flow, with the current source in the prompt), **Reload App**, **Copy Source**, and **Revert** to the version before the last change. **Delete App**, there or from the minus badge in edit mode, deletes the app and its data on every device.
 
-**What an app can use:** the list is the prompt itself, in [Shelf/Resources/Prompts/new.md](Shelf/Resources/Prompts/new.md), under "What works" and "What doesn't work". Every section there has a matching app in [fixtures/apps/](fixtures/apps/) that has to run and draw, so the list stays true.
+**What an app can use:** the list is the prompt itself. Its "What works" and "What doesn't work" are built from Kiln's [kiln-manifest.json](Packages/Kiln/kiln-manifest.json), which Shelf bundles (`Shelf/Create/PromptCatalog.swift`): one line per family with what it has and the notes on what works only in part, then the families not in Kiln yet, what's accepted but does nothing, the Swift Kiln's probes find failing, and the won't-do list. The rest is written by hand in [Shelf/Resources/Prompts/new.md](Shelf/Resources/Prompts/new.md). Every family the prompt lists has an app in [fixtures/apps/](fixtures/apps/) that names it in its `// Covers:` line and has to run and draw, so the list stays true.
 
 ## What's next
 
