@@ -1340,7 +1340,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "conformsTo" : "TableRowContent",
         "deprecated" : false,
@@ -1362,7 +1362,8 @@
             "signature" : "init<Value>(_ value: Value, isExpanded: Binding<Bool>? = nil, @TableRowBuilder<Value> content: @escaping () -> Content) where Label == TableRow<Value>, Value == Content.TableRowValue"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Scenes",
@@ -3217,8 +3218,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "In a `Slider`'s `ticks:`.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "SliderTickContent",
         "deprecated" : false,
@@ -3282,8 +3285,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "In a `Slider`'s `ticks:`: one `SliderTick` per element.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "SliderTickContent",
         "deprecated" : false,
@@ -4159,7 +4164,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "conformsTo" : "TableColumnContent",
         "deprecated" : false,
@@ -5846,12 +5851,13 @@
             "signature" : "init<V>(_ titleResource: LocalizedStringResource, value: KeyPath<RowValue, V>, @ContentBuilder content: @escaping (RowValue) -> Content) where V : Comparable"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "conformsTo" : "TableColumnContent",
         "deprecated" : false,
@@ -5893,7 +5899,8 @@
             "signature" : "init(_ data: Range<Int>, @TableColumnBuilder<TableColumnForEach<Range<Int>, Int, RowValue, Sort, Content>.TableRowValue, TableColumnForEach<Range<Int>, Int, RowValue, Sort, Content>.TableColumnSortComparator> content: @escaping (Int) -> Content) where Data == Range<Int>, ID == Int"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
@@ -5952,7 +5959,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "conformsTo" : "TableRowContent",
         "deprecated" : false,
@@ -5972,7 +5979,8 @@
             "signature" : "init(_ value: Value)"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Scenes",
@@ -7586,8 +7594,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:buttonRepeatBehavior",
@@ -7756,8 +7765,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:controlSize",
@@ -7876,8 +7886,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:defaultMinListHeaderHeight",
@@ -7900,8 +7911,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:defaultMinListRowHeight",
@@ -8287,8 +8299,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:headerProminence",
@@ -8409,8 +8422,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isEnabled",
@@ -8577,8 +8591,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isScrollEnabled",
@@ -8721,8 +8736,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:labelIconToTitleSpacing",
@@ -8745,8 +8761,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:labelReservedIconWidth",
@@ -8769,8 +8786,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:labelsVisibility",
@@ -9034,8 +9052,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:menuIndicatorVisibility",
@@ -13517,8 +13536,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ScrollTargetBehavior.paging",
@@ -13543,8 +13563,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ScrollTargetBehavior.viewAligned",
@@ -19207,7 +19228,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableColumnContent.alignment",
@@ -19228,12 +19249,13 @@
           }
         ],
         "owner" : "TableColumnContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableColumnContent.customizationID",
@@ -19254,12 +19276,13 @@
           }
         ],
         "owner" : "TableColumnContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableColumnContent.defaultVisibility",
@@ -19280,12 +19303,13 @@
           }
         ],
         "owner" : "TableColumnContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableColumnContent.disabledCustomizationBehavior",
@@ -19306,12 +19330,13 @@
           }
         ],
         "owner" : "TableColumnContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableRowContent.contextMenu",
@@ -19343,12 +19368,13 @@
           }
         ],
         "owner" : "TableRowContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Files",
       "round" : 3,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableRowContent.draggable",
@@ -19369,12 +19395,13 @@
           }
         ],
         "owner" : "TableRowContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Files",
       "round" : 3,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableRowContent.dropDestination",
@@ -19396,12 +19423,13 @@
           }
         ],
         "owner" : "TableRowContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Files",
       "round" : 3,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableRowContent.itemProvider",
@@ -19422,12 +19450,13 @@
           }
         ],
         "owner" : "TableRowContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TableRowContent.selectionDisabled",
@@ -19448,7 +19477,8 @@
           }
         ],
         "owner" : "TableRowContent"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Navigation",
@@ -23407,8 +23437,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "The closure gets the view's dimensions: `d.width`, `d.height`, `d[.top]`. A `.center` guide is set for both axes, and `d[.center]` is the horizontal center.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:alignmentGuide",
@@ -23790,8 +23822,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:arrangementViewStyle",
@@ -24225,8 +24258,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:backgroundStyle",
@@ -24316,8 +24350,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:badgeProminence",
@@ -24556,8 +24591,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`.enabled`: holding the button repeats its action.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:buttonRepeatBehavior",
@@ -24581,8 +24618,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:buttonSizing",
@@ -24606,9 +24644,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "Every built-in style, `.glass` and `.glassProminent` included, or your own `ButtonStyle` or `PrimitiveButtonStyle`.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:buttonStyle",
@@ -26591,8 +26630,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:containerCornerOffset",
@@ -26617,8 +26657,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:containerRelativeFrame",
@@ -26669,8 +26710,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "A built-in shape (`RoundedRectangle(cornerRadius: 20)`, `Capsule()`) for `ContainerRelativeShape` inside.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:containerShape",
@@ -26704,8 +26747,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Declare the key with `extension ContainerValues { @Entry var icon: String = \"\" }`; read it as `subview.containerValues.icon`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:containerValue",
@@ -26730,8 +26775,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Edges and a length or `EdgeInsets`, `for: .scrollContent` or `.scrollIndicators`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:contentMargins",
@@ -26981,8 +27028,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:controlGroupStyle",
@@ -27042,8 +27090,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`.coordinateSpace(.named(\"list\"))` or `name:`, read by `proxy.frame(in: .named(\"list\"))`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:coordinateSpace",
@@ -27235,7 +27285,7 @@
       "family" : "Controls",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:datePickerStyle",
@@ -27371,8 +27421,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultScrollAnchor",
@@ -27457,8 +27508,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "On a row of a `ForEach` with `onDelete`/`onMove` or `editActions`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:deleteDisabled",
@@ -27627,8 +27680,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`.automatic`, or your own `DisclosureGroupStyle`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:disclosureGroupStyle",
@@ -29014,8 +29069,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:findDisabled",
@@ -29039,8 +29095,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "Find (and replace) in a `TextEditor`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:findNavigator",
@@ -29629,8 +29687,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:formStyle",
@@ -29750,7 +29809,7 @@
       "family" : "Controls",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gaugeStyle",
@@ -29774,8 +29833,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:geometryGroup",
@@ -29988,8 +30048,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gridCellAnchor",
@@ -30013,8 +30074,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gridCellColumns",
@@ -30038,8 +30100,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gridCellUnsizedAxes",
@@ -30063,8 +30126,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gridColumnAlignment",
@@ -30088,8 +30152,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`.automatic`, or your own `GroupBoxStyle`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:groupBoxStyle",
@@ -30202,8 +30268,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:headerProminence",
@@ -30227,8 +30294,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "Shown when a pointer hovers (iPad with a trackpad); nothing on touch.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:help",
@@ -31044,8 +31113,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labelIconToTitleSpacing",
@@ -31069,8 +31139,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labelReservedIconWidth",
@@ -31120,8 +31191,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`.automatic`, or your own `LabeledContentStyle`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labeledContentStyle",
@@ -31145,8 +31218,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labelsHidden",
@@ -31170,8 +31244,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labelsVisibility",
@@ -31223,8 +31298,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:layoutDirectionBehavior",
@@ -31470,8 +31546,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listItemTint",
@@ -31531,10 +31608,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Always zero insets.",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listRowInsets",
@@ -31571,7 +31647,7 @@
       "family" : "Lists",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listRowSeparator",
@@ -31596,8 +31672,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listRowSeparatorTint",
@@ -31622,8 +31699,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listRowSpacing",
@@ -31647,8 +31725,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "Shows the index of `sectionIndexLabel`s down the side of a `List`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listSectionIndexVisibility",
@@ -31672,8 +31752,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listSectionMargins",
@@ -31698,8 +31779,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listSectionSeparator",
@@ -31724,8 +31806,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listSectionSeparatorTint",
@@ -31750,8 +31833,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listSectionSpacing",
@@ -32402,8 +32486,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:menuIndicator",
@@ -32427,8 +32512,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:menuOrder",
@@ -32452,8 +32538,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:menuStyle",
@@ -32680,8 +32767,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "On a row of a `ForEach` with `onDelete`/`onMove` or `editActions`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:moveDisabled",
@@ -34095,8 +34184,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`of:` turns the view's `GeometryProxy` into a value; `action:` runs when it changes.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onGeometryChange",
@@ -34236,7 +34327,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "later",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onInsert",
@@ -34268,7 +34359,8 @@
             "signature" : "func onInsert(of supportedContentTypes: [UTType], perform action: @escaping (Int, [NSItemProvider]) -> Void) -> some DynamicViewContent"
           }
         ]
-      }
+      },
+      "wontDo" : "list-insert-drop"
     },
     {
       "family" : "Scenes",
@@ -34630,8 +34722,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`of:` reads `contentOffset`, `contentSize`, `containerSize`, `visibleRect` or `bounds`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onScrollGeometryChange",
@@ -34657,8 +34751,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`old` and `new` are `.idle`, `.tracking`, `.interacting`, `.decelerating` or `.animating`; `isScrolling`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onScrollPhaseChange",
@@ -34692,8 +34788,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "The ids of the views of the `.scrollTargetLayout()` on screen.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onScrollTargetVisibilityChange",
@@ -34719,8 +34817,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onScrollVisibilityChange",
@@ -34923,8 +35022,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:overlayArrangementEdge",
@@ -35057,8 +35157,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:paletteSelectionEffect",
@@ -35644,7 +35745,7 @@
       "family" : "Controls",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:pickerStyle",
@@ -36784,8 +36885,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "`move` gets a `ReorderDifference`: `sources` (the ids moved) and `destination.position`, `.before(id)` or `.end` (and `destination.collectionID`).",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:reorderContainer",
@@ -36851,8 +36954,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "On a `ForEach` inside a `.reorderContainer(for:)`: its rows can be dragged into a new order.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:reorderable",
@@ -36886,8 +36991,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:replaceDisabled",
@@ -37063,10 +37169,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "`.top` and `.bottom`.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:safeAreaInset",
@@ -37106,8 +37211,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:safeAreaPadding",
@@ -37381,8 +37487,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollBounceBehavior",
@@ -37407,8 +37514,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollClipDisabled",
@@ -37458,8 +37566,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollDisabled",
@@ -37508,8 +37617,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollEdgeEffectHidden",
@@ -37534,8 +37644,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollEdgeEffectStyle",
@@ -37587,8 +37698,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollIndicatorsFlash",
@@ -37622,8 +37734,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Hand-gesture and look input are visionOS and watchOS; on iPhone it changes nothing.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollInputBehavior",
@@ -37648,8 +37762,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "A `ScrollPosition` binding, or `id:` bound to the id of the view at the top (with `.scrollTargetLayout()`).",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollPosition",
@@ -37685,8 +37801,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`.paging`, or `.viewAligned` with `.scrollTargetLayout()` on the stack inside.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollTargetBehavior",
@@ -37710,8 +37828,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollTargetLayout",
@@ -37735,8 +37854,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "The closure's `content` takes `opacity`, `scaleEffect`, `offset`, `rotationEffect`, `blur`, `brightness`, `saturation`, `contrast`, `hueRotation` and `grayscale`, by `phase.isIdentity` or `phase.value`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollTransition",
@@ -38557,8 +38678,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "On a `Section`: its letter in the list's index.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:sectionIndexLabel",
@@ -38592,8 +38715,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:selectionDisabled",
@@ -38872,8 +38996,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "On a built-in shape: draws it at that size, anchored at the top leading corner or `anchor:`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:size",
@@ -38931,8 +39057,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:sliderThumbVisibility",
@@ -39096,8 +39223,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:splitArrangementFixedLayoutSize",
@@ -39122,8 +39250,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:splitArrangementLayoutRatio",
@@ -39162,8 +39291,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:splitArrangementLayoutSize",
@@ -40142,10 +40272,10 @@
     },
     {
       "family" : "Lists",
-      "notes" : "On `List` rows.",
-      "overloadsCovered" : 1,
+      "notes" : "On `List` rows, and (iOS 27) on any view in a scroll view marked `.swipeActionsContainer()`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:swipeActions",
@@ -40184,8 +40314,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "Lets `.swipeActions` work on the views of a `ScrollView`'s stack.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:swipeActionsContainer",
@@ -40669,7 +40801,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tableColumnHeaders",
@@ -40689,12 +40821,13 @@
             "signature" : "func tableColumnHeaders(_ visibility: Visibility) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tableStyle",
@@ -40714,7 +40847,8 @@
             "signature" : "func tableStyle<S>(_ style: S) -> some View where S : TableStyle"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Core",
@@ -40907,8 +41041,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textEditorStyle",
@@ -40984,8 +41119,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textInputBorderShape",
@@ -41009,8 +41145,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "Shows or hides the formatting controls of a `TextEditor` bound to an `AttributedString`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textInputFormattingControlVisibility",
@@ -41209,6 +41347,7 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`.switch`, `.button`, or your own `ToggleStyle`.",
       "overloadsCovered" : 1,
       "round" : 1,
       "status" : "supported",
@@ -42789,8 +42928,9 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `primary` and `secondary`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ArrangementViewStyle",
@@ -42805,8 +42945,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isPressed`, `role`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ButtonStyle",
@@ -42837,8 +42978,9 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Prefer `@Entry` in `extension ContainerValues`; a key type's `defaultValue` isn't read.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ContainerValueKey",
@@ -42853,8 +42995,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ControlGroupStyle",
@@ -42885,8 +43028,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `selection`, `$selection`, `minimumDate`, `maximumDate`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:DatePickerStyle",
@@ -42901,8 +43045,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`, `isExpanded`, `$isExpanded`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:DisclosureGroupStyle",
@@ -42965,8 +43110,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `content`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:FormStyle",
@@ -42981,8 +43127,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `value`, `label`, `currentValueLabel`, `minimumValueLabel`, `maximumValueLabel`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:GaugeStyle",
@@ -43013,8 +43160,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:GroupBoxStyle",
@@ -43030,7 +43178,7 @@
     {
       "family" : "Navigation",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:IndexViewStyle",
@@ -43041,7 +43189,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Drawing",
@@ -43061,8 +43210,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `title`, `icon`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:LabelStyle",
@@ -43077,8 +43227,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:LabeledContentStyle",
@@ -43110,7 +43261,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ListStyle",
@@ -43121,12 +43272,14 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: show the menu with `Menu(configuration)`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:MenuStyle",
@@ -43141,8 +43294,9 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:NavigationSplitViewStyle",
@@ -43158,7 +43312,7 @@
     {
       "family" : "Navigation",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:NavigationViewStyle",
@@ -43169,12 +43323,13 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Controls",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:PickerStyle",
@@ -43185,7 +43340,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Environment",
@@ -43205,8 +43361,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `role`, `trigger()`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:PrimitiveButtonStyle",
@@ -43237,8 +43394,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `fractionCompleted`, `label`, `currentValueLabel`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ProgressViewStyle",
@@ -43319,7 +43477,7 @@
     {
       "family" : "Navigation",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:TabViewStyle",
@@ -43330,12 +43488,13 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:TableStyle",
@@ -43346,12 +43505,14 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Controls",
+      "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:TextEditorStyle",
@@ -43367,7 +43528,7 @@
     {
       "family" : "Controls",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:TextFieldStyle",
@@ -43378,7 +43539,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Drawing",
@@ -43398,8 +43560,9 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isOn`, `$isOn`, `isMixed`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ToggleStyle",
@@ -43496,8 +43659,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ArrangementViewStyle.automatic",
@@ -43522,8 +43686,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ArrangementViewStyle.overlay",
@@ -43548,8 +43713,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ArrangementViewStyle.split",
@@ -43682,8 +43848,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.glass",
@@ -43718,8 +43885,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.glassProminent",
@@ -43844,8 +44012,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ControlGroupStyle.automatic",
@@ -43870,8 +44039,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ControlGroupStyle.compactMenu",
@@ -43896,8 +44066,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ControlGroupStyle.menu",
@@ -43922,8 +44093,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ControlGroupStyle.navigation",
@@ -43948,8 +44120,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ControlGroupStyle.palette",
@@ -44082,8 +44255,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:DisclosureGroupStyle.automatic",
@@ -44108,8 +44282,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:FormStyle.automatic",
@@ -44134,8 +44309,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:FormStyle.columns",
@@ -44160,8 +44336,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:FormStyle.grouped",
@@ -44213,8 +44390,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.accessoryCircularCapacity",
@@ -44239,8 +44417,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.accessoryLinear",
@@ -44265,8 +44444,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.accessoryLinearCapacity",
@@ -44291,8 +44471,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.automatic",
@@ -44317,8 +44498,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.linearCapacity",
@@ -44343,8 +44525,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GroupBoxStyle.automatic",
@@ -44513,8 +44696,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:LabeledContentStyle.automatic",
@@ -44701,8 +44885,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:MenuStyle.automatic",
@@ -44727,8 +44912,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:MenuStyle.borderlessButton",
@@ -44753,8 +44939,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:MenuStyle.button",
@@ -45097,8 +45284,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.tabs",
@@ -45762,7 +45950,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TableStyle.automatic",
@@ -45783,12 +45971,13 @@
           }
         ],
         "owner" : "TableStyle"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TableStyle.inset",
@@ -45809,12 +45998,14 @@
           }
         ],
         "owner" : "TableStyle"
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextEditorStyle.automatic",
@@ -45839,8 +46030,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextEditorStyle.plain",
@@ -45892,8 +46084,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextFieldStyle.bordered",
@@ -46484,8 +46677,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`size`, `safeAreaInsets`, `frame(in: .local / .global / .named(…) / .scrollView)` and `bounds(of:)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:GeometryProxy",
@@ -47076,8 +47271,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`ScrollPosition(edge:)`, `(id:)`, `(x:y:)`; `scrollTo(id:)`, `scrollTo(edge:)`, `scrollTo(x:y:)`; `viewID`, `edge`, `point`, `isPositionedByUser`.",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ScrollPosition",
@@ -48035,8 +48232,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "A primary and a secondary view, split or overlaid by `.arrangementViewStyle(.split)` or `.overlay`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ArrangementView",
@@ -48305,7 +48504,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 17,
+      "overloadsCovered" : 18,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -48718,8 +48917,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "Its members as a shape (`ButtonBorderShape.capsule`), filled with the foreground style; use `Capsule()` to `.fill` or `.stroke` one.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ButtonBorderShape",
@@ -49121,7 +49322,7 @@
       "family" : "Controls",
       "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ColorPicker",
@@ -49476,7 +49677,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -49616,10 +49817,10 @@
     },
     {
       "family" : "Controls",
-      "notes" : "`displayedComponents` `.date` and `.hourAndMinute`; an `in:` range isn't enforced.",
+      "notes" : "`displayedComponents` `.date`, `.hourAndMinute` or both, with an `in:` range (`date...`, `...date` or `a...b`); every style, `.graphical` included.",
       "overloadsCovered" : 16,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:DatePicker",
@@ -50905,8 +51106,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "What `ForEach($items, editActions:)` makes.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:EditableCollectionContent",
@@ -51024,8 +51227,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Shows its content; Kiln redraws it with its parent.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:EquatableView",
@@ -51076,7 +51281,7 @@
     {
       "family" : "Layout",
       "notes" : "Over arrays, ranges and bindings (`ForEach($items) { $item in }`), by `id:` or `Identifiable`.",
-      "overloadsCovered" : 17,
+      "overloadsCovered" : 21,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -51479,9 +51684,9 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Gauge",
@@ -51560,10 +51765,10 @@
     },
     {
       "family" : "Layout",
-      "notes" : "`proxy.size`.",
+      "notes" : "The closure gets a `GeometryProxy`: `size`, `safeAreaInsets`, `frame(in:)`, `bounds(of:)`.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GeometryReader",
@@ -51665,7 +51870,7 @@
     },
     {
       "family" : "Layout",
-      "overloadsCovered" : 8,
+      "overloadsCovered" : 10,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -51818,7 +52023,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 6,
+      "overloadsCovered" : 7,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -51902,8 +52107,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "What `Group(subviews:transform:)` makes.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GroupElementsOfContent",
@@ -51918,8 +52125,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "What `Group(sections:transform:)` makes.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GroupSectionsOfContent",
@@ -52219,7 +52428,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 10,
+      "overloadsCovered" : 11,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -52344,7 +52553,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 10,
+      "overloadsCovered" : 11,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -52724,10 +52933,10 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Rows, sections, `onDelete` and `onMove`; `selection:` isn't kept.",
-      "overloadsCovered" : 2,
+      "notes" : "Rows, sections, `ForEach` with `onDelete` and `onMove`; `selection:` one value (an optional) or a `Set` (with `EditButton`); `children:` for an outline.",
+      "overloadsCovered" : 14,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:List",
@@ -53854,7 +54063,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 11,
+      "overloadsCovered" : 19,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -54192,8 +54401,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "`selection` is a `Set<DateComponents>`; read `.year`, `.month` and `.day` from each.",
+      "overloadsCovered" : 16,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:MultiDatePicker",
@@ -55235,8 +55446,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "Over a tree: `OutlineGroup(items, children: \\.children) { item in … }`, with `id:` or `Identifiable` items.",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:OutlineGroup",
@@ -55408,8 +55621,10 @@
     },
     {
       "family" : "Lists",
+      "notes" : "The children an `OutlineGroup` shows under a row.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:OutlineSubgroupChildren",
@@ -56622,9 +56837,10 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 12,
+      "notes" : "Indeterminate, `value:total:`, `timerInterval:countsDown:`, or your own `ProgressViewStyle`.",
+      "overloadsCovered" : 14,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ProgressView",
@@ -56930,8 +57146,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "Runs the nearest `.renameAction { }`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:RenameButton",
@@ -57137,7 +57355,7 @@
     },
     {
       "family" : "Lists",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 13,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -57443,7 +57661,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 6,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -58072,10 +58290,10 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Labels and `onEditingChanged` are accepted but not shown.",
-      "overloadsCovered" : 2,
+      "notes" : "Labels, `step:`, `neutralValue:`, `enabledBounds:`, and tick marks (`ticks: { SliderTick(0.5) }`, iOS 26).",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Slider",
@@ -59226,8 +59444,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "A resolved subview: show it, modify it, and read `id` and `containerValues`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Subview",
@@ -59242,8 +59462,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "`Group(subviews:)`'s subviews: an array you can count, index, slice and `ForEach` over.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:SubviewsCollection",
@@ -59258,8 +59480,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "A slice of the subviews (`subviews.prefix(3)`, `subviews.dropFirst()`).",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:SubviewsCollectionSlice",
@@ -59330,7 +59554,7 @@
     {
       "family" : "Lists",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Table",
@@ -59778,12 +60002,13 @@
             "signature" : "init<Sort>(sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
           }
         ]
-      }
+      },
+      "wontDo" : "tables"
     },
     {
       "family" : "Text",
       "notes" : "Strings, `verbatim:`, `format:`, and dates with `style:`. A literal's numbers are formatted as SwiftUI does.",
-      "overloadsCovered" : 12,
+      "overloadsCovered" : 13,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -59956,9 +60181,10 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 1,
+      "notes" : "Bound to a `String`, or to an `AttributedString` (iOS 26), which keeps its styling. `selection:` isn't kept.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "supported",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:TextEditor",
@@ -60001,8 +60227,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.",
-      "overloadsCovered" : 14,
+      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows. `selection:` isn't kept.",
+      "overloadsCovered" : 23,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -60544,8 +60770,10 @@
     },
     {
       "family" : "Controls",
+      "notes" : "For `.textInputBorderShape(_:)`: `.capsule`, `.roundedRectangle` or `.automatic`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:TextInputBorderShape",
@@ -60597,7 +60825,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 11,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -62035,8 +62263,10 @@
     },
     {
       "family" : "Layout",
+      "notes" : "Scaled for the text size when the view first appears; it doesn't follow a later change of Dynamic Type.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:ScaledMetric",
@@ -62527,6 +62757,13 @@
     "member:AsyncStream.makeAsyncIterator",
     "member:AsyncStream.makeStream",
     "member:AsyncThrowingStream.makeStream",
+    "member:AttributedString.append",
+    "member:AttributedString.backgroundColor",
+    "member:AttributedString.characters",
+    "member:AttributedString.description",
+    "member:AttributedString.font",
+    "member:AttributedString.foregroundColor",
+    "member:AttributedString.link",
     "member:Binding.animation",
     "member:Binding.constant",
     "member:Bool.description",
@@ -62719,6 +62956,10 @@
     "member:Foundation.sqrt",
     "member:Foundation.tan",
     "member:Foundation.trunc",
+    "member:GeometryProxy.bounds",
+    "member:GeometryProxy.frame",
+    "member:GeometryProxy.safeAreaInsets",
+    "member:GeometryProxy.size",
     "member:HTTPURLResponse.statusCode",
     "member:HTTPURLResponse.url",
     "member:Hasher.combine",
@@ -62798,6 +63039,11 @@
     "member:Regex.prefixMatch",
     "member:Regex.wholeMatch",
     "member:RelativeDateTimeFormatter.localizedString",
+    "member:ScrollPosition.edge",
+    "member:ScrollPosition.isPositionedByUser",
+    "member:ScrollPosition.point",
+    "member:ScrollPosition.scrollTo",
+    "member:ScrollPosition.viewID",
     "member:ScrollViewProxy.scrollTo",
     "member:Sequence.allSatisfy",
     "member:Sequence.chunked",
@@ -63049,6 +63295,7 @@
     "type:AsyncStream",
     "type:AsyncStream.Continuation",
     "type:AsyncThrowingStream",
+    "type:AttributedString",
     "type:Axis",
     "type:Binding",
     "type:Bool",
@@ -63105,6 +63352,7 @@
     "type:Regex",
     "type:Regex.Match",
     "type:RelativeDateTimeFormatter",
+    "type:ScrollTargetBehavior",
     "type:Sequence",
     "type:Set",
     "type:ShapeStyle",
@@ -63154,12 +63402,12 @@
     },
     {
       "family" : "Controls",
-      "missing" : 78,
-      "missingNew" : 17,
+      "missing" : 1,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 65,
+      "supported" : 140,
       "total" : 143,
-      "wontDo" : 0
+      "wontDo" : 2
     },
     {
       "family" : "Text",
@@ -63172,30 +63420,30 @@
     },
     {
       "family" : "Layout",
-      "missing" : 55,
-      "missingNew" : 11,
+      "missing" : 3,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 37,
+      "supported" : 89,
       "total" : 92,
       "wontDo" : 0
     },
     {
       "family" : "Lists",
-      "missing" : 45,
-      "missingNew" : 6,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 17,
+      "supported" : 44,
       "total" : 62,
-      "wontDo" : 0
+      "wontDo" : 18
     },
     {
       "family" : "Navigation",
-      "missing" : 140,
+      "missing" : 136,
       "missingNew" : 33,
       "round" : 1,
-      "supported" : 39,
+      "supported" : 40,
       "total" : 179,
-      "wontDo" : 0
+      "wontDo" : 3
     },
     {
       "family" : "Gestures",
@@ -63316,12 +63564,12 @@
     },
     {
       "family" : "Files",
-      "missing" : 32,
+      "missing" : 29,
       "missingNew" : 6,
       "round" : 3,
       "supported" : 0,
       "total" : 33,
-      "wontDo" : 1
+      "wontDo" : 4
     },
     {
       "family" : "Photos",
@@ -63463,7 +63711,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 1082
+    "symbols" : 1249
   },
   "schemaVersion" : 1,
   "sdk" : {
