@@ -1,6 +1,7 @@
 // Name: Todos
 // Icon: checklist
 // Tint: blue
+// Covers: Lists
 
 import SwiftUI
 

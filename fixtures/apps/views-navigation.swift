@@ -1,6 +1,7 @@
 // Name: Recipes
 // Icon: fork.knife
 // Tint: red
+// Covers: Navigation, Text
 
 import SwiftUI
 

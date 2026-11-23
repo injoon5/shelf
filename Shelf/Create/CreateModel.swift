@@ -1,3 +1,4 @@
+import Kiln
 import Network
 import Observation
 import SwiftUI
@@ -21,6 +22,13 @@ final class CreateModel {
     var name = ""
     var slug = ""
     private(set) var compileError: CompileError?
+    /// What `Kiln.check` and `Kiln.validate` found in the reply (plan §1.8,
+    /// §7): the first error replaces the preview and blocks Install;
+    /// warnings are listed under it and don't.
+    private(set) var checkError: CompileError?
+    private(set) var warnings: [String] = []
+    /// `Kiln.validate` is still running the reply's views and actions.
+    private(set) var isChecking = false
 
     private(set) var isInstalling = false
     private(set) var failure: String?
@@ -119,11 +127,54 @@ final class CreateModel {
         failure = nil
         name = Self.fitting(parsed.name ?? app?.meta.name ?? "")
         slug = app?.slug ?? freeSlug(parsed.slug, in: library)
+        check(parsed.source, data: library.host.data)
         withAnimation(Motion.standard) { reply = parsed }
     }
 
     func discardReply() {
+        checkTask?.cancel()
+        isChecking = false
         withAnimation(Motion.standard) { reply = nil }
+    }
+
+    @ObservationIgnored private var checkTask: Task<Void, Never>?
+
+    /// Returns once the reply's check is done.
+    func checked() async {
+        await checkTask?.value
+    }
+
+    /// Checks the reply before it can be installed: `Kiln.check` at once
+    /// (static, a few milliseconds), then `Kiln.validate`, which runs every
+    /// view and fires every action headlessly with Kiln's stub context, so it
+    /// touches no sensor, file, setting or network. A change is validated
+    /// against a copy of the app's data, held in memory.
+    func check(_ source: String, data: AppData) {
+        checkTask?.cancel()
+        // Shelf's own bridges are what the reply checks against too.
+        DBBridge.register()
+        let check = Kiln.check(source)
+        warnings = check.warnings.map(\.description)
+        checkError = check.firstError.map { CompileError(issue: $0, others: check.errors.dropFirst().map(\.description), source: source) }
+        guard check.passed else {
+            isChecking = false
+            return
+        }
+        isChecking = true
+        let meta = previewMeta ?? AppMeta(slug: "preview", name: "App")
+        let copying = app?.slug
+        checkTask = Task { [weak self] in
+            // The sheet turns to the preview first; the run waits for the next turn of the main actor.
+            await Task.yield()
+            let session = await data.scratch(copying: copying)
+            guard let self, !Task.isCancelled, self.reply?.source ?? source == source else { return }
+            let validation = Kiln.validate(source, context: RunContext.check(meta, session: session))
+            self.isChecking = false
+            self.warnings += validation.warnings
+            if !validation.errors.isEmpty {
+                self.checkError = CompileError(errors: validation.errors, source: source)
+            }
+        }
     }
 
     func previewFailed(_ error: CompileError) {
@@ -188,7 +239,7 @@ final class CreateModel {
     }
 
     func canInstall(in library: LibraryStore) -> Bool {
-        reply != nil && !isInstalling && compileError == nil && isSlugValid && !isSlugTaken(in: library)
+        reply != nil && !isInstalling && compileError == nil && checkError == nil && !isChecking && isSlugValid && !isSlugTaken(in: library)
             && !name.trimmingCharacters(in: .whitespaces).isEmpty
     }
 

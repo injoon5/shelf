@@ -1,6 +1,7 @@
 // Name: Reading Log
 // Icon: books.vertical.fill
 // Tint: purple
+// Covers: Foundation
 
 import SwiftUI
 

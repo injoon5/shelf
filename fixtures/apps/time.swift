@@ -1,6 +1,7 @@
 // Name: Steeper
 // Icon: timer
 // Tint: brown
+// Covers: Core, Foundation
 
 import SwiftUI
 

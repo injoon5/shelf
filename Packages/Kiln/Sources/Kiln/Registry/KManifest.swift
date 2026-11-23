@@ -31,10 +31,41 @@ struct KManifest: Codable, Equatable {
         var source: String?
     }
 
+    /// A family, for the prompt: what it covers, and how many symbols it has.
+    struct Family: Codable, Equatable {
+        var name: String
+        var summary: String
+        /// Symbols that work (`full` or `partial`); stubs aren't counted.
+        var supported: Int
+        var stubs: Int
+    }
+
+    /// Swift that Kiln doesn't run yet: a `KLanguageGaps` probe that fails today.
+    struct Gap: Codable, Equatable {
+        var id: String
+        /// For app authors: what fails and what to write instead.
+        var what: String
+    }
+
+    /// The won't-do list (`Tools/coverage/wont-do.json`), for the prompt.
+    struct WontDo: Codable, Equatable {
+        var id: String
+        var what: String
+        var reason: String
+        /// `wontDo`, or `later`.
+        var status: String
+    }
+
     var schemaVersion = 1
     var interim = false
     var generator = "kiln-registry"
     var description: String?
+    /// Every family, in the prompt's order. Not in the coverage tool's schema
+    /// (it ignores it); Shelf's prompt reads it.
+    var families: [Family]?
+    /// What `KLanguageGaps` finds failing when the manifest is written.
+    var gaps: [Gap]?
+    var wontDo: [WontDo]?
     var symbols: [Symbol]
 
     func encoded() throws -> Data {
@@ -129,6 +160,23 @@ extension KRegistry {
             s.overloads = s.overloads?.sorted { $0.labels.joined(separator: ",") + ($0.receiver ?? "") < $1.labels.joined(separator: ",") + ($1.receiver ?? "") }
             byID[id] = s
         }
-        return KManifest(description: "Kiln \(Kiln.version), Shelf's copy", symbols: byID.values.sorted { $0.id < $1.id })
+        let sorted = byID.values.sorted { $0.id < $1.id }
+        let families = KilnFamily.allCases.filter { $0 != .host }.map { f in
+            let mine = sorted.filter { $0.family == f.rawValue }
+            return KManifest.Family(name: f.rawValue, summary: f.summary, supported: mine.filter { $0.support != "stub" }.count,
+                                    stubs: mine.filter { $0.support == "stub" }.count)
+        }
+        return KManifest(description: "Kiln \(Kiln.version), Shelf's copy", families: families, symbols: sorted)
+    }
+
+    /// The manifest as it's checked in: with the language gaps Kiln has
+    /// today (each probe run) and the won't-do list read from `wontDo`
+    /// (`Tools/coverage/wont-do.json`).
+    func completeManifest(wontDo url: URL) throws -> KManifest {
+        var m = manifest(includeHost: false)
+        m.gaps = KLanguageGaps.current()
+        struct File: Decodable { var entries: [KManifest.WontDo] }
+        m.wontDo = try JSONDecoder().decode(File.self, from: Data(contentsOf: url)).entries
+        return m
     }
 }

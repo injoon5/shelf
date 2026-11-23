@@ -70,6 +70,46 @@ public enum KilnFamily: String, CaseIterable, Sendable {
     // Registered by the app hosting Kiln (Shelf's `DB`).
     case host = "Host"
 
+    /// What the family covers, for app authors: the prompt lists a family
+    /// with no bridges yet as "not in Kiln yet" with this line, and one with
+    /// bridges by its symbols. Round 1–5 keep it true as families fill in.
+    public var summary: String {
+        switch self {
+        case .core: return "views' life cycle: appearing, tasks, changes, timelines"
+        case .controls: return "buttons, toggles, pickers, sliders, text fields and the other controls"
+        case .text: return "text and fonts"
+        case .layout: return "stacks, grids, scroll views, frames and padding"
+        case .lists: return "lists, forms and sections"
+        case .navigation: return "navigation stacks, tabs, toolbars, sheets and alerts"
+        case .gestures: return "taps, long presses, drags, pinches and rotations"
+        case .drawing: return "shapes, paths, colors, gradients, images, effects and animation"
+        case .focus: return "keyboard focus, submit and keyboard types"
+        case .environment: return "state, bindings, observable models and environment values"
+        case .accessibility: return "accessibility labels, hints and values"
+        case .charts: return "Swift Charts"
+        case .scenes: return "the app's scene"
+        case .haptics: return "haptic feedback"
+        case .sharing: return "the share sheet and the clipboard"
+        case .units: return "measurements and unit conversion"
+        case .audio: return "playing sounds"
+        case .web: return "web views and web pages"
+        case .chart3D: return "3D charts"
+        case .files: return "importing and exporting files"
+        case .photos: return "the photo picker"
+        case .camera: return "taking photos with the camera"
+        case .motion: return "Core Motion: the accelerometer, the gyroscope and the pedometer"
+        case .location: return "the user's location and geocoding"
+        case .vision: return "Vision: text and barcode recognition"
+        case .intelligence: return "on-device Foundation Models"
+        case .widgets: return "widgets on Shelf's Home Screen"
+        case .language: return "Swift's standard library"
+        case .foundation: return "dates, formatters, JSON, files and settings"
+        case .concurrency: return "tasks, async/await, task groups and streams"
+        case .networking: return "URLSession requests"
+        case .host: return "what the app hosting Kiln adds"
+        }
+    }
+
     /// The folder under `Sources/Kiln/Bridges/`, and the suffix of its class.
     var folder: String {
         switch self {

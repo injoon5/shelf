@@ -4,7 +4,7 @@ What Kiln supports, as data. §1.4's bridge registry exports it, and three thing
 
 - **the coverage report** (`Tools/coverage.sh`, PLAN.md §1.9), which compares it with the iOS SDK and writes `COVERAGE.md`;
 - **Shelf's prompt** (§7), which builds its "What works" section from the symbols and their `notes`;
-- **`Kiln.check`** (§1.8), and later a server-side symbol check (PLAN.md, Later).
+- **`Kiln.check`** (§1.8) reads the registry itself, which the manifest is written from; a server-side symbol check could read the file (PLAN.md, Later).
 
 The registry writes it to `Packages/Kiln/kiln-manifest.json`, and it's checked in. The coverage tool reads it; `Tools/manifest.sh` regenerates it from the registry, and `RegistryTests.testManifestIsCurrent` fails when it's stale.
 
@@ -64,7 +64,12 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `interim` | bool | `true` only for the stand-in built from the 0.2.1 switch files. The registry writes `false`. |
 | `generator` | string | `kiln-registry`, or `coverage/interim-switch-scan`. |
 | `description` | string? | Free text, such as Kiln's version. |
+| `families` | array? | Every family in the prompt's order: `name`, `summary` (what it covers, for authors: `KilnFamily.summary`), `supported` (symbols that work) and `stubs`. Shelf's prompt lists a family with nothing supported as "not in Kiln yet". |
+| `gaps` | array? | Swift that doesn't work yet: `id` and `what` (the sentence for authors). Only the `KLanguageGaps` probes that fail when the manifest is written. |
+| `wontDo` | array? | `Tools/coverage/wont-do.json`'s entries: `id`, `what`, `reason`, `status` (`wontDo` or `later`). |
 | `symbols` | array | One entry per symbol, sorted by `id`. |
+
+`families`, `gaps` and `wontDo` are for Shelf's prompt; the coverage tool ignores them.
 
 ## A symbol
 

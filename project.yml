@@ -29,6 +29,9 @@ targets:
       - path: Shelf/Resources/Prompts
         type: folder
         buildPhase: resources
+      # What Kiln runs: the prompt's "What works" and "What doesn't work" (PromptCatalog).
+      - path: Packages/Kiln/kiln-manifest.json
+        buildPhase: resources
     dependencies:
       - package: Kiln
     settings:

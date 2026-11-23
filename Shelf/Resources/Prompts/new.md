@@ -44,49 +44,25 @@ If you can't run commands, reply with the code as described above.
 <!-- end -->
 ## What works
 
+Kiln runs Swift, and the parts of SwiftUI, Foundation, Charts and Swift concurrency listed here. Before installing an app, Shelf checks it: a view, modifier, type or argument label that isn't here is reported with its line, so stay within this list.
+
 **Swift**
 - Structs (memberwise and custom `init`, `mutating`, `didSet`), classes, enums (raw values, associated values, `CaseIterable`, methods).
-- Closures, `switch` with patterns and `where`, tuples (write the labels in the literal: `return (min: a, max: b)`), ranges.
+- Closures, `switch` with patterns and `where`, tuples, ranges.
 - Optionals with `?.` and `??`, `if let` / `guard let` / `while let`, `defer`, `do` / `catch` / `throw`.
-- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `UUID`, `Date`, `Calendar`, `DateFormatter`, `.formatted()`.
+- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `@Observable` classes.
 - `Int` and `Double` are distinct, as in compiled Swift.
-
-**State**
-- `@State`, `@Binding`.
-- `ObservableObject` with `@Published`, used through `@StateObject`, `@ObservedObject` or `@EnvironmentObject`.
-- `@Observable` classes.
-- `@Environment(\.dismiss)`.
-
-**Views**
-- `NavigationStack` with `navigationDestination`, `NavigationSplitView`, `TabView`.
-- `List` (sections, `onDelete`, `onMove`, `swipeActions`), `Form`, `Section` with headers and footers.
-- Controls: `Picker` (segmented, menu, wheel), `Toggle`, `Stepper`, `Slider`, `TextField` (text or `value:format:`), `DatePicker`, `Menu`, `Gauge`, `ProgressView`.
-- `ContentUnavailableView`, `Label`, `LabeledContent`.
-- `.sheet`, `.alert`, `.confirmationDialog`, `.toolbar`, `.searchable`, `.contextMenu`, `.refreshable`.
-- `Grid` and `LazyVGrid`, `GeometryReader`, `ScrollView`.
-- Custom `Shape`s that build a `Path` in `path(in:)`, a `Path` drawn directly (`Path { p in … }.stroke(.blue)`), and the built-in shapes with `fill`, `stroke` and `trim`.
-- Swift Charts: `Chart` with `BarMark`, `LineMark`, `PointMark`, `AreaMark`, `RuleMark`, `SectorMark` and `RectangleMark`.
-- `withAnimation`, `.animation(_:value:)`, transitions.
-
-**Time**
-- `Timer.publish(every:on:in:).autoconnect()` with `.onReceive`.
-- `TimelineView`.
-- `DispatchQueue.main.asyncAfter(deadline:)` for a one-off delay.
 
 **Waiting**
 - `async` functions, called with `await` from `.task { }`, `Task { }` or another `async` function. All of it runs on the main thread, so it can update state directly.
 - `.task { }` and `.task(id:)`, which stop when the view goes away and start again when the id changes. `.refreshable` waits for its closure.
 - `try await Task.sleep(for: .seconds(1))` waits without freezing the screen. `Task.isCancelled` and `try Task.checkCancellation()`.
 - `async let`, `withTaskGroup`, `AsyncStream` read with `for await`, and `await MainActor.run { }`.
-- A view's `body`, computed properties and `init` can't wait. Using `await` in them is an error.
+- A view's `body`, computed properties and `init` can't wait, and nor can a button's action or `.onAppear`: start a `Task { }` there.
 
-**Network**
-- `let (data, response) = try await URLSession.shared.data(from: url)` (or `for: request`) in an `async` function, with `do` / `catch` around it.
-- `URLSession.shared.dataTask(with:) { data, response, error in … }.resume()`. The completion handler runs on the main thread.
-- `JSONDecoder` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase` and `.iso8601`.
-- `URLComponents`, `URLQueryItem`, `URLRequest` (`httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)`).
+**By family**, with what to know about each:
 
-**Images:** SF Symbols, and `AsyncImage` for images on the web, with a `phase in` closure for the loading and failed states.
+{{WORKS}}
 
 ## Saving data
 
@@ -123,24 +99,11 @@ Saved data has to survive future versions of the app:
 - Give every field of a saved type a default value, or make it optional, so older saved data still decodes.
 - If decoding fails, don't save over the stored data. Keep a flag such as `loadFailed`, and skip saving while it's set.
 
-Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
-- Don't write `init(from:)` or `encode(to:)`. Kiln ignores them.
-- Saved enums need raw values (`enum Priority: String, Codable`). An enum with associated values can't be saved.
-- Save arrays and dictionaries, not `Set`s. A `Set` comes back as an array.
-- To turn text into `Data`, use `text.data(using: .utf8)`. `Data(text.utf8)` comes out empty.
+What Kiln can't encode yet is under "What doesn't work".
 
 ## What doesn't work
 
-- UIKit, `UIViewRepresentable`, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
-- Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
-- A view, modifier or initializer Kiln doesn't have stops the app with an error that names it and its line, and so do argument labels SwiftUI doesn't have (`.blur(10)` for `.blur(radius: 10)`). That includes `matchedGeometryEffect` and `glassEffect`.
-- `Canvas` draws nothing. Draw with a custom `Shape` or a `Path` instead.
-- `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
-- Custom property wrappers (they're ignored) and result builders.
-- Protocol conformance isn't checked, and methods from a protocol extension don't exist. Avoid designs that depend on protocol extensions or default implementations.
-- A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.
-- Calling a method straight on `allCases` (`Kind.allCases.map { … }`) fails. Store it first: `let kinds = Kind.allCases`. `ForEach(Kind.allCases)` works.
-- `$value.animation()` on a binding. Use `.animation(_:value:)` on the view.
+{{DOESNT}}
 
 ## Design
 

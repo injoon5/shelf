@@ -19,10 +19,34 @@ struct FeatureFixtureTests {
         return names.filter { $0.hasSuffix(".swift") }.map { String($0.dropLast(6)) }.sorted()
     }()
 
-    @Test func everyPromptSectionHasAFixture() {
-        for name in ["swift-language", "state", "views-navigation", "views-lists-controls", "views-layout-drawing",
-                     "time", "async", "network", "images", "saving-data"] {
+    /// The prompt's hand-written sections each have a fixture, and so does
+    /// every family "What works" lists (built from Kiln's manifest): a
+    /// fixture names it in its `// Covers:` line and uses one of its symbols.
+    /// When a round's first bridge puts a family in the prompt, this fails
+    /// until a fixture covers it.
+    @Test func everyPromptSectionHasAFixture() throws {
+        for name in ["swift-language", "async", "saving-data"] {
             #expect(Self.apps.contains(name), "missing fixtures/apps/\(name).swift")
+        }
+        let manifest = try #require(PromptCatalog.manifest)
+        var covering: [String: [String]] = [:]
+        for name in Self.apps {
+            let source = try Self.source(name)
+            guard let line = source.split(separator: "\n").first(where: { $0.hasPrefix("// Covers: ") }) else { continue }
+            for family in line.dropFirst("// Covers: ".count).split(separator: ",") {
+                covering[family.trimmingCharacters(in: .whitespaces), default: []].append(source)
+            }
+        }
+        for family in PromptCatalog.listedFamilies(manifest) {
+            let sources = covering[family.name] ?? []
+            #expect(!sources.isEmpty, "no fixture covers \(family.name): add `// Covers: \(family.name)` to one in fixtures/apps/")
+            let names = manifest.symbols.filter { $0.family == family.name && $0.support != "stub" }.map(\.name)
+            let uses = sources.contains { source in
+                names.contains { n in
+                    ["." + n + "(", "." + n + " ", "." + n + "\n", n + "(", n + " {", "@" + n + " ", n + "."].contains { source.contains($0) }
+                }
+            }
+            #expect(uses, "the fixtures covering \(family.name) use none of its symbols")
         }
     }
 
