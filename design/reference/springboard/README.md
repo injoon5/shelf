@@ -52,6 +52,78 @@ Default text size ("Large"), default icon style, default (not tinted) appearance
 | `page-swipe-1-to-0-frames.png` | Swipe from page 2 to page 1 (69 frames, 805 ms) | sheet | The Search pill turns into **two page dots as soon as the page starts moving** and keeps them until it settles, then reads "Search" again. Icons move with the finger, no scale/dim during paging. |
 | `page-swipe-0-to-1-frames.png` | Swipe from page 1 to page 2 (56 frames, 737 ms) | sheet | Same behaviour in the other direction. |
 
+## Real-device recording: swiping up to close (PLAN.md §0.7)
+
+| File | State | How produced | Notable |
+|---|---|---|---|
+| `real-device-open-close-swipe-up.mp4` | Springboard on the owner's iPhone 17 (iOS 27), dark-mode apps opened and closed with swipes up from the home indicator | iOS screen recording, 1206×2622 (3x), tagged 120 fps but about 60 (1247 frames in 21 s, 16.7 ms apart, a few dropped) | Opens and closes GitHub, Settings, Developer and Weather. **Measured from:** Settings, closes at 6.95 s and 8.70 s (icon column 1, row 4); Developer, closes at 12.80 s and 14.85 s (column 3, row 5, centre (248, 523)). The GitHub ones (1.4–4.8 s) were laggy and aren't used. |
+
+**Method.** Every frame of each close, at full resolution, with its real pts (`ffmpeg -vf select='between(t,…)',showinfo -vsync 0`). Both apps are in dark mode with a black background (luminance 0–3), and nothing behind the card is that dark, so the card is the black region: its edges per row give its width, height, centre and, row by row, its outline. Once the card has crossfaded to its icon, the Developer tile is tracked by its blue. A screen recording doesn't show the finger, so the finger's travel is inferred: it starts on the card's bottom edge, which rises with it before release. "SB" is Springboard; times are from the first frame that moves.
+
+**While the finger is down** (the four closes agree; Developer 12.80 s shown):
+
+| ms | top | bottom | width ÷ 402 |
+|---|---|---|---|
+| 17 | 6 | 865 | 0.987 |
+| 33 | 19 | 833 | 0.934 |
+| 50 | 27 | 815 | 0.904 |
+| 67 | 63 | 765 | 0.827 |
+
+- The width falls by 0.0016 of the screen per point the bottom edge rises, steadily through the first 135 points (Settings: 0.972 at 31 pt, 0.949 at 47, 0.894 at 65, 0.823 at 113). That's `RunnerMetrics.trackTravel` 0.5 with the floor at 0.3.
+- **The top edge only ever moves down**, 0.3–0.5 points per point the finger rises, in all four. It never rises above where it started. These are flicks released by 0.82 of the screen's width, so the limit itself isn't reached here: `trackEdge` (the screen's top) and `trackResistance` (62 pt) are inferred, not measured. See "Still to record" below.
+- It stays centred horizontally, give or take the finger's own sideways drift (+21 pt for Developer, whose icon is to the right).
+- The outline keeps the display's corners (about 55 pt) the whole way down to about twice the icon's size: the bottom-left corner is still inset 7 pt at 32 pt up when the card is 222 pt wide. So does Shelf's now (`CardMotion.cornerRadius`).
+
+**After the finger lets go** (Developer, 14.85 s; released at about 33 ms with the card 376 × 748, its width shrinking at 2160 pt/s, its height at 4900 pt/s, its centre moving up at 450 pt/s and right at 240). Shelf's column is its flight (`Motion.cardClose`) started from that same state:
+
+| ms | width SB / Shelf | height SB / Shelf | centre x SB / Shelf | centre y SB / Shelf |
+|---|---|---|---|---|
+| 50 | 340 / 338 | 666 / 658 | 207 / 208 | 426 / 431 |
+| 67 | 299 / 300 | 556 / 564 | 212 / 213 | 438 / 435 |
+| 83 | 278 / 265 | 499 / 480 | 215 / 218 | 442 / 442 |
+| 100 | 239 / 231 | 400 / 398 | 220 / 223 | 451 / 451 |
+| 167 | 123 / 131 | 158 / 181 | 238 / 237 | 493 / 486 |
+| 200 | 102 / 102 | 124 / 127 | 242 / 241 | 503 / 499 |
+| 233 | 83 / 83 | 95 / 95 | 245 / 243 | 512 / 507 |
+| 267 | 71 / 71 | 77 / 77 | 246 / 245 | 518 / 513 |
+| 300 | 65 / 65 | 67 / 69 | 248 / 246 | 521 / 517 |
+| 317 | 62 / 63 | 65 / 66 | 248 / 246 | 522 / 518 |
+
+- Each property was fitted on its own (least absolute error over these frames): width 0.44 s with bounce 0.16, height 0.35 s with 0.10, centre x 0.46 s with 0.2, centre y 0.38 s with 0.16, mean errors of 2.6, 5.4, 0.5 and 1.1 pt. Shelf takes the centre at 0.38 s with bounce 0.05, which fits as well (1.3 and 3.7 pt) and never overshoots an icon below.
+- **The card doesn't fly at the icon.** Its centre keeps the little speed it had (here up, at 450 pt/s, so it rises 8 pt) and stays near the middle of the screen while it shrinks, then glides into the slot. Its height closes faster than its width: portrait (2.0) at release, 1.7 at 100 ms, square as it lands.
+- **The picture is stretched, not cropped.** Squashed to the card's height, the whole app shows, home indicator included, and after the crossfade the icon's glyph is stretched to the tile in the same way.
+- **The crossfade** from the app to its icon takes two frames, at about 0.4 of the way from icon to screen width (`RunnerMetrics.contentFade` 0.28–0.42).
+- **It leans toward an icon below.** For both Developer closes (icon about 100 pt below the card) the card's bottom edge is narrower than its top, by 0.7% at 33 ms, 2.8% at 50, 4.7% at 67, 5.6% at 83 and 7.8% at 100: a lean back about its horizontal axis, growing as it closes. For both Settings closes (icon level with the card) there is none (within ±0.5%). Shelf leans by `RunnerMetrics.landingLean` (fitted, 50° per unit of drop over card height × progress lost), at most 8°, with a 500 pt perspective.
+- **Behind it**, the settled Home Screen, scaled, blurred with a Gaussian and darkened, was fitted to each frame (outside the card):
+
+  | ms | card progress | scale | blur σ (pt) | brightness |
+  |---|---|---|---|---|
+  | 50 | 0.82 | 0.90 | 20 | 0.5 |
+  | 67 | 0.69 | 0.95 | 20 | 0.5 |
+  | 100 | 0.52 | 0.90 | 16 | 0.7 |
+  | 167 | 0.17 | 0.95 | 8 | 0.8 |
+  | 217 | 0.08 | 0.95 | 4 | 0.9 |
+  | 367 | 0 | 1.0 | 2 | 1.0 |
+
+  So the blur is a real radius that shrinks with the card, not a fade (`RunnerMetrics.backdropBlurRadius` 20 pt, full down to 0.45 progress), and the dim lightens all the way down (`backdropDim` 0.5, as progress to the 0.6). Shelf draws it with §0.3's `BackdropView`.
+
+**Compared on the simulator.** A flick on Shelf (Packing, the same slot as Developer) recorded with `agent-device record` and laid beside the Developer close frame for frame: the card shrinks almost in place with the display's corners, crossfades at about 1.5× the icon to a stretched glyph, glides down into the slot and lands on it, while the Home Screen comes into focus. XCTest's injected pan isn't a finger (it moves in jumps and its release speed is its own), so the timing is judged by the table above, not by that recording.
+
+### Still to record: a slow, long swipe
+
+The limit and the resistance are inferred. To measure them, record on the iPhone 17:
+
+1. **Set up.** An app with a black background in dark mode (Settings), Settings › Accessibility › Display & Text Size › Reduce Motion **off**, Control Center's Screen Recording.
+2. **The swipe.** From the home indicator, straight up the middle, slowly and evenly, over about 2 seconds, to about 100 pt below the top of the screen. Hold still for half a second, then lift without flicking. Make three of these. Then three that go up the same way and come back down to the bottom edge before lifting (the cancel).
+3. **The finger.** A screen recording can't show it. Either film the phone at the same time with a second phone in slow motion (240 fps, finger and screen both in frame; clap once at the start to line the two up), or swipe along a ruler at an even speed, counting, so the finger's height can be taken as a straight line between touch-down (the card's first frame of motion) and lift (the first frame the card moves on its own).
+4. **Frames.** `ffmpeg -i swipe.mp4 -vf "select='between(t,START,END)',showinfo" -vsync 0 frames/%04d.png 2> frames/info.txt`, and the pts from `info.txt` (`pts_time`), never frame number ÷ 120.
+5. **Per frame.** The card's top, bottom, left and right: the rows and columns where the black background (luminance ≤ 3) spans more than 40 pixels, ignoring the Dynamic Island's band (the top 130 px, x 380–830).
+6. **Plot** against the finger's travel (its starting height less its height now):
+   - the card's top edge: it falls at first, then rises. It should flatten toward a line: that line is `trackEdge`, and the travel at which it departs from the path a card held at the finger would take gives `trackResistance` (with Shelf's band, the remaining distance d goes to d² / (d + overshoot));
+   - the width ÷ 402: its slope near zero should still read 0.0016, and where it levels off is `trackMinScale`;
+   - the bottom edge against the finger: where they part is where the finger stops holding its point on the card.
+7. **Keep** the recordings here as `real-device-swipe-slow-*.mp4` (they stay out of git), add a row to this table, and replace the inferred constants in `Shelf/Runner/RunnerMetrics.swift` with the measured ones, noting the clip.
+
 ## Real-device screenshots supplied by the owner
 
 These were pasted in during the session; they are **not** from the simulator and they are **not at default Liquid Glass settings** (owner said so), so don't match dock/pill/menu *materials* to them. Use them for: layout, **notification badge** placement/size, 4-icon dock, widget rendering, long-press menu structure (icon-size picker row for widgets, Remove App / Require Face ID / Share App / Edit Home Screen), edit-mode chrome. Photo wallpaper in these is *not* the Shelf wallpaper. Images are 920×2000 (downscaled by the sender).
@@ -73,7 +145,7 @@ These were pasted in during the session; they are **not** from the simulator and
 
 * **Photo wallpaper (owner's follow-up request): impossible on this simulator.** `simctl addmedia` worked (the photo is in Photos as the last of 7 items; I confirmed it's the Shelf photo). But: (1) Settings has no Wallpaper entry (a Settings search for "Wallpaper" returns "No Results"); (2) Home Screen → long-press → Edit → **Edit Wallpaper** shows a spinner for ~5–40 s and then drops back to the Home Screen without presenting a picker (tried 3×); (3) Photos → open photo → Share → **Use as Wallpaper** appears in the share sheet but its icon never leaves the loading placeholder, tapping it does nothing (tried by ref, by coordinates, and a short long-press, waited 10+ s). The wallpaper service on this simulator image does not seem to be functional, so all captures keep the stock black wallpaper, as the owner said to do in that case.
 * **Customize panel and the Dark / Clear / Tinted icon styles:** Home Screen → Edit → **Customize** shows the same spinner for several seconds and falls back to the plain Home Screen (tried 3×, watched with frequent screenshots). No Customize panel stills and no icon-style stills (Default, Dark, Clear, Tinted). The only icon variants available are the Default ones, and Light/Dark appearance (see `home-page1-dark.png`).
-* **Swipe-up-from-the-bottom close (quick or slow), and the cancel-and-return variant (items 8 close, 9):** agent-device injects touches via XCTest in the foreground app's frame, so a swipe starting at y=870–874 only scrolls the app (Settings scrolled) and never triggers the system home gesture (tried `gesture pan`, `swipe`, `gesture fling` from y 866–873; y=874 is rejected as outside the viewport). Therefore the finger-following close and the cancel version could not be recorded. The quick close in `app-open-close.mp4` was made with the `home` command (the system's own close transition; it plays the same card-shrinks-into-icon animation as the quick swipe-up, but it is not finger-driven). To learn how the card follows the finger, use the close sheet only as the "fast, released" case; the finger-tracking behaviour is not documented here.
+* **Swipe-up-from-the-bottom close (quick or slow), and the cancel-and-return variant (items 8 close, 9):** agent-device injects touches via XCTest in the foreground app's frame, so a swipe starting at y=870–874 only scrolls the app (Settings scrolled) and never triggers the system home gesture (tried `gesture pan`, `swipe`, `gesture fling` from y 866–873; y=874 is rejected as outside the viewport). Therefore the finger-following close and the cancel version could not be recorded here; the owner recorded swipe-ups on an iPhone 17 instead (`real-device-open-close-swipe-up.mp4`, above), and a slow, long swipe is still to record. The quick close in `app-open-close.mp4` was made with the `home` command (the system's own close transition; it plays the same card-shrinks-into-icon animation as the quick swipe-up, but it is not finger-driven). To learn how the card follows the finger, use the close sheet only as the "fast, released" case; the finger-tracking behaviour is not documented here.
 * **Dragging an icon to another slot / into the dock (item 12):** `gesture drag` in edit mode did not pick up the icon: a 150–300 ms hold + move turned into a page swipe, and a ≥ 600 ms hold triggered the quick-action menu instead of a pick-up. Tried five variants and one crashed the XCTest runner (restarted). No usable recording, so no sheet. Not recorded: icons sliding aside, drop into the dock.
 * **A press that does *not* launch** (item 10): a 350 ms `longpress` launches the app (it was too short to count as a hold), a ≥ 600 ms one lifts the icon and opens the menu. So the pressed state is shown as the first ~400 ms of `icon-press-lift-menu.mp4` (touch-down is held for that long before the lift), which is the real behaviour for a long touch.
 * The Today View (one page left of page 1) was seen but not captured as a still. Edit-mode "jiggle" amplitude is not measured (no rotation values), only visible in `edit-mode-enter-exit.mp4`.
