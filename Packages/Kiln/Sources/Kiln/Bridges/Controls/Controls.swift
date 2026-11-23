@@ -345,34 +345,46 @@ final class ControlsBridges: KBridgeFamily {
             if case .view(let t) = v { return r.text(t) }
             return r.string(v).map { Text($0) }
         }
-        let label: AnyView = c["label"].map { r.renderContent($0) } ?? AnyView(Text(placeholder))
+        // With a `label:` closure, the label forms; otherwise SwiftUI's title forms,
+        // which update a `value:` binding as the person types.
+        let label: AnyView? = c["label"].map { r.renderContent($0) }
         if let vb = r.binding(a["value"]) {
             let isInt: Bool = { if case .int = vb.get() { return true }; return false }()
             if isInt {
                 let ib = Binding<Int>(get: { vb.get().asInt ?? 0 }, set: { vb.set(.int($0)) })
-                return AnyView(TextField(value: ib, format: .number, prompt: prompt) { label })
+                if let label { return AnyView(TextField(value: ib, format: .number, prompt: prompt) { label }) }
+                return AnyView(TextField(placeholder, value: ib, format: .number, prompt: prompt))
             }
             let db = Binding<Double>(get: { vb.get().asDouble ?? 0 }, set: { vb.set(.double($0)) })
             if case .native(.format(let f))? = a["format"], case .currency(let code) = f.kind {
-                return AnyView(TextField(value: db, format: .currency(code: code), prompt: prompt) { label })
+                if let label { return AnyView(TextField(value: db, format: .currency(code: code), prompt: prompt) { label }) }
+                return AnyView(TextField(placeholder, value: db, format: .currency(code: code), prompt: prompt))
             }
             if case .native(.format(let f))? = a["format"], f.kind == .percent {
-                return AnyView(TextField(value: db, format: .percent, prompt: prompt) { label })
+                if let label { return AnyView(TextField(value: db, format: .percent, prompt: prompt) { label }) }
+                return AnyView(TextField(placeholder, value: db, format: .percent, prompt: prompt))
             }
-            return AnyView(TextField(value: db, format: .number, prompt: prompt) { label })
+            if let label { return AnyView(TextField(value: db, format: .number, prompt: prompt) { label }) }
+            return AnyView(TextField(placeholder, value: db, format: .number, prompt: prompt))
         }
         let text = c.binding("text", String.self)
-        if secure { return AnyView(SecureField(text: text, prompt: prompt) { label }) }
-        let editing: ((Bool) -> Void)? = c["onEditingChanged"].flatMap { f -> ((Bool) -> Void)? in
-            guard case .function(let fn) = f else { return nil }
-            return { [interp = c.interp] e in interp.perform(fn, [.bool(e)]) }
+        if secure {
+            if let label { return AnyView(SecureField(text: text, prompt: prompt) { label }) }
+            return AnyView(SecureField(placeholder, text: text, prompt: prompt))
         }
-        if let editing {
-            return AnyView(TextField(placeholder, text: text, onEditingChanged: editing, onCommit: r.action(a["onCommit"])))
+        if case .function(let fn)? = c["onEditingChanged"] {
+            let interp = c.interp
+            return AnyView(TextField(placeholder, text: text, onEditingChanged: { interp.perform(fn, [.bool($0)]) }, onCommit: r.action(a["onCommit"])))
         }
-        if c.symbol("axis") == "vertical" { return AnyView(TextField(text: text, prompt: prompt, axis: .vertical) { label }) }
-        if let submit = a["onCommit"] { return AnyView(TextField(text: text, prompt: prompt) { label }.onSubmit(r.action(submit))) }
-        return AnyView(TextField(text: text, prompt: prompt) { label })
+        let vertical = c.symbol("axis") == "vertical"
+        var field: AnyView
+        if let label {
+            field = vertical ? AnyView(TextField(text: text, prompt: prompt, axis: .vertical) { label }) : AnyView(TextField(text: text, prompt: prompt) { label })
+        } else {
+            field = vertical ? AnyView(TextField(placeholder, text: text, prompt: prompt, axis: .vertical)) : AnyView(TextField(placeholder, text: text, prompt: prompt))
+        }
+        if let submit = a["onCommit"] { field = AnyView(field.onSubmit(r.action(submit))) }
+        return field
     }
 
     // MARK: Pickers

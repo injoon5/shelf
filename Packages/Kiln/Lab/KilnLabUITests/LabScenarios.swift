@@ -283,7 +283,7 @@ final class AppScenarios: LabCase {
         tap("Monstera, 2 days")
         snap("2 pushed a plant")
         tap("Water now")
-        tap("Plants")
+        tap("Back")
         snap("3 watered and back")
         tap("Add")
         snap("4 sheet at medium")

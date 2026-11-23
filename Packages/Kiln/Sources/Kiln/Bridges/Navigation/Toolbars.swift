@@ -27,8 +27,27 @@ struct KToolbarEntry: Identifiable {
 
 struct KToolbarContent: ToolbarContent {
     let entries: [KToolbarEntry]
+    /// Items by position, not a `ForEach`: SwiftUI doesn't redraw an item of a
+    /// toolbar `ForEach` whose id it has seen, so `.disabled(title.isEmpty)` on a
+    /// toolbar button would never update. 24 items is more than any bar shows.
     var body: some ToolbarContent {
-        ForEach(entries) { entry in KToolbarEntryContent(entry: entry) }
+        KToolbarSlots(entries: entries, from: 0)
+        KToolbarSlots(entries: entries, from: 6)
+        KToolbarSlots(entries: entries, from: 12)
+        KToolbarSlots(entries: entries, from: 18)
+    }
+}
+
+struct KToolbarSlots: ToolbarContent {
+    let entries: [KToolbarEntry]
+    let from: Int
+    var body: some ToolbarContent {
+        if entries.count > from { KToolbarEntryContent(entry: entries[from]) }
+        if entries.count > from + 1 { KToolbarEntryContent(entry: entries[from + 1]) }
+        if entries.count > from + 2 { KToolbarEntryContent(entry: entries[from + 2]) }
+        if entries.count > from + 3 { KToolbarEntryContent(entry: entries[from + 3]) }
+        if entries.count > from + 4 { KToolbarEntryContent(entry: entries[from + 4]) }
+        if entries.count > from + 5 { KToolbarEntryContent(entry: entries[from + 5]) }
     }
 }
 

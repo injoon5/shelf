@@ -253,15 +253,19 @@ extension NavigationBridges {
         let r = c.r
         let children = r.content(c.a.lastFunction).flatMap(\.flattened)
         let usesTabs = children.contains { ["Tab", "TabSection", "AnyTabContent"].contains(r.rootPrimitiveName($0) ?? "") || r.rootPrimitiveName($0) == "ForEach" }
-        if usesTabs, #available(iOS 18.0, macOS 15.0, *) {
-            var next = 0
-            let tabs = children.flatMap { tabs(from: $0, r, &next) }
+        var next = 0
+        // A `ForEach` of views with `.tabItem` is the older form: no `Tab`s come of it.
+        if usesTabs, #available(iOS 18.0, macOS 15.0, *), case let built = children.flatMap({ Self.tabs(from: $0, r, &next) }), !built.isEmpty {
             if let sel = c.kbinding("selection") {
-                return AnyView(TabView(selection: Binding<KV>(get: { sel.get() }, set: { sel.set($0) })) { KTabsContent(tabs: tabs) })
+                return AnyView(TabView(selection: Binding<KV>(get: { sel.get() }, set: { sel.set($0) })) { KTabsContent(tabs: built) })
             }
-            return AnyView(KTabHost(tabs: tabs))
+            return AnyView(KTabHost(tabs: built))
         }
-        let items = ForEach(Array(children.enumerated()), id: \.offset) { i, child in tabContent(r, child, index: i) }
+        let flat = children.flatMap { child -> [KView] in
+            guard r.rootPrimitiveName(child) == "ForEach", case .primitive(_, let args, let labels, _)? = r.rootPrimitive(child) else { return [child] }
+            return r.forEachRows(KArgs(args: args, labels: labels)).flatMap { $0.views.flatMap(\.flattened) }
+        }
+        let items = ForEach(Array(flat.enumerated()), id: \.offset) { i, child in tabContent(r, child, index: i) }
         if let sel = c.kbinding("selection") {
             return AnyView(TabView(selection: Binding<KV>(get: { sel.get() }, set: { sel.set($0) })) { items })
         }
