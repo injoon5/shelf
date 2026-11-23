@@ -16,17 +16,29 @@ enum SearchMetrics {
     static let fieldHeight: CGFloat = 48
     /// App Library's field starts 77 px in.
     static let sideInset: CGFloat = 25.67
-    /// The round ✕ beside the field is as tall as the field, 12.67 pt from
-    /// it (the reference: 79 px across, 21 px from the field).
+    /// The round ✕ beside the field is as tall as the field (the reference:
+    /// 79 px across at 1.667 px/pt). The field keeps App Library's width,
+    /// 281.67 pt (77 px to 922), and the ✕ takes Cancel's place, at the
+    /// field's own inset from the trailing edge: 21 pt from the field.
     static let closeSize: CGFloat = 48
-    static let closeGap: CGFloat = 12.67
+    static let closeGap: CGFloat = 21
     /// The ✕ itself: 18.6 pt across in the reference.
     static let closeGlyphSize: CGFloat = 19
-    /// The magnifier's ink starts 18.33 pt into the field (132 px against 77).
-    static let glyphInset: CGFloat = 18.33
-    /// The placeholder's text starts 48 pt into the field (222 px), so
-    /// 29.67 pt from where the magnifier starts.
-    static let textInset: CGFloat = 48
+    /// The magnifier: 17.33 pt of ink across (132 px to 184), its centre
+    /// 27 pt into the field. At Title 2's size, SF's magnifier is 20.67 pt
+    /// across, so it's drawn at 0.84 of the text's size.
+    static let glyphCenter: CGFloat = 27
+    static let glyphScale: CGFloat = 0.84
+    /// Where the placeholder's text and what's typed start in the field:
+    /// App Library's "A" at 222 px and a typed "c" at 219 px, a caret's
+    /// width apart. Set by overlaying Shelf's "S" on them at 3x, side
+    /// bearings and all.
+    static let textInset: CGFloat = 47.67
+    static let typedInset: CGFloat = 46.67
+    /// The caret: 2 pt wide (6 px) and 24 pt tall (72 px), centred on where
+    /// the next letter goes and on the field's middle, where UIKit's is
+    /// 28 pt tall and starts there.
+    static let caretSize = CGSize(width: 2, height: 24)
     /// The placeholder and what's typed: an "L" 47 px tall at 3x, which is
     /// SF Pro's cap height at 22 pt, regular (a 5 px stem). That's Title 2.
     static let fieldTextStyle = UIFont.TextStyle.title2
@@ -76,12 +88,12 @@ enum SearchMetrics {
     // MARK: The index
 
     /// A–Z and #: letters centred 7.67 pt from the trailing edge (1183 px),
-    /// 13.27 pt apart (A at 1002 px, # at 2077), with a 7.33 pt cap height,
-    /// which is SF Pro semibold at 10.4 pt. Centred on the list's visible
-    /// height, as App Library's is on its own.
+    /// 13.27 pt apart (A at 1002 px, # at 2077), an "A" 20 × 22 px at 3x:
+    /// SF Pro semibold at 11.5 pt, overlaid on Shelf's own. Centred on the
+    /// list's visible height, as App Library's is on its own.
     static let indexCenterFromTrailing: CGFloat = 7.67
     static let indexPitch: CGFloat = 13.27
-    static let indexFontSize: CGFloat = 10.4
+    static let indexFontSize: CGFloat = 11.5
     static let indexWeight = UIFont.Weight.semibold
     /// How wide a finger's target the index is.
     static let indexHitWidth: CGFloat = 30
@@ -96,10 +108,12 @@ enum SearchMetrics {
     static let backdropScale: CGFloat = 0.85
     static let backdropOffsetDark: CGFloat = -14 / 255
     static let backdropOffsetLight: CGFloat = -22 / 255
-    /// White names have to read over any wallpaper: where the blurred
-    /// wallpaper would average brighter than this, the backdrop darkens
-    /// more. App Library's own backdrops average 0.09 and 0.27.
-    static let backdropCeiling: CGFloat = 0.35
+    /// White names have to read over any wallpaper: where the backdrop
+    /// would average brighter than this, it darkens more. App Library's
+    /// own darken nothing extra up to a wallpaper averaging 0.6 (the light
+    /// capture's Home Screen averages 0.57), which this leaves alone; a
+    /// white wallpaper ends at 0.42, where white text still reads at 4.9:1.
+    static let backdropCeiling: CGFloat = 0.42
 
     // MARK: The pull
 

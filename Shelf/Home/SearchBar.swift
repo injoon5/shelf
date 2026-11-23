@@ -37,7 +37,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
     private let glass = UIVisualEffectView()
     private let label = SearchLabel()
     private let dots = DotsView()
-    private let field = UITextField()
+    private let field = SearchTextField()
     private let closeButton = GlassCircleButton(symbol: "xmark")
     /// What holds the glass, the label and the ✕: the list's soft edge
     /// reaches up behind them, so rows going under the field blur away as
@@ -92,7 +92,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
         closeButton.accessibilityLabel = String(localized: "Close Search")
         closeButton.alpha = 0
         closeButton.isUserInteractionEnabled = false
-        closeButton.addAction(UIAction { [unowned self] _ in onClose() }, for: .primaryActionTriggered)
+        closeButton.addAction(UIAction { [unowned self] _ in onClose() }, for: .touchUpInside)
         ride.addSubview(closeButton)
 
         warp.onChange = { [unowned self] p in place(p) }
@@ -163,7 +163,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
     private func placeField() {
         guard let geometry else { return }
         let frame = fieldFrame
-        let leading = SearchMetrics.textInset
+        let leading = SearchMetrics.typedInset
         field.frame = CGRect(x: frame.minX + leading, y: frame.minY,
                              width: frame.width - leading - SearchMetrics.textTrailing, height: frame.height)
         UIView.performWithoutAnimation {
@@ -333,7 +333,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
 /// The pill's label is Springboard's (`closeup-search-pill.png`): caption
 /// size, medium, at 70% white, with a small bold magnifier 3.33 pt from the
 /// text. The field's is App Library's: Title 2, regular, white, with the
-/// magnifier 18.33 pt into the field and the text 48 pt in. Between the two
+/// magnifier centred 27 pt into the field and the text 48 pt in. Between the two
 /// the row's scale, its weight, its colour and the magnifier's size and gap
 /// all move with the warp, so it reads as one label getting bigger.
 private final class SearchLabel: UIView {
@@ -367,7 +367,8 @@ private final class SearchLabel: UIView {
     func configure(fieldSize: CGFloat, pillSize: CGFloat) {
         self.fieldSize = fieldSize
         self.pillSize = pillSize
-        let field = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: fieldSize, weight: .regular, scale: .medium))
+        let field = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(
+            pointSize: fieldSize * SearchMetrics.glyphScale, weight: .regular, scale: .medium))
         let pill = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: pillSize, weight: .bold, scale: .small))
         glyph.image = field?.withRenderingMode(.alwaysTemplate)
         fieldGlyph = field?.size ?? fieldGlyph
@@ -396,8 +397,9 @@ private final class SearchLabel: UIView {
         // In the row's own points, which the row's scale takes to the screen.
         let glyphWidth = lerp(pillGlyph.width / pillScale, fieldGlyph.width, p)
         let glyphHeight = glyphWidth * fieldGlyph.height / max(fieldGlyph.width, 1)
+        let fieldGlyphStart = SearchMetrics.glyphCenter - fieldGlyph.width / 2
         let textStart = lerp((pillGlyph.width + HomeMetrics.pillGlyphGap) / pillScale,
-                             SearchMetrics.textInset - SearchMetrics.glyphInset, p)
+                             SearchMetrics.textInset - fieldGlyphStart, p)
         let height = max(text.bounds.height, glyphHeight)
         bounds = CGRect(x: 0, y: 0, width: textStart + text.bounds.width, height: height)
         glyph.frame = CGRect(x: 0, y: (height - glyphHeight) / 2, width: glyphWidth, height: glyphHeight)
@@ -405,7 +407,7 @@ private final class SearchLabel: UIView {
 
         // The pill's row is centred in it; the field's starts at the magnifier's inset.
         let pillRow = pillGlyph.width + HomeMetrics.pillGlyphGap + pillTextWidth
-        let leading = lerp(pill.midX - pillRow / 2, field.minX + SearchMetrics.glyphInset, p)
+        let leading = lerp(pill.midX - pillRow / 2, field.minX + fieldGlyphStart, p)
         transform = CGAffineTransform(scaleX: scale, y: scale)
         center = CGPoint(x: leading, y: lerp(pill.midY, field.midY, p))
     }
@@ -413,28 +415,48 @@ private final class SearchLabel: UIView {
 
 private func lerp(_ a: CGFloat, _ b: CGFloat, _ t: CGFloat) -> CGFloat { a + (b - a) * t }
 
-/// A round glass button with a white glyph: search's ✕, App Library's.
-final class GlassCircleButton: UIButton {
+/// The field's text, with App Library's caret: 24 pt tall, centred on the
+/// field and on where the next letter goes.
+private final class SearchTextField: UITextField {
+    override func caretRect(for position: UITextPosition) -> CGRect {
+        let caret = super.caretRect(for: position)
+        let size = SearchMetrics.caretSize
+        // UIKit's starts at that point; App Library's straddles it.
+        return CGRect(x: caret.minX - size.width / 2, y: bounds.midY - size.height / 2, width: size.width, height: size.height)
+    }
+}
+
+/// A round glass button with a white glyph: search's ✕, App Library's. Its
+/// glass is the field's own (`HomeGlass`), so the two read as one material.
+final class GlassCircleButton: UIControl {
+    private let glass = UIVisualEffectView()
+    private let glyph = UIImageView()
+
     init(symbol: String) {
         super.init(frame: .zero)
-        var configuration = UIButton.Configuration.clearGlass()
-        configuration.image = UIImage(systemName: symbol, withConfiguration: UIImage.SymbolConfiguration(
+        glass.cornerConfiguration = .capsule()
+        glass.isUserInteractionEnabled = false
+        addSubview(glass)
+        glyph.image = UIImage(systemName: symbol, withConfiguration: UIImage.SymbolConfiguration(
             pointSize: SearchMetrics.closeGlyphSize, weight: .regular, scale: .medium))
-        configuration.baseForegroundColor = .white
-        configuration.cornerStyle = .capsule
-        configuration.contentInsets = .zero
-        self.configuration = configuration
-        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (button: GlassCircleButton, _) in button.restyle() }
-        restyle()
+        glyph.tintColor = .white
+        glyph.contentMode = .center
+        glass.contentView.addSubview(glyph)
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (button: GlassCircleButton, _) in
+            button.glass.effect = HomeGlass.effect(button.traitCollection, interactive: true)
+        }
+        glass.effect = HomeGlass.effect(traitCollection, interactive: true)
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    /// The same glass as the field's (`HomeGlass`): untinted, and tinted
-    /// dark in dark mode.
-    private func restyle() {
-        configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? HomeMetrics.darkGlassTint : .clear
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        glass.frame = bounds
+        glyph.frame = glass.contentView.bounds
     }
 }
 

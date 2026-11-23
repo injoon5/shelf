@@ -93,7 +93,11 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         list.alpha = 0
         list.isHidden = true
         list.isUserInteractionEnabled = false
-        list.onOpen = { [unowned self] id in Task { await model.open(id, in: library) } }
+        list.onOpen = { [unowned self] id in
+            // The keyboard goes on the tap, before any download, as App Library's does.
+            search.dismissKeyboard()
+            Task { await model.open(id, in: library) }
+        }
         list.onClose = { [unowned self] velocity in
             // Pulled down: the warp goes back with the finger's speed.
             search.close(velocity: -velocity / SearchMetrics.pullDistance)
@@ -109,6 +113,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         search.onSubmit = { [unowned self] in
             // Return opens the best match.
             guard let best = SearchSections.topMatch(library.items, query: model.query) else { return }
+            search.dismissKeyboard()
             Task { await model.open(best.id, in: library) }
         }
         search.onClose = { [unowned self] in model.endSearch() }
@@ -159,6 +164,16 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         holdAppearance()
+        #if DEBUG
+        if let held = Demo.searchProgress {
+            // As a finger holding a pull there would.
+            DispatchQueue.main.async { [self] in
+                prepareSearch()
+                search.beginPull()
+                search.pull(held * SearchMetrics.pullDistance)
+            }
+        }
+        #endif
         view.window?.windowScene?.registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (_: UIWindowScene, _) in
             self?.holdAppearance()
         }
