@@ -118,7 +118,9 @@ def side_by_side(left, right, title, path, boxes=None):
 
 examples = sorted({k[0] for k in shots if not k[0].endswith(".md")})
 replies = sorted({k[0] for k in shots if k[0].endswith(".md")})
-bench = {r["file"]: r for r in json.load(open(bench_path))} if os.path.exists(bench_path) else {}
+bench_json = json.load(open(bench_path)) if os.path.exists(bench_path) else []
+# bench.py writes {"rows": […]}; older runs wrote the list itself.
+bench = {r["file"]: r for r in (bench_json["rows"] if isinstance(bench_json, dict) else bench_json)}
 
 summary = {"label": label, "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "examples": {}, "replies": {}}
 md = [f"# {label}", "", f"_{summary['date']}_", ""]

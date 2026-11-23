@@ -18,8 +18,8 @@ SIM=$(cat "$KILN/Lab/.sim-udid" 2>/dev/null || xcrun simctl list devices availab
 WORK=$(mktemp -d -t kilniter)
 
 echo "== bench"
-(cd "$KILN/Tools/KilnBench" && swift build -c release 2>&1 | grep -E "error:" || true)
-python3 "$KILN/Tools/bench.py" "$OUT/bench.json" "$KILN"/Examples/Apps/*.swift "$KILN"/Examples/AppleIntelligence/*.md | tee "$OUT/bench.txt"
+# Against 0.2.1's numbers: an input more than 10% slower is marked SLOWER.
+"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/baseline-0.2.1.json" | tee "$OUT/bench.txt"
 
 echo "== lab"
 cd "$KILN/Lab"
