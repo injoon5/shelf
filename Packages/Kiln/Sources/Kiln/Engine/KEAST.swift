@@ -52,6 +52,8 @@ indirect enum KETypeRef: Equatable, CustomStringConvertible {
 struct KEArg {
     var label: String?
     var value: KEExpr
+    /// A closure literal (trailing or not), for Swift's forward scan.
+    var isClosure: Bool { if case .closure = value { return true }; return false }
 }
 
 final class KEClosure {
@@ -106,11 +108,12 @@ indirect enum KEExpr {
     case switchExpr(KEExpr, [KESwitchCase])
     case assign(String, KEExpr, KEExpr, line: Int)      // a = b / a += b inside closures used as expressions
     case value(KV)                                      // an already-evaluated value (an `await`'s result, KEAsync)
+    case regex(String, line: Int)                       // /\d+/, #/…/# (Bridges/Language/Regex.swift)
 
     var line: Int {
         switch self {
         case .ident(_, let l), .implicitMember(_, let l), .member(_, _, let l), .call(_, _, let l),
-             .subscriptAccess(_, _, let l), .binary(_, _, _, let l), .selfRef(let l), .assign(_, _, _, let l): return l
+             .subscriptAccess(_, _, let l), .binary(_, _, _, let l), .selfRef(let l), .assign(_, _, _, let l), .regex(_, let l): return l
         case .closure(let c): return c.line
         case .optionalChain(let e), .prefix(_, let e), .postfix(_, let e), .cast(let e, _, _),
              .tryExpr(_, let e), .awaitExpr(let e): return e.line
@@ -206,7 +209,7 @@ final class KEVarDecl {
     var wrapperAttribute: KEAttribute? { attributes.first(where: { Self.wrappers.contains($0.name) }) }
     static let wrappers: Set<String> = ["State", "Binding", "StateObject", "ObservedObject", "EnvironmentObject",
                                         "Environment", "Published", "AppStorage", "SceneStorage", "FocusState",
-                                        "Namespace", "GestureState", "Bindable"]
+                                        "Namespace", "GestureState", "Bindable", "FocusedValue"]
 }
 
 struct KEParam {
@@ -216,6 +219,22 @@ struct KEParam {
     var defaultValue: KEExpr?
     var isInout: Bool
     var isVariadic: Bool
+    /// `@ViewBuilder content: () -> Content`, `@escaping`.
+    var attributes: [KEAttribute] = []
+}
+
+/// A generic parameter: `Content: View`, `T`.
+struct KEGenericParam {
+    var name: String
+    var constraints: [String]
+}
+
+/// A `where` requirement: `Self: Equatable`, `Element == Int`, `T.Element: Numeric`.
+struct KEConstraint {
+    enum Relation { case conforms, same }
+    var subject: String
+    var relation: Relation
+    var type: KETypeRef
 }
 
 final class KEFuncDecl {
@@ -229,6 +248,10 @@ final class KEFuncDecl {
     let line: Int
     /// Whether the body has an `await` (KEAsync's `awaits`).
     var awaitsCache: Bool?
+    var generics: [KEGenericParam] = []
+    var constraints: [KEConstraint] = []
+    /// Declared without a body, in a protocol: a requirement.
+    var isRequirement = false
     init(name: String, params: [KEParam], returnType: KETypeRef?, body: [KEStmt], isStatic: Bool,
          isMutating: Bool, attributes: [KEAttribute], line: Int) {
         self.name = name; self.params = params; self.returnType = returnType; self.body = body
@@ -264,6 +287,9 @@ final class KETypeDecl {
     var subscripts: [KEFuncDecl] = []
     var attributes: [KEAttribute]
     let line: Int
+    var generics: [KEGenericParam] = []
+    /// `extension P where Self: Q`, `struct Box<T> where T: Equatable`.
+    var constraints: [KEConstraint] = []
     init(kind: KETypeKind, name: String, inherits: [String], attributes: [KEAttribute], line: Int) {
         self.kind = kind; self.name = name; self.inherits = inherits; self.attributes = attributes; self.line = line
     }

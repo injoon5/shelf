@@ -45,6 +45,10 @@ final class FocusBridges: KBridgeFamily {
             m.form("_:bool?") { _, view in view.autocorrectionDisabled() }
         }
         r.modifier("textContentType", .focus, support: .stub) { m in m.stub(["_:any"]) }
+        r.wrapper("FocusedValue", .focus, support: .stub, notes: "Reads its `@Entry` default; focused views don't set it yet.")
+        r.modifier("focusedValue", .focus, support: .stub, notes: "Accepted; `@FocusedValue` reads its `@Entry` default.") { m in
+            m.stub(["_:any _:any"])
+        }
         r.modifier("scrollDismissesKeyboard", .focus, support: .stub) { m in m.stub(["_:any"]) }
     }
 }

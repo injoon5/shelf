@@ -13,9 +13,19 @@ import Foundation
 struct KEParser {
     private var toks: [KEToken]
     private var p = 0
+    /// The other protocols of the composition `parseType` just read (`P & Q`).
+    private var composed: [String] = []
 
     init(tokens: [KEToken]) {
         self.toks = Self.stripConditionalCompilation(tokens)
+    }
+
+    /// A type written as text: `Set<String>`, `[String: Int]`.
+    static func typeRef(_ text: String) -> KETypeRef? {
+        var lexer = KELexer(text)
+        guard let toks = try? lexer.tokenize() else { return nil }
+        var parser = KEParser(tokens: toks)
+        return try? parser.parseType()
     }
 
     static func parse(_ source: String) throws -> KEProgram {
@@ -203,21 +213,75 @@ struct KEParser {
         let kind = KETypeKind(rawValue: kw) ?? .structType
         var name = try identifier("a type name")
         while at("."), let more = ahead(1).identValue { next(); next(); name += "." + more }   // extension A.B
-        if atOp("<") { try skipAngles() }
+        let generics = try parseGenericParams()
         var inherits: [String] = []
         if eat(":") {
             repeat {
-                if let t = try? parseType(), let n = t.name { inherits.append(n) }
+                if let t = try? parseType() {
+                    if let n = t.name { inherits.append(n) }
+                    inherits.append(contentsOf: composed)
+                }
             } while eat(",")
         }
-        if atIdent("where") { while !at("{") && !atEOF { next() } }
+        let constraints = try parseWhere()
         let decl = KETypeDecl(kind: kind, name: name, inherits: inherits, attributes: attrs, line: line)
-        if kind == .protocolType {
-            try skipBalanced("{", "}")
-            return decl
-        }
+        decl.generics = generics
+        decl.constraints = constraints
         try parseTypeBody(decl)
+        if kind == .protocolType {
+            for m in decl.methods + decl.inits + decl.subscripts where m.body.isEmpty { m.isRequirement = true }
+        }
         return decl
+    }
+
+    /// `<Content: View, T>`: names and their constraints. Anything else in
+    /// angle brackets (`<each T>`) is skipped.
+    private mutating func parseGenericParams() throws -> [KEGenericParam] {
+        guard atOp("<") || (cur.opValue?.hasPrefix("<") ?? false) else { return [] }
+        let save = p
+        var out: [KEGenericParam] = []
+        if atOp("<") {
+            next()
+            var ok = true
+            while ok {
+                guard let n = cur.identValue else { ok = false; break }
+                next()
+                var cs: [String] = []
+                if eat(":") {
+                    if let t = try? parseType(), let tn = t.name { cs.append(tn) }
+                    cs.append(contentsOf: composed)
+                }
+                out.append(KEGenericParam(name: n, constraints: cs))
+                if eat(",") { continue }
+                if atOp(">") { next(); return out }
+                ok = false
+            }
+        }
+        p = save
+        try skipAngles()
+        return out
+    }
+
+    /// `where Self: Equatable, Element == Int`. Stops before the body.
+    private mutating func parseWhere() throws -> [KEConstraint] {
+        guard eatIdent("where") else { return [] }
+        var out: [KEConstraint] = []
+        repeat {
+            guard var subject = cur.identValue else { break }
+            next()
+            while at("."), let more = ahead(1).identValue { next(); next(); subject += "." + more }
+            if eat(":") {
+                guard let t = try? parseType() else { break }
+                out.append(KEConstraint(subject: subject, relation: .conforms, type: t))
+                for extra in composed { out.append(KEConstraint(subject: subject, relation: .conforms, type: .named(extra, []))) }
+            } else if atOp("==") {
+                next()
+                guard let t = try? parseType() else { break }
+                out.append(KEConstraint(subject: subject, relation: .same, type: t))
+            } else { break }
+        } while eat(",")
+        while !at("{") && !atEOF && !cur.newlineBefore { next() }
+        return out
     }
 
     private mutating func parseTypeBody(_ decl: KETypeDecl) throws {
@@ -285,6 +349,8 @@ struct KEParser {
                 next(); _ = try identifier(); if eat("=") || atOp("=") { if atOp("=") { next() }; _ = try? parseType() }
             case "associatedtype":
                 next(); _ = try identifier(); if eat(":") { _ = try? parseType() }
+                if atOp("=") { next(); _ = try? parseType() }
+                _ = try parseWhere()
             default:
                 throw error("unexpected '\(w)' in the body of \(decl.name)")
             }
@@ -309,15 +375,21 @@ struct KEParser {
         if let n = cur.identValue { name = n; next() }
         else if let o = cur.opValue { name = o; next() }   // operator func
         else { throw error("expected a function name") }
-        if atOp("<") { try skipAngles() }
+        let generics = try parseGenericParams()
         let params = try parseParams()
-        while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) { next() }
+        while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) {
+            next()
+            if at("("), !cur.spaceBefore { try skipBalanced("(", ")") }   // throws(MyError)
+        }
         var ret: KETypeRef? = nil
         if atOp("->") { next(); ret = try parseType() }
-        if atIdent("where") { while !at("{") && !atEOF { next() } }
+        let constraints = try parseWhere()
         let body = at("{") ? try parseBlock() : []
-        return KEFuncDecl(name: name, params: params, returnType: ret, body: body, isStatic: mods.contains("static"),
-                          isMutating: mods.contains("mutating"), attributes: attrs, line: line)
+        let f = KEFuncDecl(name: name, params: params, returnType: ret, body: body, isStatic: mods.contains("static"),
+                           isMutating: mods.contains("mutating"), attributes: attrs, line: line)
+        f.generics = generics
+        f.constraints = constraints
+        return f
     }
 
     private mutating func parseInit(attrs: [KEAttribute]) throws -> KEFuncDecl {
@@ -325,20 +397,26 @@ struct KEParser {
         next()  // init
         var attributes = attrs
         if atOp("?") || atOp("!") { next(); attributes.append(KEAttribute(name: "Failable", args: [])) }
-        if atOp("<") { try skipAngles() }
+        let generics = try parseGenericParams()
         let params = try parseParams()
-        while let w = cur.identValue, ["async", "throws", "rethrows"].contains(w) { next() }
-        if atIdent("where") { while !at("{") && !atEOF { next() } }
+        while let w = cur.identValue, ["async", "throws", "rethrows"].contains(w) {
+            next()
+            if at("("), !cur.spaceBefore { try skipBalanced("(", ")") }
+        }
+        let constraints = try parseWhere()
         let body = at("{") ? try parseBlock() : []
-        return KEFuncDecl(name: "init", params: params, returnType: nil, body: body, isStatic: false,
-                          isMutating: true, attributes: attributes, line: line)
+        let f = KEFuncDecl(name: "init", params: params, returnType: nil, body: body, isStatic: false,
+                           isMutating: true, attributes: attributes, line: line)
+        f.generics = generics
+        f.constraints = constraints
+        return f
     }
 
     private mutating func parseParams() throws -> [KEParam] {
         try expect("(", "to start the parameters")
         var params: [KEParam] = []
         while !at(")") {
-            _ = try parseAttributes()
+            var attrs = try parseAttributes()
             let first = try identifier("a parameter name")
             var label: String? = first
             var name = first
@@ -348,14 +426,18 @@ struct KEParser {
             var isInout = false
             var variadic = false
             if eat(":") {
-                _ = try parseAttributes()
-                if eatIdent("inout") { isInout = true }
+                attrs += try parseAttributes()
+                while let w = cur.identValue, ["inout", "borrowing", "consuming", "sending", "isolated"].contains(w), ahead(1).identValue != nil || ahead(1).isPunct("(") || ahead(1).isPunct("[") || ahead(1).isPunct("@") {
+                    if w == "inout" { isInout = true }
+                    next()
+                }
+                attrs += try parseAttributes()
                 type = try parseType()
                 if atOp("...") { next(); variadic = true }
             }
             var def: KEExpr? = nil
             if atOp("=") { next(); def = try parseExpression() }
-            params.append(KEParam(label: label, name: name, type: type, defaultValue: def, isInout: isInout, isVariadic: variadic))
+            params.append(KEParam(label: label, name: name, type: type, defaultValue: def, isInout: isInout, isVariadic: variadic, attributes: attrs))
             if !eat(",") { break }
         }
         try expect(")", "to close the parameters")
@@ -426,6 +508,7 @@ struct KEParser {
             t = .opaque(try parseType())
             return t
         }
+        composed = []
         if at("[") {
             next()
             let first = try parseType()
@@ -478,6 +561,17 @@ struct KEParser {
         if atOp("->") {   // `Int -> Bool` without parens (old style)
             next()
             t = .function([t], try parseType())
+        }
+        // `P & Q`: the type is the first; the rest are kept in `composed`.
+        if atOp("&") {
+            var extra: [String] = []
+            while atOp("&") {
+                next()
+                if let more = try? parseType(), let n = more.name { extra.append(n); extra.append(contentsOf: composed) }
+            }
+            composed = extra
+        } else {
+            composed = []
         }
         return t
     }
@@ -906,7 +1000,7 @@ struct KEParser {
                 var args: [KEArg] = []
                 while !at("]") {
                     var label: String? = nil
-                    if let l = cur.identValue, ahead(1).isPunct(":"), !Self.keywords.contains(l) { label = l; next(); next() }
+                    if let l = cur.identValue, ahead(1).isPunct(":"), !Self.keywords.contains(l) || l == "default" { label = l; next(); next() }
                     args.append(KEArg(label: label, value: try parseExpression()))
                     if !eat(",") { break }
                 }
@@ -921,7 +1015,8 @@ struct KEParser {
             }
             if atOp("!"), !cur.spaceBefore { next(); e = .postfix("!", e); continue }
             if atOp("?"), !cur.spaceBefore { next(); e = .optionalChain(e); continue }
-            if atOp("..."), !cur.spaceBefore, ahead(1).isPunct("]") || ahead(1).isPunct(")") || ahead(1).isPunct(",") {
+            // `xs[2...]`, and `case 90...:` (a one-sided range in a pattern).
+            if atOp("..."), !cur.spaceBefore, ahead(1).isPunct("]") || ahead(1).isPunct(")") || ahead(1).isPunct(",") || ahead(1).isPunct(":") {
                 next(); e = .postfix("...", e); continue
             }
             break
@@ -1056,6 +1151,7 @@ struct KEParser {
         switch t.kind {
         case .int(let i): next(); return .int(i)
         case .double(let d): next(); return .double(d)
+        case .regex(let pattern): next(); return .regex(pattern, line: line)
         case .string(let parts, _):
             next()
             var segs: [KEStringSegment] = []

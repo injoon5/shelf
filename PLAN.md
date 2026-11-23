@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below), the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below), §1.6 (but Round 4's two macros), the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -430,6 +430,45 @@ From the prompt's "What doesn't work", Shelf's fixtures, and the 0.2.1 patch:
 - A one-sided range in a `case` (`case 90...:`), calling a method straight on `allCases`, `$value.animation()`, and `Data(text.utf8)`.
 - Fold in the 0.2.1 patch's three fixes: `JSONEncoder().encode`, `[T].self`, and a decoded `UUID` staying a `UUID`.
 - Macros the engine reads as declarations: `@Observable` (already), `@Entry`, `@Animatable` (iOS 26), `@Generable` and `@Guide` (Round 4), plus `#Preview`, which is ignored.
+
+Built, except `@Generable` and `@Guide`, which are Round 4's.
+
+- **Protocols** (`Engine/KEProtocols.swift`):
+  - Protocol bodies, generic parameters and `where` clauses are parsed.
+  - Extensions give default implementations. Constrained ones (`where Self: Equatable`, `Self == T`) win over plain ones, and a type's own members win over both.
+  - Conformance closes over protocol and class inheritance. A subclass inherits its superclass's members, and `super` works.
+  - Extensions on Swift's protocols (`Collection`, `Comparable`, `Sequence where Element: Numeric`) reach native values. `extension Array where Element == T` picks by the elements.
+  - `any P`, `some P` and `[any P]` work, and so does `.member` on a protocol type through `extension P where Self == T`.
+  - Generic parameters name the type a call passed (`T()`, `T.self`).
+  - A missing requirement is an error with the type's line.
+  - Behaviour follows conformance. A custom `==` and `hash(into:)` decide equality and hashing everywhere, including `Set` and dictionary keys. `==` needs Equatable, `<` and `sorted()` need Comparable, `allCases` needs CaseIterable, and `ForEach` without `id:` needs Identifiable, each as Swift synthesizes it. JSON needs Codable.
+- **Result builders** (`KEBuilders.swift`):
+  - Swift's whole transform: `buildBlock` or `buildPartialBlock`, `buildExpression` (overloads picked by the value's type), `buildOptional`, `buildEither` (a balanced tree for `switch`), `buildArray`, `buildLimitedAvailability` and `buildFinalResult`.
+  - On functions, properties, parameters and stored properties.
+  - `@ViewBuilder` parameters and `@ViewBuilder let content: Content` build their views. Before, `Card { Text("a"); Text("b") }` showed nothing.
+  - Bridges register builders with `r.resultBuilder(…)`, which is what §3.3's RegexBuilder needs.
+- **Property wrappers** (`KEWrappers.swift`) work on struct and class properties, in initializers and on local variables. `_x` holds the wrapper, `x` is its `wrappedValue` and `$x` its `projectedValue`.
+- **Codable** (`Bridges/Foundation/Coding.swift`):
+  - `init(from:)` and `encode(to:)` with keyed, unkeyed, single-value and nested containers, and `DecodingError`. Enums with payloads can be saved this way.
+  - Sets round-trip as sets, and `Data(text.utf8)` has its bytes.
+  - The 0.2.1 patch's three fixes are pinned by tests.
+- **Regex literals** (`/\d+/`, `#/…/#`, extended syntax) are a real `Regex<AnyRegexOutput>`. `firstMatch`, `wholeMatch`, `matches(of:)`, `contains`, `replacing` and `case /…/:` work (`Bridges/Language/Regex.swift`); §3.3 adds the rest.
+- **Small items:** `case 90...:`, `$x.animation()`, `Kind.allCases.map {…}` and `Data(text.utf8)` all work.
+- **Macros** (`KEMacros.swift`) are a table:
+  - `@Observable`.
+  - `@Animatable` lists the properties §1.5's proxy will animate.
+  - `@Entry` in EnvironmentValues, FocusedValues, ContainerValues and Transaction. `@Environment(\.key)` reads what `.environment(\.key, v)` set, or the default. The older `EnvironmentKey` pattern works too, as does `@Environment(Model.self)`.
+  - `#Preview` is ignored.
+- **Errors about the app's own types** (`KEDiagnostics.swift`) are worded like the registry's:
+  - "'Person' has no greet(nmae:); it has greet(name:)"
+  - "Value of type 'Person' has no member 'nmae' (did you mean 'name'?)"
+
+  Wrong labels used to bind by position silently, and assigning a property that doesn't exist was ignored.
+- **Checks:**
+  - `Tools/diff.sh` is identical on every earlier input. The new inputs from `LanguageTests` differ only where something that errored or drew nothing now works (`Tools/diff-expected.txt`).
+  - Shelf has three new fixtures: `swift-protocols`, `swift-builders` and `swift-codable`.
+  - The prompt's "What doesn't work" no longer lists any of these.
+  - No benchmark is more than 10% slower than `after-1.7-context.json`. The worst is Chess, at 8% ([Benchmarks](Packages/Kiln/Benchmarks/README.md#after-16-languagejson)).
 
 ### 1.7 A context for each run
 

@@ -416,7 +416,7 @@ enum KAwaitScan {
     static func expr(_ e: KEExpr) -> Bool {
         switch e {
         case .awaitExpr: return true
-        case .closure, .int, .double, .bool, .nilLit, .ident, .implicitMember, .keyPath, .selfRef, .typeExpr, .value:
+        case .closure, .int, .double, .bool, .nilLit, .ident, .implicitMember, .keyPath, .selfRef, .typeExpr, .value, .regex:
             return false
         case .string(let segs):
             return segs.contains { if case .interp(let args) = $0 { return args.contains { expr($0.value) } }; return false }
@@ -1348,6 +1348,7 @@ extension KInterpreter {
     func userFrame(_ decl: KEFuncDecl, args: [KV], labels: [String?], selfContext: KSelfContext?, parent: KEnv) throws -> KFrame {
         let env = KEnv(parent: parent, selfContext: selfContext)
         try bindParameters(decl.params, args: args, labels: labels, into: env, name: decl.name)
+        bindGenerics(decl, env)
         var single: KEExpr?
         if decl.body.count == 1, case .expr(let e) = decl.body[0], decl.returnType != nil || decl.isViewBuilder { single = e }
         return KBodyFrame(env: env, stmts: decl.body, single: single, returns: decl.returnType, line: decl.line)

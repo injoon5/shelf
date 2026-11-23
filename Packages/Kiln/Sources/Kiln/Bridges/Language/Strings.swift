@@ -93,6 +93,7 @@ extension LanguageBridges {
             t.method("hasPrefix") { c in .bool(s(c).hasPrefix(c.at(0)?.asString ?? "")) }
             t.method("hasSuffix") { c in .bool(s(c).hasSuffix(c.at(0)?.asString ?? "")) }
             t.method("contains") { c in
+                if let r = KBuiltins.regexBox(c.first) { return .bool(try r.regex.firstMatch(in: s(c)) != nil) }
                 if c.labels.first == "where" {
                     let test = try c.interp.applier(c.first ?? .void, c.line)
                     return .bool(try s(c).contains { c.interp.truthy(try test(.string(String($0)))) })

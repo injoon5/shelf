@@ -31,7 +31,9 @@ struct OutlineTests {
             rest = rest.replacingOccurrences(of: block, with: "")
         }
         for line in rest.components(separatedBy: "\n") where line.contains("{") {
-            #expect(line.hasSuffix("{ … }") || Self.isTypeHeader(line), "\(name): a body is left in: \(line)")
+            // A protocol's `var title: String { get }` is a requirement, not a body.
+            let requirement = line.hasSuffix("{ get }") || line.hasSuffix("{ get set }")
+            #expect(line.hasSuffix("{ … }") || Self.isTypeHeader(line) || requirement, "\(name): a body is left in: \(line)")
         }
         for statement in ["return ", "NavigationStack {", ".onAppear", "DB.save(", "withAnimation", "print("] {
             #expect(!rest.contains(statement), "\(name): \(statement)")

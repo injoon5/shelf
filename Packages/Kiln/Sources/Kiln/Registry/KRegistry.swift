@@ -528,6 +528,8 @@ final class KRegistry {
     private(set) var protocols: [String: KProtocolBridge] = [:]
     private(set) var environment: [String: KEnvironmentBridge] = [:]
     private(set) var wrappers: [String: KWrapperBridge] = [:]
+    /// Result builders bridges declare (`RegexComponentBuilder`), by attribute name (KEBuilders).
+    private(set) var resultBuilders: [String: KNativeBuilder] = [:]
     /// `.name` with no expected type, by name (`.infinity`, `.degrees(…)`, `.red`).
     private(set) var contextFree: [String: @MainActor ([KV], [String?], String?) -> KV?] = [:]
     /// Type names that are aliases of another (`CGFloat` → `Double`).
@@ -598,6 +600,10 @@ final class KRegistry {
     func add(_ b: KWrapperBridge) {
         claim("wrapper:" + b.name, b.family, b.source)
         wrappers[b.name] = b
+    }
+
+    func addResultBuilder(_ b: KNativeBuilder) {
+        resultBuilders[b.name] = b
     }
 
     func addContextFree(_ name: String, _ resolve: @escaping @MainActor ([KV], [String?], String?) -> KV?) {

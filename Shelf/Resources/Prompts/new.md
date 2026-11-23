@@ -49,13 +49,17 @@ If you can't run commands, reply with the code as described above.
 - Closures, `switch` with patterns and `where`, tuples (write the labels in the literal: `return (min: a, max: b)`), ranges.
 - Optionals with `?.` and `??`, `if let` / `guard let` / `while let`, `defer`, `do` / `catch` / `throw`.
 - Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `UUID`, `Date`, `Calendar`, `DateFormatter`, `.formatted()`.
+- Protocols with extensions and default implementations (`extension P where Self: Q` too), `any P` and `some P`, generics, and classes that inherit with `super`.
+- `Equatable`, `Hashable`, `Comparable` and `CaseIterable` as Swift synthesizes them, or with your own `==`, `hash(into:)` and `<`. Declare them: `==`, `sorted()`, `allCases` and `ForEach` without `id:` need them.
+- `@ViewBuilder` functions, properties and parameters (with `if`, `switch` and `for`), and your own `@resultBuilder` and `@propertyWrapper` types.
+- Regex literals (`/\d+/`, `#/…/#`) with `firstMatch(of:)`, `wholeMatch(of:)`, `matches(of:)`, `contains` and `replacing`.
 - `Int` and `Double` are distinct, as in compiled Swift.
 
 **State**
 - `@State`, `@Binding`.
 - `ObservableObject` with `@Published`, used through `@StateObject`, `@ObservedObject` or `@EnvironmentObject`.
-- `@Observable` classes.
-- `@Environment(\.dismiss)`.
+- `@Observable` classes, also passed down with `.environment(model)` and read with `@Environment(Model.self)`.
+- `@Environment(\.dismiss)`, and your own values declared with `@Entry` in `extension EnvironmentValues`.
 
 **Views**
 - `NavigationStack` with `navigationDestination`, `NavigationSplitView`, `TabView`.
@@ -123,11 +127,8 @@ Saved data has to survive future versions of the app:
 - Give every field of a saved type a default value, or make it optional, so older saved data still decodes.
 - If decoding fails, don't save over the stored data. Keep a flag such as `loadFailed`, and skip saving while it's set.
 
-Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
-- Don't write `init(from:)` or `encode(to:)`. Kiln ignores them.
-- Saved enums need raw values (`enum Priority: String, Codable`). An enum with associated values can't be saved.
-- Save arrays and dictionaries, not `Set`s. A `Set` comes back as an array.
-- To turn text into `Data`, use `text.data(using: .utf8)`. `Data(text.utf8)` comes out empty.
+Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, or by your own `init(from:)` and `encode(to:)`:
+- Saved enums need raw values (`enum Priority: String, Codable`). An enum with associated values needs its own `init(from:)` and `encode(to:)`.
 
 ## What doesn't work
 
@@ -136,11 +137,6 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
 - A view, modifier or initializer Kiln doesn't have stops the app with an error that names it and its line, and so do argument labels SwiftUI doesn't have (`.blur(10)` for `.blur(radius: 10)`). That includes `matchedGeometryEffect` and `glassEffect`.
 - `Canvas` draws nothing. Draw with a custom `Shape` or a `Path` instead.
 - `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
-- Custom property wrappers (they're ignored) and result builders.
-- Protocol conformance isn't checked, and methods from a protocol extension don't exist. Avoid designs that depend on protocol extensions or default implementations.
-- A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.
-- Calling a method straight on `allCases` (`Kind.allCases.map { … }`) fails. Store it first: `let kinds = Kind.allCases`. `ForEach(Kind.allCases)` works.
-- `$value.animation()` on a binding. Use `.animation(_:value:)` on the view.
 
 ## Design
 
