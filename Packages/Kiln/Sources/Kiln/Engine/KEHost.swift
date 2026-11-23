@@ -138,6 +138,46 @@ struct KHostView: View {
     }
 }
 
+/// The app's `ViewModifier` (PLAN.md §1.5): SwiftUI's content goes to its
+/// `body(content:)`. Animatable, so an `Animatable` modifier interpolates.
+struct KModifierProxy: ViewModifier, Animatable {
+    var app: KAppValue
+
+    nonisolated var animatableData: KAnimVector {
+        get { MainActor.assumeIsolated { KAnimatable.data(app) } }
+        set { MainActor.assumeIsolated { KAnimatable.setData(&app, newValue) } }
+    }
+
+    func body(content: Content) -> some View {
+        if let s = app.structValue {
+            KModifierHost(value: s, interp: app.interp, content: AnyView(content))
+        } else {
+            content
+        }
+    }
+}
+
+/// Hosts a `ViewModifier`'s `body(content:)` like `KHostView` hosts a view's
+/// `body`: the modifier's `@State` lives as long as the view it's on.
+struct KModifierHost: View {
+    let value: KStructValue
+    let interp: KInterpreter
+    let content: AnyView
+    @StateObject private var storage = KViewStorage()
+    @SwiftUI.Environment(\.dismiss) private var dismiss
+    @SwiftUI.Environment(\.colorScheme) private var colorScheme
+    @SwiftUI.Environment(\.kilnObjects) private var objects
+
+    var body: some View {
+        storage.prepare(value, interp)
+        storage.setEnvironment(value, dismiss: dismiss, colorScheme: colorScheme, objects: objects, interp: interp)
+        let tracker = KReadTracker()
+        let out = interp.renderBody(of: value, storage: storage, tracker: tracker, content: KNativeContent.value(content))
+        storage.observe(tracker.objects)
+        return out
+    }
+}
+
 /// Content evaluated lazily inside SwiftUI (sheet content, navigation
 /// destinations): re-evaluates whenever SwiftUI asks for it.
 struct KLazyView: View {
@@ -196,7 +236,8 @@ struct KErrorView: View {
 // MARK: - Body evaluation
 
 extension KInterpreter {
-    func renderBody(of value: KStructValue, storage: KViewStorage?, tracker: KReadTracker?) -> AnyView {
+    /// `content`: a `ViewModifier`'s `body(content:)` is run with it.
+    func renderBody(of value: KStructValue, storage: KViewStorage?, tracker: KReadTracker?, content: KV? = nil) -> AnyView {
         let ctx = KSelfContext(type: value.type, location: .box(KBox(.structV(value))), storage: storage)
         let env = KEnv(parent: globalEnv, selfContext: ctx)
         let saved = readTracker
@@ -204,6 +245,18 @@ extension KInterpreter {
         // An error from here on is the body's: the host shows its error screen.
         context.bodyDepth += 1
         defer { readTracker = saved; context.bodyDepth -= 1 }
+        if let content {
+            guard let m = value.type.method("body", labels: ["content"]) else {
+                return AnyView(KErrorView(message: "\(value.type.name) has no body(content:)"))
+            }
+            do {
+                let v = try entry { try invoke(m, args: [content], labels: ["content"], selfContext: ctx, parent: globalEnv) }
+                return KRenderer(interp: self).render(.group(KBuiltins.asViews(v, self)))
+            } catch {
+                report(error)
+                return AnyView(KErrorView(message: describeError(error)))
+            }
+        }
         guard let bodyDecl = value.type.computed["body"] else {
             if value.type.isApp, let scenes = value.type.computed["body"] { _ = scenes }
             return AnyView(KErrorView(message: "\(value.type.name) has no body"))
