@@ -340,6 +340,21 @@ actor AppData {
         await push(slug)
     }
 
+    /// Delete App, on this phone or another: the app's file and everything
+    /// held for it, pending writes included, with nothing pushed. A push or
+    /// pull already under way finds its session gone and saves nothing, and
+    /// a session the app still holds (its card open while it was deleted
+    /// elsewhere) is cut off, so its writes go nowhere.
+    func remove(_ slug: String) {
+        saveTimers.removeValue(forKey: slug)?.cancel()
+        pushTimers.removeValue(forKey: slug)?.cancel()
+        pushes[slug] = nil
+        pulls[slug] = nil
+        sessions[slug] = nil
+        saved[slug] = nil
+        files.remove(slug)
+    }
+
     /// Sign Out: every file, with nothing pushed.
     func reset() async {
         generation += 1
@@ -426,15 +441,17 @@ actor AppData {
 
     private func startPull(_ slug: String) -> Task<Void, Never> {
         if let pull = pulls[slug] { return pull }
-        let pull = Task { await self.pullOnce(slug) }
+        // The session is taken now, not when the task starts: an app removed
+        // in between must not get a fresh one that the pull then saves.
+        let session = session(slug)
+        let pull = Task { await self.pullOnce(slug, into: session) }
         pulls[slug] = pull
         return pull
     }
 
-    private func pullOnce(_ slug: String) async {
+    private func pullOnce(_ slug: String, into session: DBSession) async {
         defer { pulls[slug] = nil }
         guard let api = api() else { return }
-        let session = session(slug)
         let generation = self.generation
         let start = session.pullStart()
         guard let changes = try? await api.changes(for: slug, since: start.rev) else { return }

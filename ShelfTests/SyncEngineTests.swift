@@ -3,7 +3,8 @@ import Synchronization
 import Testing
 @testable import Shelf
 
-/// A fake `/api/apps` with an ETag, per-app sources, and switches for failure.
+/// A fake `/api/apps` with an ETag, per-app sources, `PUT` and `DELETE`, and
+/// switches for failure.
 final class FakeLibrary: Sendable {
     struct State {
         var apps: [AppMeta] = []
@@ -13,12 +14,15 @@ final class FakeLibrary: Sendable {
         var unauthorized = false
         var listDelay: Duration = .zero
         var sourceDelay: Duration = .zero
+        /// What `DELETE` answers instead of deleting, when set.
+        var deleteRefusal: StubResponse?
+        var deleteDelay: Duration = .zero
     }
     let state = Locked(State())
     let server = StubServer()
 
     init() {
-        server.handle { [state] request in state.withLock { Self.respond(to: request, in: $0) } }
+        server.handle { [state] request in state.withLock { Self.respond(to: request, in: &$0) } }
     }
 
     func put(_ slug: String, version: String, name: String? = nil) {
@@ -39,9 +43,11 @@ final class FakeLibrary: Sendable {
     func update(_ change: (inout State) -> Void) { state.withLock { change(&$0) } }
 
     var listRequests: [StubRequest] { server.requests("GET", "/api/apps") }
+    func deleteRequests(_ slug: String) -> [StubRequest] { server.requests("DELETE", "/api/apps/\(slug)") }
+    var slugs: [String] { state.withLock { $0.apps.map(\.slug) } }
     func sourceRequests(_ slug: String) -> [StubRequest] { server.requests("GET", "/api/apps/\(slug)") }
 
-    private static func respond(to request: StubRequest, in state: State) -> StubResponse {
+    private static func respond(to request: StubRequest, in state: inout State) -> StubResponse {
         if state.offline { return .offline }
         if state.unauthorized { return .fixture("error-401", status: 401) }
         if request.path == "/api/apps" {
@@ -51,6 +57,23 @@ final class FakeLibrary: Sendable {
             return StubResponse.json(.object(["apps": apps]), headers: ["ETag": etag]).delayed(state.listDelay)
         }
         let slug = String(request.path.dropFirst("/api/apps/".count))
+        if request.method == "PUT" {
+            guard case .object(let body)? = request.json, case .string(let name)? = body["name"],
+                  case .string(let source)? = body["source"] else { return StubResponse(status: 400) }
+            let meta = AppMeta(slug: slug, name: name, tint: .teal, version: "put-\(source.count)", updatedAt: 1)
+            state.apps.removeAll { $0.slug == slug }
+            state.apps.append(meta)
+            state.sources[slug] = source
+            return (try? StubResponse.json(JSONDecoder().decode(JSONValue.self, from: JSONEncoder().encode(meta)), status: 201))
+                ?? StubResponse(status: 500)
+        }
+        if request.method == "DELETE" {
+            if let refusal = state.deleteRefusal { return refusal.delayed(state.deleteDelay) }
+            guard state.apps.contains(where: { $0.slug == slug }) else { return .fixture("error-404", status: 404) }
+            state.apps.removeAll { $0.slug == slug }
+            state.sources[slug] = nil
+            return .fixture("app-delete").delayed(state.deleteDelay)
+        }
         guard let meta = state.apps.first(where: { $0.slug == slug }), let source = state.sources[slug] else {
             return .fixture("error-404", status: 404)
         }

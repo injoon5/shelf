@@ -13,8 +13,13 @@ struct SlugFolder: Sendable {
     }
 
     func url(for slug: String) -> URL? {
-        let isFileSafe = !slug.isEmpty && !slug.hasPrefix(".") && !slug.contains("/") && !slug.contains("\0")
-        return isFileSafe ? root.appending(path: slug + "." + fileExtension, directoryHint: .notDirectory) : nil
+        Self.isFileSafe(slug) ? root.appending(path: slug + "." + fileExtension, directoryHint: .notDirectory) : nil
+    }
+
+    /// Whether `slug` can name a file or folder inside another folder and no
+    /// other: not empty, not hidden (so never "." or ".."), and no "/".
+    static func isFileSafe(_ slug: String) -> Bool {
+        !slug.isEmpty && !slug.hasPrefix(".") && !slug.contains("/") && !slug.contains("\0")
     }
 
     func read(_ slug: String) -> Data? {

@@ -15,6 +15,7 @@ struct AppCache: Sendable {
     var root: URL { sources.root }
 
     private var indexURL: URL { root.appending(path: "index.json") }
+    private var deletionsURL: URL { root.appending(path: "deletions.json") }
 
     /// Synchronous, so the Home Screen can read it before its first frame.
     /// A missing or unreadable index is an empty library.
@@ -28,6 +29,23 @@ struct AppCache: Sendable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         try sources.write(try encoder.encode(index), to: indexURL)
+    }
+
+    /// Deletions the server hasn't heard about yet, oldest first: made
+    /// offline, or cut off by a quit. The next sync sends them before it
+    /// lists apps. Kept beside the index, so Sign Out drops them with it.
+    func readDeletions() -> [String] {
+        guard let data = try? Data(contentsOf: deletionsURL),
+              let slugs = try? JSONDecoder().decode([String].self, from: data) else { return [] }
+        return slugs
+    }
+
+    func writeDeletions(_ slugs: [String]) throws {
+        if slugs.isEmpty {
+            try? FileManager.default.removeItem(at: deletionsURL)
+        } else {
+            try sources.write(try JSONEncoder().encode(slugs), to: deletionsURL)
+        }
     }
 
     func source(for slug: String) -> String? {
@@ -52,7 +70,7 @@ struct AppCache: Sendable {
         sources.slugs()
     }
 
-    /// Sign Out: the index and every source.
+    /// Sign Out: the index, the queued deletions and every source.
     func removeAll() {
         sources.removeAll()
     }

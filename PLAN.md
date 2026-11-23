@@ -206,6 +206,8 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Failure** (other than offline or a 404): the icon comes back, and the failure follows the same rule as a failed sync or Revert.
 - **Tests:** `APITests` against the fixture, and `LibraryStoreTests` for online, offline, and failure with the icon restored. `FakeServer` gains DELETE.
 
+**Done: the data, sync and server half.** `API.deleteApp`, `LibraryStore.delete(_:) -> Deletion` (`.deleted`, `.queued`, `.restored(failure)`, `.refused`), the persisted queue (`deletions.json`, sent first by every sync), and `AppCleanup`, which both a delete and a sync-observed removal run. The launch snapshot's folder is `Caches/Snapshots/<slug>/` (`LaunchSnapshots`); files (§4.1), permission grants (§4.0) and widgets (§6) add their steps to `AppCleanup.library` when they arrive. The server now also drops the slug's unused install keys, and still purges for an app it no longer has. Left for the UIKit Home Screen (§0.2): the badges, the menu item, the alert, and the icon's exit and return.
+
 ### 0.5 Icon appearance: Automatic, Light, Dark
 
 - **Remove Clear:** `IconStyle.clear`, `IconGlass`, the Clear branch in `CardFace`, and the Icon Style picker. Most of that code goes in §0.2 anyway. A stored `clear` reads as Automatic.

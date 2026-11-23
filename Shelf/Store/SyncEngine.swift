@@ -12,12 +12,24 @@ actor SyncEngine {
         case finished(slug: String)
     }
 
+    /// How Delete App went, when it didn't fail.
+    enum Deletion: Equatable, Sendable {
+        /// The server has deleted it, or never had it.
+        case deleted
+        /// Offline: the next sync sends it. Everything on the phone is gone already.
+        case queued
+    }
+
     /// Downloads in flight at once (plan §4, step 2).
     static let maxConcurrentDownloads = 4
 
     private let cache: AppCache
     private let api: @Sendable () -> API?
     private let appStorage: AppStorageKeys
+    /// What a deleted app leaves on the phone, and how to remove it.
+    private let cleanup: AppCleanup
+    /// Queued deletions the server refused for good since the last `takeRefusals`.
+    private var refusals: [API.Failure] = []
 
     /// The sync in flight, which a second caller joins instead of starting another.
     private var running: Task<LibraryIndex, Error>?
@@ -27,11 +39,14 @@ actor SyncEngine {
     private var generation = 0
 
     /// `api` returns nil while signed out. `appStorage` is where Kiln keeps
-    /// apps' `@AppStorage`; tests pass their own suite.
-    init(cache: AppCache, api: @escaping @Sendable () -> API?, appStorage: AppStorageKeys = AppStorageKeys(.standard)) {
+    /// apps' `@AppStorage`; tests pass their own suite. `cleanup` removes a
+    /// deleted app; without one, it's the source and `@AppStorage` only.
+    init(cache: AppCache, api: @escaping @Sendable () -> API?, appStorage: AppStorageKeys = AppStorageKeys(.standard),
+         cleanup: AppCleanup? = nil) {
         self.cache = cache
         self.api = api
         self.appStorage = appStorage
+        self.cleanup = cleanup ?? .library(cache: cache, appStorage: appStorage)
     }
 
     /// One full sync. Returns the index as written.
@@ -53,6 +68,40 @@ actor SyncEngine {
         try await enqueue { engine in try await engine.performFetch(slug) }.value
     }
 
+    /// Delete App (plan §0.4), in turn with syncs and fetches.
+    ///
+    /// The app leaves the index and joins the queued deletions before the
+    /// server is asked, so nothing lists it again even if Shelf quits
+    /// mid-request. Then:
+    /// - deleted, or a `404`: everything on the phone goes (`cleanup`);
+    /// - offline: everything on the phone goes, and the deletion stays queued
+    ///   for the next sync to send;
+    /// - any other failure: nothing on the phone has been touched, the app
+    ///   goes back where it was in the index, and the failure is thrown.
+    ///
+    /// Returns the index as it now stands.
+    func delete(_ slug: String) async throws -> (Deletion, LibraryIndex) {
+        try await enqueue { engine in try await engine.performDelete(slug) }.value
+    }
+
+    /// Sends `slug`'s queued deletion now, if it has one: before installing
+    /// an app under the same slug, which the deletion would otherwise take
+    /// with it at the next sync.
+    func sendQueuedDeletion(of slug: String) async throws {
+        try await enqueue { engine in
+            guard let api = engine.api() else { throw API.Failure.unauthorized }
+            guard engine.cache.readDeletions().contains(slug) else { return }
+            try await engine.sendDeletions([slug], with: api, generation: engine.generation)
+        }.value
+    }
+
+    /// The failures of queued deletions the server refused for good, each
+    /// once. Those apps came back with the sync that sent them.
+    func takeRefusals() -> [API.Failure] {
+        defer { refusals = [] }
+        return refusals
+    }
+
     /// Clears an app's blue dot.
     func markOpened(_ slug: String) -> LibraryIndex {
         var index = cache.readIndex()
@@ -67,6 +116,7 @@ actor SyncEngine {
     func abandon() {
         generation += 1
         running = nil
+        refusals = []
     }
 
     /// Sign Out: the cache, and every app's `@AppStorage` keys.
@@ -97,6 +147,8 @@ actor SyncEngine {
     private func performSync(onEvent: @Sendable (Event) -> Void) async throws -> LibraryIndex {
         guard let api = api() else { throw API.Failure.unauthorized }
         let generation = self.generation
+        // Deletions made offline go first, so the list never shows them again.
+        try await sendDeletions(cache.readDeletions(), with: api, generation: generation)
         let before = cache.readIndex()
         // A source that went missing on disk is not current, whatever the index says.
         let onDisk = Dictionary(
@@ -153,11 +205,76 @@ actor SyncEngine {
         // Only now that the index no longer lists them: remove what is gone.
         let listedSlugs = Set(merged.map(\.slug))
         let gone = Set(before.apps.map(\.slug)).union(cache.sourceSlugs()).subtracting(listedSlugs)
+        // Deleted on another phone, or on the web: everything goes here too.
         for slug in gone {
-            cache.removeSource(for: slug)
-            appStorage.remove(slug: slug)
+            await cleanup.remove(slug)
         }
         return index
+    }
+
+    // MARK: Delete
+
+    private func performDelete(_ slug: String) async throws -> (Deletion, LibraryIndex) {
+        guard let api = api() else { throw API.Failure.unauthorized }
+        let generation = self.generation
+
+        var deletions = cache.readDeletions()
+        if !deletions.contains(slug) { deletions.append(slug) }
+        try cache.writeDeletions(deletions)
+        var index = cache.readIndex()
+        let position = index.apps.firstIndex { $0.slug == slug }
+        let removed = position.map { index.apps.remove(at: $0) }
+        // The listing behind the etag still has the app.
+        index.etag = nil
+        try cache.writeIndex(index)
+
+        do throws(API.Failure) {
+            try await api.deleteApp(slug)
+        } catch .offline {
+            try checkGeneration(generation)
+            await cleanup.remove(slug)
+            return (.queued, cache.readIndex())
+        } catch {
+            try checkGeneration(generation)
+            try dequeueDeletion(slug)
+            if let removed, let position {
+                var index = cache.readIndex()
+                if !index.apps.contains(where: { $0.slug == slug }) {
+                    index.apps.insert(removed, at: min(position, index.apps.count))
+                    try cache.writeIndex(index)
+                }
+            }
+            throw error
+        }
+        try checkGeneration(generation)
+        try dequeueDeletion(slug)
+        await cleanup.remove(slug)
+        return (.deleted, cache.readIndex())
+    }
+
+    /// Sends queued deletions, oldest first. Offline, a rejected token or a
+    /// server error leaves the rest queued and throws, as a failed listing
+    /// would: retrying later can work. Any other refusal can't, so that
+    /// deletion is dropped, the app comes back with the list, and the
+    /// failure waits in `refusals` to be reported.
+    private func sendDeletions(_ slugs: [String], with api: API, generation: Int) async throws {
+        for slug in slugs {
+            do throws(API.Failure) {
+                try await api.deleteApp(slug)
+            } catch {
+                switch error {
+                case .offline, .unauthorized: throw error
+                case .rejected(let status, _) where status >= 500: throw error
+                case .rejected: refusals.append(error)
+                }
+            }
+            try checkGeneration(generation)
+            try dequeueDeletion(slug)
+        }
+    }
+
+    private func dequeueDeletion(_ slug: String) throws {
+        try cache.writeDeletions(cache.readDeletions().filter { $0 != slug })
     }
 
     /// Downloads and writes `slugs`, a few at a time. Returns what landed on disk.

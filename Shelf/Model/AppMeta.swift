@@ -17,6 +17,20 @@ struct AppMeta: Codable, Identifiable, Hashable, Sendable {
 
     var id: String { slug }
 
+    /// Whether `slug` is one the server could hold: its `SLUG_PATTERN`, a
+    /// letter or digit and then up to 63 letters, digits, hyphens and
+    /// underscores. Shelf's own slugs are a narrower lowercase kind, but an
+    /// agent with an install key can choose any of these. Nothing that isn't
+    /// one, such as the Home Screen's reserved Settings entry, is an app.
+    static func isValidSlug(_ slug: String) -> Bool {
+        let scalars = Array(slug.unicodeScalars)
+        guard (1...64).contains(scalars.count) else { return false }
+        func isAlphanumeric(_ s: Unicode.Scalar) -> Bool {
+            ("a"..."z").contains(s) || ("A"..."Z").contains(s) || ("0"..."9").contains(s)
+        }
+        return isAlphanumeric(scalars[0]) && scalars.dropFirst().allSatisfy { isAlphanumeric($0) || $0 == "-" || $0 == "_" }
+    }
+
     enum CodingKeys: String, CodingKey {
         case slug, name, icon, tint, version, revertible
         case updatedAt = "updated_at"

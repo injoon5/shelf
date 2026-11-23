@@ -11,7 +11,7 @@ milliseconds; `version` and the ETag are opaque strings. Every error body is
 | `app.json` | `GET /api/apps/{slug}` | 200 |
 | `app-put.json` | `PUT /api/apps/{slug}` (JSON or `text/x-swift`) | 201 created / 200 updated |
 | `app-revert.json` | `POST /api/apps/{slug}/revert` | 200 |
-| `app-delete.json` | `DELETE /api/apps/{slug}` (`?data=delete` also deletes its data) | 200 |
+| `app-delete.json` | `DELETE /api/apps/{slug}`: the app, its history and its unused install keys (`?data=delete` also deletes its data). An unknown app is `error-404.json`, after the same purge | 200 |
 | — | `GET /api/apps/{slug}/source` → raw file, `text/x-swift; charset=utf-8` | 200 |
 | `data.json` | `GET /api/apps/{slug}/data` | 200 |
 | `data-since.json` | `GET /api/apps/{slug}/data?since=1` (tombstone `value: null`) | 200 |
