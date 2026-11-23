@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-Nothing here is built yet.
+§0.1 is built: its findings, and what still needs a re-check once §0.2 lands, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -74,7 +74,7 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 - **Search:** result order, and where a card opened from a result lands (an icon on another page leaves past that side of the screen; with no icon it lands in the pill).
 - **Leaving Shelf:** going to the background during a drag (handled), with a card open, and with a sheet up. What each looks like on return.
 - **Persistence:** when `commitLayout` writes, what a corrupt `layout.json` does, and whether the current page survives a relaunch.
-- **Settings becomes an ordinary icon** (decided). Today it's fixed in the dock's last place, which Springboard has no equivalent of.
+- **Settings becomes an ordinary icon** (decided, and built). It used to be fixed in the dock's last place, which Springboard has no equivalent of.
   - It moves like any icon, to any page or within the dock, and starts in the dock's last place.
   - It can't be deleted: no minus badge, no Delete App in its menu. Its menu has only Edit Home Screen.
   - `Layout` holds it under a reserved ID that can never be an app slug (slugs are lowercase letters, digits and hyphens, so something like `:settings`). `reconcile` always keeps it.

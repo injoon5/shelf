@@ -1,7 +1,8 @@
 import PhotosUI
 import SwiftUI
 
-/// Settings, as a sheet from the gear in the dock. It keeps the system's own
+/// Settings, as a sheet from its icon, which sits in the layout like any
+/// app's (`Layout.settings`). It keeps the system's own
 /// sheet glass: no custom background.
 struct SettingsView: View {
     @Environment(LibraryStore.self) private var library
