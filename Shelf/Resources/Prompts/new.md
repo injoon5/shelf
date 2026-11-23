@@ -73,7 +73,15 @@ If you can't run commands, reply with the code as described above.
 - `TimelineView`.
 - `DispatchQueue.main.asyncAfter(deadline:)` for a one-off delay.
 
+**Waiting**
+- `async` functions, called with `await` from `.task { }`, `Task { }` or another `async` function. All of it runs on the main thread, so it can update state directly.
+- `.task { }` and `.task(id:)`, which stop when the view goes away and start again when the id changes. `.refreshable` waits for its closure.
+- `try await Task.sleep(for: .seconds(1))` waits without freezing the screen. `Task.isCancelled` and `try Task.checkCancellation()`.
+- `async let`, `withTaskGroup`, `AsyncStream` read with `for await`, and `await MainActor.run { }`.
+- A view's `body`, computed properties and `init` can't wait. Using `await` in them is an error.
+
 **Network**
+- `let (data, response) = try await URLSession.shared.data(from: url)` (or `for: request`) in an `async` function, with `do` / `catch` around it.
 - `URLSession.shared.dataTask(with:) { data, response, error in … }.resume()`. The completion handler runs on the main thread.
 - `JSONDecoder` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase` and `.iso8601`.
 - `URLComponents`, `URLQueryItem`, `URLRequest` (`httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)`).
@@ -127,8 +135,6 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
 - Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
 - `Canvas`, and `Path` used directly as a view, draw nothing. Draw with a custom `Shape` instead.
 - `matchedGeometryEffect` and `glassEffect` are skipped. `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
-- `Task.sleep` returns immediately. Use a `Timer` or `DispatchQueue.main.asyncAfter` for anything timed.
-- `try await URLSession.shared.data(from:)` freezes the screen until the response arrives, for up to 20 seconds. Use `dataTask(with:)` instead.
 - Custom property wrappers (they're ignored) and result builders.
 - Protocol conformance isn't checked, and methods from a protocol extension don't exist. Avoid designs that depend on protocol extensions or default implementations.
 - A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.

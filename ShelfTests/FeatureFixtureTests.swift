@@ -21,7 +21,7 @@ struct FeatureFixtureTests {
 
     @Test func everyPromptSectionHasAFixture() {
         for name in ["swift-language", "state", "views-navigation", "views-lists-controls", "views-layout-drawing",
-                     "time", "network", "images", "saving-data"] {
+                     "time", "async", "network", "images", "saving-data"] {
             #expect(Self.apps.contains(name), "missing fixtures/apps/\(name).swift")
         }
     }
@@ -146,20 +146,70 @@ struct FeatureFixtureTests {
         #expect(all.contains { $0.contains(warning) }, "\(claim) now works? \(all)")
     }
 
-    @Test func taskSleepDoesNotWait() async throws {
+    // MARK: Waiting (PLAN.md §1.3, §1.11's "real async works")
+
+    /// The async fixture, shown as Shelf shows it: it sleeps, fetches with
+    /// `try await` from a stub server, and counts down with `for await` over an
+    /// `AsyncStream`, all really waiting, without holding the main thread.
+    @Test func asyncFixtureSleepsFetchesAndStreams() async throws {
+        let server = StubServer { request in
+            request.path == "/today"
+                ? .json(#"{"text":"Stay hungry, stay foolish.","author":"Stewart Brand"}"#).delayed(.milliseconds(100))
+                : StubResponse(status: 404)
+        }
+        URLProtocol.registerClass(StubProtocol.self)
+        defer { URLProtocol.unregisterClass(StubProtocol.self) }
+        let source = try Self.source("async")
+            .replacingOccurrences(of: "https://quotes.example.com", with: server.origin.absoluteString)
+        let compiled = try KilnEngine.compile(source)
+        defer { compiled.interp.tearDown() }
+
+        let clock = ContinuousClock()
+        let start = clock.now
+        let window = try Self.show(compiled)
+        defer { window.isHidden = true }
+        var mainRuns = 0
+        let deadline = start + .seconds(5)
+        while clock.now < deadline {
+            let console = compiled.interp.console
+            if console.contains("counted [3, 2, 1]"), console.contains("loaded Stewart Brand"), compiled.interp.activeTaskCount == 0 { break }
+            mainRuns += 1
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        let console = compiled.interp.console
+        // The countdown runs while the quote loads, so their lines interleave.
+        #expect(console.contains("slept\n"), "\(console) \(compiled.interp.errors)")
+        #expect(console.contains("loaded Stewart Brand"), "\(console) \(compiled.interp.errors)")
+        #expect(console.range(of: "slept")!.lowerBound < console.range(of: "loaded")!.lowerBound)
+        #expect(console.contains("counted [3, 2, 1]"), "\(console)")
+        #expect(compiled.interp.errors.isEmpty, "\(compiled.interp.errors)")
+        #expect(compiled.interp.warnings.isEmpty, "\(compiled.interp.warnings)")
+        #expect(server.requests("GET", "/today").count == 1)
+        // The 300 ms sleep and the 100 ms response were really waited for…
+        #expect(clock.now - start >= .milliseconds(400))
+        // …while the main thread kept running other work.
+        #expect(mainRuns >= 10)
+    }
+
+    @Test func asyncTasksStopWithTheRun() async throws {
         let compiled = try KilnEngine.compile(Self.claimSource(#"""
-            Text("x").onAppear {
-                Task { try? await Task.sleep(nanoseconds: 2_000_000_000) }
+            Text("x").task {
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .milliseconds(10))
+                    print("tick")
+                }
             }
             """#))
-        // Kiln runs a `Task` body later on the main queue; a sleep that waited would hold it there.
-        let clock = ContinuousClock()
-        let elapsed = try await clock.measure {
-            KProbe(interp: compiled.interp, ticks: 1).run(compiled.root)
-            try await Task.sleep(for: .milliseconds(300))
-        }
-        #expect(elapsed < .seconds(1.5))
-        #expect(compiled.interp.warnings.contains { $0.contains("Task.sleep runs without waiting") }, "\(compiled.interp.warnings)")
+        let window = try Self.show(compiled)
+        defer { window.isHidden = true }
+        try await Task.sleep(for: .milliseconds(150))
+        #expect(compiled.interp.activeTaskCount == 1)
+        compiled.interp.tearDown()
+        #expect(compiled.interp.activeTaskCount == 0)
+        let printed = compiled.interp.console
+        #expect(printed.contains("tick"))
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(compiled.interp.console == printed)
     }
 
     @Test func dataFromUTF8ViewIsEmpty() {
@@ -262,18 +312,28 @@ struct FeatureFixtureTests {
     /// renderer reported while drawing it.
     static func render(_ source: String) throws -> (errors: [String], warnings: [String]) {
         let compiled = try KilnEngine.compile(source)
+        // What the app started (`.task`) stops with the window, as when Shelf closes it.
+        defer { compiled.interp.tearDown() }
+        let window = try show(compiled)
+        for _ in 0..<5 {
+            window.rootViewController?.view.setNeedsLayout()
+            window.rootViewController?.view.layoutIfNeeded()
+            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
+        }
+        window.isHidden = true
+        return (compiled.interp.errors, compiled.interp.warnings)
+    }
+
+    /// The app in a window of its own, laid out once.
+    static func show(_ compiled: KilnEngine.Compiled) throws -> UIWindow {
         let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let window = UIWindow(windowScene: scene)
         window.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
         let host = UIHostingController(rootView: KRootView(compiled: compiled))
         window.rootViewController = host
         window.isHidden = false
-        for _ in 0..<5 {
-            host.view.setNeedsLayout()
-            host.view.layoutIfNeeded()
-            RunLoop.main.run(until: Date().addingTimeInterval(0.02))
-        }
-        window.isHidden = true
-        return (compiled.interp.errors, compiled.interp.warnings)
+        host.view.setNeedsLayout()
+        host.view.layoutIfNeeded()
+        return window
     }
 }
