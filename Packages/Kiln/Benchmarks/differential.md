@@ -1,8 +1,8 @@
 # Differential check
 
-Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
+Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**49 inputs: 47 identical, 2 different as expected, 0 different otherwise.**
+**50 inputs: 49 identical, 1 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -13,14 +13,14 @@ Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparin
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
-| Packages/Kiln/Examples/AppleIntelligence/expense.md | 754 | 13 | identical |
+| Packages/Kiln/Examples/AppleIntelligence/expense.md | 754 | 13 | expected (The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.) |
 | Packages/Kiln/Examples/AppleIntelligence/habit.md | 377 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/memory.md | 31 | 1 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/timer.md | 338 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/tip.md | 1092 | 13 | identical |
 | Packages/Kiln/Examples/Networking/OpenLibrarySearch.swift | 22 | 2 | identical |
 | Packages/Kiln/Examples/LibraryApp.swift | 64 | 2 | identical |
-| fixtures/apps/async.swift | 284 | 14 | expected (New with §1.3: an app that sleeps, fetches with try await and streams with for await. Before §1.3 the sleep didn't wait, .task blocked on the request, and AsyncStream didn't exist.) |
+| fixtures/apps/async.swift | 283 | 14 | identical |
 | fixtures/apps/images.swift | 663 | 13 | identical |
 | fixtures/apps/network.swift | 211 | 14 | identical |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
@@ -50,260 +50,135 @@ Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparin
 | tests/KilnValidateTests-2.swift | 4 | 1 | identical |
 | tests/KilnValidateTests-3.swift | 12 | 1 | identical |
 | tests/KilnValidateTests-4.swift | 4 | 1 | identical |
+| tests/RegistryTests-0.swift | 2 | 1 | identical |
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
-| tests/WeatherRepro-0.swift | 209 | 13 | expected (A button calls fetchWeather(), which isn't async but awaits URLSession: §1.3 reports that with its line, where 0.2.1 blocked the main thread on the request.) |
+| tests/WeatherRepro-0.swift | 209 | 13 | identical |
 | tests/WeatherRepro-1.swift | 183 | 14 | identical |
 
-## fixtures/apps/async.swift
+## Packages/Kiln/Examples/AppleIntelligence/expense.md
 
 ```diff
 --- before
 +++ after
-@@ -24,13 +24,12 @@
- console: failed
--error: Line 121: Cannot find 'AsyncStream' in scope
--warning: Task.sleep runs without waiting in Kiln.
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=0, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
--        Text("Starting")
-+console: counted [3, 2, 1]
-+ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=0, related=[]}
-+  NavigationStack({fn})
-+    List({fn})
-+      Section("Today", {fn})
-+        Case 2
-+          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
-+            .foregroundStyle(Color)
-+      Section("Countdown", {fn})
-+        Text("3 · 2 · 1")
-           .monospacedDigit()
-@@ -45,11 +44,11 @@
- == after Button[…]@68
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=1, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
--        Text("Starting")
-+ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=1, related=[]}
-+  NavigationStack({fn})
-+    List({fn})
-+      Section("Today", {fn})
-+        Case 2
-+          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
-+            .foregroundStyle(Color)
-+      Section("Countdown", {fn})
-+        Text("3 · 2 · 1")
-           .monospacedDigit()
-@@ -66,11 +65,11 @@
- console: failed
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=1, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
--        Text("Starting")
-+ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=1, related=[]}
-+  NavigationStack({fn})
-+    List({fn})
-+      Section("Today", {fn})
-+        Case 2
-+          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
-+            .foregroundStyle(Color)
-+      Section("Countdown", {fn})
-+        Text("3 · 2 · 1")
-           .monospacedDigit()
-@@ -85,11 +84,11 @@
- == after Button[…]@68
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=2, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
--        Text("Starting")
-+ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=2, related=[]}
-+  NavigationStack({fn})
-+    List({fn})
-+      Section("Today", {fn})
-+        Case 2
-+          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
-+            .foregroundStyle(Color)
-+      Section("Countdown", {fn})
-+        Text("3 · 2 · 1")
-           .monospacedDigit()
-@@ -106,11 +105,11 @@
- console: failed
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=2, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
--        Text("Starting")
-+ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=2, related=[]}
-+  NavigationStack({fn})
-+    List({fn})
-+      Section("Today", {fn})
-+        Case 2
-+          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
-+            .foregroundStyle(Color)
-+      Section("Countdown", {fn})
-+        Text("3 · 2 · 1")
-           .monospacedDigit()
-@@ -125,11 +124,11 @@
- == after Button[…]@68
--ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=3, related=[]}
--  NavigationStack({fn})
--    List({fn})
--      Section("Today", {fn})
--        Case 2
--          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
--            .foregroundStyle(Color)
--      Section("Countdown", {fn})
-…
-```
-
-## tests/WeatherRepro-0.swift
-
-```diff
---- before
-+++ after
-@@ -17,193 +17,193 @@
- == after Button(action)@12
--error: Uncaught error: The operation couldn’t be completed. (NSURLErrorDomain error -1009.)
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
--      .font(Font)
--    HStack({fn})
--      Text(_literal: "0.000000°F")
--        .font(Font)
--      Text("N/A")
--        .font(Font)
--    Button(action: {fn}, label: {fn})
--      Label("Refresh", systemImage: "arrow.clockwise")
--        .padding()
--        .background(Color)
--        .foregroundColor(Color)
--        .cornerRadius(10)
--== after Button(action)@12
--ContentView {temperature=0.0, condition="N/A"}
--  VStack(spacing: 20, {fn})
--    Text(_literal: "New York City Weather")
+@@ -7,8 +7,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -22,2 +17,3 @@
+         Button("Add Expense", {fn})
++error: Line 40: Kiln doesn't support the .stepValue() modifier
+ == after Button[Add Expense]@65
+@@ -29,8 +25,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -57,8 +48,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -91,8 +77,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -131,8 +112,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -177,8 +153,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -229,8 +200,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -287,8 +253,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -351,8 +312,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -421,8 +377,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -497,8 +448,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-          Stepper(value: $0.0, {fn})
+-            Text(_literal: "0.00")
+-            .stepValue(0.1)
+-          DatePicker("Date", selection: $<date>, displayedComponents: .date)
++          content failed
+         .padding()
+@@ -579,8 +525,3 @@
+           Text(_literal: "New Expense")
+-          TextField("Category", text: $"")
+-            .textFieldStyle(.roundedBorder)
 …
 ```

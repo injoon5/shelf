@@ -401,7 +401,7 @@ Built.
 - **Host bridges** use `Kiln.registerType` and `Kiln.registerFunction`.
 - **Observation.** A native `@Observable` object that `body` reads is tracked by SwiftUI; `RegistryTests` pins this down.
 - **The guide** for adding a bridge is [Packages/Kiln/Docs/bridges.md](Packages/Kiln/Docs/bridges.md).
-- **Speed** is in [Benchmarks](Packages/Kiln/Benchmarks/README.md#14-bridges-in-a-registry).
+- **Speed** is in [Benchmarks](Packages/Kiln/Benchmarks/README.md#after-14-registryjson).
 
 ### 1.5 Native code calling the app's code
 

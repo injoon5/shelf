@@ -20,7 +20,7 @@ WORK=$(mktemp -d -t kilniter)
 echo "== bench"
 # Against the latest recorded step (Benchmarks/README.md): an input more than
 # 10% slower is marked SLOWER.
-"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/after-1.3-async.json" | tee "$OUT/bench.txt"
+"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/after-1.4-registry.json" | tee "$OUT/bench.txt"
 
 echo "== lab"
 cd "$KILN/Lab"

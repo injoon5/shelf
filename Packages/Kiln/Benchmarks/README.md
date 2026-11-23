@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.3-async.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.4-registry.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step, not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.4-registry.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -122,6 +122,57 @@ Validate, minimum per call, in ms:
 | Workloads/Collections.swift | 31.88 | 30.49 | -4% |
 | Workloads/Objects.swift | 32.13 | 30.86 | -4% |
 | **Total (inputs in both)** | **406.84** | **386.61** | -5% |
+
+### after-1.4-registry.json
+
+After §1.4 (bridges in a registry). `Tools/iterate.sh` now compares against this file.
+
+- Command: `Benchmarks/run.sh Benchmarks/after-1.4-registry.json --compare Benchmarks/after-1.3-async.json` (21 samples). Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is views-layout-drawing, 5.9% slower. The compute workloads are within 2%.
+- `expense.md` now fails `validate` on purpose: it writes `.stepValue(0.1)`, which isn't SwiftUI, and an unknown modifier is an error.
+- **What it costs.** A view or modifier call now:
+  - picks an overload by labels and argument syntax;
+  - evaluates each argument against its parameter's kind;
+  - keeps the overload it picked.
+
+  The first port was 10 to 16% slower on view-heavy apps. These made it cheap again:
+  - an error message, a member name (`Date.now`) or an argument-syntax array is no longer built until it's needed;
+  - a value's fallback type (a `String`'s characters, for `map`) is made only when its own type lacks the member;
+  - each parameter's expected type is made once, at registration;
+  - the interpreter keeps the registry.
+- **Back to back.** Run back to back on this machine against the engine before the registry (b466f9c), apps are 0 to 5% slower to validate, and 2.5% in total. One 0.01 ms clock tick is 2 to 3% on these sub-millisecond inputs.
+
+Validate, minimum per call, in ms:
+
+| Input | §1.3 | §1.4 | Change |
+|---|---:|---:|---:|
+| Apps/Chess.swift | 10.95 | 11.29 | +3% |
+| Apps/ExpenseTracker.swift | 0.70 | 0.73 | +4% |
+| Apps/FocusTimer.swift | 0.48 | 0.49 | +2% |
+| Apps/HabitTracker.swift | 0.67 | 0.70 | +4% |
+| Apps/MemoryMatch.swift | 0.53 | 0.52 | -2% |
+| Apps/ReadingList.swift | 0.95 | 0.98 | +3% |
+| Apps/TipCalculator.swift | 0.30 | 0.31 | +3% |
+| AppleIntelligence/expense.md | 0.32 | 0.32 | +0% |
+| AppleIntelligence/habit.md | 0.25 | 0.25 | +0% |
+| AppleIntelligence/memory.md | 0.30 | 0.30 | +0% |
+| AppleIntelligence/timer.md | 0.44 | 0.45 | +2% |
+| AppleIntelligence/tip.md | 0.44 | 0.46 | +5% |
+| Networking/OpenLibrarySearch.swift | 0.30 | 0.29 | -3% |
+| apps/async.swift | 0.55 | 0.56 | +2% |
+| apps/images.swift | 0.37 | 0.38 | +3% |
+| apps/network.swift | 0.68 | 0.65 | -4% |
+| apps/saving-data.swift | 0.75 | 0.76 | +1% |
+| apps/state.swift | 0.45 | 0.46 | +2% |
+| apps/swift-language.swift | 1.04 | 1.07 | +3% |
+| apps/time.swift | 0.45 | 0.45 | +0% |
+| apps/todos-db.swift | 0.29 | 0.30 | +3% |
+| apps/views-layout-drawing.swift | 1.02 | 1.08 | +6% |
+| apps/views-lists-controls.swift | 0.72 | 0.75 | +4% |
+| apps/views-navigation.swift | 0.71 | 0.73 | +3% |
+| Workloads/Arithmetic.swift | 302.15 | 303.03 | +0% |
+| Workloads/Collections.swift | 30.49 | 30.31 | -1% |
+| Workloads/Objects.swift | 30.86 | 30.28 | -2% |
 
 ## §1.3: Code that can wait
 
