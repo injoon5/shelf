@@ -59,6 +59,9 @@ final class HomeModel {
     /// Per app: how many times it has refused to open. A change shakes its icon.
     private(set) var refusals: [String: Int] = [:]
 
+    /// The app whose deletion is waiting on the alert's Delete or Cancel.
+    private(set) var deleteRequest: String?
+
     @ObservationIgnored private var taps = 0
     @ObservationIgnored private var requests = 0
     @ObservationIgnored private var flip: (target: Int, task: Task<Void, Never>)?
@@ -236,6 +239,31 @@ final class HomeModel {
                 self?.showsPageDots = false
             }
         }
+    }
+
+    // MARK: Deleting
+
+    /// A minus badge or Delete App was tapped: the icon asks to be deleted,
+    /// and the Home Screen asks the person (`DeleteAlert`). Nothing has
+    /// been deleted yet.
+    func askToDelete(_ id: String) {
+        guard Layout.isDeletable(id) else { return }
+        deleteRequest = id
+    }
+
+    /// Cancel, in the alert.
+    func cancelDelete() {
+        deleteRequest = nil
+    }
+
+    /// Delete, in the alert. The icon leaves at once (`LibraryStore.delete`
+    /// takes it out of the layout before it asks the server), and comes
+    /// back if the server refuses.
+    @discardableResult
+    func confirmDelete(in library: LibraryStore) async -> LibraryStore.Deletion? {
+        guard let id = deleteRequest else { return nil }
+        deleteRequest = nil
+        return await library.delete(id)
     }
 
     // MARK: Search

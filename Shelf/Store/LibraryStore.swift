@@ -361,10 +361,17 @@ final class LibraryStore {
         }
         let before = layout
         let slot = layout.slot(of: slug)
-        apps.remove(at: position)
+        let removed = apps.remove(at: position)
         reconcileLayout()
-        if isDemo { return .deleted }
         let after = layout
+        if isDemo {
+            #if DEBUG
+            if Demo.deleteFails {
+                return await refuseDemoDeletion(removed, at: position, slot: slot, layoutBefore: before, layoutAfter: after)
+            }
+            #endif
+            return .deleted
+        }
 
         let account = self.account
         deleting.insert(slug)
@@ -407,6 +414,19 @@ final class LibraryStore {
     }
 
     #if DEBUG
+    /// The demo's server refusing a deletion, after a while, as a real one
+    /// might (`-ShelfDemoDeleteFails YES`): for seeing an icon come back.
+    private func refuseDemoDeletion(_ app: CachedApp, at position: Int, slot: Layout.Slot?,
+                                    layoutBefore before: Layout, layoutAfter after: Layout) async -> Deletion {
+        try? await Task.sleep(for: .seconds(Demo.deleteFailDelay * Motion.Spring.slowdown))
+        let failure = API.Failure.rejected(status: 503, message: "The server had a problem. Try again later.")
+        guard self.app(app.slug) == nil else { return .restored(failure) }
+        apps.insert(app, at: min(position, apps.count))
+        restore(app.slug, to: slot, layoutBefore: before, layoutAfter: after)
+        report(failure)
+        return .restored(failure)
+    }
+
     /// A library with no server behind it, for previews and screenshots:
     /// `apps`, with their sources already in `cache`. It never syncs.
     init(demo apps: [CachedApp], dock: [String] = [], cache: AppCache) {

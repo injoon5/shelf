@@ -109,3 +109,42 @@ The backdrop darkens beyond App Library's over a wallpaper brighter than about
 0.6 on average, to 0.42, so white names still read (App Library's own captures
 average 0.09 and 0.27). That ceiling is Shelf's: Springboard over a white
 wallpaper wasn't captured.
+
+## Deleting an app (PLAN.md §0.4)
+
+Springboard on the iPhone 17 simulator (iOS 27.0), dark, driven with
+`agent-device` and recorded whole-screen at 30 fps, then read frame by
+frame. The motion is from **Remove from Home Screen**, which takes the icon
+away exactly as Delete App does and can be undone; the simulator's only
+deletable apps weren't ours to delete.
+
+**The menu:** Remove App, red, with a minus in a circle, last, in one group
+with Edit Home Screen (`longpress-menu-grid-photos.png`); above the dock the
+menu lists the other way, so it's first (`longpress-menu-dock-safari.png`).
+
+**The alerts**, both the system alert in its iOS 27 glass:
+
+| Alert | Title | Message | Buttons |
+|---|---|---|---|
+| Remove App | Remove “CS”? | Removing from Home Screen will keep the app in your App Library. | Remove from Home Screen, Delete App (red), Cancel, stacked |
+| Delete App | Delete “CS”? | Deleting this app will also delete its data. | Cancel, Delete (red), side by side |
+
+Shelf has no App Library, so it has only the second, as `UIAlertController`:
+"Delete “Habits”?" / "Deleting this app will also delete its data on all your
+devices. This can’t be undone." / Cancel, Delete.
+
+**The motion**, from the tap on the alert's button:
+
+| When | What |
+|---|---|
+| 0–200 ms | The alert fades and the dim lifts. |
+| ≈ 270 ms | The icon starts to shrink about its artwork's centre, label and all, and fade. |
+| +33, 67, 100, 133 ms | 0.87, 0.64, 0.35, 0.13 of its size: about 200 ms, slow at both ends (ease in and out). |
+| +230 ms | Gone; the icons after it start closing up, each straight to its new place (one from the next row cuts diagonally across). |
+| +117, 283, 450 ms | 49%, 95%, then 0.6% past its place; still by about +680 ms. A spring of 0.48 s, bounce 0.14, fits every frame to within 2 px over 718 px. |
+
+Shelf's, recorded the same way (`Motion.iconLeave`, `closeUpDelay`,
+`iconCloseUp`): the shrink and the close-up land on the same frames, 230 ms
+apart, and the close-up reads 57%, 93% and 100.2% at 122, 255 and 388 ms. Its
+alert hands over about 470 ms after the tap rather than 270: UIKit calls an
+alert action's handler only once the alert has gone.
