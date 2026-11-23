@@ -1,44 +1,20 @@
 import SwiftUI
 import UIKit
 
-/// What the SwiftUI side of the Home Screen hands the stage each update.
-struct StageInput: Equatable {
-    var run: HomeModel.Run?
-    var isSearching = false
-    var isEditing = false
-    var showsPageDots = false
-    var pageCount = 1
-    var page = 0
-
-    /// Page dots stand in for "Search" in edit mode, and while there are
-    /// pages to move between and they are moving.
-    var showsDots: Bool { isEditing || (showsPageDots && pageCount > 1) }
-}
-
-/// Where the stage has put things, for the SwiftUI views it hosts.
+/// Where search results are, for the SwiftUI results the stage hosts until
+/// search is rebuilt in UIKit (PLAN.md §0.3).
 @MainActor
 @Observable
-final class StageLayout {
-    /// The coordinate space icons report their frames in: the stage's own.
-    nonisolated static let space = "stage"
-
+final class ResultsLayout {
     var geometry = HomeGeometry(size: .zero, safeTop: 0, displayRadius: 0, labelHeight: 0)
     var labelSize = HomeMetrics.labelSize
     /// From the bottom of the screen to just above the search field.
     var resultsBottom: CGFloat = 0
-    /// Icons whose artwork is hidden because their app's card stands in for
-    /// them: open, or in flight. Their labels stay, as on Springboard.
+    /// Results whose app's card stands in for them.
     var cardIcons: Set<String> = []
-    /// Where each icon's artwork is, in the stage's coordinates, as last laid
-    /// out: what a card grows out of and lands on.
-    @ObservationIgnored var iconFrames: [IconKey: CGRect] = [:]
-
-    /// Where a card should grow out of or land on for `slug`: the search
-    /// result while searching, otherwise its dock or grid icon.
-    func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
-        if preferResult, let frame = iconFrames[IconKey(slug: slug, place: .result)] { return frame }
-        return iconFrames[IconKey(slug: slug, place: .dock)] ?? iconFrames[IconKey(slug: slug, place: .grid)]
-    }
+    /// Where each result's artwork is, in the stage's coordinates, as last
+    /// laid out: what a card opened from search grows out of.
+    @ObservationIgnored var frames: [String: CGRect] = [:]
 }
 
 /// The Home Screen and the apps that open over it, in UIKit, where every
@@ -47,39 +23,39 @@ struct HomeStage: UIViewControllerRepresentable {
     var model: HomeModel
     var library: LibraryStore
     var settings: ShelfSettings
-    var input: StageInput
 
     func makeUIViewController(context: Context) -> StageController {
         StageController(model: model, library: library, settings: settings)
     }
 
-    func updateUIViewController(_ controller: StageController, context: Context) {
-        controller.apply(input)
-    }
+    // The stage follows the models itself, in `updateProperties()`.
+    func updateUIViewController(_ controller: StageController, context: Context) {}
 }
 
 /// The stage, back to front:
 ///
 /// - the wallpaper, and the dim search lays over it;
-/// - the Home Screen proper (grid, dock, search results, the search glass),
-///   which scales back while an app is open;
+/// - the Home Screen proper (`HomeView`: pages, dock, edit mode), search's
+///   results and glass, and the overlay a lifted icon and its menu rise
+///   into, all of which scale back while an app is open;
 /// - the blur and dim an app's card is seen over;
 /// - the cards, each with its live app above it.
 ///
-/// The SwiftUI layers ignore the safe area: the stage gives them the
-/// geometry, so scaling them never makes them lay out again.
+/// It follows `HomeModel` in `updateProperties()`, which UIKit tracks for
+/// observation: what is open, searching, editing, the page dots.
 @MainActor
 final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private let model: HomeModel
     private let library: LibraryStore
     private let settings: ShelfSettings
-    let layout = StageLayout()
+    let layout = ResultsLayout()
 
-    private var wallpaper: UIHostingController<WallpaperLayer>!
+    private var wallpaper: WallpaperView!
     private let searchDim = UIView()
     /// Everything that scales back behind an open app.
     private let home = UIView()
-    private var icons: UIHostingController<IconsLayer>!
+    private var homeView: HomeView!
+    private let overlay = HomeOverlay()
     private var results: UIHostingController<ResultsLayer>!
     private var search: SearchBar!
     private let backdropDim = UIView()
@@ -88,7 +64,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private var cards: [AppCard] = []
     private var heldCard: AppCard?
     private var displayLink: CADisplayLink?
-    private var input = StageInput()
+    private var openRun: HomeModel.Run?
+    private var shownDots: (shown: Bool, count: Int, page: Int)?
+    private lazy var launchImpact = UIImpactFeedbackGenerator(style: .light, view: view)
 
     private let edgePan = UIPanGestureRecognizer()
     private let stripPan = UIPanGestureRecognizer()
@@ -114,20 +92,21 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        let environment = StageEnvironment(model: model, library: library, settings: settings, layout: layout)
 
-        wallpaper = host(WallpaperLayer(stage: environment), in: view)
+        wallpaper = WallpaperView(settings: settings)
+        view.addSubview(wallpaper)
         searchDim.backgroundColor = .black
         searchDim.alpha = 0
         searchDim.isUserInteractionEnabled = false
         view.addSubview(searchDim)
 
         view.addSubview(home)
-        icons = host(IconsLayer(stage: environment), in: home)
-        results = host(ResultsLayer(stage: environment), in: home)
+        homeView = HomeView(model: model, library: library, overlay: overlay)
+        home.addSubview(homeView)
+        results = host(ResultsLayer(model: model, library: library, layout: layout), in: home)
         results.view.alpha = 0
         results.view.isUserInteractionEnabled = false
-        search = SearchBar(fades: .init(home: icons.view, results: results.view, dim: searchDim))
+        search = SearchBar(fades: .init(home: homeView, results: results.view, dim: searchDim))
         search.onTapPill = { [unowned self] in
             guard canOpenSearch else { return }
             openSearch()
@@ -141,6 +120,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
         search.onFieldMoved = { [unowned self] top in placeResults(aboveFieldAt: top) }
         home.addSubview(search)
+        home.addSubview(overlay)
 
         for cover in [backdropDim, backdropBlur] {
             cover.isUserInteractionEnabled = false
@@ -160,6 +140,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             recognizer.delegate = self
             view.addGestureRecognizer(recognizer)
         }
+
+        // The search pull waits to see whether a touch on an icon is a press.
+        pull.require(toFail: homeView.touch)
 
         registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (controller: StageController, _) in
             controller.view.setNeedsLayout()
@@ -184,14 +167,22 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         view.window?.windowScene?.screen.traitCollection.userInterfaceStyle ?? traitCollection.userInterfaceStyle
     }
 
-    /// The Home Screen keeps the chosen appearance behind any app.
+    /// The Home Screen keeps the chosen appearance behind any app, and so
+    /// do icons everywhere: the tone is set once, on the window, so the
+    /// grid, the dock, cards' faces and sheets' previews all read the same
+    /// value. For now it follows the system; Icon Appearance (§0.5) will
+    /// set it from Settings.
     private func holdAppearance() {
         let style = chosenStyle
-        for layer in [wallpaper as UIViewController?, icons, results].compactMap({ $0 }) where layer.overrideUserInterfaceStyle != style {
+        if let results, results.overrideUserInterfaceStyle != style { results.overrideUserInterfaceStyle = style }
+        for layer in [wallpaper as UIView?, homeView, overlay, search, backdropBlur].compactMap({ $0 }) where layer.overrideUserInterfaceStyle != style {
             layer.overrideUserInterfaceStyle = style
         }
-        for layer in [search as UIView?, backdropBlur].compactMap({ $0 }) where layer.overrideUserInterfaceStyle != style {
-            layer.overrideUserInterfaceStyle = style
+        let tone = IconTone(style)
+        // Reading an override that was never set throws, so ask the
+        // window's traits instead.
+        if let window = view.window, window.traitCollection[IconToneTrait.self] != tone {
+            window.traitOverrides.iconTone = tone
         }
     }
 
@@ -209,11 +200,11 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLayoutSubviews()
         let bounds = view.bounds
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
-        for layer in [wallpaper.view!, searchDim, home, backdropDim, backdropBlur, cardsView] {
+        for layer in [wallpaper!, searchDim, home, backdropDim, backdropBlur, cardsView] as [UIView] {
             layer.bounds = bounds
             layer.center = center
         }
-        for layer in [icons.view!, results.view!, search!] as [UIView] {
+        for layer in [homeView!, results.view!, search!, overlay] as [UIView] {
             layer.bounds = home.bounds
             layer.center = center
         }
@@ -228,9 +219,12 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         if geometry != layout.geometry || labels.size != layout.labelSize {
             layout.geometry = geometry
             layout.labelSize = labels.size
+            homeView.geometry = geometry
+            homeView.labelFont = .systemFont(ofSize: labels.size, weight: .medium)
             search.layout(geometry)
             placeResults(aboveFieldAt: search.restingField.minY)
-            search.setDots(input.showsDots, count: input.pageCount, current: input.page, animated: false)
+            shownDots = nil
+            setNeedsUpdateProperties()
         }
     }
 
@@ -246,26 +240,38 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: Following the model
 
-    func apply(_ new: StageInput) {
-        let old = input
-        input = new
-        if new.isSearching != search.isOpen {
-            if new.isSearching {
+    override func updateProperties() {
+        super.updateProperties()
+        if model.isSearching != search.isOpen {
+            if model.isSearching {
                 openSearch()
             } else {
                 search.close()
             }
         }
-        if new.isEditing != old.isEditing || new.showsPageDots != old.showsPageDots
-            || new.pageCount != old.pageCount || new.page != old.page {
-            search.setDots(new.showsDots, count: new.pageCount, current: new.page, animated: true)
+        // An app opened from search closes back onto the Home Screen.
+        if model.run != nil, model.isSearching { model.endSearch() }
+
+        // Page dots stand in for "Search" in edit mode, and while there are
+        // pages to move between and they are moving.
+        let count = model.pageCount(library.layout.pages)
+        let dots = (shown: model.isEditing || (model.showsPageDots && count > 1), count: count, page: model.page)
+        if let shownDots, shownDots != dots {
+            search.setDots(dots.shown, count: dots.count, current: dots.page, animated: true)
+        } else if shownDots == nil, layout.geometry.size.width > 0 {
+            search.setDots(dots.shown, count: dots.count, current: dots.page, animated: false)
         }
-        if new.run != old.run { follow(new.run) }
+        if layout.geometry.size.width > 0 { shownDots = dots }
+
+        if model.run != openRun {
+            openRun = model.run
+            follow(model.run)
+        }
     }
 
     /// Search opens over a still Home Screen: no app, no edit mode, and
     /// not open already (a tap on its glass would clear what was typed).
-    private var canOpenSearch: Bool { cards.isEmpty && !input.isEditing && !search.isOpen }
+    private var canOpenSearch: Bool { cards.isEmpty && !model.isEditing && !search.isOpen }
 
     private func openSearch() {
         setSearchTone()
@@ -307,13 +313,12 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     private func present(_ run: HomeModel.Run) {
         let bounds = view.bounds
-        let icon = iconFrame(run.id, preferResult: input.isSearching || search.isOpen)
+        let icon = iconFrame(run.id, preferResult: search.isOpen)
         let source = CardMotion.landing(icon: icon, screenWidth: bounds.width,
                                         pill: layout.geometry.pillFrame, iconSize: iconSize).frame
-        let face = CardFace(IconFace(run.app.meta), style: settings.iconStyle,
-                            dark: chosenStyle == .dark, iconSize: iconSize)
-        let card = AppCard(run: run, data: library.data, face: face, screen: bounds.size, iconSize: iconSize,
+        let card = AppCard(run: run, data: library.data, face: IconFace(run.app.meta), screen: bounds.size, iconSize: iconSize,
                            fullRadius: Display.cornerRadius, from: source)
+        launchImpact.impactOccurred(at: CGPoint(x: source.midX, y: source.midY))
         addChild(card.host)
         cardsView.addSubview(card.face)
         card.host.view.frame = bounds
@@ -321,14 +326,12 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         card.host.didMove(toParent: self)
         cards.append(card)
         card.open()
-        // Not during this view update: on the next turn of the run loop.
-        Task { @MainActor in self.layout.cardIcons.insert(run.id) }
+        setCardIcons()
         startTicking()
     }
 
     private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
-        // An app deleted while its card was up has no icon to land on, even
-        // if SwiftUI hasn't yet taken the icon's frame away.
+        // An app deleted while its card was up has no icon to land on.
         let icon = library.app(card.slug) == nil ? nil : iconFrame(card.slug, preferResult: false)
         let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
                                          pill: layout.geometry.pillFrame, iconSize: iconSize)
@@ -336,24 +339,25 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         startTicking()
     }
 
-    /// Where `slug`'s icon is: as its view last reported it, or, for an
-    /// icon on a page out of view, which reports nothing, where the layout
-    /// puts it.
+    /// Where `slug`'s icon is: the search result's while searching, else
+    /// where the layout puts it on the Home Screen, exactly, an icon on
+    /// another page a whole page's width off to that side.
     private func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
-        if let reported = layout.iconFrame(slug, preferResult: preferResult) { return reported }
-        guard let slot = library.layout.slot(of: slug) else { return nil }
-        return layout.geometry.iconFrame(at: slot, dockCount: library.layout.dock.count, page: model.page)
+        if preferResult, let result = layout.frames[slug] { return result }
+        return homeView.iconFrame(for: slug).map { homeView.convert($0, to: view) }
+    }
+
+    /// The icons a card stands in for show no artwork. A landed card and
+    /// its icon trade places in one frame: the icon is drawn, and the card
+    /// goes, in the same transaction.
+    private func setCardIcons() {
+        let slugs = Set(cards.filter { $0.phase != .landed }.map(\.slug))
+        homeView.cardIcons = slugs
+        if layout.cardIcons != slugs { layout.cardIcons = slugs }
     }
 
     private func land(_ card: AppCard) {
-        layout.cardIcons.remove(card.slug)
-        // The icon is drawn beneath the card on SwiftUI's next pass; the card
-        // stays a moment longer so there is never a frame with neither.
-        Task { @MainActor in
-            try? await Task.sleep(for: Motion.cardHandoff)
-            guard card.phase == .landed else { return }
-            self.remove(card)
-        }
+        remove(card)
     }
 
     private func remove(_ card: AppCard) {
@@ -362,6 +366,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         card.host.removeFromParent()
         card.face.removeFromSuperview()
         cards.removeAll { $0 === card }
+        setCardIcons()
         if cards.isEmpty { setBackdrop(0) }
         coverChanged()
     }
@@ -370,7 +375,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     /// is out of sight, so it is out of reach too.
     private func coverChanged() {
         let covered = cards.contains { $0.phase == .open }
-        for layer in [wallpaper.view!, home] where layer.accessibilityElementsHidden != covered {
+        for layer in [wallpaper!, home] where layer.accessibilityElementsHidden != covered {
             layer.accessibilityElementsHidden = covered
         }
     }
@@ -499,7 +504,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             close(card, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
             return
         }
+        openRun = model.run
         card.reopen(centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+        setCardIcons()
         startTicking()
     }
 

@@ -55,7 +55,7 @@ struct ErrorScreen: View {
     var body: some View {
         ScrollView {
             VStack(spacing: RunnerMetrics.errorSpacing) {
-                IconArt(face: face, size: RunnerMetrics.errorIconSize)
+                IconImage(face: face, size: RunnerMetrics.errorIconSize)
                 Text("\(name) couldn’t open")
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)

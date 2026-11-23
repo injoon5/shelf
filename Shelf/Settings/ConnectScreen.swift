@@ -14,7 +14,7 @@ struct ConnectScreen: View {
         // wallpaper behind stays where it is.
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(Motion.standard, value: isKeyboardUp)
-        .background { Wallpaper() }
+        .background { WallpaperBackground().ignoresSafeArea() }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in isKeyboardUp = true }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in isKeyboardUp = false }
         .dynamicTypeSize(...ShelfMetrics.textSizeCap)
@@ -175,6 +175,23 @@ struct ConnectForm: View {
                 shakes += 1
                 focus = .token
             }
+        }
+    }
+}
+
+/// A quick side-to-side shake: the token was refused.
+private struct Shake: ViewModifier {
+    var trigger: Int
+
+    func body(content: Content) -> some View {
+        content.keyframeAnimator(initialValue: CGFloat.zero, trigger: trigger) { view, x in
+            view.offset(x: x)
+        } keyframes: { _ in
+            let step = Motion.shakeSteps
+            SpringKeyframe(HomeMetrics.shakeDistance, duration: step[0], spring: Motion.shakeStep)
+            SpringKeyframe(-HomeMetrics.shakeDistance, duration: step[1], spring: Motion.shakeStep)
+            SpringKeyframe(HomeMetrics.shakeDistance / 2, duration: step[2], spring: Motion.shakeStep)
+            SpringKeyframe(0, duration: step[3], spring: Motion.shakeHome)
         }
     }
 }

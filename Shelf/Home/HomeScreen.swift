@@ -3,8 +3,8 @@ import SwiftUI
 /// The Home Screen: icons on a wallpaper, a glass dock, and apps that open
 /// out of their icon. There is no navigation stack here; each app is a
 /// card with its own view controller (`AppCard`), so its own stack never
-/// nests inside a launcher's. The stage (`HomeStage`) does the motion; this
-/// view keeps the state and the sheets.
+/// nests inside a launcher's. The stage (`HomeStage`, in UIKit) draws and
+/// moves everything; this view keeps the state, the sheets and the status bar.
 struct HomeScreen: View {
     @Environment(LibraryStore.self) private var library
     @Environment(ShelfSettings.self) private var settings
@@ -13,10 +13,7 @@ struct HomeScreen: View {
 
     var body: some View {
         @Bindable var model = model
-        HomeStage(model: model, library: library, settings: settings,
-                  input: StageInput(run: model.run, isSearching: model.isSearching, isEditing: model.isEditing,
-                                    showsPageDots: model.showsPageDots,
-                                    pageCount: model.pageCount(library.layout.pages), page: model.page))
+        HomeStage(model: model, library: library, settings: settings)
             .ignoresSafeArea()
             .statusBarHidden(model.isEditing)
             // With an app open, the first swipe up from the bottom edge is
@@ -32,15 +29,9 @@ struct HomeScreen: View {
                 case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
                 }
             }
-            .sensoryFeedback(.impact(weight: .light), trigger: model.launches)
-            .sensoryFeedback(.impact(weight: .medium), trigger: model.editStarts)
-            .onChange(of: model.run) { _, run in
-                // An app opened from search closes back onto the Home Screen.
-                if run != nil, model.isSearching { model.endSearch() }
-            }
             .onChange(of: library.isSignedIn) { model.stopEditing() }
-            // A drag the system cancels never reaches a drop target, so nothing
-            // else would bring its icon back, or save where it left the others.
+            // Leaving the foreground ends a drag (the stage lets go of its
+            // icon when the model says so) and saves where it left the others.
             .onChange(of: scenePhase) { _, phase in
                 if phase != .active {
                     model.endDrag()
@@ -53,199 +44,6 @@ struct HomeScreen: View {
             .onChange(of: library.layout) { old, new in
                 model.layoutChanged(from: old, to: new, in: library)
             }
-    }
-}
-
-/// What every layer of the stage reads.
-struct StageEnvironment {
-    var model: HomeModel
-    var library: LibraryStore
-    var settings: ShelfSettings
-    var layout: StageLayout
-}
-
-extension View {
-    /// A layer of the stage, hosted on its own: the stage's objects, and the
-    /// coordinate space icons report their frames in. It ignores every safe
-    /// area, the keyboard's included: the stage gives it the geometry.
-    func stage(_ stage: StageEnvironment) -> some View {
-        ignoresSafeArea()
-            .environment(stage.model)
-            .environment(stage.library)
-            .environment(stage.settings)
-            .environment(stage.layout)
-            .coordinateSpace(.named(StageLayout.space))
-    }
-}
-
-struct WallpaperLayer: View {
-    var stage: StageEnvironment
-
-    var body: some View {
-        // The gradient stops drifting while an app covers it.
-        Wallpaper(isPaused: stage.model.run != nil)
-            .stage(stage)
-    }
-}
-
-/// The grid, the dock and edit mode's buttons: what search fades away.
-struct IconsLayer: View {
-    var stage: StageEnvironment
-
-    var body: some View {
-        // No cap on the whole layer: the icons and edit buttons carry the
-        // Home Screen's, and the empty library and the banner the app's.
-        IconsContent()
-            .stage(stage)
-    }
-}
-
-private struct IconsContent: View {
-    @Environment(LibraryStore.self) private var library
-    @Environment(HomeModel.self) private var model
-    @Environment(StageLayout.self) private var layout
-
-    var body: some View {
-        let geometry = layout.geometry
-        ZStack {
-            Group {
-                if library.apps.isEmpty {
-                    EmptyLibrary(geometry: geometry)
-                } else {
-                    IconGrid(geometry: geometry, labelSize: layout.labelSize)
-                }
-            }
-
-            DockGlass(geometry: geometry)
-            DockIcons(geometry: geometry, labelSize: layout.labelSize)
-                .environment(\.iconPlace, .dock)
-
-            if model.isEditing {
-                EditControls()
-                    .frame(maxHeight: .infinity, alignment: .top)
-                    .padding(.top, HomeMetrics.editButtonTop)
-                    .transition(.opacity)
-            }
-
-            if let banner = library.banner {
-                SyncBanner(banner: banner) {
-                    library.hideBanner()
-                    if banner == .tokenExpired { model.sheet = .settings }
-                }
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, geometry.safeTop + HomeMetrics.bannerTopGap)
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-        .frame(width: geometry.size.width, height: geometry.size.height)
-        .animation(Motion.standard, value: library.banner)
-    }
-}
-
-/// Search results, which search fades in.
-struct ResultsLayer: View {
-    var stage: StageEnvironment
-
-    var body: some View {
-        // The results carry the Home Screen's cap, "No Results" the app's.
-        ResultsContent()
-            .stage(stage)
-    }
-}
-
-private struct ResultsContent: View {
-    @Environment(StageLayout.self) private var layout
-
-    var body: some View {
-        SearchResults(geometry: layout.geometry, labelSize: layout.labelSize, bottom: layout.resultsBottom)
-            .frame(width: layout.geometry.size.width, height: layout.geometry.size.height)
-    }
-}
-
-/// The two buttons edit mode adds, where Springboard puts its own and in the
-/// same glass capsules: New App on the left, Done on the right.
-private struct EditControls: View {
-    @Environment(HomeModel.self) private var model
-
-    var body: some View {
-        HStack {
-            EditButton(symbol: "plus", title: "New App") { model.sheet = .newApp }
-            Spacer()
-            EditButton(symbol: "checkmark", title: "Done") { model.stopEditing() }
-        }
-        .padding(.horizontal, HomeMetrics.editButtonInset)
-    }
-}
-
-private struct EditButton: View {
-    @Environment(\.colorScheme) private var scheme
-    var symbol: String
-    var title: LocalizedStringKey
-    var action: () -> Void
-
-    var body: some View {
-        let size = HomeMetrics.editButtonSize
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.body.weight(.bold))
-                .foregroundStyle(.white)
-                .frame(width: size.width, height: size.height)
-                .glassEffect(HomeMetrics.glass(scheme).interactive(), in: .capsule)
-                // The capsule is shorter than a finger; the target isn't.
-                .padding(.vertical, (HomeMetrics.minimumHit - size.height) / 2)
-                .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .padding(.vertical, -(HomeMetrics.minimumHit - size.height) / 2)
-        .accessibilityLabel(title)
-        .dynamicTypeSize(...HomeMetrics.textSizeCap)
-    }
-}
-
-/// What stands in for the grid when there are no apps: still loading, failed
-/// to load, or really empty.
-private struct EmptyLibrary: View {
-    @Environment(LibraryStore.self) private var library
-    @Environment(HomeModel.self) private var model
-    var geometry: HomeGeometry
-    @State private var showsSpinner = false
-
-    var body: some View {
-        Group {
-            if let failure = library.loadFailure {
-                ContentUnavailableView {
-                    Label(failure == .unauthorized ? "Token Expired" : "Can't Reach Server",
-                          systemImage: failure == .unauthorized ? "key" : "wifi.slash")
-                } actions: {
-                    if failure == .unauthorized {
-                        Button("Open Settings") { model.sheet = .settings }
-                            .buttonStyle(.glassProminent)
-                    } else {
-                        Button("Try Again") { Task { await library.sync() } }
-                            .buttonStyle(.glassProminent)
-                    }
-                }
-            } else if library.isSyncing {
-                ProgressView()
-                    .controlSize(.large)
-                    .opacity(showsSpinner ? 1 : 0)
-                    .task {
-                        try? await Task.sleep(for: Motion.spinnerDelay)
-                        withAnimation(Motion.fade) { showsSpinner = true }
-                    }
-            } else {
-                ContentUnavailableView {
-                    Label("No Apps", systemImage: "square.grid.2x2")
-                } actions: {
-                    Button("New App") { model.sheet = .newApp }
-                        .buttonStyle(.glassProminent)
-                }
-            }
-        }
-        // The wallpaper is dark in both modes; draw on it as on a dark surface.
-        .environment(\.colorScheme, .dark)
-        .padding(.bottom, geometry.size.height - geometry.pillFrame.minY)
-        .dynamicTypeSize(...ShelfMetrics.textSizeCap)
     }
 }
 

@@ -21,16 +21,16 @@ import UIKit
     private func render(at size: DynamicTypeSize) throws -> Data {
         let model = HomeModel()
         model.query = "nothing matches this"
-        let layout = StageLayout()
+        let layout = ResultsLayout()
         layout.geometry = HomeGeometry(size: CGSize(width: 393, height: 852), safeTop: 62, displayRadius: 55, labelHeight: 14)
         layout.resultsBottom = 120
-        let stage = StageEnvironment(model: model, library: LibraryStore(demo: [], cache: AppCache(root: temporaryFolder())),
-                                     settings: ShelfSettings(), layout: layout)
+        let library = LibraryStore(demo: [], cache: AppCache(root: temporaryFolder()))
 
         let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let window = UIWindow(windowScene: scene)
         window.frame = CGRect(origin: .zero, size: layout.geometry.size)
-        let host = UIHostingController(rootView: ResultsLayer(stage: stage).environment(\.dynamicTypeSize, size))
+        let host = UIHostingController(rootView: ResultsLayer(model: model, library: library, layout: layout)
+            .environment(\.dynamicTypeSize, size))
         window.rootViewController = host
         window.isHidden = false
         defer { window.isHidden = true }

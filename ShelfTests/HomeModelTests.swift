@@ -27,7 +27,6 @@ import Testing
         let model = HomeModel()
         await model.open("habits", in: library)
         #expect(model.run?.id == "habits")
-        #expect(model.launches == 1)
     }
 
     /// The second tap of a double tap lands on an app that is already open.
@@ -39,7 +38,6 @@ import Testing
         await model.open("habits", in: library)
         await model.open("todos", in: library)
         #expect(model.run?.id == "habits")
-        #expect(model.launches == 1)
     }
 
     /// An app whose source never came, with no way to fetch it: its icon
@@ -183,7 +181,6 @@ import Testing
         model.endSearch()
         model.longPressedWallpaper()
         #expect(model.isEditing)
-        #expect(model.editStarts == 1)
     }
 
     // MARK: Pages
@@ -229,27 +226,52 @@ import Testing
         let (library, folder) = demo()
         defer { try? FileManager.default.removeItem(at: folder) }
         let model = HomeModel()
-        model.pageWidth = 402
         model.page = 2
         model.layoutChanged(from: Layout(pages: [["a"], ["b"], ["c"]]), to: Layout(pages: [["a"], ["c"]]), in: library)
         #expect(model.page == 1)
-        #expect(model.scroll.x == 402)
+        // At once: the icons in view didn't move on screen, only their page did.
+        #expect(model.pageRequest?.page == 1)
+        #expect(model.pageRequest?.animated == false)
+    }
+
+    /// A carried icon held at a screen edge turns the page, animated, once
+    /// it has stayed there long enough; leaving the edge first cancels it.
+    @Test func holdingAtAnEdgeTurnsThePage() async throws {
+        let model = HomeModel()
+        model.holdAtEdge(toward: 1)
+        model.cancelFlip()
+        try await Task.sleep(for: Motion.pageFlipHold * 1.5)
+        #expect(model.pageRequest == nil)
+
+        model.holdAtEdge(toward: 1)
+        #expect(await eventually { await model.pageRequest?.page == 1 })
+        #expect(model.page == 1)
+        #expect(model.pageRequest?.animated == true)
+    }
+
+    /// Each request is new, even to the page already asked for, so the
+    /// pager can tell it from the last.
+    @Test func pageRequestsAreEachNew() {
+        let model = HomeModel()
+        model.go(to: 1, animated: false)
+        let first = model.pageRequest
+        model.go(to: 1, animated: false)
+        #expect(model.pageRequest != first)
     }
 
     // MARK: Syncs mid-gesture
 
-    /// The dragged app was deleted elsewhere: the drag ends, and a later
-    /// hover doesn't pick it up again.
+    /// The dragged app was deleted elsewhere: the drag ends (the stage then
+    /// lets go of the icon).
     @Test func aDragWhoseAppIsDeletedEnds() {
         let (library, folder) = demo()
         defer { try? FileManager.default.removeItem(at: folder) }
         let model = HomeModel()
         model.startEditing()
-        model.lifted("todos")
-        #expect(model.dragMoved() == "todos")
+        model.beginDrag("todos")
+        #expect(model.dragging == "todos")
         model.layoutChanged(from: Layout(pages: [["habits", "todos"]]), to: Layout(pages: [["habits"]]), in: library)
         #expect(model.dragging == nil)
-        #expect(model.dragMoved() == nil)
     }
 
     /// Another app added or deleted mid-drag: the drag goes on.
@@ -258,36 +280,22 @@ import Testing
         defer { try? FileManager.default.removeItem(at: folder) }
         let model = HomeModel()
         model.startEditing()
-        model.lifted("todos")
-        _ = model.dragMoved()
+        model.beginDrag("todos")
         model.layoutChanged(from: Layout(pages: [["habits", "todos"]]), to: Layout(pages: [["todos", "new"]]), in: library)
         #expect(model.dragging == "todos")
     }
 
-    /// A drop a full dock refused reaches no one: the system only says the
-    /// icon left the dock. With no target hearing of it after, the drag is
-    /// over and the icon comes back. (It stayed hidden until Done.)
-    @Test func aDragLetGoOfOutsideEveryTargetEnds() async {
+    /// Icons are carried only in edit mode (a drag from the long-press menu
+    /// starts it first), and Done lets go of a carried icon.
+    @Test func dragsHappenOnlyInEditMode() {
         let model = HomeModel()
+        model.beginDrag("todos")
+        #expect(model.dragging == nil)
         model.startEditing()
-        model.lifted("todos")
-        _ = model.dragMoved()
-        model.dragExited()
-        #expect(await eventually { await model.dragging == nil })
-        #expect(model.snaps == 1)
-    }
-
-    /// Crossing from one target into the next: the next hears of it at
-    /// once, and the drag goes on.
-    @Test func aDragCrossingIntoAnotherTargetGoesOn() async throws {
-        let model = HomeModel()
-        model.startEditing()
-        model.lifted("todos")
-        _ = model.dragMoved()
-        model.dragExited()
-        _ = model.dragMoved()
-        try await Task.sleep(for: Motion.dragLost * 2)
+        model.beginDrag("todos")
         #expect(model.dragging == "todos")
+        model.stopEditing()
+        #expect(model.dragging == nil)
     }
 
     // MARK: Cards
@@ -319,7 +327,6 @@ import Testing
         model.close()
         #expect(model.reopen(habits, in: library))
         #expect(model.run?.id == "habits")
-        #expect(model.launches == 2)
 
         // Closing, and another app tapped meanwhile.
         model.close()
