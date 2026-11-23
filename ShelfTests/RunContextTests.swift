@@ -157,8 +157,13 @@ struct RunContextTests {
         #expect(error.excerpt.contains { $0.number == 7 && $0.text.contains("totals[3]") })
 
         // The error screen is what shows: the app's own text is gone.
-        try await Task.sleep(for: .milliseconds(600))
-        let labels = Self.texts(in: window)
+        // Polled, not a fixed wait: the screen's crossfade runs late on a busy machine.
+        let shown = ContinuousClock.now + .seconds(5)
+        var labels = Self.texts(in: window)
+        while !labels.contains(where: { $0.contains("Broken couldn’t open") }), ContinuousClock.now < shown {
+            try await Task.sleep(for: .milliseconds(20))
+            labels = Self.texts(in: window)
+        }
         #expect(labels.contains { $0.contains("Broken couldn’t open") }, "\(labels)")
         #expect(!labels.contains("Total"), "\(labels)")
     }
