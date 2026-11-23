@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Every number the Home Screen is drawn with, in one place.
 ///
@@ -83,21 +84,9 @@ enum HomeMetrics {
 
     // MARK: Glass
 
-    /// The one glass the Home Screen is made of: the dock, the search pill,
-    /// the search field, the edit-mode buttons and Clear icons. One
-    /// definition, so they always match each other and Springboard's.
-    ///
-    /// Springboard's dock and pill let the wallpaper through with only a
-    /// light frost: over black they are 32 of 255 in light mode and 17 in
-    /// dark, with a bright hairline at the edge. `.regular` turns into a pale
-    /// grey slab over a dark photo (134 over black); `.clear` measures 32 with
-    /// the same hairline, and a black tint takes it to Springboard's 17 in
-    /// dark mode.
-    static func glass(_ scheme: ColorScheme) -> Glass {
-        scheme == .dark ? .clear.tint(darkGlassTint) : .clear
-    }
-
-    static let darkGlassTint = Color.black.opacity(0.45)
+    /// The black that tints the Home Screen's glass in dark mode
+    /// (`HomeGlass`).
+    static let darkGlassTint = UIColor.black.withAlphaComponent(0.45)
 
     // MARK: Dock
 
@@ -158,7 +147,7 @@ enum HomeMetrics {
 
     // MARK: Wallpaper
 
-    /// How far the gradient's middle points stray from their places, as a
+    /// How far the gradient's middle points sit from the centre, as a
     /// fraction of the screen.
     static let wallpaperReach: Float = 0.12
 
@@ -171,11 +160,48 @@ enum HomeMetrics {
     static let editButtonTop: CGFloat = 19
     static let jiggleAngle: Double = 1.6
     static let jiggleShift: CGFloat = 0.6
+    /// Springboard's minus badge, measured in edit mode: a 27 pt grey disc
+    /// whose centre is 3.67 pt in from the icon's top-left corner, with a
+    /// dark dash 11.67 × 2 pt.
+    static let badgeSize: CGFloat = 27
+    static let badgeInset: CGFloat = 3.67
+    static let badgeFill = UIColor(red: 149 / 255, green: 148 / 255, blue: 148 / 255, alpha: 1)
+    static let badgeDash = CGSize(width: 11.67, height: 2)
     /// How close to a screen edge a dragged icon flips the page.
     static let pageFlipEdge: CGFloat = 28
     static let bannerTopGap: CGFloat = 4
-    static let bannerPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 18)
     static let shakeDistance: CGFloat = 8
+
+    // MARK: Long press
+
+    /// The icon under a long press, measured from `longpress-menu-grid-
+    /// photos.png`: 73.3 pt across for a 64 pt icon, about its own centre.
+    static let liftScale: CGFloat = 1.146
+    /// Everything but the lifted icon and its menu goes to 80% (255 to 204,
+    /// 62 to 50 in the capture).
+    static let liftDim: CGFloat = 0.2
+    /// How far a finger can stray before a press stops being a tap or a
+    /// hold, and how far it moves under a lifted icon before it is a drag.
+    static let touchSlop: CGFloat = 10
+
+    // MARK: Menu
+
+    /// Springboard's quick-action menu, measured in the same capture: 250 pt
+    /// wide, 8.33 pt from the lifted icon, its edge in line with the icon's,
+    /// 42 pt rows (the glyph's centre 40.3 pt in, the text 64.7 pt in), and
+    /// about 10 pt above the first row and below the last.
+    static let menuWidth: CGFloat = 250
+    static let menuGap: CGFloat = 8.33
+    static let menuRowHeight: CGFloat = 42
+    static let menuPadding: CGFloat = 10
+    static let menuGlyphCenter: CGFloat = 40.33
+    static let menuTextStart: CGFloat = 64.67
+    static let menuTrailing: CGFloat = 20
+    static let menuCornerRadius: CGFloat = 26
+    /// A thin line between groups of actions.
+    static let menuSectionGap: CGFloat = 8
+    /// The menu keeps this far from the screen's sides.
+    static let menuMargin: CGFloat = 16
 
     // MARK: Hit targets
 
@@ -270,5 +296,30 @@ struct HomeGeometry: Equatable {
         let column = min(max(Int(((point.x - sideInset - iconSize / 2) / columnPitch).rounded()), 0), Layout.columns - 1)
         let row = min(max(Int(((point.y - gridTop - iconSize / 2) / rowPitch).rounded()), 0), Layout.rows - 1)
         return min(row * Layout.columns + column, max(count, 0))
+    }
+}
+
+extension HomeGeometry {
+    /// Where an icon carried with its artwork's centre at `point` (on
+    /// screen) would go, with `page` in view: a place in the dock while it is
+    /// over the dock, or the nearest place on the page, never past the last
+    /// icon there. Nil over a full dock that it isn't already in: the dock
+    /// refuses a newcomer, and the icon keeps the place it had.
+    func dropSlot(for id: String, at point: CGPoint, page: Int, in layout: Layout) -> Layout.Slot? {
+        if dockFrame.contains(point) {
+            guard layout.dockHasRoom(for: id) else { return nil }
+            let count = layout.dock.contains(id) ? layout.dock.count : layout.dock.count + 1
+            return .dock(index: dockIndex(at: point.x, of: count))
+        }
+        let others = page < layout.pages.count ? layout.pages[page].filter { $0 != id }.count : 0
+        return .page(page, index: gridIndex(at: point, count: others))
+    }
+
+    /// Which way, if any, a carried icon at `x` asks the pages to turn:
+    /// held within `pageFlipEdge` of a side that has a page beyond it.
+    func flipTarget(at x: CGFloat, page: Int, pageCount: Int) -> Int? {
+        if x < HomeMetrics.pageFlipEdge, page > 0 { return page - 1 }
+        if x > size.width - HomeMetrics.pageFlipEdge, page < pageCount - 1 { return page + 1 }
+        return nil
     }
 }

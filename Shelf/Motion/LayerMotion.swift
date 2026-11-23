@@ -24,6 +24,7 @@ extension CALayer {
         animation.toValue = value
         animation.initialVelocity = spring.played(velocity: velocity)
         animation.duration = animation.settlingDuration
+        animation.preferredFrameRateRange = Motion.frameRate
         add(animation, forKey: keyPath)
     }
 
@@ -95,5 +96,18 @@ final class ImmediatePanGestureRecognizer: UIPanGestureRecognizer {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesBegan(touches, with: event)
         if state == .possible { state = .began }
+    }
+}
+
+extension Motion.Spring {
+    /// Animates `changes` to views on this spring. UIKit's view animations
+    /// are additive: one that interrupts another carries on from wherever
+    /// the view is on screen, with its speed, so these can be retargeted
+    /// freely. `velocity` is in spring lengths per second.
+    @MainActor
+    func animate(velocity: CGFloat = 0, options: UIView.AnimationOptions = [], _ changes: @escaping () -> Void,
+                 completion: ((Bool) -> Void)? = nil) {
+        UIView.animate(springDuration: playedDuration, bounce: bounce, initialSpringVelocity: played(velocity: velocity),
+                       delay: 0, options: options.union(.allowUserInteraction), animations: changes, completion: completion)
     }
 }

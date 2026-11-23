@@ -1,6 +1,15 @@
 import SwiftUI
 import Observation
 
+/// A page the pager should go to: after a drag held at an edge (animated),
+/// or because the page in view moved (at once). Each request is new, even to
+/// the same page, so the pager can tell it from the last.
+struct PageRequest: Equatable, Sendable {
+    var page: Int
+    var animated: Bool
+    var serial: Int
+}
+
 /// The Home Screen's own state: what is open, whether icons are jiggling,
 /// what is being dragged. The library itself lives in `LibraryStore`.
 @MainActor
@@ -33,32 +42,27 @@ final class HomeModel {
     var sheet: Sheet?
 
     private(set) var isEditing = false
-    /// The icon under the finger during a drag. Its place in the grid is kept
-    /// empty while the system's drag preview stands in for it.
+    /// The icon under the finger during a drag. The stage carries it; its
+    /// place in the layout moves as it hovers.
     private(set) var dragging: String?
 
     var isSearching = false
     var query = ""
 
+    /// The page in view, which the pager reports as it moves.
     var page = 0
-    var scroll = ScrollPosition(x: 0)
+    /// Where the pager has been asked to go.
+    private(set) var pageRequest: PageRequest?
     /// Dots stand in for the search pill while pages are moving.
     var showsPageDots = false
 
-    // Haptic triggers. They only ever count up.
-    private(set) var launches = 0
-    private(set) var editStarts = 0
-    private(set) var snaps = 0
     /// Per app: how many times it has refused to open. A change shakes its icon.
     private(set) var refusals: [String: Int] = [:]
 
-    /// The pager's width, for scrolling to a page from here.
-    @ObservationIgnored var pageWidth: CGFloat = 0
     @ObservationIgnored private var taps = 0
-    @ObservationIgnored private var liftedSlug: String?
+    @ObservationIgnored private var requests = 0
     @ObservationIgnored private var flip: (target: Int, task: Task<Void, Never>)?
     @ObservationIgnored private var dotsTask: Task<Void, Never>?
-    @ObservationIgnored private var dropWatch: Task<Void, Never>?
 
     // MARK: Opening
 
@@ -71,7 +75,6 @@ final class HomeModel {
         taps += 1
         let tap = taps
         if id == Layout.settings {
-            launches += 1
             // Opening anything from search closes search, as an app does.
             endSearch()
             sheet = .settings
@@ -94,7 +97,6 @@ final class HomeModel {
 
     private func launch(_ app: CachedApp, source: String, in library: LibraryStore) {
         guard run == nil else { return }
-        launches += 1
         library.opened(app.slug)
         run = Run(app: app, source: source)
     }
@@ -105,7 +107,6 @@ final class HomeModel {
     func reopen(_ again: Run, in library: LibraryStore) -> Bool {
         if run?.id == again.id { return true }
         guard run == nil, library.app(again.id) != nil else { return false }
-        launches += 1
         run = again
         return true
     }
@@ -116,11 +117,12 @@ final class HomeModel {
 
     // MARK: Edit mode
 
-    /// From an icon's menu. Edit mode and search never show together, so
-    /// this closes search, as the menu of a search result can be opened there.
+    /// From an icon's menu, a long press on the wallpaper, or a lifted icon
+    /// that the finger carries on. Edit mode and search never show together,
+    /// so this closes search, as the menu of a search result can be opened there.
     func startEditing() {
         guard !isEditing else { return }
-        editStarts += 1
+        // Animated for SwiftUI's part, the status bar; the stage animates its own.
         withAnimation(Motion.standard) {
             isEditing = true
             isSearching = false
@@ -136,63 +138,45 @@ final class HomeModel {
 
     func stopEditing() {
         cancelFlip()
-        liftedSlug = nil
+        dragging = nil
         withAnimation(Motion.standard) {
             isEditing = false
-            dragging = nil
         }
     }
 
-    /// An icon was lifted. That isn't a drag yet: the system also asks for the
-    /// drag item when it opens the icon's context menu, and most lifts end there.
-    func lifted(_ slug: String) {
-        liftedSlug = slug
+    /// An icon has been picked up and follows the finger. Only in edit mode:
+    /// a drag from the long-press menu starts edit mode first.
+    func beginDrag(_ id: String) {
+        guard isEditing else { return }
+        dragging = id
     }
 
-    /// The lifted icon has moved over a drop target, so it really is a drag.
-    func dragMoved() -> String? {
-        dropWatch?.cancel()
-        if dragging == nil, let liftedSlug {
-            dragging = liftedSlug
-        }
-        return dragging
-    }
-
-    /// The dragged icon left a drop target. Usually it is entering another,
-    /// which says so at once. If none does, the drag ended without a drop,
-    /// which the system reports to no one (over a full dock, say), and the
-    /// icon has to come back by itself.
-    func dragExited() {
-        dropWatch?.cancel()
-        guard dragging != nil else { return }
-        dropWatch = Task { [weak self] in
-            try? await Task.sleep(for: Motion.dragLost)
-            guard !Task.isCancelled else { return }
-            self?.endDrag()
-        }
-    }
-
+    /// The dragged icon was let go of, or the drag was cut short.
     func endDrag() {
-        dropWatch?.cancel()
         cancelFlip()
-        if dragging != nil { snaps += 1 }
-        liftedSlug = nil
-        withAnimation(Motion.reorder) { dragging = nil }
+        dragging = nil
     }
 
     // MARK: Pages
 
     /// Flips to `target` if the dragged icon stays at the edge long enough.
-    func holdAtEdge(toward target: Int, pageWidth: CGFloat) {
+    func holdAtEdge(toward target: Int) {
         if flip?.target == target { return }
         cancelFlip()
         let task = Task { [weak self] in
             try? await Task.sleep(for: Motion.pageFlipHold)
             guard !Task.isCancelled, let self else { return }
             self.flip = nil
-            withAnimation(Motion.standard) { self.scroll.scrollTo(x: CGFloat(target) * pageWidth) }
+            self.go(to: target, animated: true)
         }
         flip = (target, task)
+    }
+
+    /// Asks the pager for `page`.
+    func go(to page: Int, animated: Bool) {
+        requests += 1
+        self.page = page
+        pageRequest = PageRequest(page: page, animated: animated, serial: requests)
     }
 
     func cancelFlip() {
@@ -201,9 +185,12 @@ final class HomeModel {
     }
 
     /// How many pages there are to scroll through. While editing there is
-    /// always an empty page at the end to drop onto, and a dot for it.
+    /// always an empty page at the end to drop onto, and a dot for it. The
+    /// icon being carried doesn't count: carried onto that page, it doesn't
+    /// make another, so holding it at the edge never runs on past one.
     func pageCount(_ pages: [[String]]) -> Int {
-        let spare = isEditing && pages.last?.isEmpty == false
+        let last = pages.last?.filter { $0 != dragging } ?? []
+        let spare = isEditing && !last.isEmpty
         return max(pages.count + (spare ? 1 : 0), 1)
     }
 
@@ -212,16 +199,14 @@ final class HomeModel {
     /// has gone ends, and an app deleted while open closes (into the pill,
     /// as it has no icon to land on).
     func layoutChanged(from old: Layout, to new: Layout, in library: LibraryStore) {
-        if let held = dragging ?? liftedSlug, new.slot(of: held) == nil {
+        if let held = dragging, new.slot(of: held) == nil {
             cancelFlip()
-            liftedSlug = nil
             dragging = nil
         }
         if let run, library.app(run.id) == nil { close() }
         let target = Self.page(following: page, from: old.pages, to: new.pages, count: pageCount(new.pages))
         guard target != page else { return }
-        page = target
-        if pageWidth > 0 { scroll.scrollTo(x: CGFloat(target) * pageWidth) }
+        go(to: target, animated: false)
     }
 
     /// The page to show once the pages change from `old` to `new`: the one
@@ -243,12 +228,12 @@ final class HomeModel {
     func pagesMoved(_ moving: Bool) {
         dotsTask?.cancel()
         if moving {
-            withAnimation(Motion.fade) { showsPageDots = true }
+            showsPageDots = true
         } else {
             dotsTask = Task { [weak self] in
                 try? await Task.sleep(for: Motion.pageDotsStay)
                 guard !Task.isCancelled else { return }
-                withAnimation(Motion.fade) { self?.showsPageDots = false }
+                self?.showsPageDots = false
             }
         }
     }
@@ -266,19 +251,4 @@ final class HomeModel {
     func endSearch() {
         isSearching = false
     }
-}
-
-/// Which copy of an icon: the Home Screen shows an app once on a page or in
-/// the dock, and again among search results.
-enum IconPlace: Hashable, Sendable {
-    case grid, dock, result
-}
-
-struct IconKey: Hashable, Sendable {
-    var slug: String
-    var place: IconPlace
-}
-
-extension EnvironmentValues {
-    @Entry var iconPlace = IconPlace.grid
 }

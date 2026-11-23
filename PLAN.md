@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 is built: its findings, and what still needs a re-check once §0.2 lands, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1 and §0.2 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -85,6 +85,17 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 **Done when:** every case has a test (in `LayoutTests`, or a new `HomeModelTests`), or a recorded simulator check, and the fixes are in.
 
 ### 0.2 The Home Screen in UIKit and Core Animation
+
+**Built.** What came out of it:
+
+- **The spike** (step 1) went to the fallback. Once `UIContextMenuInteraction`'s menu is up, UIKit cancels the touch for every other recognizer, even one on the window, and there is no public way to get it back. So the long press is Shelf's own (`IconTouchRecognizer`), with its own glass menu (`IconMenuView`), measured from `longpress-menu-grid-photos.png`.
+- **`IconArtView`** is the one renderer. Its outline is a path, because Core Animation's continuous corner is rounder than Springboard's. Overlaid on the SwiftUI icon at 3x, the outline matched exactly and the glyphs matched for four symbols of five (`books.vertical.fill` is ⅓ pt off).
+- **Hooks for what comes next:**
+  - §0.3: `ResultsLayout` and `SearchResults` are what to delete. Results already draw with `IconImage`, and the menu is `HomeItem.menu(model:library:)`.
+  - §0.4: `HomeView.onDelete` is called when a minus badge is tapped (today a no-op), and Delete App goes last in `HomeItem.menu`.
+  - §0.5: set `window.traitOverrides.iconTone` in `StageController.holdAppearance()`; `IconImage` reads `\.iconTone` in SwiftUI.
+  - §0.6: the dock's outline is set only in `DockView.place(_:)`.
+- **Not done:** picking up more than one icon (the stretch goal), and the 120 fps check on a device. On the simulator, Time Profiler takes no samples from Shelf while a full page jiggles.
 
 Decided: everything the stage shows moves to UIKit and Core Animation. Today the stage, the cards and the search pill are already UIKit; the icons, grid, dock, edit mode, long-press menu, drag and drop, search results, wallpaper and banners are SwiftUI hosted inside it. Moving them gives:
 

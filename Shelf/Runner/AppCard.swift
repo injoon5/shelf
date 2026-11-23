@@ -24,81 +24,45 @@ struct CardRoot: View {
     }
 }
 
-/// How an app's icon is painted, for its card: the same fill and glyph as
-/// `IconArt`, so a card at icon size is the icon and a card at full screen
-/// is the app's launch screen, and every size between is both.
-struct CardFace {
-    var top: UIColor
-    var bottom: UIColor
-    var glyph: UIColor
-    var symbol: String
-    var glyphSize: CGFloat
-
-    @MainActor
-    init(_ face: IconFace, style: IconStyle, dark: Bool, iconSize: CGFloat) {
-        var environment = EnvironmentValues()
-        environment.colorScheme = dark ? .dark : .light
-        func ui(_ color: Color) -> UIColor { UIColor(cgColor: color.resolve(in: environment).cgColor) }
-        // Clear icons are glass, which a moving card can't be; the colour
-        // icon of the same appearance stands in for them.
-        let fill = face.fill(dark: dark)
-        top = ui(fill.top)
-        bottom = ui(fill.bottom)
-        glyph = IconFace.tintsGlyph(style, dark: dark) ? ui(face.tint) : .white
-        symbol = face.symbol
-        glyphSize = iconSize * HomeMetrics.glyphRatio
-    }
-}
-
-/// The moving part of a card: the icon's fill and glyph, with a picture of
-/// the app over them.
+/// The moving part of a card: the app's icon (`IconArtView`, the same
+/// renderer as the Home Screen's, so a card at icon size is the icon), with a
+/// picture of the app over it. At full screen the icon's tile and glyph are
+/// the app's launch screen; every size between is both.
 ///
-/// Its bounds are kept centred on its own origin, so the glyph and the
-/// picture sit at (0, 0) and stay centred while the bounds animate, with
-/// no animations of their own to keep in step.
-final class CardFaceView: UIView {
-    override class var layerClass: AnyClass { CAGradientLayer.self }
-
-    let glyph = UIImageView()
+/// Like every `IconArtView`, its bounds are centred on its own origin, so
+/// the glyph and the picture sit at (0, 0) and stay centred while the
+/// outline springs, with no animations of their own to keep in step.
+final class CardFaceView: IconArtView {
     /// Holds the app's picture at full-screen size, scaled to the card's width.
     let content = UIView()
     private let screen: CGSize
+    /// Carries the corner's springs, which the outline's paths do too, so
+    /// where the corner is on screen can be read back when a finger catches
+    /// the card.
+    private let corner = CALayer()
 
-    init(face: CardFace, screen: CGSize) {
+    init(face: IconFace, iconSize: CGFloat, screen: CGSize) {
         self.screen = screen
-        super.init(frame: .zero)
-        isUserInteractionEnabled = false
-        let gradient = layer as! CAGradientLayer
-        gradient.colors = [face.top.cgColor, face.bottom.cgColor]
-        gradient.startPoint = CGPoint(x: 0.5, y: 0)
-        gradient.endPoint = CGPoint(x: 0.5, y: 1)
-        layer.cornerCurve = .continuous
-        layer.masksToBounds = true
-
-        let configuration = UIImage.SymbolConfiguration(pointSize: face.glyphSize, weight: .medium)
-            .applying(UIImage.SymbolConfiguration(hierarchicalColor: face.glyph))
-        glyph.image = UIImage(systemName: face.symbol, withConfiguration: configuration)
-        glyph.sizeToFit()
-        glyph.center = .zero
-        addSubview(glyph)
-
+        super.init(face: face, iconSize: iconSize)
+        corner.isHidden = true
+        layer.addSublayer(corner)
         content.bounds = CGRect(origin: .zero, size: screen)
         content.center = .zero
         content.alpha = 0
         addSubview(content)
     }
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError() }
-
     /// Puts the card at `frame` at once.
     func place(_ frame: CardFrame) {
         withoutActions {
+            layer.removeAnimations(withKeyPrefix: "position")
+            corner.removeAllAnimations()
             layer.position = frame.center
-            layer.bounds = Self.centered(frame.size)
-            layer.cornerRadius = frame.radius
+            corner.cornerRadius = frame.radius
+            content.layer.removeAllAnimations()
             content.layer.setValue(frame.size.width / screen.width, forKeyPath: "transform.scale")
         }
+        setOutline(frame.size, radius: frame.radius)
     }
 
     /// Springs the card to `frame` from wherever it is on screen. The
@@ -111,15 +75,16 @@ final class CardFaceView: UIView {
                      velocity: CardMotion.springVelocity(centerVelocity.x, from: shown.position.x, to: frame.center.x))
         layer.spring("position.y", to: frame.center.y, spring,
                      velocity: CardMotion.springVelocity(centerVelocity.y, from: shown.position.y, to: frame.center.y))
-        layer.spring("bounds", to: NSValue(cgRect: Self.centered(frame.size)), spring, velocity: sizeVelocity)
-        layer.spring("cornerRadius", to: frame.radius, spring, velocity: sizeVelocity)
+        springOutline(to: frame.size, radius: frame.radius, spring, velocity: sizeVelocity)
+        corner.spring("cornerRadius", to: frame.radius, spring, velocity: sizeVelocity)
         content.layer.spring("transform.scale", to: frame.size.width / screen.width, spring, velocity: sizeVelocity)
     }
 
     /// Stops the card where it is on screen and returns where that is.
     func freeze() -> CardFrame {
-        let frame = CardFrame(layer: layer.presentation() ?? layer)
+        let frame = shownCard
         layer.removeAllAnimationsDeeply()
+        content.layer.removeAllAnimationsDeeply()
         place(frame)
         return frame
     }
@@ -127,18 +92,21 @@ final class CardFaceView: UIView {
     var isMoving: Bool { layer.isAnimating || content.layer.isAnimating }
 
     /// Where the card's springs are headed.
-    var targetFrame: CGRect { CardFrame(layer: layer).rect }
+    var targetFrame: CGRect { CardFrame(center: layer.position, size: layer.bounds.size, radius: corner.cornerRadius).rect }
 
     /// Ends the springs at their targets, which the model already holds.
     func finishMoving() {
         layer.removeAllAnimationsDeeply()
+        content.layer.removeAllAnimationsDeeply()
     }
 
-    var shownFrame: CGRect { CardFrame(layer: layer.presentation() ?? layer).rect }
-
-    private static func centered(_ size: CGSize) -> CGRect {
-        CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height)
+    private var shownCard: CardFrame {
+        let shown = layer.presentation() ?? layer
+        return CardFrame(center: shown.position, size: shown.bounds.size,
+                         radius: (corner.presentation() ?? corner).cornerRadius)
     }
+
+    var shownFrame: CGRect { shownCard.rect }
 }
 
 /// One open app: a card that grows out of its icon, the live app over it
@@ -180,14 +148,14 @@ final class AppCard {
 
     var slug: String { run.id }
 
-    init(run: HomeModel.Run, data: AppData, face: CardFace, screen: CGSize, iconSize: CGFloat, fullRadius: CGFloat,
+    init(run: HomeModel.Run, data: AppData, face: IconFace, screen: CGSize, iconSize: CGFloat, fullRadius: CGFloat,
          from source: CGRect) {
         self.run = run
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
         startProgress = CardMotion.progress(width: source.width, iconSize: iconSize, screenWidth: screen.width)
-        self.face = CardFaceView(face: face, screen: screen)
+        self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen)
         host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
@@ -233,6 +201,7 @@ final class AppCard {
     func open(_ spring: Motion.Spring = Motion.cardOpen, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
         phase = .opening
         landingFades = false
+        face.isHidden = false
         face.alpha = 1
         face.spring(to: full, spring, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
     }
@@ -298,6 +267,8 @@ final class AppCard {
         case .opening:
             phase = .open
             host.view.isHidden = false
+            // Covered by the live app until a finger or a close needs it.
+            face.isHidden = true
             face.content.subviews.forEach { $0.removeFromSuperview() }
             state.isSettled = true
             return false
@@ -311,6 +282,7 @@ final class AppCard {
 
     /// Swaps the live app for a picture of it, which can move.
     private func takePicture() {
+        face.isHidden = false
         host.view.endEditing(true)
         if let picture = host.view.snapshotView(afterScreenUpdates: false) {
             face.content.subviews.forEach { $0.removeFromSuperview() }
@@ -319,13 +291,6 @@ final class AppCard {
             face.content.alpha = 1
         }
         host.view.isHidden = true
-    }
-}
-
-extension CardFrame {
-    /// Where `layer` is: its position, size and corner.
-    init(layer: CALayer) {
-        self.init(center: layer.position, size: layer.bounds.size, radius: layer.cornerRadius)
     }
 }
 

@@ -308,12 +308,7 @@ final class SearchBar: UIView, UITextFieldDelegate {
     }
 
     private func restyle() {
-        let glassEffect = UIGlassEffect(style: .clear)
-        if traitCollection.userInterfaceStyle == .dark {
-            glassEffect.tintColor = UIColor(HomeMetrics.darkGlassTint)
-        }
-        glassEffect.isInteractive = true
-        glass.effect = glassEffect
+        glass.effect = HomeGlass.effect(traitCollection, interactive: true)
 
         let category = min(traitCollection.preferredContentSizeCategory, UIContentSizeCategory(ShelfMetrics.textSizeCap))
         bodyFont = UIFont.preferredFont(forTextStyle: .body, compatibleWith: UITraitCollection(preferredContentSizeCategory: category))

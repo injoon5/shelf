@@ -123,7 +123,7 @@ private struct PreviewView: View {
                 stage(meta, source: reply.source)
 
                 HStack(spacing: CreateMetrics.spacing) {
-                    IconArt(face: IconFace(meta), size: CreateMetrics.tileSize)
+                    IconImage(face: IconFace(meta), size: CreateMetrics.tileSize)
                     VStack(alignment: .leading, spacing: CreateMetrics.fieldSpacing) {
                         TextField("Name", text: $model.name)
                             .font(.headline)
