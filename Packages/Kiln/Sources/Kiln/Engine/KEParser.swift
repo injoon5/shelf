@@ -311,13 +311,18 @@ struct KEParser {
         else { throw error("expected a function name") }
         if atOp("<") { try skipAngles() }
         let params = try parseParams()
-        while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) { next() }
+        var attributes = attrs
+        while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) {
+            // `Kiln.check` reads it: an `await` needs an `async` function, and a call to one needs `await`.
+            if w == "async" || w == "reasync" { attributes.append(KEAttribute(name: "async", args: [])) }
+            next()
+        }
         var ret: KETypeRef? = nil
         if atOp("->") { next(); ret = try parseType() }
         if atIdent("where") { while !at("{") && !atEOF { next() } }
         let body = at("{") ? try parseBlock() : []
         return KEFuncDecl(name: name, params: params, returnType: ret, body: body, isStatic: mods.contains("static"),
-                          isMutating: mods.contains("mutating"), attributes: attrs, line: line)
+                          isMutating: mods.contains("mutating"), attributes: attributes, line: line)
     }
 
     private mutating func parseInit(attrs: [KEAttribute]) throws -> KEFuncDecl {

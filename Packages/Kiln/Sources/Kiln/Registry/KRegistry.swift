@@ -307,6 +307,15 @@ final class KOverload {
     let notes: String?
     /// The receiver a modifier is bridged on (`Shape`, `Text`), for the manifest.
     let receiver: String?
+    /// The call waits: `Kiln.check` says so when it isn't `await`ed
+    /// (`Task.sleep`, `URLSession.data`). Set with `async: true`.
+    var isAsync = false
+    /// The closures passed to it run where they can wait (`Task {}`, `.task {}`,
+    /// `.refreshable {}`, a task group). Elsewhere `Kiln.check` says an `await`
+    /// in a closure argument can't wait. Set with `closuresCanWait: true`.
+    var closuresCanWait = false
+    /// Accepted with no effect (`stub(_:)`): `Kiln.check` warns.
+    var isStub = false
 
     init(params: [KParam], lenient: Bool = false, lenientKinds: [String?: KArgKind] = [:],
          availability: KilnAvailability? = nil, notes: String? = nil, receiver: String? = nil) {
@@ -458,6 +467,8 @@ final class KTypeBridge: KBridge {
         let set: (@MainActor (inout KCall) throws -> Void)?
         let notes: String?
         let support: KilnSupport
+        /// Reading it waits (`task.value`).
+        var isAsync = false
     }
     var inits: [Method] = []
     var staticProperties: [String: Property] = [:]
@@ -497,6 +508,8 @@ final class KFunctionBridge: KBridge {
 /// (a native class forwarding each requirement to the app's methods); for now
 /// these are declarations the checker and the manifest read.
 final class KProtocolBridge: KBridge {
+    /// What an adopting type must declare: `body`, `path(in:)`. A trailing `?`
+    /// marks one with a default (`errorDescription?`), which `Kiln.check` doesn't require.
     var requirements: [String] = []
     /// Makes a native proxy for an app value (§1.5).
     var proxy: (@MainActor (KV, KInterpreter) -> AnyObject?)?

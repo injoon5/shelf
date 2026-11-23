@@ -62,14 +62,16 @@ extension KRegistry {
     @discardableResult
     func function(_ name: String, _ family: KilnFamily, _ signature: String? = nil, owner: String = "Swift",
                   support: KilnSupport = .full, introduced: String? = nil, notes: String? = nil, file: String = #fileID,
-                  kinds: [String?: KArgKind] = [:], _ run: @escaping KTypeBridge.Fn) -> KFunctionBridge {
+                  kinds: [String?: KArgKind] = [:], async: Bool = false, closuresCanWait: Bool = false,
+                  _ run: @escaping KTypeBridge.Fn) -> KFunctionBridge {
         let b = functions[name] ?? {
             let f = KFunctionBridge(name: name, family: family, support: support, introduced: introduced, notes: notes, source: Self.source(file))
             f.owner = owner
             add(f)
             return f
         }()
-        b.forms.append(.init(overload: KTypeBuilder.overload(signature, kinds: kinds, introduced: introduced, notes: nil), run: run))
+        b.forms.append(.init(overload: KTypeBuilder.overload(signature, kinds: kinds, introduced: introduced, notes: nil,
+                                                             async: async, closuresCanWait: closuresCanWait), run: run))
         return b
     }
 
@@ -155,9 +157,18 @@ struct KModifierBuilder {
         for s in signatures { form(s, receiver: receiver, apply) }
     }
 
-    /// Accepted, with no effect (the manifest says `stub`).
+    /// Accepted, with no effect (the manifest says `stub`, and `Kiln.check` warns).
     func stub(_ signatures: [String], receiver: String? = nil) {
-        for s in signatures { form(s, receiver: receiver) { _, view in view } }
+        for s in signatures {
+            form(s, receiver: receiver) { _, view in view }
+            bridge.forms.last?.overload.isStub = true
+        }
+    }
+
+    /// Its closures run where they can `await` (`.task`, `.refreshable`), so
+    /// `Kiln.check` doesn't call an `await` in them an error. Call it after the forms.
+    func closuresCanWait() {
+        for f in bridge.forms { f.overload.closuresCanWait = true }
     }
 
     /// On a `Text`, the modifier keeps it a `Text`.
@@ -172,17 +183,26 @@ struct KTypeBuilder {
     let bridge: KTypeBridge
     init(_ b: KTypeBridge) { bridge = b }
 
-    static func overload(_ signature: String?, kinds: [String?: KArgKind] = [:], introduced: String?, notes: String?) -> KOverload {
-        guard let signature else {
-            return KOverload(params: [], lenient: true, lenientKinds: kinds, availability: introduced.map { .iOS($0) }, notes: notes)
+    /// `async`: the call must be awaited (`Kiln.check` says so when it isn't).
+    /// `closuresCanWait`: closures passed to it may `await` (`Task {}`).
+    static func overload(_ signature: String?, kinds: [String?: KArgKind] = [:], introduced: String?, notes: String?,
+                         async: Bool = false, closuresCanWait: Bool = false) -> KOverload {
+        let o: KOverload
+        if let signature {
+            o = KOverload(params: KSignature.parse(signature), availability: introduced.map { .iOS($0) }, notes: notes)
+        } else {
+            o = KOverload(params: [], lenient: true, lenientKinds: kinds, availability: introduced.map { .iOS($0) }, notes: notes)
         }
-        return KOverload(params: KSignature.parse(signature), availability: introduced.map { .iOS($0) }, notes: notes)
+        o.isAsync = async
+        o.closuresCanWait = closuresCanWait
+        return o
     }
 
     /// `Type(…)`. A nil signature takes any labels; the bridge reads them.
     func initializer(_ signature: String? = nil, kinds: [String?: KArgKind] = [:], introduced: String? = nil,
-                     notes: String? = nil, _ run: @escaping KTypeBridge.Fn) {
-        bridge.inits.append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes), run: run))
+                     notes: String? = nil, closuresCanWait: Bool = false, _ run: @escaping KTypeBridge.Fn) {
+        bridge.inits.append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
+                                                          closuresCanWait: closuresCanWait), run: run))
     }
 
     func staticProperty(_ name: String, notes: String? = nil, support: KilnSupport = .full, _ get: @escaping KTypeBridge.Fn) {
@@ -195,28 +215,32 @@ struct KTypeBuilder {
     }
 
     func staticMethod(_ name: String, _ signature: String? = nil, kinds: [String?: KArgKind] = [:], introduced: String? = nil,
-                      notes: String? = nil, _ run: @escaping KTypeBridge.Fn) {
-        bridge.staticMethods[name, default: []].append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes), run: run))
+                      notes: String? = nil, async: Bool = false, closuresCanWait: Bool = false, _ run: @escaping KTypeBridge.Fn) {
+        bridge.staticMethods[name, default: []].append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
+                                                                                     async: async, closuresCanWait: closuresCanWait), run: run))
     }
 
-    func property(_ name: String, notes: String? = nil, support: KilnSupport = .full, _ get: @escaping KTypeBridge.Fn,
+    /// `async`: reading it waits (`task.value`).
+    func property(_ name: String, notes: String? = nil, support: KilnSupport = .full, async: Bool = false, _ get: @escaping KTypeBridge.Fn,
                   set: (@MainActor (inout KCall) throws -> Void)? = nil) {
-        bridge.properties[name] = .init(get: get, set: set, notes: notes, support: support)
+        bridge.properties[name] = .init(get: get, set: set, notes: notes, support: support, isAsync: async)
     }
 
     /// An instance method. A nil signature takes any labels.
     func method(_ name: String, _ signature: String? = nil, kinds: [String?: KArgKind] = [:], introduced: String? = nil,
-                notes: String? = nil, _ run: @escaping KTypeBridge.Fn) {
-        bridge.methods[name, default: []].append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes), run: run))
+                notes: String? = nil, async: Bool = false, closuresCanWait: Bool = false, _ run: @escaping KTypeBridge.Fn) {
+        bridge.methods[name, default: []].append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
+                                                                               async: async, closuresCanWait: closuresCanWait), run: run))
     }
 
     /// The same body for several method names (`uppercased`, `lowercased`).
-    func methods(_ names: [String], _ run: @escaping @MainActor (inout KCall, String) throws -> KV) {
-        for n in names { method(n) { c in try run(&c, n) } }
+    func methods(_ names: [String], async: Bool = false, closuresCanWait: Bool = false,
+                 _ run: @escaping @MainActor (inout KCall, String) throws -> KV) {
+        for n in names { method(n, async: async, closuresCanWait: closuresCanWait) { c in try run(&c, n) } }
     }
 
-    func properties(_ names: [String], _ get: @escaping @MainActor (inout KCall, String) throws -> KV) {
-        for n in names { property(n) { c in try get(&c, n) } }
+    func properties(_ names: [String], async: Bool = false, _ get: @escaping @MainActor (inout KCall, String) throws -> KV) {
+        for n in names { property(n, async: async) { c in try get(&c, n) } }
     }
 
     func anyProperty(_ f: @escaping @MainActor (inout KCall, String) throws -> KV?) { bridge.anyProperty = f }

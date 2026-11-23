@@ -16,7 +16,7 @@ final class NetworkingBridges: KBridgeFamily {
     override class func register(into r: KRegistry) {
         r.type("URLSession", .networking, notes: "`shared` only.") { t in
             t.staticProperty("shared") { _ in .native(.object("URLSession", KRef(URLSession.shared))) }
-            t.method("data", notes: "`try await`: waits without blocking.") { c in
+            t.method("data", notes: "`try await`: waits without blocking.", async: true) { c in
                 guard let req = KBuiltins.request(c.arg("from") ?? c.arg("for") ?? c.first) else { throw c.interp.fail("URLSession.data needs a URL", c.line) }
                 return try KBuiltins.fetch(req, c.interp, c.line)
             }

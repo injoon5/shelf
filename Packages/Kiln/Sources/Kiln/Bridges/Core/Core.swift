@@ -67,6 +67,7 @@ final class CoreBridges: KBridgeFamily {
                     view
                 }
             }
+            m.closuresCanWait()
         }
         r.modifier("onChange", .core) { m in
             m.form("of:any initial:bool? _:action") { c, view in
@@ -145,7 +146,7 @@ final class CoreBridges: KBridgeFamily {
         r.protocolBridge("Decodable", .foundation)
         r.protocolBridge("Encodable", .foundation)
         r.protocolBridge("Error", .language)
-        r.protocolBridge("LocalizedError", .foundation, requirements: ["errorDescription"])
+        r.protocolBridge("LocalizedError", .foundation, requirements: ["errorDescription?"])
         r.protocolBridge("CustomStringConvertible", .language, requirements: ["description"])
         r.protocolBridge("ObservableObject", .environment, support: .full, notes: "`@Published` and plain properties both refresh the views that read them.")
     }
