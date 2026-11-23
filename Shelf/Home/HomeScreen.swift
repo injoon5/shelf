@@ -52,7 +52,7 @@ struct HomeScreen: View {
     }
 }
 
-/// The screen's own corner radius, which the dock's corners follow.
+/// The screen's own corner radius, which an open card's corners keep.
 @MainActor
 enum Display {
     static let cornerRadius: CGFloat = {

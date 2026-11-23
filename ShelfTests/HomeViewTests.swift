@@ -7,7 +7,7 @@ import UIKit
 /// pages and menus, and the measurements it is drawn to.
 @MainActor
 @Suite struct HomeViewTests {
-    private let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, displayRadius: 55, labelHeight: 14.3)
+    private let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, labelHeight: 14.3)
 
     // MARK: Icon tone
 
@@ -68,7 +68,7 @@ import UIKit
     /// (`drawHierarchy`): a layer's `render(in:)` would draw the corner
     /// circular.
     @Test func theDockIsSpringboards() throws {
-        let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, displayRadius: 62, labelHeight: 14.3)
+        let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, labelHeight: 14.3)
         let frame = geometry.dockFrame
         #expect(abs(frame.width - 368) < 0.01 && abs(frame.height - 103.33) < 0.02)
         let view = UIView(frame: CGRect(origin: .zero, size: frame.size))

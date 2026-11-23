@@ -270,7 +270,7 @@ struct LayoutTests {
     // MARK: Geometry
 
     @Test func geometryRoundTripsSlots() {
-        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, displayRadius: 62, labelHeight: 16)
+        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, labelHeight: 16)
         for index in 0..<Layout.pageSize {
             #expect(geometry.gridIndex(at: geometry.iconCenter(index), count: Layout.pageSize) == index)
         }
@@ -286,7 +286,7 @@ struct LayoutTests {
     /// Four icons fit the dock as Springboard's do: the outer two the same
     /// distance in from its ends.
     @Test func fourDockIconsFitTheDock() {
-        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, displayRadius: 62, labelHeight: 16)
+        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, labelHeight: 16)
         let first = geometry.dockCenter(0, of: 4).x - geometry.iconSize / 2
         let last = geometry.dockCenter(3, of: 4).x + geometry.iconSize / 2
         #expect(first > geometry.dockFrame.minX)

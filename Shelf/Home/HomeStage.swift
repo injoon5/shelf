@@ -34,7 +34,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private let model: HomeModel
     private let library: LibraryStore
     private let settings: ShelfSettings
-    private(set) var geometry = HomeGeometry(size: .zero, safeTop: 0, displayRadius: 0, labelHeight: 0)
+    private(set) var geometry = HomeGeometry(size: .zero, safeTop: 0, labelHeight: 0)
     private var labelSize = HomeMetrics.labelSize
 
     private var wallpaper: WallpaperView!
@@ -226,8 +226,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
 
         let labels = labelMetrics()
-        let geometry = HomeGeometry(size: bounds.size, safeTop: view.safeAreaInsets.top,
-                                    displayRadius: Display.cornerRadius, labelHeight: labels.height)
+        let geometry = HomeGeometry(size: bounds.size, safeTop: view.safeAreaInsets.top, labelHeight: labels.height)
         guard geometry.size.width > 0 else { return }
         if geometry != self.geometry || labels.size != labelSize {
             self.geometry = geometry

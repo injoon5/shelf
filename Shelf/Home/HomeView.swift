@@ -75,7 +75,7 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
     private var shownRefusals: [String: Int]?
     private var wasEditing = false
 
-    var geometry = HomeGeometry(size: .zero, safeTop: 0, displayRadius: 0, labelHeight: 0) {
+    var geometry = HomeGeometry(size: .zero, safeTop: 0, labelHeight: 0) {
         didSet {
             guard geometry != oldValue else { return }
             setNeedsUpdateProperties()

@@ -383,7 +383,7 @@ import Testing
     /// layout. Opened from search and closed, a card for an app on page 2
     /// leaves past the right edge at its row. (It fell into the pill.)
     @Test func anIconOnAnotherPageHasAFrameOffToThatSide() {
-        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, displayRadius: 62, labelHeight: 16)
+        let geometry = HomeGeometry(size: .init(width: 402, height: 874), safeTop: 62, labelHeight: 16)
         let home = geometry.iconFrame(at: .page(0, index: 5), dockCount: 4, page: 0)
         #expect(home.midX == geometry.iconCenter(5).x && home.midY == geometry.iconCenter(5).y)
         #expect(home.width == geometry.iconSize)

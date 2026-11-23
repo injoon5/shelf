@@ -16,7 +16,7 @@ pixels:
 | Label, widest (truncated) | about 86 pt |
 | Search pill | 78.7 × 29.3 pt, 20.3 pt above the dock |
 | Dock | inset 17 pt on the sides and the bottom, 103.3 pt tall |
-| Dock corner radius | about 45 pt (the display's 62 pt, less the 17 pt inset) |
+| Dock corner radius | 38.75 pt on UIKit's continuous curve, 3/8 of its height (see "Dock corners") |
 | Dock icons | 64 pt, 24 pt apart, 19.67 pt from the dock's top and bottom |
 
 To check Shelf against it, take a 3x screenshot of Shelf on the same
@@ -55,6 +55,68 @@ continuous rounded rectangle at 26%, which `IconPath` draws. A Core Animation
 layer's `cornerRadius` with `cornerCurve = .continuous` reads 52, 36, 30, 22,
 17, 11, 7, 4, 2: a different, rounder curve. So no icon's outline is a
 layer's corner radius.
+
+## Dock corners
+
+Measured as the icon corners were (PLAN.md §0.6): how far the dock's left
+edge is inset on each pixel row down from its top, at 3x, over the
+simulator's black wallpaper, at a threshold of 20 on a pixel (the fill is
+32, the rim brighter). Springboard from `home-page1-light.png` (the
+`closeup-dock-left-corner.png` crop reads the same on every row); Shelf
+from screenshots on the same iPhone 17 simulator, launched with
+`-ShelfWallpaperFile` pointing at a black picture.
+
+| Row (px from top) | Springboard | Shelf before (45 pt) | Shelf (38.75 pt) |
+|---|---|---|---|
+| 0 | 137 | 162 | 135 |
+| 1 | 114 | 136 | 113 |
+| 2 | 104 | 123 | 103 |
+| 4 | 90 | 108 | 90 |
+| 8 | 75 | 90 | 74 |
+| 12 | 65 | 79 | 64 |
+| 18 | 53 | 66 | 53 |
+| 24 | 45 | 57 | 44 |
+| 32 | 36 | 47 | 35 |
+| 40 | 28 | 38 | 28 |
+| 50 | 21 | 29 | 20 |
+| 60 | 15 | 22 | 14 |
+| 70 | 10 | 16 | 10 |
+| 80 | 7 | 12 | 6 |
+| 90 | 4 | 8 | 4 |
+| 100 | 2 | 5 | 2 |
+| 110 | 1 | 3 | 1 |
+
+The corner runs most of the way down the dock's 155 px half-height, which
+is what reads as "nearly a pill", but its first rows are much less inset
+than a pill's (a capsule reads 176 at row 0, 60 at row 32). Rasterizing
+candidates the same way and fitting all 120 rows:
+
+- Core Animation's continuous corner (what `cornerConfiguration` `.fixed`
+  draws) at **38.75 pt fits best**: within 2 px on every row, 0.5 px RMS.
+  It is 3/8 of the dock's 103.33 pt height.
+- SwiftUI's continuous rounded rectangle at 38.75–39 pt is within 4 px.
+- A circular corner of any radius is off by 28 px or more at the top rows.
+- Concentric with the display (62 pt, less the 17 pt inset: 45 pt, which
+  Shelf drew before) is 25 px rounder at the top. UIKit's
+  `.containerConcentric()` on the dock gives square corners, since nothing
+  above it has corners. The display's outline offset 17 pt inward fits
+  only if the display's radius were 55 pt (1.3 px RMS), and it is 62.
+
+So the dock is a fixed 38.75 pt continuous corner (`HomeMetrics.dockRadius`).
+The 50% overlay of Shelf on Springboard shows one outline, light and dark
+(within 1 px in dark, threshold 8 on a fill of 17). The fill is the same
+(32 light; 17 Springboard, 18 Shelf dark), and so is the rim: a hairline
+brightest along the top and the top corners (117 at the top's first row on
+Springboard, 131 on Shelf, both falling to the fill within 4 px) and
+fading down the sides to the fill's level at the dock's middle, where
+neither has a lighter edge. The rim is the system glass's own, so it
+followed the shape.
+
+A carried icon is over the dock inside the same outline
+(`HomeGeometry.dockOutline`, SwiftUI's continuous corner, since
+`UIBezierPath(roundedRect:)` is 20 px rounder). `HomeViewTests.theDockIsSpringboards`
+pins the shape as the render server draws it (`drawHierarchy`; a layer's
+`render(in:)` draws the corner circular).
 
 ## Long press and edit mode
 

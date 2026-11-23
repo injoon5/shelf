@@ -98,7 +98,7 @@ enum HomeMetrics {
     /// `.fixed`): fitted to the inset of Springboard's dock edge on every
     /// pixel row at 3x (`home-page1-light.png`), within 2 px on every row
     /// (design/reference/README.md, "Dock corners"). It is 3/8 of the dock's
-    /// height. Not concentric with the display (62 − 17 = 45 is 24 px rounder
+    /// height. Not concentric with the display (62 − 17 = 45 is 25 px rounder
     /// at the top row), and nowhere near a pill.
     static let dockRadius: CGFloat = 38.75
     /// Used when the display's own corner radius can't be read.
@@ -194,7 +194,6 @@ struct HomeGeometry: Equatable {
     /// The whole screen, safe areas included.
     var size: CGSize
     var safeTop: CGFloat
-    var displayRadius: CGFloat
     /// The height one line of label text takes at the current text size.
     var labelHeight: CGFloat
 
