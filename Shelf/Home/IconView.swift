@@ -45,6 +45,11 @@ final class IconView: UIView {
         badge.alpha = 0
         label.name = item.name
         label.isNew = item.app?.isNew == true
+        // One element per icon, named, so it can be found and driven. The
+        // rest of Home Screen accessibility is on PLAN.md's Later list.
+        isAccessibilityElement = true
+        accessibilityLabel = item.name
+        accessibilityTraits = .button
         // Drawn once and composited as one bitmap while it jiggles or pages:
         // the rim's mask and the label's shadow would otherwise be drawn
         // again every frame, for every icon.
@@ -68,6 +73,7 @@ final class IconView: UIView {
         self.item = item
         art.face = item.face
         label.name = item.name
+        accessibilityLabel = item.name
         label.isNew = item.app?.isNew == true
         art.setPending(isRunnable: item.app?.isRunnable ?? true, isDownloading: isDownloading)
     }
@@ -147,6 +153,10 @@ final class IconView: UIView {
         hidesLabel = hidden
         fade(label, to: hidden ? 0 : 1, animated: animated)
     }
+
+    /// The layer the jiggle runs on.
+    var jiggleLayer: CALayer { wobble.layer }
+    var showsMinusBadge: Bool { showsBadge }
 
     func setBadge(_ shown: Bool, animated: Bool) {
         let shown = shown && item.isDeletable

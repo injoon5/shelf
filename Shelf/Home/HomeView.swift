@@ -314,6 +314,9 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
 
     // MARK: Where icons are
 
+    /// The icon for `id`, wherever it is.
+    func iconView(_ id: String) -> IconView? { icons[id] }
+
     /// Where `id`'s artwork sits, in this view's coordinates, as the layout
     /// puts it: the grid's at the pages' current scroll position (an icon on
     /// another page is a whole page off to that side), or the dock's.
