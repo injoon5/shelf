@@ -100,6 +100,7 @@ final class ListsBridges: KBridgeFamily {
                     view
                 }
             }
+            m.closuresCanWait()
         }
         r.modifier("listStyle", .lists, support: .partial) { m in
             m.styles("ListStyle", ["plain", "inset", "sidebar", "insetGrouped", "grouped", "automatic"])

@@ -10,4 +10,9 @@ enum CreateMetrics {
     static let previewBorder: CGFloat = 0.5
     static let tileSize: CGFloat = 52
     static let fieldSpacing: CGFloat = 2
+    /// `Kiln.check`'s warnings listed under the name; the rest are counted.
+    static let warningsShown = 2
+    static let warningLines = 2
+    /// "2 more warnings" lines up with the text of the warnings above it.
+    static let warningIndent: CGFloat = 24
 }

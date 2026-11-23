@@ -1,6 +1,7 @@
 // Name: Steps
 // Icon: chart.bar.fill
 // Tint: mint
+// Covers: Layout, Drawing, Charts
 
 import SwiftUI
 import Charts

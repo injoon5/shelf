@@ -1,5 +1,203 @@
 {
   "description" : "Kiln 0.2.1, Shelf's copy",
+  "families" : [
+    {
+      "name" : "Core",
+      "stubs" : 0,
+      "summary" : "views' life cycle: appearing, tasks, changes, timelines",
+      "supported" : 15
+    },
+    {
+      "name" : "Controls",
+      "stubs" : 0,
+      "summary" : "buttons, toggles, pickers, sliders, text fields and the other controls",
+      "supported" : 61
+    },
+    {
+      "name" : "Text",
+      "stubs" : 0,
+      "summary" : "text and fonts",
+      "supported" : 42
+    },
+    {
+      "name" : "Layout",
+      "stubs" : 3,
+      "summary" : "stacks, grids, scroll views, frames and padding",
+      "supported" : 69
+    },
+    {
+      "name" : "Lists",
+      "stubs" : 2,
+      "summary" : "lists, forms and sections",
+      "supported" : 21
+    },
+    {
+      "name" : "Navigation",
+      "stubs" : 4,
+      "summary" : "navigation stacks, tabs, toolbars, sheets and alerts",
+      "supported" : 39
+    },
+    {
+      "name" : "Gestures",
+      "stubs" : 5,
+      "summary" : "taps, long presses, drags, pinches and rotations",
+      "supported" : 4
+    },
+    {
+      "name" : "Drawing",
+      "stubs" : 11,
+      "summary" : "shapes, paths, colors, gradients, images, effects and animation",
+      "supported" : 194
+    },
+    {
+      "name" : "Focus & Keyboard",
+      "stubs" : 5,
+      "summary" : "keyboard focus, submit and keyboard types",
+      "supported" : 6
+    },
+    {
+      "name" : "Environment",
+      "stubs" : 5,
+      "summary" : "state, bindings, observable models and environment values",
+      "supported" : 26
+    },
+    {
+      "name" : "Accessibility",
+      "stubs" : 5,
+      "summary" : "accessibility labels, hints and values",
+      "supported" : 3
+    },
+    {
+      "name" : "Charts",
+      "stubs" : 10,
+      "summary" : "Swift Charts",
+      "supported" : 12
+    },
+    {
+      "name" : "Scenes",
+      "stubs" : 0,
+      "summary" : "the app's scene",
+      "supported" : 1
+    },
+    {
+      "name" : "Haptics",
+      "stubs" : 4,
+      "summary" : "haptic feedback",
+      "supported" : 0
+    },
+    {
+      "name" : "Sharing",
+      "stubs" : 1,
+      "summary" : "the share sheet and the clipboard",
+      "supported" : 0
+    },
+    {
+      "name" : "Units",
+      "stubs" : 1,
+      "summary" : "measurements and unit conversion",
+      "supported" : 0
+    },
+    {
+      "name" : "Audio",
+      "stubs" : 0,
+      "summary" : "playing sounds",
+      "supported" : 0
+    },
+    {
+      "name" : "Web",
+      "stubs" : 0,
+      "summary" : "web views and web pages",
+      "supported" : 0
+    },
+    {
+      "name" : "Chart3D",
+      "stubs" : 0,
+      "summary" : "3D charts",
+      "supported" : 0
+    },
+    {
+      "name" : "Files",
+      "stubs" : 0,
+      "summary" : "importing and exporting files",
+      "supported" : 0
+    },
+    {
+      "name" : "Photos",
+      "stubs" : 0,
+      "summary" : "the photo picker",
+      "supported" : 0
+    },
+    {
+      "name" : "Camera",
+      "stubs" : 0,
+      "summary" : "taking photos with the camera",
+      "supported" : 0
+    },
+    {
+      "name" : "Motion",
+      "stubs" : 0,
+      "summary" : "Core Motion: the accelerometer, the gyroscope and the pedometer",
+      "supported" : 0
+    },
+    {
+      "name" : "Location",
+      "stubs" : 0,
+      "summary" : "the user's location and geocoding",
+      "supported" : 0
+    },
+    {
+      "name" : "Vision",
+      "stubs" : 0,
+      "summary" : "Vision: text and barcode recognition",
+      "supported" : 0
+    },
+    {
+      "name" : "Intelligence",
+      "stubs" : 0,
+      "summary" : "on-device Foundation Models",
+      "supported" : 0
+    },
+    {
+      "name" : "Widgets",
+      "stubs" : 0,
+      "summary" : "widgets on Shelf's Home Screen",
+      "supported" : 0
+    },
+    {
+      "name" : "Language",
+      "stubs" : 0,
+      "summary" : "Swift's standard library",
+      "supported" : 265
+    },
+    {
+      "name" : "Foundation",
+      "stubs" : 3,
+      "summary" : "dates, formatters, JSON, files and settings",
+      "supported" : 201
+    },
+    {
+      "name" : "Concurrency",
+      "stubs" : 0,
+      "summary" : "tasks, async/await, task groups and streams",
+      "supported" : 41
+    },
+    {
+      "name" : "Networking",
+      "stubs" : 0,
+      "summary" : "URLSession requests",
+      "supported" : 23
+    }
+  ],
+  "gaps" : [
+    {
+      "id" : "payload-enum-codable",
+      "what" : "An enum with associated values isn't `Codable` by itself: give a saved enum raw values (`enum Priority: String, Codable`), or write its `init(from:)` and `encode(to:)`."
+    },
+    {
+      "id" : "tuple-labels",
+      "what" : "A tuple doesn't take its labels from the declared type: write them in the literal (`return (min: a, max: b)`)."
+    }
+  ],
   "generator" : "kiln-registry",
   "interim" : false,
   "schemaVersion" : 1,
@@ -14390,6 +14588,104 @@
       ],
       "source" : "Sources/Kiln/Environment.swift",
       "support" : "full"
+    }
+  ],
+  "wontDo" : [
+    {
+      "id" : "mapkit-views",
+      "reason" : "Too much for the value. Geocoding stays (§4.6).",
+      "status" : "wontDo",
+      "what" : "MapKit views (`Map`, `Marker`, Look Around)"
+    },
+    {
+      "id" : "custom-cameras",
+      "reason" : "A live preview layer and session management; `UIImagePickerController` covers taking a photo (§4.3).",
+      "status" : "wontDo",
+      "what" : "Custom cameras with `AVCaptureSession`"
+    },
+    {
+      "id" : "metal-shaders",
+      "reason" : "They need a compiled Metal library, and run off the main thread at frame rate.",
+      "status" : "wontDo",
+      "what" : "Metal shaders (`colorEffect`, `distortionEffect`, `layerEffect` with `ShaderLibrary`)"
+    },
+    {
+      "id" : "swiftdata-coredata",
+      "reason" : "`DB` is the synced store.",
+      "status" : "wontDo",
+      "what" : "SwiftData, Core Data"
+    },
+    {
+      "id" : "background-modes",
+      "reason" : "Apps run only while their card is open.",
+      "status" : "wontDo",
+      "what" : "Background modes (location, audio, refresh)"
+    },
+    {
+      "id" : "documents-windows-scenes",
+      "reason" : "A Shelf app is one screen inside a card. `WindowGroup` stays: it's the app's root.",
+      "status" : "wontDo",
+      "what" : "iOS 27's `Document` protocol, documents, multiple windows and scenes, commands"
+    },
+    {
+      "id" : "uikit-beyond-allowlist",
+      "reason" : "Each controller is bridged on purpose, and the app delegate is Shelf's.",
+      "status" : "wontDo",
+      "what" : "UIKit beyond the representable allowlist (`UIApplicationDelegateAdaptor`)"
+    },
+    {
+      "id" : "health-home-accessories",
+      "reason" : "Entitlements, or delegate-heavy APIs for little use here.",
+      "status" : "wontDo",
+      "what" : "Bluetooth, NFC, HealthKit, HomeKit (and WorkoutKit)"
+    },
+    {
+      "id" : "translation",
+      "reason" : "On PLAN.md's Later list.",
+      "status" : "later",
+      "what" : "Translation (`translationPresentation`, `translationTask`)"
+    },
+    {
+      "id" : "storekit",
+      "reason" : "Purchases need App Store products and an app record; Shelf apps aren't sold through the App Store.",
+      "status" : "wontDo",
+      "what" : "StoreKit views and purchase modifiers"
+    },
+    {
+      "id" : "wallet-apple-pay",
+      "reason" : "They need a merchant ID, pass type IDs and entitlements that Shelf can't grant per app.",
+      "status" : "wontDo",
+      "what" : "Apple Pay and Wallet buttons"
+    },
+    {
+      "id" : "3d-and-games",
+      "reason" : "Scene graphs of subclassed native nodes, run at frame rate; see subclassing native classes. `Canvas` and `TimelineView` cover 2D games.",
+      "status" : "wontDo",
+      "what" : "RealityKit, SceneKit and SpriteKit views, game controllers"
+    },
+    {
+      "id" : "musickit",
+      "reason" : "MusicKit is registered per bundle ID, so every app would share Shelf's.",
+      "status" : "wontDo",
+      "what" : "MusicKit views (`ArtworkImage`, the music picker, subscription offer)"
+    },
+    {
+      "id" : "sign-in-with-apple",
+      "reason" : "Needs an entitlement and server-side token checks per app.",
+      "status" : "wontDo",
+      "what" : "Sign in with Apple"
+    },
+    {
+      "id" : "system-services",
+      "reason" : "Entitlement-gated, or they register the app with the system, which a Shelf app can't do.",
+      "status" : "wontDo",
+      "what" : "Siri and Shortcuts views, Screen Time, managed apps, PermissionKit, device discovery, screen capture"
+    },
+    {
+      "id" : "xcode-previews",
+      "reason" : "There's no canvas in Shelf; `#Preview` blocks are skipped when read (§1.6).",
+      "status" : "wontDo",
+      "what" : "Xcode previews (`#Preview`, `@Previewable`, `preview*` modifiers)"
     }
   ]
 }

@@ -1,6 +1,7 @@
 // Name: Workouts
 // Icon: figure.run
 // Tint: green
+// Covers: Environment
 
 import SwiftUI
 import Observation

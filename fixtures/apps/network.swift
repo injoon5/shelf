@@ -1,6 +1,7 @@
 // Name: Launches
 // Icon: airplane.departure
 // Tint: indigo
+// Covers: Networking, Foundation
 
 import SwiftUI
 

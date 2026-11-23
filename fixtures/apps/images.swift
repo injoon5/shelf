@@ -1,6 +1,7 @@
 // Name: Gallery
 // Icon: photo.on.rectangle
 // Tint: pink
+// Covers: Drawing
 
 import SwiftUI
 

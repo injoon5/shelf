@@ -262,6 +262,8 @@ final class KEFuncDecl {
         if case .opaque(let inner) = t, let n = inner.name { return ["View", "ChartContent", "ToolbarContent", "Scene"].contains(n) }
         return false
     }
+    /// Declared `async` (the parser keeps it as an attribute).
+    var isAsync: Bool { attributes.contains { $0.name == "async" } }
     /// Labels as callers write them: `total(for:)`.
     var signature: String { name + "(" + params.map { ($0.label ?? "_") + ":" }.joined() + ")" }
 }

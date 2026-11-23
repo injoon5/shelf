@@ -44,53 +44,30 @@ If you can't run commands, reply with the code as described above.
 <!-- end -->
 ## What works
 
+Kiln runs Swift, and the parts of SwiftUI, Foundation, Charts and Swift concurrency listed here. Before installing an app, Shelf checks it: a view, modifier, type or argument label that isn't here is reported with its line, so stay within this list.
+
 **Swift**
 - Structs (memberwise and custom `init`, `mutating`, `didSet`), classes, enums (raw values, associated values, `CaseIterable`, methods).
-- Closures, `switch` with patterns and `where`, tuples (write the labels in the literal: `return (min: a, max: b)`), ranges.
+- Closures, `switch` with patterns and `where`, tuples, ranges.
 - Optionals with `?.` and `??`, `if let` / `guard let` / `while let`, `defer`, `do` / `catch` / `throw`.
-- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`, `UUID`, `Date`, `Calendar`, `DateFormatter`, `.formatted()`.
+- Extensions on your own types and on built-in ones, `Codable` types, `Identifiable`.
 - Protocols with extensions and default implementations (`extension P where Self: Q` too), `any P` and `some P`, generics, and classes that inherit with `super`.
 - `Equatable`, `Hashable`, `Comparable` and `CaseIterable` as Swift synthesizes them, or with your own `==`, `hash(into:)` and `<`. Declare them: `==`, `sorted()`, `allCases` and `ForEach` without `id:` need them.
 - `@ViewBuilder` functions, properties and parameters (with `if`, `switch` and `for`), and your own `@resultBuilder` and `@propertyWrapper` types.
 - Regex literals (`/\d+/`, `#/…/#`) with `firstMatch(of:)`, `wholeMatch(of:)`, `matches(of:)`, `contains` and `replacing`.
+- `@Observable` classes, also passed down with `.environment(model)` and read with `@Environment(Model.self)`; your own environment values declared with `@Entry` in `extension EnvironmentValues`.
 - `Int` and `Double` are distinct, as in compiled Swift.
-
-**State**
-- `@State`, `@Binding`.
-- `ObservableObject` with `@Published`, used through `@StateObject`, `@ObservedObject` or `@EnvironmentObject`.
-- `@Observable` classes, also passed down with `.environment(model)` and read with `@Environment(Model.self)`.
-- `@Environment(\.dismiss)`, and your own values declared with `@Entry` in `extension EnvironmentValues`.
-
-**Views**
-- `NavigationStack` with `navigationDestination`, `NavigationSplitView`, `TabView`.
-- `List` (sections, `onDelete`, `onMove`, `swipeActions`), `Form`, `Section` with headers and footers.
-- Controls: `Picker` (segmented, menu, wheel), `Toggle`, `Stepper`, `Slider`, `TextField` (text or `value:format:`), `DatePicker`, `Menu`, `Gauge`, `ProgressView`.
-- `ContentUnavailableView`, `Label`, `LabeledContent`.
-- `.sheet`, `.alert`, `.confirmationDialog`, `.toolbar`, `.searchable`, `.contextMenu`, `.refreshable`.
-- `Grid` and `LazyVGrid`, `GeometryReader`, `ScrollView`.
-- Custom `Shape`s that build a `Path` in `path(in:)`, a `Path` drawn directly (`Path { p in … }.stroke(.blue)`), and the built-in shapes with `fill`, `stroke` and `trim`.
-- Swift Charts: `Chart` with `BarMark`, `LineMark`, `PointMark`, `AreaMark`, `RuleMark`, `SectorMark` and `RectangleMark`.
-- `withAnimation`, `.animation(_:value:)`, transitions.
-
-**Time**
-- `Timer.publish(every:on:in:).autoconnect()` with `.onReceive`.
-- `TimelineView`.
-- `DispatchQueue.main.asyncAfter(deadline:)` for a one-off delay.
 
 **Waiting**
 - `async` functions, called with `await` from `.task { }`, `Task { }` or another `async` function. All of it runs on the main thread, so it can update state directly.
 - `.task { }` and `.task(id:)`, which stop when the view goes away and start again when the id changes. `.refreshable` waits for its closure.
 - `try await Task.sleep(for: .seconds(1))` waits without freezing the screen. `Task.isCancelled` and `try Task.checkCancellation()`.
 - `async let`, `withTaskGroup`, `AsyncStream` read with `for await`, and `await MainActor.run { }`.
-- A view's `body`, computed properties and `init` can't wait. Using `await` in them is an error.
+- A view's `body`, computed properties and `init` can't wait, and nor can a button's action or `.onAppear`: start a `Task { }` there.
 
-**Network**
-- `let (data, response) = try await URLSession.shared.data(from: url)` (or `for: request`) in an `async` function, with `do` / `catch` around it.
-- `URLSession.shared.dataTask(with:) { data, response, error in … }.resume()`. The completion handler runs on the main thread.
-- `JSONDecoder` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase` and `.iso8601`.
-- `URLComponents`, `URLQueryItem`, `URLRequest` (`httpMethod`, `httpBody`, `setValue(_:forHTTPHeaderField:)`).
+**By family**, with what to know about each:
 
-**Images:** SF Symbols, and `AsyncImage` for images on the web, with a `phase in` closure for the loading and failed states.
+{{WORKS}}
 
 ## Saving data
 
@@ -132,11 +109,7 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, o
 
 ## What doesn't work
 
-- UIKit, `UIViewRepresentable`, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
-- Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
-- A view, modifier or initializer Kiln doesn't have stops the app with an error that names it and its line, and so do argument labels SwiftUI doesn't have (`.blur(10)` for `.blur(radius: 10)`). That includes `matchedGeometryEffect` and `glassEffect`.
-- `Canvas` draws nothing. Draw with a custom `Shape` or a `Path` instead.
-- `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
+{{DOESNT}}
 
 ## Design
 

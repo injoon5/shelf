@@ -14,9 +14,14 @@ enum Prompts {
     /// The new-app prompt. Without `install` (offline, no key) the Installing
     /// section is left out and the rest still works by paste.
     static func newApp(idea: String, install: Install?) -> String {
-        var values = installValues(install)
+        var values = installValues(install).merging(catalog) { $1 }
         values["IDEA"] = idea
         return fill(template("new"), install: install != nil, values)
+    }
+
+    /// The sections built from Kiln's manifest (`PromptCatalog`).
+    static var catalog: [String: String] {
+        ["WORKS": PromptCatalog.whatWorks(), "DOESNT": PromptCatalog.whatDoesntWork()]
     }
 
     /// The change prompt. `includeSource` picks the full source or the outline.
@@ -39,7 +44,7 @@ enum Prompts {
     static var rules: String {
         let new = template("new")
         guard let start = new.range(of: "## What works") else { return "" }
-        return fill(String(new[start.lowerBound...]), install: false, [:])
+        return fill(String(new[start.lowerBound...]), install: false, catalog)
     }
 
     /// Where the templates are: the app's bundle, found through a type in the

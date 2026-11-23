@@ -37,11 +37,11 @@ extension Kiln {
     /// Adds a global function the app's code can call.
     @MainActor
     public static func registerFunction(_ name: String, signature: String? = nil, family: KilnFamily = .host, notes: String? = nil,
-                                        _ run: @escaping @MainActor (KilnCall) throws -> KilnValue) {
+                                        async: Bool = false, _ run: @escaping @MainActor (KilnCall) throws -> KilnValue) {
         let r = KRegistry.shared
         let b = KFunctionBridge(name: name, family: family, support: .full, introduced: nil, notes: notes, source: "host")
         b.owner = "Host"
-        b.forms = [.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes), run: KilnTypeBuilder.wrap(run))]
+        b.forms = [.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes, async: async), run: KilnTypeBuilder.wrap(run))]
         r.replace(b)
     }
 
@@ -89,10 +89,11 @@ public struct KilnTypeBuilder {
         bridge.staticProperties[name] = .init(get: Self.wrap(get), set: nil, notes: notes, support: .full)
     }
 
-    /// `Type.name(…)`.
-    public func staticMethod(_ name: String, _ signature: String? = nil, notes: String? = nil,
+    /// `Type.name(…)`. `async`: it returns `KilnValue.async { … }`, and
+    /// `Kiln.check` says so when a call to it isn't `await`ed.
+    public func staticMethod(_ name: String, _ signature: String? = nil, notes: String? = nil, async: Bool = false,
                              _ run: @escaping @MainActor (KilnCall) throws -> KilnValue) {
-        bridge.staticMethods[name, default: []].append(.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes), run: Self.wrap(run)))
+        bridge.staticMethods[name, default: []].append(.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes, async: async), run: Self.wrap(run)))
     }
 
     /// `value.name`, and `value.name = x` when `set` is given (`call.receiver`
@@ -102,10 +103,10 @@ public struct KilnTypeBuilder {
         bridge.properties[name] = .init(get: Self.wrap(get), set: set.map { s in { c in try s(KilnCall(c: c)) } }, notes: notes, support: .full)
     }
 
-    /// `value.name(…)`.
-    public func method(_ name: String, _ signature: String? = nil, notes: String? = nil,
+    /// `value.name(…)`. `async` as for `staticMethod`.
+    public func method(_ name: String, _ signature: String? = nil, notes: String? = nil, async: Bool = false,
                        _ run: @escaping @MainActor (KilnCall) throws -> KilnValue) {
-        bridge.methods[name, default: []].append(.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes), run: Self.wrap(run)))
+        bridge.methods[name, default: []].append(.init(overload: KTypeBuilder.overload(signature, introduced: nil, notes: notes, async: async), run: Self.wrap(run)))
     }
 }
 

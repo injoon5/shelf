@@ -15,6 +15,11 @@ struct NewAppSheet: View {
         _model = State(initialValue: CreateModel(app: app, source: source))
     }
 
+    /// A sheet over a model already made (tests show one with a reply in it).
+    init(model: CreateModel) {
+        _model = State(initialValue: model)
+    }
+
     var body: some View {
         Group {
             if model.reply == nil {
@@ -153,24 +158,68 @@ private struct PreviewView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .transition(.opacity)
                 }
+
+                if !model.warnings.isEmpty {
+                    warnings
+                        .transition(.opacity)
+                }
             }
         }
         .padding(CreateMetrics.padding)
         .animation(Motion.quick, value: model.failure)
+        .animation(Motion.quick, value: model.warnings)
+    }
+
+    /// What Kiln accepts but doesn't do yet: listed, never blocking.
+    private var warnings: some View {
+        let shown = model.warnings.prefix(CreateMetrics.warningsShown)
+        let more = model.warnings.count - shown.count
+        return VStack(alignment: .leading, spacing: CreateMetrics.fieldSpacing) {
+            ForEach(Array(shown.enumerated()), id: \.offset) { _, warning in
+                Label {
+                    Text((try? AttributedString(markdown: warning)) ?? AttributedString(warning))
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                }
+            }
+            if more > 0 {
+                Text(more == 1 ? "1 more warning" : "\(more) more warnings")
+                    .padding(.leading, CreateMetrics.warningIndent)
+            }
+        }
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .lineLimit(CreateMetrics.warningLines)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 
     private func stage(_ meta: AppMeta, source: String) -> some View {
         let shape = RoundedRectangle(cornerRadius: CreateMetrics.previewRadius, style: .continuous)
-        return AppStage(app: meta, source: source,
-                        // A change is tried against a copy of the app's real data; nothing here is saved.
-                        store: .scratch(copying: model.app?.slug), host: library.host,
-                        // The real capabilities, after the same sheet an installed app gets.
-                        permissions: model.previewPermissions(library.permissions),
-                        onError: { error in model.previewFailed(error) })
+        return ZStack {
+            if let error = model.checkError {
+                // What Kiln found before running it: the reply can't be installed as written.
+                ZStack {
+                    Color(.systemBackground)
+                    ErrorScreen(face: IconFace(meta), name: meta.name, error: error,
+                                title: "\(meta.name) can’t be installed")
+                }
+                .transition(.opacity)
+            } else {
+                AppStage(app: meta, source: source,
+                         // A change is tried against a copy of the app's real data; nothing here is saved.
+                         store: .scratch(copying: model.app?.slug), host: library.host,
+                         // The real capabilities, after the same sheet an installed app gets.
+                         permissions: model.previewPermissions(library.permissions),
+                         onError: { error in model.previewFailed(error) })
+            }
+        }
+        .animation(Motion.quick, value: model.checkError)
         .clipShape(shape)
         .overlay { shape.strokeBorder(.separator, lineWidth: CreateMetrics.previewBorder) }
         .overlay(alignment: .bottom) {
-            if let error = model.compileError {
+            if let error = model.checkError ?? model.compileError {
                 // A broken reply goes back to the model with the lines around the failure.
                 Button {
                     UIPasteboard.general.string = error.report
@@ -198,8 +247,9 @@ private struct PreviewView: View {
         } label: {
             ZStack {
                 Text(connectivity.isOnline ? (model.isChange ? "Update" : "Install") : "Offline")
-                    .opacity(model.isInstalling ? 0 : 1)
-                if model.isInstalling { ProgressView() }
+                    .opacity(model.isInstalling || model.isChecking ? 0 : 1)
+                // Installing, or `Kiln.validate` still trying the reply.
+                if model.isInstalling || model.isChecking { ProgressView() }
             }
             .font(.body.weight(.semibold))
             .frame(minHeight: CreateMetrics.buttonHeight)

@@ -377,7 +377,10 @@ struct KEParser {
         else { throw error("expected a function name") }
         let generics = try parseGenericParams()
         let params = try parseParams()
+        var attributes = attrs
         while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) {
+            // `Kiln.check` reads it: an `await` needs an `async` function, and a call to one needs `await`.
+            if w == "async" || w == "reasync" { attributes.append(KEAttribute(name: "async", args: [])) }
             next()
             if at("("), !cur.spaceBefore { try skipBalanced("(", ")") }   // throws(MyError)
         }
@@ -386,7 +389,7 @@ struct KEParser {
         let constraints = try parseWhere()
         let body = at("{") ? try parseBlock() : []
         let f = KEFuncDecl(name: name, params: params, returnType: ret, body: body, isStatic: mods.contains("static"),
-                           isMutating: mods.contains("mutating"), attributes: attrs, line: line)
+                           isMutating: mods.contains("mutating"), attributes: attributes, line: line)
         f.generics = generics
         f.constraints = constraints
         return f
