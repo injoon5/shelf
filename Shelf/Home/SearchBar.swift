@@ -346,7 +346,15 @@ private final class SearchLabel: UIView {
     private var fieldGlyph = CGSize(width: 17, height: 17)
     /// "Search" as wide as it is in the pill, at the pill's size.
     private var pillTextWidth: CGFloat = 40
+    /// The letter-spacing, in the row's own points, that makes "Search"
+    /// drawn at the field's size as wide as the pill's once scaled down: SF
+    /// tracks a 12 pt size looser than a 22 pt one.
+    private var pillKern: CGFloat = 0
+    /// The magnifier in each weight it passes through, boldest first: the
+    /// pill's is bold, the field's regular.
+    private var glyphs: [UIImage] = []
     private var shownWeight: CGFloat = .nan
+    private var shownGlyph = -1
 
     var showsText = true {
         didSet { text.isHidden = !showsText }
@@ -367,15 +375,19 @@ private final class SearchLabel: UIView {
     func configure(fieldSize: CGFloat, pillSize: CGFloat) {
         self.fieldSize = fieldSize
         self.pillSize = pillSize
-        let field = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(
-            pointSize: fieldSize * SearchMetrics.glyphScale, weight: .regular, scale: .medium))
+        glyphs = [UIImage.SymbolWeight.bold, .semibold, .medium, .regular].compactMap { weight in
+            UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(
+                pointSize: fieldSize * SearchMetrics.glyphScale, weight: weight, scale: .medium))?.withRenderingMode(.alwaysTemplate)
+        }
         let pill = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: pillSize, weight: .bold, scale: .small))
-        glyph.image = field?.withRenderingMode(.alwaysTemplate)
-        fieldGlyph = field?.size ?? fieldGlyph
+        fieldGlyph = glyphs.last?.size ?? fieldGlyph
         pillGlyph = pill?.size ?? pillGlyph
-        let pillText = NSAttributedString(string: text.text ?? "", attributes: [.font: UIFont.systemFont(ofSize: pillSize, weight: .medium)])
-        pillTextWidth = pillText.size().width.rounded(.up)
+        let word = text.text ?? ""
+        pillTextWidth = NSAttributedString(string: word, attributes: [.font: UIFont.systemFont(ofSize: pillSize, weight: .medium)]).size().width
+        let drawn = NSAttributedString(string: word, attributes: [.font: UIFont.systemFont(ofSize: fieldSize, weight: .medium)]).size().width
+        pillKern = (pillTextWidth * fieldSize / pillSize - drawn) / CGFloat(max(word.count, 1))
         shownWeight = .nan
+        shownGlyph = -1
     }
 
     /// The row at `p` of the way from the pill to the field.
@@ -383,12 +395,22 @@ private final class SearchLabel: UIView {
         let pillScale = pillSize / fieldSize
         let scale = lerp(pillScale, 1, p)
 
-        // Medium in the pill, regular in the field, through every weight between.
+        // Medium in the pill, regular in the field, through every weight
+        // between, and the pill's looser spacing easing out.
         let weight = lerp(UIFont.Weight.medium.rawValue, UIFont.Weight.regular.rawValue, p)
         if abs(weight - shownWeight) > 0.002 || shownWeight.isNaN {
             shownWeight = weight
-            text.font = .systemFont(ofSize: fieldSize, weight: UIFont.Weight(weight))
+            text.attributedText = NSAttributedString(string: String(localized: "Search"), attributes: [
+                .font: UIFont.systemFont(ofSize: fieldSize, weight: UIFont.Weight(weight)),
+                .kern: pillKern * (1 - p),
+            ])
             text.sizeToFit()
+        }
+        // The magnifier's weight can only step; it steps while it's small.
+        let step = min(Int(p * CGFloat(glyphs.count + 1)), glyphs.count - 1)
+        if step != shownGlyph, glyphs.indices.contains(step) {
+            shownGlyph = step
+            glyph.image = glyphs[step]
         }
         let ink = UIColor.white.withAlphaComponent(lerp(HomeMetrics.pillTextOpacity, 1, p))
         text.textColor = ink

@@ -342,7 +342,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         let bounds = view.bounds
         // From search, the card grows out of the row's icon, and the
         // keyboard goes; search stays under the card until it comes back.
-        let row = model.isSearching ? list.iconFrame(for: run.id, in: view) : nil
+        let row = model.isSearching ? list.iconFrame(for: run.id, in: home) : nil
         if model.isSearching { search.dismissKeyboard() }
         let icon = row ?? iconFrame(run.id)
         let size = row == nil ? iconSize : SearchMetrics.iconSize
@@ -365,7 +365,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
         // An app deleted while its card was up has no icon to land on.
         // Opened from search, it closes back into its row.
-        let row = model.isSearching ? list.iconFrame(for: card.slug, in: view) : nil
+        let row = model.isSearching ? list.iconFrame(for: card.slug, in: home) : nil
         let icon = library.app(card.slug) == nil ? nil : row ?? iconFrame(card.slug)
         let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
                                          pill: geometry.pillFrame, iconSize: row == nil ? iconSize : SearchMetrics.iconSize)
@@ -375,8 +375,13 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     /// Where `slug`'s icon is on the Home Screen, exactly as the layout puts
     /// it, an icon on another page a whole page's width off to that side.
+    ///
+    /// Icon frames are taken in `home`'s own space, which is the screen's
+    /// once it is at full size: a card lands where the icon will be when the
+    /// Home Screen has grown back from behind it, not where its scaled-down
+    /// picture is as the close begins.
     private func iconFrame(_ slug: String) -> CGRect? {
-        homeView.iconFrame(for: slug).map { homeView.convert($0, to: view) }
+        homeView.iconFrame(for: slug).map { homeView.convert($0, to: home) }
     }
 
     /// The icons a card stands in for show no artwork. A landed card and

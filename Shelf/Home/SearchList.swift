@@ -277,10 +277,13 @@ final class SearchList: UIView, UICollectionViewDelegate, UIGestureRecognizerDel
     /// on the Home Screen does.
     private func iconPreview(at indexPath: IndexPath) -> UITargetedPreview? {
         guard let row = collectionView.cellForItem(at: indexPath) as? SearchRow else { return nil }
+        // The row, cut to its icon: the icon's own bounds are centred on its
+        // origin, which a preview's snapshot doesn't allow for.
         let parameters = UIPreviewParameters()
         parameters.backgroundColor = .clear
-        parameters.visiblePath = UIBezierPath(cgPath: IconPath.path(row.art.bounds, radius: HomeMetrics.iconRadius(SearchMetrics.iconSize)))
-        return UITargetedPreview(view: row.art, parameters: parameters)
+        let icon = row.art.convert(row.art.bounds, to: row)
+        parameters.visiblePath = UIBezierPath(cgPath: IconPath.path(icon, radius: HomeMetrics.iconRadius(SearchMetrics.iconSize)))
+        return UITargetedPreview(view: row, parameters: parameters)
     }
 }
 
