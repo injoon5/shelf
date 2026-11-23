@@ -8,10 +8,10 @@ import UIKit
 /// and sheets embed it through `IconImage`.
 ///
 /// Its bounds are centred on its own origin, so every layer in it sits at
-/// (0, 0) and stays centred while the outline animates (a card growing out
+/// (0, 0) and stays centred while the outline changes (a card growing out
 /// of its icon) with nothing of its own to keep in step: the outline's
-/// layers spring their paths and bounds, and the glyph and the pie keep
-/// their size.
+/// layers take new paths and bounds, and the glyph and the pie keep their
+/// size (a card's face stretches its glyph to the card, `stretchArt`).
 ///
 /// The outline is a path, not a layer's `cornerRadius`: Core Animation's
 /// continuous corner is rounder than Springboard's by up to 6 pixels at 3x,
@@ -134,15 +134,11 @@ class IconArtView: UIView {
         }
     }
 
-    /// Springs the outline to `size` and `radius` from wherever it is on screen.
-    /// `velocity` is in spring lengths per second.
-    func springOutline(to size: CGSize, radius: CGFloat, _ spring: Motion.Spring, velocity: CGFloat) {
-        let bounds = NSValue(cgRect: Self.centered(size))
-        for bounded in boundedLayers {
-            bounded.spring("bounds", to: bounds, spring, velocity: velocity)
-        }
-        for (shape, path) in paths(size, radius: radius) {
-            shape.spring("path", to: path, spring, velocity: velocity)
+    /// Stretches the glyph to an outline of `size`, as a card's face is one
+    /// picture stretched to the card. An icon's glyph is drawn at its size.
+    func stretchArt(to size: CGSize) {
+        withoutActions {
+            glyph.transform = CATransform3DMakeScale(size.width / iconSize, size.height / iconSize, 1)
         }
     }
 

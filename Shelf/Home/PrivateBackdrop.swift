@@ -15,7 +15,10 @@ import UIKit
 // `UIBlurEffect` has one fixed radius per style and a tint of its own, and
 // the only public way to blur by less is to scrub a paused animator, which
 // gives no control of the radius. These filters give exactly the measured
-// blur, at any point of the pull.
+// blur, at any point of the pull. Behind an app's card the same backdrop
+// comes into focus as the card lands, as Springboard's does: its radius
+// shrinks with the card (`RunnerMetrics.backdropBlurRadius`), where a fixed
+// system blur could only fade.
 //
 // If either class is ever missing, the backdrop draws nothing and search sits
 // over a plain dim instead (`BackdropView.isBlurring` is false).
@@ -36,16 +39,20 @@ final class BackdropView: UIView {
     /// Whether this is the real backdrop, blurring what's behind it.
     let isBlurring: Bool
 
-    override init(frame: CGRect) {
+    /// `resolution` is the size of the copy the blur works on, as a fraction
+    /// of the screen's: a quarter for search's 40 pt blur, more for a blur
+    /// that goes down to a point or two.
+    init(frame: CGRect = .zero, resolution: CGFloat = 0.25) {
         isBlurring = NSClassFromString("CABackdropLayer") != nil && blur != nil && colors != nil
         super.init(frame: frame)
         isUserInteractionEnabled = false
         accessibilityElementsHidden = true
         if isBlurring, let blur, let colors {
             blur.setValue(true, forKey: "inputNormalizeEdges")
-            // The blur happens on a quarter-size copy: a 40 pt deviation
-            // loses nothing to it, and the GPU does a sixteenth of the work.
-            layer.setValue(0.25, forKey: "scale")
+            // The blur works on a smaller copy: at search's quarter size a
+            // 40 pt deviation loses nothing, and the GPU does a sixteenth of
+            // the work.
+            layer.setValue(resolution, forKey: "scale")
             layer.filters = [blur, colors]
         } else {
             fallbackDim.backgroundColor = UIColor.black.cgColor

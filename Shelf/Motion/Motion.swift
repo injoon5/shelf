@@ -44,12 +44,22 @@ enum Motion {
     }
 
     /// An app's card growing out of its icon to full screen.
-    static let cardOpen = Spring(duration: 0.4, bounce: 0.04)
-    /// The card shrinking into its icon. Quicker than the open: Springboard's
-    /// card reaches its icon in about 130 ms and has settled by about 320.
-    static let cardClose = Spring(duration: 0.34, bounce: 0.1)
+    static let cardOpen = CardSprings(Spring(duration: 0.4, bounce: 0.04))
+    /// The card shrinking into its icon after a swipe up lets go, fitted to
+    /// Springboard's on an iPhone 17 (`real-device-open-close-swipe-up.mp4`,
+    /// the second Developer close, started from its measured release: see
+    /// `design/reference/springboard/README.md`). Each fits that close to
+    /// within a few points a frame. The height closes fastest, so the card
+    /// turns from portrait to square on the way; the width overshoots a
+    /// little, so the tile settles into its slot. The centre barely bounces
+    /// (fitted 0.16–0.2, but taken at 0.05, which fits as well), so a card
+    /// on its way down to the dock never drops past it. Release to rest
+    /// takes about 300 ms.
+    static let cardClose = CardSprings(position: Spring(duration: 0.38, bounce: 0.05),
+                                       width: Spring(duration: 0.44, bounce: 0.16),
+                                       height: Spring(duration: 0.35, bounce: 0.1))
     /// A close let go of short: the card goes back to full screen.
-    static let cardReturn = Spring(duration: 0.38, bounce: 0.1)
+    static let cardReturn = CardSprings(Spring(duration: 0.38, bounce: 0.1))
     /// The pill warping into the search field, and back.
     static let searchWarp = Spring(duration: 0.45, bounce: 0.18)
     /// The pill widening or narrowing for its page dots.
@@ -73,6 +83,26 @@ enum Motion {
     /// rate, 120 Hz on ProMotion (with `CADisableMinimumFrameDurationOnPhone`
     /// in Info.plist, without which an iPhone app stops at 60).
     static let frameRate = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
+
+    /// The springs a card flies on (`CardFlight`): one for its centre, one
+    /// for its width (and its corner, which follows the width), one for its
+    /// height.
+    struct CardSprings: Sendable {
+        var position: Spring
+        var width: Spring
+        var height: Spring
+
+        init(position: Spring, width: Spring, height: Spring) {
+            self.position = position
+            self.width = width
+            self.height = height
+        }
+
+        /// Everything on one spring.
+        init(_ spring: Spring) {
+            self.init(position: spring, width: spring, height: spring)
+        }
+    }
 
     // MARK: Fades
 

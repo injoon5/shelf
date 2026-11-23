@@ -29,84 +29,134 @@ struct CardRoot: View {
 /// picture of the app over it. At full screen the icon's tile and glyph are
 /// the app's launch screen; every size between is both.
 ///
+/// As Springboard's, the card is one picture stretched to its frame: the
+/// app's picture and the icon's glyph are squashed to the card's width and
+/// height, not cropped, and the corners stay the display's until the card is
+/// nearly an icon. On its way to an icon below it, it leans back.
+///
 /// Like every `IconArtView`, its bounds are centred on its own origin, so
 /// the glyph and the picture sit at (0, 0) and stay centred while the
-/// outline springs, with no animations of their own to keep in step.
+/// outline changes.
+///
+/// It has no Core Animation animations of its own. A finger places it, or
+/// its flight (`CardFlight`, a spring per property) does, every frame, so
+/// what is on screen is always `shown`: a finger catches it exactly there,
+/// and a new target carries on from there at the speed it had.
 final class CardFaceView: IconArtView {
-    /// Holds the app's picture at full-screen size, scaled to the card's width.
+    /// Holds the app's picture at full-screen size, stretched to the card.
     let content = UIView()
     private let screen: CGSize
-    /// Carries the corner's springs, which the outline's paths do too, so
-    /// where the corner is on screen can be read back when a finger catches
-    /// the card.
-    private let corner = CALayer()
+    private let fullRadius: CGFloat
+    /// Where the card is on screen.
+    private(set) var shown: CardFrame
+    /// Where it is headed, if it is moving by itself.
+    private(set) var flight: CardFlight?
+    private var springs = Motion.cardOpen
+    /// The lean, in radians about the horizontal axis, and what the
+    /// current flight does with it.
+    private(set) var lean: CGFloat = 0
+    private var leanFrom: CGFloat = 0
+    private var flightStartProgress: CGFloat = 1
+    private var leans = false
 
-    init(face: IconFace, iconSize: CGFloat, screen: CGSize) {
+    init(face: IconFace, iconSize: CGFloat, screen: CGSize, fullRadius: CGFloat) {
         self.screen = screen
+        self.fullRadius = fullRadius
+        shown = CardFrame(center: .zero, size: CGSize(width: iconSize, height: iconSize),
+                          radius: HomeMetrics.iconRadius(iconSize))
         super.init(face: face, iconSize: iconSize)
-        corner.isHidden = true
-        layer.addSublayer(corner)
         content.bounds = CGRect(origin: .zero, size: screen)
         content.center = .zero
         content.alpha = 0
         addSubview(content)
     }
 
-    /// Puts the card at `frame` at once.
+    private func progress(_ frame: CardFrame) -> CGFloat {
+        CardMotion.progress(width: frame.size.width, iconSize: iconSize, screenWidth: screen.width)
+    }
+
+    /// Puts the card at `frame` at once, its corner drawn for its size.
+    ///
+    /// In one transaction: its outline, its picture and its glyph reach the
+    /// screen in the same frame, or the tile shows around the picture.
     func place(_ frame: CardFrame) {
+        let size = frame.size
+        shown = CardFrame(center: frame.center, size: size, radius: CardMotion.cornerRadius(size: size, full: fullRadius))
         withoutActions {
-            layer.removeAnimations(withKeyPrefix: "position")
-            corner.removeAllAnimations()
             layer.position = frame.center
-            corner.cornerRadius = frame.radius
-            content.layer.removeAllAnimations()
-            content.layer.setValue(frame.size.width / screen.width, forKeyPath: "transform.scale")
+            content.layer.transform = CATransform3DMakeScale(size.width / screen.width, size.height / screen.height, 1)
+            stretchArt(to: size)
+            setOutline(size, radius: shown.radius)
         }
-        setOutline(frame.size, radius: frame.radius)
     }
 
-    /// Springs the card to `frame` from wherever it is on screen. The
-    /// centre's speed is in points per second; the size's in points of
-    /// width per second.
-    func spring(to frame: CardFrame, _ spring: Motion.Spring, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
-        let shown = layer.presentation() ?? layer
-        let sizeVelocity = CardMotion.springVelocity(widthVelocity, from: shown.bounds.width, to: frame.size.width)
-        layer.spring("position.x", to: frame.center.x, spring,
-                     velocity: CardMotion.springVelocity(centerVelocity.x, from: shown.position.x, to: frame.center.x))
-        layer.spring("position.y", to: frame.center.y, spring,
-                     velocity: CardMotion.springVelocity(centerVelocity.y, from: shown.position.y, to: frame.center.y))
-        springOutline(to: frame.size, radius: frame.radius, spring, velocity: sizeVelocity)
-        corner.spring("cornerRadius", to: frame.radius, spring, velocity: sizeVelocity)
-        content.layer.spring("transform.scale", to: frame.size.width / screen.width, spring, velocity: sizeVelocity)
+    /// Sends the card to `target` on `springs`, from where it is on screen,
+    /// at `velocity` (per second, of played time), or at the speed it is
+    /// already moving. A card that `leans` leans toward an icon below it on
+    /// the way; one that doesn't straightens up as it goes.
+    func fly(to target: CardFrame, _ springs: Motion.CardSprings, velocity: CardVelocity? = nil, leans: Bool = false,
+             at time: Double = CACurrentMediaTime()) {
+        let velocity = velocity ?? flight?.velocity(at: time) ?? .zero
+        self.springs = springs
+        if flight == nil || leans != self.leans { flightStartProgress = progress(shown) }
+        self.leans = leans
+        leanFrom = lean
+        flight = CardFlight(from: shown, velocity: velocity, to: target, springs: springs,
+                            slowdown: Motion.Spring.slowdown, at: time)
     }
 
-    /// Stops the card where it is on screen and returns where that is.
-    func freeze() -> CardFrame {
-        let frame = shownCard
-        layer.removeAllAnimationsDeeply()
-        content.layer.removeAllAnimationsDeeply()
+    /// The same flight, to where its target has moved, carrying on at the
+    /// speed it has.
+    func retarget(_ target: CardFrame, at time: Double) {
+        guard let flight, !flight.target.isClose(to: target, within: RunnerMetrics.restTolerance) else { return }
+        fly(to: target, springs, leans: leans, at: time)
+    }
+
+    /// Moves the card to where its flight has it at `time`. Returns whether
+    /// it has arrived: the flight's tail of sub-pixel motion would
+    /// otherwise keep the launch screen up (and the app unbuilt) for most of
+    /// a second longer than anyone can see.
+    func step(at time: Double) -> Bool {
+        guard let flight else { return true }
+        let arrived = flight.isSettled(at: time)
+        let frame = arrived ? flight.target : flight.frame(at: time)
         place(frame)
-        return frame
+        setLean(arrived ? 0 : lean(for: frame, in: flight))
+        if arrived { self.flight = nil }
+        return arrived
     }
 
-    var isMoving: Bool { layer.isAnimating || content.layer.isAnimating }
-
-    /// Where the card's springs are headed.
-    var targetFrame: CGRect { CardFrame(center: layer.position, size: layer.bounds.size, radius: corner.cornerRadius).rect }
-
-    /// Ends the springs at their targets, which the model already holds.
-    func finishMoving() {
-        layer.removeAllAnimationsDeeply()
-        content.layer.removeAllAnimationsDeeply()
+    /// The lean for `frame` on `flight`: what it had when the flight began,
+    /// fading out as the card gets where it is going, plus, landing, the
+    /// lean toward its icon.
+    private func lean(for frame: CardFrame, in flight: CardFlight) -> CGFloat {
+        let now = progress(frame), start = flightStartProgress, end = progress(flight.target)
+        let left = abs(start - end) > 0.001 ? min(max((now - end) / (start - end), 0), 1) : 0
+        var lean = leanFrom * left
+        if leans {
+            lean += CardMotion.lean(centerY: frame.center.y, height: frame.size.height, targetY: flight.target.center.y,
+                                    startProgress: start, progress: now)
+        }
+        return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
     }
 
-    private var shownCard: CardFrame {
-        let shown = layer.presentation() ?? layer
-        return CardFrame(center: shown.position, size: shown.bounds.size,
-                         radius: (corner.presentation() ?? corner).cornerRadius)
+    private func setLean(_ angle: CGFloat) {
+        guard angle != lean else { return }
+        lean = angle
+        var transform = CATransform3DIdentity
+        transform.m34 = -1 / RunnerMetrics.leanPerspective
+        withoutActions { layer.transform = CATransform3DRotate(transform, angle, 1, 0, 0) }
     }
 
-    var shownFrame: CGRect { shownCard.rect }
+    /// Stops the card where it is on screen and returns where that is. It
+    /// keeps its lean until it moves again.
+    func freeze() -> CardFrame {
+        flight = nil
+        return shown
+    }
+
+    var isMoving: Bool { flight != nil }
+    var shownFrame: CGRect { shown.rect }
 }
 
 /// One open app: a card that grows out of its icon, the live app over it
@@ -145,6 +195,7 @@ final class AppCard {
     private let fullRadius: CGFloat
     private var grab: (frame: CardFrame, scale: CGFloat, finger: CGPoint, direction: CloseDirection)?
     private var travel: CGFloat = 0
+    private var translation: CGPoint = .zero
 
     var slug: String { run.id }
 
@@ -154,8 +205,7 @@ final class AppCard {
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
-        startProgress = CardMotion.progress(width: source.width, iconSize: iconSize, screenWidth: screen.width)
-        self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen)
+        self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen, fullRadius: fullRadius)
         host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
         // Clear until the app is built, so the card's face is its launch screen.
         host.view.backgroundColor = .clear
@@ -167,58 +217,52 @@ final class AppCard {
         CardFrame(rect: CGRect(origin: .zero, size: screen), radius: fullRadius)
     }
 
-    /// How open the card is on screen: 1 full screen, 0 its icon. A card
-    /// added this turn of the run loop has no presentation yet, and its
-    /// model already holds its target, so it is where it started.
+    /// How open the card is on screen: 1 full screen, 0 its icon.
     var progress: CGFloat {
-        guard let shown = face.layer.presentation() else { return startProgress }
-        return CardMotion.progress(width: shown.bounds.width, iconSize: iconSize, screenWidth: screen.width)
-    }
-    private let startProgress: CGFloat
-
-    private var lastShown: CGRect?
-
-    /// Whether the card's spring has come to rest: no longer moving on
-    /// screen and within a fraction of a point of its target. A spring's
-    /// tail of sub-pixel motion would otherwise keep the launch screen up
-    /// (and the app unbuilt) for most of a second longer than anyone can see.
-    func hasComeToRest() -> Bool {
-        guard face.isMoving else { return true }
-        guard face.layer.presentation() != nil else { return false }
-        let shown = face.shownFrame
-        defer { lastShown = shown }
-        let tolerance = RunnerMetrics.restTolerance
-        let target = face.targetFrame
-        guard let lastShown, shown.isClose(to: lastShown, within: tolerance), shown.isClose(to: target, within: tolerance) else {
-            return false
-        }
-        face.finishMoving()
-        self.lastShown = nil
-        return true
+        CardMotion.progress(width: face.shown.size.width, iconSize: iconSize, screenWidth: screen.width)
     }
 
-    /// Grows (or goes back) to full screen from wherever it is.
-    func open(_ spring: Motion.Spring = Motion.cardOpen, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
+    /// Moves the card along its flight to `time`. Returns whether it has
+    /// come to rest.
+    func step(at time: Double) -> Bool {
+        face.step(at: time)
+    }
+
+    /// Grows (or goes back) to full screen from wherever it is, at
+    /// `velocity`, or at the speed it is already moving.
+    func open(_ springs: Motion.CardSprings = Motion.cardOpen, velocity: CardVelocity? = nil) {
         phase = .opening
         landingFades = false
         face.isHidden = false
         face.alpha = 1
-        face.spring(to: full, spring, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+        face.fly(to: full, springs, velocity: velocity)
     }
 
     /// Goes back to full screen after a finger let it go short of closing:
-    /// on the open's spring if it was caught on its way home.
-    func reopen(centerVelocity: CGPoint, widthVelocity: CGFloat) {
-        open(heldFrom == .closing ? Motion.cardOpen : Motion.cardReturn, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+    /// on the open's springs if it was caught on its way home.
+    func reopen(velocity: CardVelocity) {
+        open(heldFrom == .closing ? Motion.cardOpen : Motion.cardReturn, velocity: velocity)
     }
 
-    /// Shrinks into `landing`, from wherever it is.
-    func close(to landing: CGRect, fades: Bool, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
+    /// Shrinks into `landing`, from wherever it is, at `velocity` or the
+    /// speed it already has.
+    func close(to landing: CGRect, fades: Bool, velocity: CardVelocity? = nil) {
         if phase == .open { takePicture() }
         phase = .closing
         landingFades = fades
-        face.spring(to: CardFrame(rect: landing, radius: HomeMetrics.iconRadius(landing.width)), Motion.cardClose,
-                    centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+        face.fly(to: Self.landed(landing), Motion.cardClose, velocity: velocity, leans: true)
+    }
+
+    /// The icon it is landing on has moved (the pages turned under it, say):
+    /// it heads there instead, without a jolt.
+    func follow(landing: CGRect, fades: Bool, at time: Double) {
+        guard phase == .closing else { return }
+        landingFades = fades
+        face.retarget(Self.landed(landing), at: time)
+    }
+
+    private static func landed(_ landing: CGRect) -> CardFrame {
+        CardFrame(rect: landing, radius: HomeMetrics.iconRadius(landing.width))
     }
 
     /// A finger has caught the card at `finger`: it stops where it is on
@@ -230,6 +274,7 @@ final class AppCard {
         let frame = face.freeze()
         grab = (frame, frame.size.width / screen.width, finger, direction)
         travel = 0
+        translation = .zero
     }
 
     func move(_ translation: CGPoint) {
@@ -237,19 +282,29 @@ final class AppCard {
         let tracked = CardMotion.tracked(start: grab.frame, startScale: grab.scale, finger: grab.finger,
                                          translation: translation, direction: grab.direction, screenHeight: screen.height)
         travel = tracked.travel
+        self.translation = translation
         face.place(tracked.frame)
     }
 
     /// The finger has let go, moving at `velocity`: whether the card should
-    /// close, and how fast its centre and width were moving.
-    func release(velocity: CGPoint) -> (closes: Bool, centerVelocity: CGPoint, widthVelocity: CGFloat) {
-        guard let grab else { return (false, .zero, 0) }
+    /// close, and how fast the card itself was moving.
+    ///
+    /// The decision is the finger's: its travel and its speed, however
+    /// little the card's edge moved against its limit, so a flick still
+    /// closes. The springs that follow carry on at the card's own speed,
+    /// which near the limit is far less than the finger's, so nothing jumps
+    /// and a flick never throws the card off the screen before it turns for
+    /// its icon. Springboard's card does the same: after a flick its centre
+    /// keeps the little speed it had and it shrinks where it is.
+    func release(velocity: CGPoint) -> (closes: Bool, velocity: CardVelocity) {
+        guard let grab else { return (false, .zero) }
         self.grab = nil
-        let travelVelocity = grab.direction.travel(velocity)
-        let slope = CardMotion.scaleSlope(travel: travel, screenHeight: screen.height,
-                                          floor: CardMotion.floor(startScale: grab.scale))
-        let widthVelocity = grab.frame.size.width / max(grab.scale, .ulpOfOne) * slope * travelVelocity
-        return (CardMotion.closes(travel: travel, velocity: travelVelocity), velocity, widthVelocity)
+        let closes = CardMotion.closes(travel: travel, velocity: grab.direction.travel(velocity))
+        let cardVelocity = CardMotion.trackedVelocity(start: grab.frame, startScale: grab.scale, finger: grab.finger,
+                                                      translation: translation, velocity: velocity,
+                                                      direction: grab.direction, screenHeight: screen.height)
+        // A finger's speed is real time; the springs run in played time.
+        return (closes, cardVelocity.scaled(by: 1 / Motion.Spring.slowdown))
     }
 
     /// Called every frame while anything moves: what the card shows follows
@@ -294,9 +349,10 @@ final class AppCard {
     }
 }
 
-private extension CGRect {
-    func isClose(to other: CGRect, within tolerance: CGFloat) -> Bool {
-        abs(minX - other.minX) <= tolerance && abs(minY - other.minY) <= tolerance
-            && abs(width - other.width) <= tolerance && abs(height - other.height) <= tolerance
+extension CardFrame {
+    func isClose(to other: CardFrame, within tolerance: CGFloat) -> Bool {
+        abs(center.x - other.center.x) <= tolerance && abs(center.y - other.center.y) <= tolerance
+            && abs(size.width - other.size.width) <= tolerance && abs(size.height - other.size.height) <= tolerance
+            && abs(radius - other.radius) <= tolerance
     }
 }
