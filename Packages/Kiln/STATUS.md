@@ -57,3 +57,15 @@ and `KilnValue` (only that interpreter read the bridges), its tests and
 `KILN_GUIDE.md`. Code in that dialect now fails with its line (`Cannot find
 'GameCanvas' in scope`). Every source goes to `Engine/`. Its history, Plans
 1 to 8, is in git before this commit.
+
+## Code that can wait (Shelf, 2026-11-24)
+
+PLAN.md §1.3, as its fallback: code with no `await` still runs on the
+tree-walker; a function or closure with an `await` runs as a task on a
+resumable evaluator (`Engine/KEAsync.swift`) whose frames live on the heap,
+so it parks at a real wait and resumes on the main actor. `Task {}`, `.task`,
+real `Task.sleep`, cancellation, `async let`, task groups, `for await` over
+`AsyncStream` and native sequences, continuations, `MainActor.run`, and
+`URLSession.data` without blocking. The step budget is per stretch between
+waits; `KilnResult.tearDown()` stops a run. `Tools/diff.sh` compares every
+input against the engine before ([Benchmarks/differential.md](Benchmarks/differential.md)).

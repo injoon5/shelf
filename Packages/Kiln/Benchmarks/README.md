@@ -3,7 +3,7 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.2-one-engine.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.3-async.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
@@ -80,3 +80,60 @@ The same, after §1.2 deleted the original interpreter. Every input still passes
 - **`run` is 4 to 5 times faster on every app, and `validate` 1.5 to 4.5 times.** None of it is the interpreter: the compute workloads are unchanged (within ±1.2%). It's the dialect check. Before running anything, 0.2.1 scanned the whole source for ten strings (`GameCanvas(`, `.onTick(` …) to pick an engine, in both `run` and `validate`, with Foundation's `String.contains`. That costs 0.9 ms on TipCalculator's 2 KB and 8.7 ms on Chess's 21 KB, measured alone with `swiftc -O`. That's three quarters of what `Kiln.run` took on a typical app, and Shelf calls it each time an app opens.
 - What's left is parsing and the walk: `run` is now 0.2 to 0.7 ms per app (Chess 2.7 ms), and `validate` adds the body and the actions.
 
+
+### after-1.3-async.json
+
+After §1.3 (code that can wait). Every input still passes with no errors. `Tools/iterate.sh` now compares against this file.
+
+- Command: `Benchmarks/run.sh Benchmarks/after-1.3-async.json --compare Benchmarks/after-1.2-one-engine.json` (21 samples). Load average about 5. Date: 24 November 2026.
+- **No input is slower.** Code without an `await` runs on the same tree-walker as before; what §1.3 adds to its hot path is a cached flag read per call and an enum check per expression statement.
+- **Apps that use `DB` are about twice as fast to validate** (saving-data −46%, todos-db −55%): `DB` is answered by the host at once (`Kiln.hostRequestHandler`) instead of a round trip through `URLSession` and a semaphore. OpenLibrarySearch (−48%) no longer starts a request at all: `validate` is headless and fails it at once.
+- The compute workloads are 4% faster, which is within what a quieter machine gives; nothing in them changed.
+
+Validate, minimum per call, in ms:
+
+| Input | §1.2 | §1.3 | Change |
+|---|---:|---:|---:|
+| Apps/Chess.swift | 12.57 | 10.95 | -13% |
+| Apps/ExpenseTracker.swift | 0.80 | 0.70 | -13% |
+| Apps/FocusTimer.swift | 0.52 | 0.48 | -8% |
+| Apps/HabitTracker.swift | 0.72 | 0.67 | -7% |
+| Apps/MemoryMatch.swift | 0.56 | 0.53 | -5% |
+| Apps/ReadingList.swift | 1.11 | 0.95 | -14% |
+| Apps/TipCalculator.swift | 0.32 | 0.30 | -6% |
+| AppleIntelligence/expense.md | 0.35 | 0.32 | -9% |
+| AppleIntelligence/habit.md | 0.27 | 0.25 | -7% |
+| AppleIntelligence/memory.md | 0.32 | 0.30 | -6% |
+| AppleIntelligence/timer.md | 0.48 | 0.44 | -8% |
+| AppleIntelligence/tip.md | 0.48 | 0.44 | -8% |
+| Networking/OpenLibrarySearch.swift | 0.58 | 0.30 | -48% |
+| apps/async.swift | – | 0.55 | new |
+| apps/images.swift | 0.40 | 0.37 | -8% |
+| apps/network.swift | 0.68 | 0.68 | +0% |
+| apps/saving-data.swift | 1.40 | 0.75 | -46% |
+| apps/state.swift | 0.47 | 0.45 | -4% |
+| apps/swift-language.swift | 1.09 | 1.04 | -5% |
+| apps/time.swift | 0.47 | 0.45 | -4% |
+| apps/todos-db.swift | 0.64 | 0.29 | -55% |
+| apps/views-layout-drawing.swift | 1.15 | 1.02 | -11% |
+| apps/views-lists-controls.swift | 0.80 | 0.72 | -10% |
+| apps/views-navigation.swift | 0.76 | 0.71 | -7% |
+| Workloads/Arithmetic.swift | 315.89 | 302.15 | -4% |
+| Workloads/Collections.swift | 31.88 | 30.49 | -4% |
+| Workloads/Objects.swift | 32.13 | 30.86 | -4% |
+| **Total (inputs in both)** | **406.84** | **386.61** | -5% |
+
+## §1.3: Code that can wait
+
+PLAN.md §1.3 asked for a spike first: a bytecode VM with lowering for everything, frames on the heap and resolved slots, running every input with output identical to the tree-walker's, with no bridges changed; Go if it matched everywhere and was slower nowhere, else the fallback, a second evaluator for code that contains `await`.
+
+**Decision: the fallback.** I scoped the VM against the code and chose not to build it in this step; no VM was written, so there are no VM numbers. Two things decided it.
+
+1. **"No bridges changed" can't hold for a VM with resolved slots.** The bridges take syntax, not values. `KBuiltins.callGlobal`, `callStatic` and `color`, and `KInterpreter.evalCall`/`callMethod`/`viewMethod`, receive the unevaluated arguments and a live `KEnv`. They evaluate each argument themselves with an expected type picked per callee and label (so `.red`, `.title` and `.segmented` resolve), turn a string literal into a `LocalizedStringKey` only when it is a `Text` or title (that's how `Text("\(n) pages")` reads "1,400 pages"), and resolve names at run time by asking the environment (`isBuiltinTypeName` checks `env.lookup` before treating `Color` as a type; implicit `self` members, `@State` storage, globals, functions and types are tried in that order on every lookup). A VM whose locals are slots has no `KEnv` to hand them. Making those calls take values is exactly §1.4's work (the registry, with `call.binding("selection", …)`-style decoding), so doing it here would be doing §1.4 inside §1.3, under the stricter "identical output" bar.
+2. **The fallback can be as good at waiting.** What Round 3 needs (the photo picker, Foundation Models, WebSockets, `WebPage`, `CLLocationUpdate.liveUpdates()`) is real suspension and resumption, which the second evaluator gives fully.
+
+The second evaluator isn't Swift `async`, which would have been shorter. I measured why not: `Kiln.validate` is synchronous and is called from main-actor jobs (Swift Testing, XCTest, SwiftUI), and a nested run loop doesn't run other main-actor jobs while one is executing (a 1 ms `Task.sleep` started from inside a main-queue block hadn't run after 1 s of `RunLoop.main.run`; from top-level code it ran in 1 ms). So a Swift-`async` evaluator could never let `validate` check code after an `await`. Instead the second evaluator is resumable and explicit (`Engine/KEAsync.swift`): a task is a stack of `KFrame`s on the heap, each a state machine over one statement or expression. It runs synchronously until a suspension really has to wait, so headless `validate` drives tasks to their end, while a live run parks and resumes on the main actor. That is the heap-frame half of the VM, and the suspension API (`KSuspension`) is the one the VM will need.
+
+**Where the VM's speed would come from.** Sampling the Arithmetic workload: most of the time is `swift_retain`/`swift_release`, copies of `KV`, and array copies of the tree's indirect enums as the walker switches over them. Lowering to instructions with slots removes exactly that. **Recommendation:** build the VM after §1.4, when the bridges take decoded values; lower all code to it then, keeping `KEAsync`'s frame and suspension model, and retire the tree-walker.
+
+**Differential:** [differential.md](differential.md): 49 inputs (Kiln's example apps and model replies, Networking, LibraryApp, Shelf's `fixtures/apps`, the workloads, and the SwiftUI sources in Kiln's tests), 47 identical to the engine before §1.3, 2 different as expected and listed in `Tools/diff-expected.txt` (a button calling a non-`async` function that awaits is now an error with its line instead of blocking the main thread on the request; and the new async fixture, which the old engine couldn't run).

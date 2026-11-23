@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 to §0.4, §0.7, items 1–4 of §0.8, and §1.1 and §1.2 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1 to §0.4, §0.7, items 1–4 of §0.8, and §1.1 to §1.3 are built (§1.3 as its fallback, below). §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -344,6 +344,8 @@ Code runs on a small bytecode VM instead of walking the syntax tree:
 - **Budget.** The step limit applies to each stretch of code between two waits, not to the whole run. A long-lived task that waits between steps never trips it, and a runaway loop still stops with its line.
 - **Speed.** Bytecode with resolved slots should beat dictionary lookups on a tree. Before the switch, measure 0.2.1 with `Tools/KilnBench` on the example apps and Shelf's fixtures. The VM must not be slower anywhere.
 - **Risk.** This is the largest single piece. Spike it first: the VM runs `Examples/Apps` and Shelf's `fixtures/apps/` with output identical to 0.2.1's, with no bridges changed. If the VM stalls, the fallback is a second, `async` evaluator used only for code that contains `await` (Swift marks those places, so they're known when the source is read). It duplicates code but is less risky.
+
+Built, as the fallback. The VM wasn't started: with resolved slots, "no bridges changed" can't hold, because the bridges take unevaluated arguments and a live environment (expected types per argument, `LocalizedStringKey` literals, names resolved at run time), and making them take values is §1.4's work. The second evaluator (`Engine/KEAsync.swift`) runs functions and closures that contain `await` as tasks: stacks of frames on the heap that run synchronously until a real wait, then park and resume on the main actor. It isn't Swift `async`, because `validate` must drive tasks synchronously and a nested run loop can't run main-actor jobs. Everything in the list above works, `URLSession.data` no longer blocks, the budget is per stretch, an `await` in `body`, a computed property or `init` is an error with its line, and `KilnResult.tearDown()` cancels a run's tasks. `DB` is answered by the host at once through `Kiln.hostRequestHandler` until §1.7. `Tools/diff.sh` compares every input with the engine before: 47 of 49 identical, 2 different as expected. No benchmark is slower; `DB` apps validate about twice as fast. The VM, for speed, comes after §1.4, on `KEAsync`'s frames ([Benchmarks](Packages/Kiln/Benchmarks/README.md#13-code-that-can-wait)).
 
 ### 1.4 Bridges in a registry
 

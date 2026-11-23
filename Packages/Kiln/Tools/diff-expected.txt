@@ -1,3 +1,4 @@
 # Inputs whose transcript is meant to differ from the engine before §1.3, and why.
 # One per line: the input as Tools/diff.py names it, a space, the reason.
 tests/WeatherRepro-0.swift A button calls fetchWeather(), which isn't async but awaits URLSession: §1.3 reports that with its line, where 0.2.1 blocked the main thread on the request.
+fixtures/apps/async.swift New with §1.3: an app that sleeps, fetches with try await and streams with for await. Before §1.3 the sleep didn't wait, .task blocked on the request, and AsyncStream didn't exist.

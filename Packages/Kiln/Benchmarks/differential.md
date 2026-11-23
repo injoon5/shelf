@@ -2,7 +2,7 @@
 
 Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**48 inputs: 47 identical, 1 different as expected, 0 different otherwise.**
+**49 inputs: 47 identical, 2 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -20,6 +20,7 @@ Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparin
 | Packages/Kiln/Examples/AppleIntelligence/tip.md | 1092 | 13 | identical |
 | Packages/Kiln/Examples/Networking/OpenLibrarySearch.swift | 22 | 2 | identical |
 | Packages/Kiln/Examples/LibraryApp.swift | 64 | 2 | identical |
+| fixtures/apps/async.swift | 284 | 14 | expected (New with §1.3: an app that sleeps, fetches with try await and streams with for await. Before §1.3 the sleep didn't wait, .task blocked on the request, and AsyncStream didn't exist.) |
 | fixtures/apps/images.swift | 663 | 13 | identical |
 | fixtures/apps/network.swift | 211 | 14 | identical |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
@@ -54,6 +55,132 @@ Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparin
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
 | tests/WeatherRepro-0.swift | 209 | 13 | expected (A button calls fetchWeather(), which isn't async but awaits URLSession: §1.3 reports that with its line, where 0.2.1 blocked the main thread on the request.) |
 | tests/WeatherRepro-1.swift | 183 | 14 | identical |
+
+## fixtures/apps/async.swift
+
+```diff
+--- before
++++ after
+@@ -24,13 +24,12 @@
+ console: failed
+-error: Line 121: Cannot find 'AsyncStream' in scope
+-warning: Task.sleep runs without waiting in Kiln.
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=0, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+-        Text("Starting")
++console: counted [3, 2, 1]
++ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=0, related=[]}
++  NavigationStack({fn})
++    List({fn})
++      Section("Today", {fn})
++        Case 2
++          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
++            .foregroundStyle(Color)
++      Section("Countdown", {fn})
++        Text("3 · 2 · 1")
+           .monospacedDigit()
+@@ -45,11 +44,11 @@
+ == after Button[…]@68
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=1, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+-        Text("Starting")
++ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=1, related=[]}
++  NavigationStack({fn})
++    List({fn})
++      Section("Today", {fn})
++        Case 2
++          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
++            .foregroundStyle(Color)
++      Section("Countdown", {fn})
++        Text("3 · 2 · 1")
+           .monospacedDigit()
+@@ -66,11 +65,11 @@
+ console: failed
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=1, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+-        Text("Starting")
++ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=1, related=[]}
++  NavigationStack({fn})
++    List({fn})
++      Section("Today", {fn})
++        Case 2
++          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
++            .foregroundStyle(Color)
++      Section("Countdown", {fn})
++        Text("3 · 2 · 1")
+           .monospacedDigit()
+@@ -85,11 +84,11 @@
+ == after Button[…]@68
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=2, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+-        Text("Starting")
++ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=2, related=[]}
++  NavigationStack({fn})
++    List({fn})
++      Section("Today", {fn})
++        Case 2
++          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
++            .foregroundStyle(Color)
++      Section("Countdown", {fn})
++        Text("3 · 2 · 1")
+           .monospacedDigit()
+@@ -106,11 +105,11 @@
+ console: failed
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=2, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+-        Text("Starting")
++ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[3, 2, 1], refreshes=2, related=[]}
++  NavigationStack({fn})
++    List({fn})
++      Section("Today", {fn})
++        Case 2
++          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
++            .foregroundStyle(Color)
++      Section("Countdown", {fn})
++        Text("3 · 2 · 1")
+           .monospacedDigit()
+@@ -125,11 +124,11 @@
+ == after Button[…]@68
+-ContentView {quote=nil, phase=.failed, message="Couldn't load today's quote.", countdown=[], refreshes=3, related=[]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Today", {fn})
+-        Case 2
+-          Label("Couldn't load today's quote.", systemImage: "wifi.slash")
+-            .foregroundStyle(Color)
+-      Section("Countdown", {fn})
+…
+```
 
 ## tests/WeatherRepro-0.swift
 
