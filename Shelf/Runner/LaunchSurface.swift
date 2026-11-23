@@ -74,6 +74,10 @@ final class LaunchSnapshotStore {
     /// Pictures still being written to disk.
     private var writing: Set<String> = []
 
+    /// Whether a picture is still on its way to disk. A picture being
+    /// written counts as fresh even before its file exists.
+    var isWriting: Bool { !writing.isEmpty }
+
     /// The fresh snapshot for `key`, if it is in memory. Only while its
     /// file is still there (or on its way): Delete App and Sign Out clear
     /// the files, and a picture of a signed-out account's app must go with

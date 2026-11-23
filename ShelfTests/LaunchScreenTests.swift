@@ -135,6 +135,10 @@ struct LaunchSnapshotTests {
         let files = store.files, key = key
         let written = await eventually { files.fresh("habits", key) != nil }
         #expect(written)
+        // The file can be there a moment before the store hears the write
+        // finished; until then a picture on its way counts as fresh.
+        let settled = await eventually { await MainActor.run { !store.isWriting } }
+        #expect(settled)
         var dark = key
         dark.dark = true
         #expect(store.cached("habits", dark) == nil)
