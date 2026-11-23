@@ -1,48 +1,50 @@
-import SwiftUI
 import UIKit
 
-/// The search pill and the field it warps into: one piece of glass.
+/// The search pill and the field it warps into: one piece of glass, one
+/// label, and the round ✕ that arrives beside them. App Library's top bar,
+/// at the bottom (PLAN.md §0.3).
 ///
 /// At rest it is the pill above the dock, reading "Search", or page dots
 /// while pages move and in edit mode. Pulling down on the Home Screen
 /// stretches it toward the field, as far as the finger has gone; a tap plays
-/// the same warp. The field sits on the pill's line, full width, until the
-/// keyboard rises and carries it up to just above itself.
+/// the same warp. The field sits on the pill's line until the keyboard rises
+/// and carries it up to just above itself.
 ///
-/// The warp is one progress, 0 the pill and 1 the field, and everything that
-/// follows it (the glass's frame, the label sliding into the placeholder's
-/// place, the grid fading, the wallpaper dimming, the results appearing) is
-/// set from it in the same animation. Every animation starts from what is
-/// on screen, so the warp can be caught, reversed or retargeted anywhere.
+/// The warp is one number, `progress`, 0 the pill and 1 the field, on a
+/// spring stepped every frame (`ValueSpring`). Everything that follows it is
+/// set from that one number in the same frame: the glass's frame, the label
+/// (drawn once, at the field's size, and scaled down to the pill's; never two
+/// labels), the ✕, and through `onProgress` what the stage owns: the Home
+/// Screen blurring and fading, the backdrop, the list. So nothing is ever
+/// shown twice, and a finger can catch the warp anywhere and go on from
+/// exactly where it is, at the speed it was going.
 @MainActor
 final class SearchBar: UIView, UITextFieldDelegate {
-    /// What fades with the warp, owned by the stage.
-    struct Fades {
-        /// The grid and the dock.
-        var home: UIView
-        var results: UIView
-        var dim: UIView
-    }
-
     var onTapPill: () -> Void = {}
     var onQuery: (String) -> Void = { _ in }
     var onSubmit: () -> Void = {}
-    /// The field's top, once the keyboard has moved it: the results end above it.
+    /// The ✕.
+    var onClose: () -> Void = {}
+    /// Every new point of the warp, for what the stage moves with it.
+    var onProgress: (CGFloat) -> Void = { _ in }
+    /// Where the warp is headed changed: open or not.
+    var onOpenChanged: (Bool) -> Void = { _ in }
+    /// The field's top, once the keyboard has moved it: the list ends above it.
     var onFieldMoved: (CGFloat) -> Void = { _ in }
 
-    private let fades: Fades
     /// Lifted by the keyboard. The warp happens inside it.
     private let ride = UIView()
     private let glass = UIVisualEffectView()
-    /// The magnifier and "Search": the pill's label, which becomes the
-    /// field's placeholder. Drawn at the field's size and scaled down to the
-    /// pill's, so the text is never scaled up.
-    private let label = UIView()
-    private let pillRow = LabelRow()
-    private let fieldRow = LabelRow()
+    private let label = SearchLabel()
     private let dots = DotsView()
     private let field = UITextField()
+    private let closeButton = GlassCircleButton(symbol: "xmark")
+    /// What holds the glass, the label and the ✕: the list's soft edge
+    /// reaches up behind them, so rows going under the field blur away as
+    /// they do under App Library's bar.
+    var edgeContainer: UIView { ride }
 
+    private let warp = ValueSpring(0)
     private var geometry: HomeGeometry?
     /// Where the warp is headed: open (the field) or not (the pill).
     private(set) var isOpen = false
@@ -50,12 +52,12 @@ final class SearchBar: UIView, UITextFieldDelegate {
     private var keyboardTop: CGFloat?
     private var showsDots = false
     private var dotCount = 1
-    private var bodyFont = UIFont.preferredFont(forTextStyle: .body)
-    private var pillScale: CGFloat = 1
 
-    init(fades: Fades) {
-        self.fades = fades
-        super.init(frame: .zero)
+    /// How far along the warp it is now, on screen.
+    var progress: CGFloat { warp.value }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         addSubview(ride)
 
         glass.cornerConfiguration = .capsule()
@@ -70,9 +72,6 @@ final class SearchBar: UIView, UITextFieldDelegate {
         glass.contentView.addSubview(dots)
 
         label.isUserInteractionEnabled = false
-        label.layer.anchorPoint = CGPoint(x: 0, y: 0.5)
-        label.addSubview(pillRow)
-        label.addSubview(fieldRow)
         ride.addSubview(label)
 
         field.delegate = self
@@ -83,9 +82,20 @@ final class SearchBar: UIView, UITextFieldDelegate {
         field.clearButtonMode = .whileEditing
         field.adjustsFontForContentSizeCategory = true
         field.accessibilityLabel = String(localized: "Search")
+        field.textColor = .white
+        field.tintColor = .white
+        field.keyboardAppearance = .dark
         field.alpha = 0
         field.addTarget(self, action: #selector(textChanged), for: .editingChanged)
         ride.addSubview(field)
+
+        closeButton.accessibilityLabel = String(localized: "Close Search")
+        closeButton.alpha = 0
+        closeButton.isUserInteractionEnabled = false
+        closeButton.addAction(UIAction { [unowned self] _ in onClose() }, for: .primaryActionTriggered)
+        ride.addSubview(closeButton)
+
+        warp.onChange = { [unowned self] p in place(p) }
 
         maximumContentSizeCategory = UIContentSizeCategory(ShelfMetrics.textSizeCap)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(_:)),
@@ -99,8 +109,8 @@ final class SearchBar: UIView, UITextFieldDelegate {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    // Only the glass and the field take touches; the rest of the Home
-    // Screen is under this view.
+    // Only the glass, the field and the ✕ take touches; the rest of the
+    // Home Screen is under this view.
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let hit = super.hitTest(point, with: event)
         return hit === self || hit === ride ? nil : hit
@@ -125,83 +135,84 @@ final class SearchBar: UIView, UITextFieldDelegate {
         self.geometry = geometry
         ride.bounds = CGRect(origin: .zero, size: geometry.size)
         ride.center = CGPoint(x: geometry.size.width / 2, y: geometry.size.height / 2)
-        UIView.performWithoutAnimation {
-            placeField()
-            place(isOpen ? 1 : 0)
-        }
+        placeField()
+        place(warp.value)
     }
 
-    /// Everything that follows the warp, at progress `p`.
+    /// Everything that follows the warp, at progress `p`. The spring may
+    /// carry `p` a little past the field: the glass stretches with it, and
+    /// everything else stops at the field.
     private func place(_ p: CGFloat) {
+        let shown = min(max(p, 0), 1)
         let pill = pill
-        let field = fieldFrame
-        glass.frame = pill.interpolated(to: field, p)
-        dots.center = CGPoint(x: glass.bounds.midX, y: glass.bounds.midY)
+        let target = fieldFrame
+        UIView.performWithoutAnimation {
+            glass.frame = pill.interpolated(to: target, min(max(p, 0), SearchWarp.overshoot))
+            dots.center = CGPoint(x: glass.bounds.midX, y: glass.bounds.midY)
+            label.place(shown, pill: pill, field: target)
 
-        let scale = pillScale + (1 - pillScale) * p
-        label.transform = CGAffineTransform(scaleX: scale, y: scale)
-        let start = CGPoint(x: pill.midX - pillRow.bounds.width * pillScale / 2, y: pill.midY)
-        let end = CGPoint(x: field.minX + HomeMetrics.searchSideInset, y: field.midY)
-        label.center = CGPoint(x: start.x + (end.x - start.x) * p, y: start.y + (end.y - start.y) * p)
-        pillRow.alpha = 1 - p
-        fieldRow.alpha = p
-
-        fades.home.alpha = 1 - p
-        fades.results.alpha = p
-        fades.dim.alpha = p * HomeMetrics.searchDim
+            let arrival = SearchMetrics.closeArrival.ramp(shown)
+            closeButton.alpha = arrival
+            let scale = 0.5 + 0.5 * arrival
+            closeButton.transform = CGAffineTransform(scaleX: scale, y: scale)
+            field.alpha = SearchMetrics.caretArrival.ramp(shown)
+        }
+        onProgress(p)
     }
 
     private func placeField() {
+        guard let geometry else { return }
         let frame = fieldFrame
-        let leading = HomeMetrics.searchSideInset + fieldRow.textStart
+        let leading = SearchMetrics.textInset
         field.frame = CGRect(x: frame.minX + leading, y: frame.minY,
-                             width: frame.width - leading - HomeMetrics.searchTextTrailing, height: frame.height)
-    }
-
-    /// How far along the warp the glass is on screen now.
-    private var shownProgress: CGFloat {
-        let width = (glass.layer.presentation() ?? glass.layer).bounds.width
-        return SearchWarp.progress(width: width, pill: pill, field: fieldFrame)
-    }
-
-    private var moving: [UIView] { [glass, label, pillRow, fieldRow, field] }
-    private var fading: [UIView] { [fades.home, fades.results, fades.dim] }
-
-    // MARK: Opening and closing
-
-    /// Warps to the field from wherever the glass is, and raises the keyboard
-    /// with it. `velocity` is in warps per second.
-    func open(velocity: CGFloat = 0) {
-        isOpen = true
-        field.text = ""
-        textChanged()
-        setDots(false, animated: true)
-        warp(to: 1, velocity: velocity)
-        field.becomeFirstResponder()
-        interactionChanged()
-    }
-
-    /// Warps back to the pill from wherever the glass is.
-    func close(velocity: CGFloat = 0) {
-        isOpen = false
-        field.resignFirstResponder()
-        warp(to: 0, velocity: velocity)
-        interactionChanged()
-    }
-
-    private func warp(to target: CGFloat, velocity: CGFloat) {
-        let distance = target - shownProgress
-        let springVelocity = abs(distance) > .ulpOfOne ? velocity / distance : 0
-        UIView.retarget(moving, fading: fading, Motion.searchWarp, velocity: springVelocity) {
-            self.place(target)
-            self.field.alpha = target
+                             width: frame.width - leading - SearchMetrics.textTrailing, height: frame.height)
+        UIView.performWithoutAnimation {
+            closeButton.transform = .identity
+            closeButton.frame = SearchWarp.close(screenWidth: geometry.size.width, field: frame)
         }
     }
 
-    private func interactionChanged() {
-        fades.home.isUserInteractionEnabled = !isOpen
-        fades.results.isUserInteractionEnabled = isOpen
-        glass.accessibilityElementsHidden = isOpen
+    // MARK: Opening and closing
+
+    /// Warps to the field from wherever it is, and raises the keyboard with
+    /// it. `velocity` is in warps per second; nil keeps the speed it has.
+    func open(velocity: CGFloat? = nil) {
+        if !isOpen {
+            field.text = ""
+            textChanged()
+        }
+        setOpen(true)
+        setDots(false, animated: true)
+        stopGlassAnimations()
+        warp.animate(to: 1, Motion.searchWarp, velocity: velocity)
+        field.becomeFirstResponder()
+    }
+
+    /// Warps back to the pill from wherever it is.
+    func close(velocity: CGFloat? = nil) {
+        setOpen(false)
+        field.resignFirstResponder()
+        stopGlassAnimations()
+        warp.animate(to: 0, Motion.searchWarp, velocity: velocity)
+    }
+
+    /// Lets the keyboard go, leaving search open: an app opened from it.
+    func dismissKeyboard() {
+        field.resignFirstResponder()
+    }
+
+    private func setOpen(_ open: Bool) {
+        guard open != isOpen else { return }
+        isOpen = open
+        glass.accessibilityElementsHidden = open
+        closeButton.isUserInteractionEnabled = open
+        onOpenChanged(open)
+    }
+
+    /// The pill's own resize (for its dots) is a view animation; the warp
+    /// takes the glass over from wherever that has got to.
+    private func stopGlassAnimations() {
+        glass.freezeOnScreen()
     }
 
     // MARK: Pulling
@@ -209,27 +220,26 @@ final class SearchBar: UIView, UITextFieldDelegate {
     /// A pull down on the Home Screen has begun: the warp stops where it is
     /// on screen, and follows the finger from there.
     func beginPull() {
-        moving.forEach { $0.freezeOnScreen() }
-        fading.forEach { $0.freezeOpacityOnScreen() }
-        pullStart = shownProgress
+        warp.stop()
+        stopGlassAnimations()
+        pullStart = warp.value
         setDots(false, animated: true)
     }
 
     func pull(_ distance: CGFloat) {
-        let p = SearchWarp.progress(pull: distance, from: pullStart)
-        UIView.performWithoutAnimation { place(p) }
+        warp.set(SearchWarp.progress(pull: distance, from: pullStart))
     }
 
     /// The pull has been let go of, moving down at `velocity` (pt/s).
     /// Returns whether search opened.
     func endPull(velocity: CGFloat) -> Bool {
-        let p = shownProgress
-        let warpVelocity = velocity / HomeMetrics.searchPullDistance
-        if SearchWarp.opens(progress: p, velocity: velocity) {
+        let warpVelocity = velocity / SearchMetrics.pullDistance
+        if SearchWarp.opens(progress: warp.value, velocity: velocity) {
             open(velocity: warpVelocity)
             return true
         }
-        warp(to: 0, velocity: warpVelocity)
+        setOpen(false)
+        warp.animate(to: 0, Motion.searchWarp, velocity: warpVelocity)
         return false
     }
 
@@ -250,38 +260,32 @@ final class SearchBar: UIView, UITextFieldDelegate {
         }
         if animated {
             UIView.animate(withDuration: Motion.pillFade, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction], animations: change)
-            if !isOpen, shownProgress == 0 {
-                UIView.retarget([glass], Motion.pillResize) { self.place(0) }
+            if !isOpen, !warp.isMoving, warp.value == 0 {
+                UIView.retarget([glass], Motion.pillResize) {
+                    self.glass.frame = self.pill
+                    self.dots.center = CGPoint(x: self.glass.bounds.midX, y: self.glass.bounds.midY)
+                }
             }
         } else {
             change()
-            UIView.performWithoutAnimation { place(isOpen ? 1 : 0) }
+            place(warp.value)
         }
         glass.accessibilityLabel = shown ? String(localized: "Page \(dots.current + 1) of \(dotCount)") : String(localized: "Search")
     }
 
     // MARK: The field
 
-    /// Light or dark text, after what sits behind the field.
-    func setTone(_ tone: ColorScheme) {
-        let ink: UIColor = tone == .dark ? .white : .black
-        field.textColor = ink
-        field.tintColor = ink
-        field.keyboardAppearance = tone == .dark ? .dark : .light
-        fieldRow.color = ink.withAlphaComponent(HomeMetrics.searchPlaceholderOpacity)
-    }
-
     /// Where the field will be once the keyboard has lifted it, as far as
-    /// is known: for working out what is behind it.
+    /// is known.
     var restingField: CGRect {
-        fieldFrame.offsetBy(dx: 0, dy: SearchWarp.lift(field: fieldFrame, keyboardTop: keyboardTop))
+        fieldFrame.offsetBy(dx: 0, dy: isOpen ? SearchWarp.lift(field: fieldFrame, keyboardTop: keyboardTop) : 0)
     }
 
     @objc private func tapped() { onTapPill() }
 
     @objc private func textChanged() {
         let text = field.text ?? ""
-        fieldRow.showsText = text.isEmpty
+        label.showsText = text.isEmpty
         onQuery(text)
     }
 
@@ -309,52 +313,50 @@ final class SearchBar: UIView, UITextFieldDelegate {
 
     private func restyle() {
         glass.effect = HomeGlass.effect(traitCollection, interactive: true)
-
         let category = min(traitCollection.preferredContentSizeCategory, UIContentSizeCategory(ShelfMetrics.textSizeCap))
-        bodyFont = UIFont.preferredFont(forTextStyle: .body, compatibleWith: UITraitCollection(preferredContentSizeCategory: category))
+        let traits = UITraitCollection(preferredContentSizeCategory: category == .unspecified ? .large : category)
+        let fieldFont = UIFont.preferredFont(forTextStyle: SearchMetrics.fieldTextStyle, compatibleWith: traits)
         // Springboard's pill keeps its size at every text size.
         let pillFont = UIFont.preferredFont(forTextStyle: .caption1, compatibleWith: UITraitCollection(preferredContentSizeCategory: .large))
-        pillScale = pillFont.pointSize / bodyFont.pointSize
-        let medium = UIFont.systemFont(ofSize: bodyFont.pointSize, weight: .medium)
-        pillRow.configure(font: medium, symbolScale: .small, symbolWeight: .bold,
-                          gap: HomeMetrics.pillGlyphGap / pillScale,
-                          color: .white.withAlphaComponent(HomeMetrics.pillTextOpacity))
-        fieldRow.configure(font: bodyFont, symbolScale: .medium, symbolWeight: .regular,
-                           gap: HomeMetrics.searchGlyphGap, color: fieldRow.color)
-        field.font = bodyFont
-        label.bounds = CGRect(x: 0, y: 0, width: max(pillRow.bounds.width, fieldRow.bounds.width),
-                              height: max(pillRow.bounds.height, fieldRow.bounds.height))
-        for row in [pillRow, fieldRow] {
-            row.center = CGPoint(x: row.bounds.width / 2, y: label.bounds.midY)
-        }
+        label.configure(fieldSize: fieldFont.pointSize, pillSize: pillFont.pointSize)
+        field.font = fieldFont
         dots.layoutDots()
-        let shown = isOpen ? CGFloat(1) : 0
-        UIView.performWithoutAnimation {
-            placeField()
-            place(shown)
-        }
+        placeField()
+        place(warp.value)
     }
 }
 
-/// A magnifier and "Search", laid out at their natural size.
-private final class LabelRow: UIView {
+/// The magnifier and "Search": one row, drawn at the field's size and scaled
+/// to the pill's, so there is only ever one, and its text is never a bitmap
+/// scaled up.
+///
+/// The pill's label is Springboard's (`closeup-search-pill.png`): caption
+/// size, medium, at 70% white, with a small bold magnifier 3.33 pt from the
+/// text. The field's is App Library's: Title 2, regular, white, with the
+/// magnifier 18.33 pt into the field and the text 48 pt in. Between the two
+/// the row's scale, its weight, its colour and the magnifier's size and gap
+/// all move with the warp, so it reads as one label getting bigger.
+private final class SearchLabel: UIView {
     private let glyph = UIImageView()
     private let text = UILabel()
-    /// Where the text starts, from the row's leading edge.
-    private(set) var textStart: CGFloat = 0
-    var color: UIColor = .white {
-        didSet {
-            glyph.tintColor = color
-            text.textColor = color
-        }
-    }
+    private var fieldSize: CGFloat = 22
+    private var pillSize: CGFloat = 12
+    /// The magnifier as drawn in the pill and in the field, in points.
+    private var pillGlyph = CGSize(width: 10, height: 10)
+    private var fieldGlyph = CGSize(width: 17, height: 17)
+    /// "Search" as wide as it is in the pill, at the pill's size.
+    private var pillTextWidth: CGFloat = 40
+    private var shownWeight: CGFloat = .nan
+
     var showsText = true {
         didSet { text.isHidden = !showsText }
     }
 
-    init() {
-        super.init(frame: .zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        layer.anchorPoint = CGPoint(x: 0, y: 0.5)
         text.text = String(localized: "Search")
+        glyph.contentMode = .scaleToFill
         addSubview(glyph)
         addSubview(text)
     }
@@ -362,19 +364,77 @@ private final class LabelRow: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    func configure(font: UIFont, symbolScale: UIImage.SymbolScale, symbolWeight: UIImage.SymbolWeight, gap: CGFloat, color: UIColor) {
-        let configuration = UIImage.SymbolConfiguration(font: font, scale: symbolScale)
-            .applying(UIImage.SymbolConfiguration(weight: symbolWeight))
-        glyph.image = UIImage(systemName: "magnifyingglass", withConfiguration: configuration)
-        glyph.sizeToFit()
-        text.font = font
-        text.sizeToFit()
-        let height = max(glyph.bounds.height, text.bounds.height)
-        glyph.center = CGPoint(x: glyph.bounds.width / 2, y: height / 2)
-        textStart = glyph.bounds.width + gap
-        text.frame.origin = CGPoint(x: textStart, y: (height - text.bounds.height) / 2)
+    func configure(fieldSize: CGFloat, pillSize: CGFloat) {
+        self.fieldSize = fieldSize
+        self.pillSize = pillSize
+        let field = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: fieldSize, weight: .regular, scale: .medium))
+        let pill = UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(pointSize: pillSize, weight: .bold, scale: .small))
+        glyph.image = field?.withRenderingMode(.alwaysTemplate)
+        fieldGlyph = field?.size ?? fieldGlyph
+        pillGlyph = pill?.size ?? pillGlyph
+        let pillText = NSAttributedString(string: text.text ?? "", attributes: [.font: UIFont.systemFont(ofSize: pillSize, weight: .medium)])
+        pillTextWidth = pillText.size().width.rounded(.up)
+        shownWeight = .nan
+    }
+
+    /// The row at `p` of the way from the pill to the field.
+    func place(_ p: CGFloat, pill: CGRect, field: CGRect) {
+        let pillScale = pillSize / fieldSize
+        let scale = lerp(pillScale, 1, p)
+
+        // Medium in the pill, regular in the field, through every weight between.
+        let weight = lerp(UIFont.Weight.medium.rawValue, UIFont.Weight.regular.rawValue, p)
+        if abs(weight - shownWeight) > 0.002 || shownWeight.isNaN {
+            shownWeight = weight
+            text.font = .systemFont(ofSize: fieldSize, weight: UIFont.Weight(weight))
+            text.sizeToFit()
+        }
+        let ink = UIColor.white.withAlphaComponent(lerp(HomeMetrics.pillTextOpacity, 1, p))
+        text.textColor = ink
+        glyph.tintColor = ink
+
+        // In the row's own points, which the row's scale takes to the screen.
+        let glyphWidth = lerp(pillGlyph.width / pillScale, fieldGlyph.width, p)
+        let glyphHeight = glyphWidth * fieldGlyph.height / max(fieldGlyph.width, 1)
+        let textStart = lerp((pillGlyph.width + HomeMetrics.pillGlyphGap) / pillScale,
+                             SearchMetrics.textInset - SearchMetrics.glyphInset, p)
+        let height = max(text.bounds.height, glyphHeight)
         bounds = CGRect(x: 0, y: 0, width: textStart + text.bounds.width, height: height)
-        self.color = color
+        glyph.frame = CGRect(x: 0, y: (height - glyphHeight) / 2, width: glyphWidth, height: glyphHeight)
+        text.frame.origin = CGPoint(x: textStart, y: (height - text.bounds.height) / 2)
+
+        // The pill's row is centred in it; the field's starts at the magnifier's inset.
+        let pillRow = pillGlyph.width + HomeMetrics.pillGlyphGap + pillTextWidth
+        let leading = lerp(pill.midX - pillRow / 2, field.minX + SearchMetrics.glyphInset, p)
+        transform = CGAffineTransform(scaleX: scale, y: scale)
+        center = CGPoint(x: leading, y: lerp(pill.midY, field.midY, p))
+    }
+}
+
+private func lerp(_ a: CGFloat, _ b: CGFloat, _ t: CGFloat) -> CGFloat { a + (b - a) * t }
+
+/// A round glass button with a white glyph: search's ✕, App Library's.
+final class GlassCircleButton: UIButton {
+    init(symbol: String) {
+        super.init(frame: .zero)
+        var configuration = UIButton.Configuration.clearGlass()
+        configuration.image = UIImage(systemName: symbol, withConfiguration: UIImage.SymbolConfiguration(
+            pointSize: SearchMetrics.closeGlyphSize, weight: .regular, scale: .medium))
+        configuration.baseForegroundColor = .white
+        configuration.cornerStyle = .capsule
+        configuration.contentInsets = .zero
+        self.configuration = configuration
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (button: GlassCircleButton, _) in button.restyle() }
+        restyle()
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError() }
+
+    /// The same glass as the field's (`HomeGlass`): untinted, and tinted
+    /// dark in dark mode.
+    private func restyle() {
+        configuration?.baseBackgroundColor = traitCollection.userInterfaceStyle == .dark ? HomeMetrics.darkGlassTint : .clear
     }
 }
 
@@ -418,37 +478,42 @@ private final class DotsView: UIView {
 
 /// The rules the search pill warps into the field by, apart from any view.
 enum SearchWarp {
+    /// How far past the field the glass may stretch when the spring carries
+    /// it there.
+    static let overshoot: CGFloat = 1.03
+
     /// How far along the warp a pull of `pull` points takes it, from `start`.
     static func progress(pull: CGFloat, from start: CGFloat) -> CGFloat {
-        min(max(start + pull / HomeMetrics.searchPullDistance, 0), 1)
+        min(max(start + pull / SearchMetrics.pullDistance, 0), 1)
     }
 
     /// Whether a pull let go of at `progress`, moving down at `velocity`
     /// (pt/s), opens search.
     static func opens(progress: CGFloat, velocity: CGFloat) -> Bool {
-        if velocity > HomeMetrics.searchOpenVelocity { return true }
-        if velocity < -HomeMetrics.searchOpenVelocity { return false }
-        return progress > HomeMetrics.searchOpenProgress
+        if velocity > SearchMetrics.openVelocity { return true }
+        if velocity < -SearchMetrics.openVelocity { return false }
+        return progress > SearchMetrics.openProgress
     }
 
-    /// The field before the keyboard lifts it: full width, on the pill's line.
+    /// The field before the keyboard lifts it: App Library's, on the pill's
+    /// line, from the leading inset to the ✕.
     static func field(screenWidth: CGFloat, pill: CGRect) -> CGRect {
-        let height = HomeMetrics.searchFieldHeight
-        return CGRect(x: HomeMetrics.searchSideInset, y: pill.midY - height / 2,
-                      width: screenWidth - 2 * HomeMetrics.searchSideInset, height: height)
+        let height = SearchMetrics.fieldHeight
+        let inset = SearchMetrics.sideInset
+        return CGRect(x: inset, y: pill.midY - height / 2,
+                      width: screenWidth - 2 * inset - SearchMetrics.closeSize - SearchMetrics.closeGap, height: height)
+    }
+
+    /// The round ✕, beside the field and as tall as it.
+    static func close(screenWidth: CGFloat, field: CGRect) -> CGRect {
+        let size = SearchMetrics.closeSize
+        return CGRect(x: screenWidth - SearchMetrics.sideInset - size, y: field.midY - size / 2, width: size, height: size)
     }
 
     /// How far the keyboard lifts the field: enough to sit just above it.
     static func lift(field: CGRect, keyboardTop: CGFloat?) -> CGFloat {
         guard let keyboardTop else { return 0 }
-        return min(0, keyboardTop - HomeMetrics.searchKeyboardGap - field.maxY)
-    }
-
-    /// How far along the warp a glass `width` wide is.
-    static func progress(width: CGFloat, pill: CGRect, field: CGRect) -> CGFloat {
-        let span = field.width - pill.width
-        guard span > 0 else { return 0 }
-        return min(max((width - pill.width) / span, 0), 1)
+        return min(0, keyboardTop - SearchMetrics.keyboardGap - field.maxY)
     }
 }
 
