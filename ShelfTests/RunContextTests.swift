@@ -313,6 +313,7 @@ struct RunContextTests {
     }
 
     static func texts(in window: UIWindow) -> [String] {
+        enableAccessibilityAutomation
         func walk(_ element: NSObject) -> [String] {
             var out: [String] = []
             if let label = element.accessibilityLabel, !label.isEmpty { out.append(label) }
@@ -322,4 +323,16 @@ struct RunContextTests {
         }
         return walk(window)
     }
+
+    /// SwiftUI only builds its accessibility elements, which `texts(in:)`
+    /// reads, once something has turned accessibility automation on. A
+    /// simulator that an automation tool has driven has it on; a fresh one
+    /// doesn't, and every label reads as missing. Turn it on here, once,
+    /// through libAccessibility's private switch (what UI-testing tools use).
+    private static let enableAccessibilityAutomation: Void = {
+        guard let handle = dlopen("/usr/lib/libAccessibility.dylib", RTLD_NOW),
+              let symbol = dlsym(handle, "_AXSSetAutomationEnabled") else { return }
+        typealias SetEnabled = @convention(c) (Int32) -> Void
+        unsafeBitCast(symbol, to: SetEnabled.self)(1)
+    }()
 }
