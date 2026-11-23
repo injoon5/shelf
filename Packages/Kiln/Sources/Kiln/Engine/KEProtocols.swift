@@ -100,6 +100,14 @@ extension KInterpreter {
 
     /// Everything a protocol or class inherits, transitively.
     func ancestors(of name: String) -> [String] {
+        // Most names (View, Identifiable, the app's own types) have nothing to walk.
+        let userParents = protocols[name]?.inherits ?? types[name].map { Array($0.declaredInherits) }
+        if userParents == nil {
+            guard let builtin = Self.builtinParents[name] else { return [] }
+            if builtin.allSatisfy({ Self.builtinParents[$0] == nil || Self.builtinParents[$0]!.isEmpty }) { return builtin }
+        } else if userParents!.isEmpty {
+            return []
+        }
         var out: [String] = []
         var seen: Set<String> = [name]
         var queue = [name]
@@ -138,11 +146,15 @@ extension KInterpreter {
             t.conformances.formUnion(["Equatable", "Hashable"])
         }
         if t.rawType != nil { t.conformances.insert("RawRepresentable") }
-        for c in Array(t.conformances) { t.conformances.formUnion(ancestors(of: c)) }
+        for c in t.conformances {
+            let up = ancestors(of: c)
+            if !up.isEmpty { t.conformances.formUnion(up) }
+        }
 
         // Default implementations: the type's own members win; then constrained
         // extensions, which are more specific; then plain ones.
-        for name in t.conformances.sorted() {
+        let adoptable = !protocols.isEmpty || t.conformances.contains { Self.adoptableBuiltinProtocols.contains($0) && builtinExtensions[$0] != nil }
+        for name in adoptable ? t.conformances.sorted() : [] {
             if let proto = protocols[name] {
                 let exts = proto.extensions.filter { !$0.constraints.isEmpty } + proto.extensions.filter { $0.constraints.isEmpty }
                 for ext in exts where constraintsHold(ext.constraints, t) { adopt(ext, into: t) }
@@ -152,7 +164,10 @@ extension KInterpreter {
             }
         }
         installHooks(t)
-        checkRequirements(t)
+        if t.stored.contains(where: { !$0.attributes.isEmpty }) {
+            t.wrappedNames = Set(t.stored.filter { customWrapper($0) != nil }.map(\.name))
+        }
+        if !protocols.isEmpty { checkRequirements(t) }
     }
 
     /// `class Dog: Animal`: the superclass's members and conformances.
@@ -248,8 +263,8 @@ extension KInterpreter {
     /// A custom `==` and `hash(into:)` decide equality and hashing everywhere
     /// (`==`, `contains`, `firstIndex(of:)`, `Set`, `onChange(of:)`).
     private func installHooks(_ t: KType) {
-        let staticCtx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
         if let eq = t.staticMethods["=="]?.first(where: { $0.params.count == 2 }) {
+            let staticCtx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
             t.customEquals = { [weak self] a, b in
                 guard Thread.isMainThread, let self else { return nil }
                 return MainActor.assumeIsolated {

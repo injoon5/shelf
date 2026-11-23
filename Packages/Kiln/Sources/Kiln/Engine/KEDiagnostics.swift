@@ -46,7 +46,8 @@ extension KInterpreter {
 
     /// Labels a memberwise initializer doesn't have.
     func requireMemberwiseLabels(_ t: KType, _ labels: [String?], line: Int) throws {
-        let names = Set(memberwiseParams(t).map(\.name))
+        if t.memberwiseNames == nil { t.memberwiseNames = Set(memberwiseParams(t).map(\.name)) }
+        let names = t.memberwiseNames!
         guard labels.contains(where: { $0 != nil && !names.contains($0!) }) else { return }
         var known = [memberwiseSignature(t)]
         if !t.inits.isEmpty { known = t.inits.map(\.signature) }

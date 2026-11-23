@@ -38,7 +38,7 @@ extension KInterpreter {
 
     /// The wrapper on a stored property of `t`.
     func wrapped(_ t: KType, _ name: String) -> KWrapped? {
-        guard let d = t.storedDecl(name) else { return nil }
+        guard t.wrappedNames.contains(name) || !t.finalized, let d = t.storedDecl(name) else { return nil }
         return customWrapper(d)
     }
 

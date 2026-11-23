@@ -45,6 +45,10 @@ final class KType {
     var userBuilder: KUserBuilder?
     /// `@Animatable`: the stored properties it animates (KEMacros), for §1.5's proxy.
     var animatableProperties: [String] = []
+    /// Stored properties with the app's own property wrapper (KEWrappers), set when the program loads.
+    var wrappedNames: Set<String> = []
+    /// The memberwise initializer's labels, once asked for (KEDiagnostics).
+    var memberwiseNames: Set<String>?
 
     static func standIn(_ name: String) -> KType {
         let t = KType(name: name, kind: .structType)
@@ -131,6 +135,8 @@ final class KInterpreter {
     var builtinConformances: [String: Set<String>] = [:]
     /// `@Entry var accent = Color.blue` in `extension EnvironmentValues` (KEMacros), by owner and name.
     var entries: [String: [String: KEVarDecl]] = [:]
+    /// The short names of nested types (`CodingKeys`), so other names skip that lookup.
+    var nestedNames: Set<String> = []
 
     /// What the code has printed.
     var console = ""
@@ -237,6 +243,7 @@ final class KInterpreter {
             types[full] = t
             if types[d.name] == nil || parent == nil { types[d.name] = t }      // short name for nested types
             parent?.nested[d.name] = t
+            if parent != nil { nestedNames.insert(d.name) }
             absorb(d, into: t)
             register(d.nested, parent: t)
         }

@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.4-registry.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.6-language.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step (now `after-1.4-registry.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.6-language.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -173,6 +173,63 @@ Validate, minimum per call, in ms:
 | Workloads/Arithmetic.swift | 302.15 | 303.03 | +0% |
 | Workloads/Collections.swift | 30.49 | 30.31 | -1% |
 | Workloads/Objects.swift | 30.86 | 30.28 | -2% |
+
+### after-1.6-language.json
+
+PLAN.md §1.6: protocols, result builders, property wrappers, custom Codable, regex literals, macros as declarations, and errors about the app's own types.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.6-language.json --compare <the engine before §1.6, timed the same hour>` (21 samples). Date: 24 November 2026.
+- **The base.** The engine before §1.6 (08fd535) was timed in the same hour on the same machine. It was 0 to 4% slower than `after-1.4-registry.json`, because the machine had drifted.
+- **No input is more than 10% slower**, against either the base timed the same hour or `after-1.4-registry.json`.
+  - Against the base timed the same hour, the worst is swift-language, 7% slower. Apps are 1 to 7% slower, and the compute workloads are within 3%.
+  - Against `after-1.4-registry.json`, the worst is 9%.
+- **What it costs.** Loading a program now does two more things:
+  - closing each type's conformances over inheritance;
+  - adopting default implementations.
+
+  Each call to one of the app's functions now checks its labels as Swift does.
+- **How it was made cheap.** The first version was 10 to 28% slower; Objects, method calls and memberwise inits, was the 28%. These brought it back:
+  - Closure flags are built only when a call has a closure literal.
+  - The memberwise labels are kept per type.
+  - The wrapped-property check runs only for types that have wrapped properties.
+  - The nested-type lookup runs only for names that are nested somewhere.
+  - The extension-on-a-native-type `self` check runs only after the registry has no such name.
+  - Loading skips conformance walks, adoption, hooks and requirement checks when the program has nothing for them.
+
+Validate, minimum per call, in ms (the base is 08fd535 timed the same hour):
+
+| Input | §1.4 | Base, same hour | §1.6 | Change vs base |
+|---|---:|---:|---:|---:|
+| Apps/Chess.swift | 11.29 | 11.46 | 12.04 | +5% |
+| Apps/ExpenseTracker.swift | 0.73 | 0.73 | 0.77 | +5% |
+| Apps/FocusTimer.swift | 0.49 | 0.49 | 0.51 | +4% |
+| Apps/HabitTracker.swift | 0.70 | 0.71 | 0.74 | +4% |
+| Apps/MemoryMatch.swift | 0.52 | 0.54 | 0.55 | +2% |
+| Apps/ReadingList.swift | 0.98 | 0.99 | 1.04 | +5% |
+| Apps/TipCalculator.swift | 0.31 | 0.31 | 0.32 | +3% |
+| AppleIntelligence/expense.md | 0.32 | 0.32 | 0.34 | +6% |
+| AppleIntelligence/habit.md | 0.25 | 0.26 | 0.27 | +4% |
+| AppleIntelligence/memory.md | 0.30 | 0.30 | 0.31 | +3% |
+| AppleIntelligence/timer.md | 0.45 | 0.45 | 0.46 | +2% |
+| AppleIntelligence/tip.md | 0.46 | 0.46 | 0.47 | +2% |
+| Networking/OpenLibrarySearch.swift | 0.29 | 0.30 | 0.30 | +0% |
+| apps/async.swift | 0.56 | 0.56 | 0.58 | +4% |
+| apps/images.swift | 0.38 | 0.38 | 0.39 | +3% |
+| apps/network.swift | 0.65 | 0.67 | 0.70 | +4% |
+| apps/saving-data.swift | 0.76 | 0.76 | 0.80 | +5% |
+| apps/state.swift | 0.46 | 0.47 | 0.49 | +4% |
+| apps/swift-builders.swift (new) | | | 0.67 | |
+| apps/swift-codable.swift (new) | | | 0.89 | |
+| apps/swift-language.swift | 1.07 | 1.07 | 1.14 | +7% |
+| apps/swift-protocols.swift (new) | | | 0.76 | |
+| apps/time.swift | 0.45 | 0.45 | 0.46 | +2% |
+| apps/todos-db.swift | 0.30 | 0.30 | 0.31 | +3% |
+| apps/views-layout-drawing.swift | 1.08 | 1.08 | 1.12 | +4% |
+| apps/views-lists-controls.swift | 0.75 | 0.76 | 0.77 | +1% |
+| apps/views-navigation.swift | 0.73 | 0.75 | 0.76 | +1% |
+| Workloads/Arithmetic.swift | 303.03 | 305.17 | 306.63 | +0% |
+| Workloads/Collections.swift | 30.31 | 30.12 | 30.80 | +2% |
+| Workloads/Objects.swift | 30.28 | 30.71 | 31.63 | +3% |
 
 ## §1.3: Code that can wait
 
