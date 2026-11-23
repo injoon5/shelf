@@ -144,6 +144,7 @@ let check = Kiln.validate(source)   // check.isValid, check.errors
 | Computed properties read live `@State`; a title bug | 4 of 5 | 98% | 5 of 5 |
 | Seeded runs; `Color` opacity as a style | 5 of 5 | 100% | 5 of 5 |
 | A sixth app (tabs, search, a shared store); SwiftUI's number formatting | 6 of 6 | 100% | 5 of 5 |
+| Bridges in a registry (§1.4): unknown modifiers are errors | 7 of 7 | 100% | 4 of 5: `expense.md` writes `.stepValue(0.1)`, which isn't SwiftUI |
 
 ## Coverage
 
