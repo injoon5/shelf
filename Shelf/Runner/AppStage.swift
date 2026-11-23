@@ -60,6 +60,11 @@ struct AppStage: View {
                         ErrorScreen(face: IconFace(app), name: app.name, error: CompileError(errors: result.errors, source: source))
                     }
                 }
+                // Faded as one picture. Faded view by view, each of the
+                // app's backgrounds, cells and text at the same opacity
+                // over the launch surface, the surface's own text showed
+                // through several of them and the screen went pale halfway.
+                .compositingGroup()
                 .transition(.opacity)
             }
         }

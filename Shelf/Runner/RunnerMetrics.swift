@@ -56,6 +56,11 @@ enum RunnerMetrics {
     /// A card within this of its target, and moving less than this in a
     /// frame, has arrived.
     static let restTolerance: CGFloat = 0.5
+    /// The most a card's flight moves on between two frames, in seconds: two
+    /// frames at 60 Hz. A frame held up longer than that (the main thread
+    /// building a card) costs the flight that time instead of skipping its
+    /// motion (`CardClock`). Springboard shows every frame of its growth.
+    static let maxFrameStep: Double = 1.0 / 30
 
     // MARK: Behind the card
 

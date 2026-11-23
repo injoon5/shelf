@@ -48,9 +48,17 @@ struct CardRoot: View {
 /// It has no Core Animation animations of its own. A finger places it, or
 /// its flight (`CardFlight`, a spring per property) does, every frame, so
 /// what is on screen is always `shown`: a finger catches it exactly there,
-/// and a new target carries on from there at the speed it had.
+/// and a new target carries on from there at the speed it had. Its flights
+/// run on a clock of their own (`CardClock`), so its first frame is where
+/// it set off from, and no frame of its motion is lost to a slow one.
+///
+/// It is one picture: the outline, the icon's face, the app's picture and
+/// a snapshot fading in over that are placed in the same transaction, and
+/// the outline's mask (this layer's) clips all of them, so the picture is
+/// always exactly the card's width and top.
 final class CardFaceView: IconArtView {
-    /// Holds the app's picture at full-screen size, stretched to the card.
+    /// Holds the app's picture at full-screen size, scaled to the card's
+    /// width from its top.
     let content = UIView()
     private let screen: CGSize
     private let fullRadius: CGFloat
@@ -67,6 +75,7 @@ final class CardFaceView: IconArtView {
     private var leans = false
     /// The middle of the icon a growing card left, while it leans by it.
     private var leansFrom: CGPoint?
+    private(set) var clock = CardClock()
 
     init(face: IconFace, iconSize: CGFloat, screen: CGSize, fullRadius: CGFloat) {
         self.screen = screen
@@ -111,7 +120,8 @@ final class CardFaceView: IconArtView {
     /// same way growing out of it, less as it grows; any other straightens
     /// up as it goes. It leans from the angle it has, without a jolt.
     func fly(to target: CardFrame, _ springs: Motion.CardSprings, velocity: CardVelocity? = nil, leans: Bool = false,
-             leansFrom icon: CGPoint? = nil, at time: Double = CACurrentMediaTime()) {
+             leansFrom icon: CGPoint? = nil) {
+        let time = clock.now
         let velocity = velocity ?? flight?.velocity(at: time) ?? .zero
         self.springs = springs
         if flight == nil || leans != self.leans || (icon == nil) != (leansFrom == nil) { flightStartProgress = progress(shown) }
@@ -128,22 +138,26 @@ final class CardFaceView: IconArtView {
 
     /// The same flight, to where its target has moved, carrying on at the
     /// speed it has.
-    func retarget(_ target: CardFrame, at time: Double) {
+    func retarget(_ target: CardFrame) {
         guard let flight, !flight.target.isClose(to: target, within: RunnerMetrics.restTolerance) else { return }
-        fly(to: target, springs, leans: leans, leansFrom: leansFrom, at: time)
+        fly(to: target, springs, leans: leans, leansFrom: leansFrom)
     }
 
-    /// Moves the card to where its flight has it at `time`. Returns whether
-    /// it has arrived: the flight's tail of sub-pixel motion would
-    /// otherwise keep the launch screen up (and the app unbuilt) for most of
-    /// a second longer than anyone can see.
+    /// Moves the card to where its flight has it in the frame the display
+    /// shows at `time`. Returns whether it has arrived: the flight's tail of
+    /// sub-pixel motion would otherwise keep the launch screen up (and the
+    /// app unbuilt) for most of a second longer than anyone can see.
     func step(at time: Double) -> Bool {
         guard let flight else { return true }
-        let arrived = flight.isSettled(at: time)
-        let frame = arrived ? flight.target : flight.frame(at: time)
+        let now = clock.advance(to: time)
+        let arrived = flight.isSettled(at: now)
+        let frame = arrived ? flight.target : flight.frame(at: now)
         place(frame)
         setLean(arrived ? .none : lean(for: frame, in: flight))
-        if arrived { self.flight = nil }
+        if arrived {
+            self.flight = nil
+            clock.pause()
+        }
         return arrived
     }
 
@@ -194,26 +208,49 @@ final class CardFaceView: IconArtView {
     /// keeps its lean until it moves again.
     func freeze() -> CardFrame {
         flight = nil
+        clock.pause()
         return shown
     }
 
     var isMoving: Bool { flight != nil }
     var shownFrame: CGRect { shown.rect }
 
+    /// How much of the app's picture shows over the icon. The icon's face
+    /// is drawn only while some of it shows through: once the picture
+    /// covers the card, the tile, the glyph and the rim are gone.
+    func setContentOpacity(_ opacity: CGFloat) {
+        content.alpha = opacity
+        showsArt = opacity < 1
+    }
+
     /// Shows `picture` over the icon, full-screen size, in place of what
-    /// was there: a crossfade when any of it is showing.
+    /// was there. `fading`, and with any of the old one showing, it fades
+    /// in over it, and the old one goes once it has: both are inside
+    /// `content`, so they are placed, scaled and clipped as one, and the
+    /// old one stays opaque under the new, so nothing behind shows through.
     func show(_ picture: UIView, fading: Bool = false) {
         picture.frame = content.bounds
-        let swap = { [content] in
-            content.subviews.forEach { $0.removeFromSuperview() }
-            content.addSubview(picture)
+        picture.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        let old = content.subviews
+        content.addSubview(picture)
+        guard fading, !old.isEmpty, content.alpha > 0.01, !isHidden else {
+            old.forEach { $0.removeFromSuperview() }
+            return
         }
-        if fading, content.alpha > 0.01, !isHidden {
-            UIView.transition(with: content, duration: Motion.fadeDuration * Motion.Spring.slowdown,
-                              options: [.transitionCrossDissolve, .allowUserInteraction], animations: swap)
-        } else {
-            swap()
+        // Only the new picture's opacity animates, never the card's
+        // geometry, which the stage places every frame.
+        CATransaction.begin()
+        CATransaction.setCompletionBlock { [weak picture] in
+            guard picture?.superview != nil else { return }
+            old.forEach { $0.removeFromSuperview() }
         }
+        let fade = CABasicAnimation(keyPath: "opacity")
+        fade.fromValue = 0
+        fade.toValue = 1
+        fade.duration = Motion.fadeDuration * Motion.Spring.slowdown
+        fade.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        picture.layer.add(fade, forKey: "fadeIn")
+        CATransaction.commit()
     }
 }
 
@@ -359,10 +396,10 @@ final class AppCard {
 
     /// The icon it is landing on has moved (the pages turned under it, say):
     /// it heads there instead, without a jolt.
-    func follow(landing: CGRect, fades: Bool, at time: Double) {
+    func follow(landing: CGRect, fades: Bool) {
         guard phase == .closing else { return }
         landingFades = fades
-        face.retarget(Self.landed(landing), at: time)
+        face.retarget(Self.landed(landing))
     }
 
     private static func landed(_ landing: CGRect) -> CardFrame {
@@ -418,7 +455,7 @@ final class AppCard {
     func tick() {
         let progress = progress
         look = handoff.look(at: progress)
-        face.content.alpha = look.content
+        face.setContentOpacity(look.content)
         if landingFades { face.alpha = min(progress / RunnerMetrics.landingFade, 1) }
     }
 
@@ -465,7 +502,7 @@ final class AppCard {
         if let snapshot = snapshot() { keepsPicture(snapshot) }
         if let picture = host.view.snapshotView(afterScreenUpdates: false) {
             face.show(picture)
-            face.content.alpha = 1
+            face.setContentOpacity(1)
         }
         host.view.isHidden = true
     }
