@@ -61,6 +61,8 @@ final class KEClosure {
     /// `{ a, b in }` was written; otherwise `$0`, `$1` are the parameters.
     var hasExplicitParams: Bool
     let line: Int
+    /// Whether the body has an `await` (KEAsync's `awaits`).
+    var awaitsCache: Bool?
     init(params: [Param], body: [KEStmt], hasExplicitParams: Bool, line: Int) {
         self.params = params
         self.body = body
@@ -103,6 +105,7 @@ indirect enum KEExpr {
     case ifExpr([KECondition], [KEStmt], [KEStmt])      // Swift 5.9 if-expression
     case switchExpr(KEExpr, [KESwitchCase])
     case assign(String, KEExpr, KEExpr, line: Int)      // a = b / a += b inside closures used as expressions
+    case value(KV)                                      // an already-evaluated value (an `await`'s result, KEAsync)
 
     var line: Int {
         switch self {
@@ -224,6 +227,8 @@ final class KEFuncDecl {
     var isMutating: Bool
     var attributes: [KEAttribute]
     let line: Int
+    /// Whether the body has an `await` (KEAsync's `awaits`).
+    var awaitsCache: Bool?
     init(name: String, params: [KEParam], returnType: KETypeRef?, body: [KEStmt], isStatic: Bool,
          isMutating: Bool, attributes: [KEAttribute], line: Int) {
         self.name = name; self.params = params; self.returnType = returnType; self.body = body

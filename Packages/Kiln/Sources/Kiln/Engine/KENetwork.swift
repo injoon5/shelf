@@ -4,8 +4,8 @@
 //
 //  URLSession and JSONDecoder for interpreted code.
 //  - `try await URLSession.shared.data(from:)` (or `for: URLRequest`) fetches
-//    and returns `(Data, URLResponse)`. Interpreted code has no suspension
-//    points, so the call waits for the response (at most 20 seconds).
+//    and returns `(Data, URLResponse)`. The task waits (KEAsync); the main
+//    thread doesn't.
 //  - `URLSession.shared.dataTask(with:) { data, response, error in … }.resume()`
 //    fetches in the background and calls back on the main thread.
 //  - `JSONDecoder().decode(T.self, from:)` builds your own Decodable types
@@ -65,24 +65,29 @@ extension KBuiltins {
         .native(.object("Error", KRef(NSError(domain: "Kiln", code: 1, userInfo: [NSLocalizedDescriptionKey: message]))))
     }
 
-    /// `try await URLSession.shared.data(from: url)`.
+    /// `try await URLSession.shared.data(from: url)` (or `for:`): a
+    /// suspension the calling task waits on, so the main thread never blocks.
+    /// A request the host answers itself (`Kiln.hostRequestHandler`, Shelf's
+    /// `db://`) comes back at once, without waiting, even where code can't wait.
+    /// A headless run (`validate`) never touches the network: the request
+    /// fails at once, as it would offline.
     @MainActor static func fetch(_ request: URLRequest, _ interp: KInterpreter, _ line: Int) throws -> KV {
-        final class Result: @unchecked Sendable { var data: Data?; var response: URLResponse?; var error: Error? }
-        let result = Result()
-        let done = DispatchSemaphore(value: 0)
-        var req = request
-        req.timeoutInterval = min(req.timeoutInterval, 20)
-        let task = URLSession.shared.dataTask(with: req) { data, response, error in
-            result.data = data; result.response = response; result.error = error
-            done.signal()
+        if let handler = Kiln.hostRequestHandler, let reply = handler(request) {
+            let url = request.url ?? URL(string: "about:blank")!
+            let response = HTTPURLResponse(url: url, statusCode: reply.statusCode, httpVersion: "HTTP/1.1", headerFields: nil)
+            return fetched(reply.body ?? Data(), response ?? URLResponse())
         }
-        task.resume()
-        if done.wait(timeout: .now() + 20) == .timedOut {
-            task.cancel()
-            throw KEThrown(value: errorValue("The request timed out."))
-        }
-        if let error = result.error { throw KEThrown(value: errorValue(error.localizedDescription)) }
-        return .tuple([data(result.data ?? Data()), .native(.object("HTTPURLResponse", KRef(result.response ?? URLResponse())))], [nil, nil])
+        let req = KUnsafeSendable(request)
+        return .suspension(KSuspension.async(headless: {
+            throw KEThrown(value: errorValue(URLError(.notConnectedToInternet).localizedDescription))
+        }) {
+            let (data, response) = try await URLSession.shared.data(for: req.value)
+            return fetched(data, response)
+        })
+    }
+
+    static func fetched(_ data: Data, _ response: URLResponse) -> KV {
+        .tuple([KBuiltins.data(data), .native(.object("HTTPURLResponse", KRef(response)))], [nil, nil])
     }
 
     @MainActor static func networkMethod(_ kind: String, _ ref: KRef<AnyObject>, _ name: String, _ args: [KV], _ labels: [String?],

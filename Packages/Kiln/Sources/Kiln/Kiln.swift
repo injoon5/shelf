@@ -45,6 +45,15 @@ public enum Kiln {
     /// returns a SwiftUI `Image` (not a UIImage) so Kiln stays platform-neutral.
     @MainActor public static var hostImageProvider: ((String) -> Image?)?
 
+    /// Requests the host answers itself, at once, on the main actor, before
+    /// `URLSession.shared.data(from:)`/`data(for:)` in the app's code go to the
+    /// network: Shelf's `db://` store. Return nil to let a request through.
+    /// Because the answer is immediate, the app gets it without waiting, even
+    /// in code that can't wait.
+    ///
+    /// Temporary: PLAN.md §1.7 replaces it with a `DB` host bridge.
+    @MainActor public static var hostRequestHandler: ((URLRequest) -> KilnHostResponse?)?
+
     /// Parse, evaluate, and render a Swift source string. Returns a
     /// `KilnResult` containing the rendered view (when the source produced
     /// one), any `print(...)` output, and any errors raised during parsing
@@ -162,6 +171,16 @@ public enum Kiln {
     public static let version: String = "0.2.1"
 }
 
+/// A request the host answered (`Kiln.hostRequestHandler`).
+public struct KilnHostResponse {
+    public var statusCode: Int
+    public var body: Data?
+    public init(statusCode: Int, body: Data? = nil) {
+        self.statusCode = statusCode
+        self.body = body
+    }
+}
+
 // MARK: - Validation result
 
 /// The outcome of `Kiln.validate(_:)` — a deeper check than `KilnResult` that
@@ -212,6 +231,18 @@ public struct KilnResult {
 
     /// `true` when `view` is non-nil — convenience for `if result.hasView { … }`.
     public var hasView: Bool { view != nil }
+
+    /// The run behind `view`, for `tearDown` and `activeTaskCount`.
+    var interp: KInterpreter?
+
+    /// Stops the run: cancels every task the app started (`Task {}`,
+    /// `.task {}`, `async let`, task groups), invalidates its timers, and runs
+    /// none of its code again: no timer, delayed block or callback. For when
+    /// the app's screen closes (PLAN.md §1.7). Safe to call more than once.
+    @MainActor public func tearDown() { interp?.tearDown() }
+
+    /// Tasks the app has started that haven't ended.
+    @MainActor public var activeTaskCount: Int { interp?.activeTaskCount ?? 0 }
 
     public init(view: AnyView?, consoleOutput: String, errors: [String]) {
         self.view = view
@@ -278,6 +309,7 @@ public struct KilnView<ErrorContent: View>: View {
             }
         }
         .task(id: code) {
+            result?.tearDown()
             result = Kiln.run(code)
         }
     }

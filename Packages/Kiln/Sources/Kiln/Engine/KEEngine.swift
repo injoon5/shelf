@@ -30,14 +30,14 @@ enum KilnEngine {
         case noView(String)
     }
 
-    static func compile(_ code: String) throws -> Compiled {
+    static func compile(_ code: String, headless: Bool = false) throws -> Compiled {
         let program: KEProgram
         do {
             program = try KEParser.parse(code)
         } catch let e as KESyntaxError {
             throw Failure.syntax(formatSyntaxError(e, code))
         }
-        let interp = try KInterpreter(program: program)
+        let interp = try KInterpreter(program: program, headless: headless)
         guard let root = findRoot(program, interp, code) else {
             let views = program.types.filter { $0.inherits.contains("View") }.map(\.name)
             if views.isEmpty {
@@ -89,7 +89,9 @@ enum KilnEngine {
         do {
             let compiled = try compile(code)
             let view = AnyView(KRootView(compiled: compiled))
-            return KilnResult(view: view, consoleOutput: compiled.interp.console, errors: [])
+            var result = KilnResult(view: view, consoleOutput: compiled.interp.console, errors: [])
+            result.interp = compiled.interp
+            return result
         } catch let f as Failure {
             switch f {
             case .syntax(let m), .noView(let m): return KilnResult(view: nil, consoleOutput: "", errors: [m])
@@ -104,7 +106,7 @@ enum KilnEngine {
     static func validate(_ code: String, ticks: Int, fuel: Int) -> KilnValidation {
         let compiled: Compiled
         do {
-            compiled = try compile(code)
+            compiled = try compile(code, headless: true)
         } catch let f as Failure {
             switch f {
             case .syntax(let m), .noView(let m): return KilnValidation(errors: [m], warnings: [], renderedContent: false, hasView: false)
@@ -116,6 +118,8 @@ enum KilnEngine {
         interp.budget = fuel
         let probe = KProbe(interp: interp, ticks: ticks)
         probe.run(compiled.root)
+        // Nothing the check started may run after it.
+        interp.tearDown()
         return KilnValidation(errors: interp.errors, warnings: interp.warnings,
                               renderedContent: probe.renderedContent, hasView: true)
     }
@@ -184,7 +188,7 @@ final class KProbe {
     let interp: KInterpreter
     let ticks: Int
     var renderedContent = false
-    private var actions: [(KFunction, [KV])] = []
+    private var actions: [(KFunction, [KV], Bool)] = []
     private var visitedTypes = 0
 
     init(interp: KInterpreter, ticks: Int) {
@@ -208,13 +212,16 @@ final class KProbe {
         } catch {
             interp.report(error)
         }
-        // Fire every action once (onReceive timers `ticks` times).
+        // Tasks the globals or the views' construction started.
+        interp.drain()
+        // Fire every action once (onReceive timers `ticks` times). `.task`
+        // and `.refreshable` may wait; their tasks run to their end (or to
+        // a wait nothing headless answers) before the next action.
         var fired = 0
         while !actions.isEmpty, fired < 400 {
-            let (f, args) = actions.removeFirst()
+            let (f, args, canWait) = actions.removeFirst()
             fired += 1
-            do { _ = try interp.entry { try interp.call(f, args, args.map { _ in nil }) } }
-            catch { interp.report(error) }
+            interp.runAction(f, args, canWait: canWait)
         }
     }
 
@@ -249,9 +256,9 @@ final class KProbe {
             for (i, arg) in args.enumerated() {
                 guard case .function(let f) = arg else { continue }
                 let label = labels[i]
-                if let l = label, Self.actionLabels.contains(l) { actions.append((f, [])); continue }
+                if let l = label, Self.actionLabels.contains(l) { actions.append((f, [], false)); continue }
                 if name == "Button", label == nil, i == 1 || (i == 0 && args.count > 1 && labels[1] == "label") {
-                    actions.append((f, [])); continue
+                    actions.append((f, [], false)); continue
                 }
                 var sample: [KV] = []
                 if name == "GeometryReader" { sample = [.tuple([.native(.size(393, 852))], ["size"])] }
@@ -269,13 +276,14 @@ final class KProbe {
             walk(base, depth: depth + 1)
             if Self.actionModifiers.contains(m.name), case .function(let f)? = m.args.last {
                 switch m.name {
-                case "onReceive": for _ in 0..<max(1, ticks) { actions.append((f, [.native(.date(Date()))])) }
-                case "onDelete": actions.append((f, [.native(.indexSet(IndexSet(integer: 0)))]))
+                case "onReceive": for _ in 0..<max(1, ticks) { actions.append((f, [.native(.date(Date()))], false)) }
+                case "onDelete": actions.append((f, [.native(.indexSet(IndexSet(integer: 0)))], false))
                 case "onChange":
                     let n = KRenderer(interp: interp).closureParamCount(.function(f))
                     let v = m.arg("of") ?? .nilValue
-                    actions.append((f, n == 0 ? [] : (n == 1 ? [v] : [v, v])))
-                default: actions.append((f, []))
+                    actions.append((f, n == 0 ? [] : (n == 1 ? [v] : [v, v]), false))
+                case "task", "refreshable": actions.append((f, [], true))
+                default: actions.append((f, [], false))
                 }
                 return
             }

@@ -66,6 +66,7 @@ enum KNative: Hashable {
     case shape(KRef<AnyShape>)
     case path(KRef<KPathBox>)
     case rect(Double, Double, Double, Double)  // CGRect x, y, width, height
+    case suspension(KSuspension)           // what `await` waits on (KEAsync)
 
     var kindName: String {
         switch self {
@@ -93,6 +94,7 @@ enum KNative: Hashable {
         case .shape: return "Shape"
         case .path: return "Path"
         case .rect: return "CGRect"
+        case .suspension: return "Task"
         }
     }
 

@@ -209,13 +209,11 @@ extension KInterpreter {
     }
 
     /// Run interpreted code from a UI event (a tap, a timer) with its own budget.
+    /// A closure that uses `await` is an error here (it would have to wait);
+    /// after teardown, nothing runs.
     func perform(_ f: KFunction?, _ args: [KV] = []) {
         guard let f else { return }
-        do {
-            _ = try entry { try call(f, args, args.map { _ in nil }) }
-        } catch {
-            report(error)
-        }
+        runAction(f, args, canWait: false)
     }
 }
 

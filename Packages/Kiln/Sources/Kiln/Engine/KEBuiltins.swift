@@ -491,14 +491,8 @@ enum KBuiltins {
             return .void
         case "repeatElement":
             return .array(Array(repeating: args[0], count: arg("count")?.asInt ?? 0))
-        case "Task":
-            if case .function(let f)? = args.last {
-                DispatchQueue.main.async {
-                    do { _ = try interp.entry { try interp.call(f, [], []) } } catch { interp.report(error) }
-                }
-            }
-            return .native(.object("Task", KRef(NSObject())))
         default:
+            if let v = try asyncGlobal(name, args, labels, interp, line) { return v }
             return try construct(name, args, labels, interp, line)
         }
     }
@@ -506,6 +500,7 @@ enum KBuiltins {
     // MARK: - Constructors of built-in types
 
     static func construct(_ name: String, _ args: [KV], _ labels: [String?], _ interp: KInterpreter, _ line: Int) throws -> KV {
+        if name == "AsyncStream" || name == "AsyncThrowingStream", let v = try asyncGlobal(name, args, labels, interp, line) { return v }
         func arg(_ l: String) -> KV? { labels.firstIndex(of: l).map { args[$0] } }
         let first = args.first
         switch name {
@@ -768,6 +763,8 @@ enum KBuiltins {
             if name == "self" { return .type(.builtin("String")) }
         case "UIApplication":
             return .native(.object("UIApplication", KRef(NSObject())))
+        case "Task":
+            if let v = asyncStaticMember(typeName, name, interp) { return v }
         default:
             break
         }
@@ -800,10 +797,9 @@ enum KBuiltins {
             if case .function(let block)? = args.last {
                 let timerValue = KV.native(.timer(KRef(box)))
                 box.timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: repeats) { _ in
-                    MainActor.assumeIsolated {
-                        do { _ = try interp.entry { try interp.call(block, [timerValue], [nil]) } } catch { interp.report(error) }
-                    }
+                    MainActor.assumeIsolated { interp.perform(block, [timerValue]) }
                 }
+                interp.runtime.timers.append(box)
             }
             return .native(.timer(KRef(box)))
         case ("Font", _):
@@ -812,11 +808,8 @@ enum KBuiltins {
             if let a = animation(name, args, labels) { return .native(.animation(KRef(a))) }
         case ("Color", _), ("UIColor", _):
             if name == "init" { return try color(argExprs, env, interp, line) }
-        case ("Task", "sleep"):
-            interp.warn("Task.sleep runs without waiting in Kiln.")
-            return .void
-        case ("Task", "detached"):
-            return try callGlobalValues("Task", args, labels, interp, line)
+        case ("Task", _), ("MainActor", _), ("AsyncStream", _), ("AsyncThrowingStream", _):
+            if let v = try asyncStatic(typeName, name, args, labels, interp, line) { return v }
         case ("AnyTransition", _):
             return .native(.transition(name, args))
         case ("Date", "now"):
@@ -1027,6 +1020,7 @@ enum KBuiltins {
             if name == "radians" { return .double(d * .pi / 180) }
         case .object(let kind, let ref):
             if let v = networkMember(kind, ref, name) { return v }
+            if let v = asyncMember(kind, ref, name, interp) { return v }
             switch (kind, name) {
             case ("UIScreen", "bounds"): return .tuple([.double(0), .double(0), .double(402), .double(874)], ["x", "y", "width", "height"])
             case ("UIScreen", "main"): return .native(n)
@@ -1048,6 +1042,7 @@ enum KBuiltins {
     static func setNativeMember(_ n: KNative, _ name: String, _ value: KV) -> Bool {
         guard case .object(let kind, let ref) = n else { return false }
         if setNetworkMember(kind, ref, name, value) { return true }
+        if setAsyncMember(kind, ref, name, value) { return true }
         switch (kind, name) {
         case ("DateFormatter", "dateStyle"):
             (ref.value as! DateFormatter).dateStyle = dateStyle(value); return true
@@ -1612,6 +1607,7 @@ enum KBuiltins {
             }
         case .object(let kind, let ref):
             if let v = try networkMethod(kind, ref, name, args, labels, interp, line) { return v }
+            if let v = try asyncMethod(kind, ref, name, args, labels, interp, line) { return v }
             switch (kind, name) {
             case ("DispatchQueue", "asyncAfter"):
                 var delay = 0.0
@@ -1619,18 +1615,14 @@ enum KBuiltins {
                 else if let s = (arg("deadline") ?? args.first)?.asDouble { delay = s }
                 if case .function(let f)? = args.last {
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                        MainActor.assumeIsolated {
-                            do { _ = try interp.entry { try interp.call(f, [], []) } } catch { interp.report(error) }
-                        }
+                        MainActor.assumeIsolated { interp.perform(f) }
                     }
                 }
                 return .void
             case ("DispatchQueue", "async"), ("DispatchQueue", "sync"):
                 if case .function(let f)? = args.last {
                     DispatchQueue.main.async {
-                        MainActor.assumeIsolated {
-                            do { _ = try interp.entry { try interp.call(f, [], []) } } catch { interp.report(error) }
-                        }
+                        MainActor.assumeIsolated { interp.perform(f) }
                     }
                 }
                 return .void
@@ -1670,7 +1662,7 @@ enum KBuiltins {
                     return .string((ref.value as! RelativeDateTimeFormatter).localizedString(for: d, relativeTo: Date()))
                 }
                 return .string("")
-            case ("Haptics", _), ("UIApplication", _), ("Task", _):
+            case ("Haptics", _), ("UIApplication", _):
                 return .void
             default:
                 break
