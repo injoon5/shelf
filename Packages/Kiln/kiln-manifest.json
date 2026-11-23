@@ -909,6 +909,22 @@
     },
     {
       "family" : "Environment",
+      "id" : "member:Binding.animation",
+      "kind" : "member",
+      "name" : "animation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Binding",
+      "source" : "Sources/Kiln/Core.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Environment",
       "id" : "member:Binding.constant",
       "kind" : "member",
       "name" : "constant",
@@ -10929,7 +10945,7 @@
       "id" : "type:Binding",
       "kind" : "type",
       "name" : "Binding",
-      "notes" : "`Binding(get:set:)` and `.constant(_:)`.",
+      "notes" : "`Binding(get:set:)`, `.constant(_:)` and `.animation(_:)`.",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },

@@ -182,7 +182,7 @@ final class CoreBridges: KBridgeFamily {
             }
         }
 
-        r.type("Binding", .environment, notes: "`Binding(get:set:)` and `.constant(_:)`.") { t in
+        r.type("Binding", .environment, notes: "`Binding(get:set:)`, `.constant(_:)` and `.animation(_:)`.") { t in
             t.initializer { c in
                 if case .function(let g)? = c.arg("get"), case .function(let s)? = c.arg("set") {
                     let interp = c.interp
@@ -192,6 +192,14 @@ final class CoreBridges: KBridgeFamily {
                 return .binding(.constant(c.first ?? .nilValue))
             }
             t.staticMethod("constant") { c in .binding(.constant(c.first ?? .nilValue)) }
+            // `Toggle("On", isOn: $on.animation())`: writes through it animate.
+            t.method("animation", "_:Animation?") { c in
+                guard case .binding(let b) = c.receiver else { return c.receiver }
+                var anim: Animation? = .default
+                if case .native(.animation(let a))? = c.first { anim = a.value }
+                else if case .native(.implicit(let n, let a))? = c.first { anim = KDrawing.animation(n, a, []) ?? .default }
+                return .binding(KBinding(get: b.get, set: { v in withAnimation(anim) { b.set(v) } }))
+            }
             t.implicit { name, args, _ in name == "constant" ? .binding(.constant(args.first ?? .void)) : nil }
         }
     }

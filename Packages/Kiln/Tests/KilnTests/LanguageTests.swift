@@ -570,4 +570,47 @@ final class LanguageTests: XCTestCase {
         let r = /(unclosed/
         """, fails: "Line 2: Invalid regex /(unclosed/")
     }
+
+    // MARK: Small items
+
+    func testOneSidedRangesInCase() {
+        expect("""
+        func grade(_ score: Int) -> String {
+            switch score {
+            case 90...: return "A"
+            case 80..<90: return "B"
+            case ..<50: return "F"
+            default: return "C"
+            }
+        }
+        func half(_ c: String) -> String {
+            switch c { case "n"...: return "late"; default: return "early" }
+        }
+        print(grade(95), grade(85), grade(10), grade(60), half("q"), half("b"))
+        print([1, 2, 3, 4][2...], (5...).contains(7))
+        """, prints: "A B F C late early\n[3, 4] true\n")
+    }
+
+    func testBindingAnimationAndAllCasesMethods() throws {
+        let code = """
+        import SwiftUI
+        enum Size: String, CaseIterable { case small, large }
+        struct ContentView: View {
+            @State private var on = false
+            var body: some View {
+                VStack {
+                    Toggle("On", isOn: $on.animation())
+                    Toggle("Spring", isOn: $on.animation(.spring()))
+                    Text(Size.allCases.map { $0.rawValue }.joined(separator: "/"))
+                    Text("\\(Size.allCases.count) sizes, first \\(Size.allCases.first!.rawValue)")
+                }
+            }
+        }
+        """
+        let t = Kiln.transcript(code, steps: 0)
+        XCTAssertTrue(t.contains("small/large"), t)
+        XCTAssertTrue(t.contains("2 sizes, first small"), t)
+        XCTAssertFalse(t.lowercased().contains("error"), t)
+        XCTAssertEqual(Kiln.validate(code).errors, [])
+    }
 }

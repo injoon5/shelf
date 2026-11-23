@@ -1277,7 +1277,17 @@ final class KInterpreter {
             let l = lo.asDouble ?? -.infinity, h = hi.asDouble ?? .infinity
             return x >= l && (closed ? x <= h : x < h)
         }
-        if let s = v.asString, let l = lo.asString, let h = hi.asString { return s >= l && (closed ? s <= h : s < h) }
+        if let s = v.asString, lo.asString != nil || hi.asString != nil {
+            // One-sided string ranges too: `case "n"...:`.
+            if let l = lo.asString, s < l { return false }
+            if let h = hi.asString { return closed ? s <= h : s < h }
+            return true
+        }
+        if case .native(.date(let d)) = v {
+            if case .native(.date(let l)) = lo, d < l { return false }
+            if case .native(.date(let h)) = hi { return closed ? d <= h : d < h }
+            return true
+        }
         return false
     }
 

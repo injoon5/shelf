@@ -1015,7 +1015,8 @@ struct KEParser {
             }
             if atOp("!"), !cur.spaceBefore { next(); e = .postfix("!", e); continue }
             if atOp("?"), !cur.spaceBefore { next(); e = .optionalChain(e); continue }
-            if atOp("..."), !cur.spaceBefore, ahead(1).isPunct("]") || ahead(1).isPunct(")") || ahead(1).isPunct(",") {
+            // `xs[2...]`, and `case 90...:` (a one-sided range in a pattern).
+            if atOp("..."), !cur.spaceBefore, ahead(1).isPunct("]") || ahead(1).isPunct(")") || ahead(1).isPunct(",") || ahead(1).isPunct(":") {
                 next(); e = .postfix("...", e); continue
             }
             break
