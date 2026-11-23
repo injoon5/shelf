@@ -154,10 +154,13 @@ enum KArgKind: Equatable {
     case action
     /// A view value (`Text("…")`, `Image(…)`).
     case view
+    /// An array of a type (`colors:[Color]`): each element evaluated against it.
+    case typedArray(String)
 
     /// The expected type the engine evaluates the argument against.
     var expected: KETypeRef? {
         if case .typed(let n) = self { return .named(n, []) }
+        if case .typedArray(let n) = self { return .array(.named(n, [])) }
         if case .binding = self { return .named("Binding", []) }
         return nil
     }
@@ -175,7 +178,7 @@ enum KArgKind: Equatable {
         case (.content, .stringLiteral), (.closure, .stringLiteral), (.action, .stringLiteral): return false
         case (.content, .numberLiteral), (.closure, .numberLiteral), (.action, .numberLiteral): return false
         case (.title, .closureLiteral), (.string, .closureLiteral), (.number, .closureLiteral), (.bool, .closureLiteral): return false
-        case (.typed, .closureLiteral), (.binding, .closureLiteral), (.view, .stringLiteral), (.view, .numberLiteral): return false
+        case (.typed, .closureLiteral), (.typedArray, .closureLiteral), (.binding, .closureLiteral), (.view, .stringLiteral), (.view, .numberLiteral): return false
         case (.binding, .stringLiteral), (.binding, .numberLiteral), (.number, .stringLiteral): return false
         default: return true
         }
@@ -194,6 +197,7 @@ enum KArgKind: Equatable {
         case .closure: return "closure"
         case .action: return "action"
         case .view: return "view"
+        case .typedArray(let n): return "[\(n)]"
         }
     }
 
@@ -210,6 +214,7 @@ enum KArgKind: Equatable {
         case "action": self = .action
         case "view": self = .view
         default:
+            if k.hasPrefix("["), k.hasSuffix("]") { self = .typedArray(String(k.dropFirst().dropLast())); return }
             precondition(k.first?.isUppercase == true, "Unknown argument kind '\(k)' in a bridge signature")
             self = .typed(k)
         }
@@ -332,8 +337,12 @@ final class KOverload {
             var found = -1
             while j < params.count {
                 let param = params[j]
-                let labelMatches = param.label == label
-                    || (label == nil && syntax[i] == .closureLiteral && param.kind.isClosure)
+                // A trailing closure (unlabeled) binds a labeled closure parameter;
+                // one with a default is passed over when a later closure parameter
+                // needs an argument (Swift's forward scan, SE-0286).
+                let trailing = label == nil && syntax[i] == .closureLiteral && param.kind.isClosure && param.label != nil
+                    && !(param.optional && params[(j + 1)...].contains { $0.kind.isClosure && !$0.optional })
+                let labelMatches = param.label == label || trailing
                 if labelMatches && param.kind.accepts(syntax[i]) { found = j; break }
                 // Only a parameter with a default can be skipped.
                 if !param.optional { return nil }
@@ -412,8 +421,10 @@ final class KModifierBridge: KBridge {
     struct Form {
         let overload: KOverload
         /// The view with the modifier applied. `c.base` is the description of
-        /// the view it's applied to (a shape, a `ForEach`): `c.view` shows it.
-        let apply: @MainActor (KCall) -> AnyView
+        /// the view it's applied to (a shape, a `ForEach`). The view itself is
+        /// the second argument when the renderer already has it (an image
+        /// rebuilt with its chain), else `c.view` shows it.
+        let apply: @MainActor (KCall, AnyView?) -> AnyView
     }
     var forms: [Form] = []
     /// The same modifier on a `Text` that stays a `Text` (so `Text + Text`

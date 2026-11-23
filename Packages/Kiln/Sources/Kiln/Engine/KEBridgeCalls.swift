@@ -40,7 +40,9 @@ extension KInterpreter {
         let args = try evalBridgeArgs(o, binding, argExprs, env, name: b.name, line: line)
         let bound = KBound(overload: o, slots: o.slots(binding))
         if let make = b.make {
-            return try make(KCall(interp: self, name: b.name, line: line, args: args, labels: labels, overload: o, slots: bound.slots))
+            var c = KCall(interp: self, name: b.name, line: line, args: args, labels: labels, overload: o, slots: bound.slots)
+            c.syntax = argExprs.map { KArgSyntax($0.value) }
+            return try make(c)
         }
         return .view(KView(.primitive(b.name, args, labels, line: line), bound: bound))
     }
@@ -289,7 +291,13 @@ extension KRenderer {
             return AnyView(t)
         }
         guard let (form, c) = modifierCall(b, base, m) else { return render(base) }
-        return form.apply(c)
+        return form.apply(c, nil)
+    }
+
+    /// A modifier applied to a view the renderer already built.
+    func applyModifier(_ m: KModifier, to view: AnyView, base: KView) -> AnyView {
+        guard let b = interp.registry.modifier(m.name), let (form, c) = modifierCall(b, base, m) else { return view }
+        return form.apply(c, view)
     }
 
     func modifierCall(_ b: KModifierBridge, _ base: KView, _ m: KModifier) -> (KModifierBridge.Form, KCall)? {

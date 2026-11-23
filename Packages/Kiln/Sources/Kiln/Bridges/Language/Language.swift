@@ -26,6 +26,7 @@ final class LanguageBridges: KBridgeFamily {
 
     static func globals(_ r: KRegistry) {
         r.addConstant("pi") { _ in .double(.pi) }
+        r.addContextFree("infinity") { _, _, _ in .double(.infinity) }
 
         for name in ["print", "debugPrint", "NSLog"] {
             r.function(name, .language, owner: name == "NSLog" ? "Foundation" : "Swift") { c in

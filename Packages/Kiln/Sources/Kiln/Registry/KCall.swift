@@ -55,6 +55,9 @@ struct KCall {
     var mutated: KV?
     /// For a modifier: the description of the view it's applied to.
     var base: KView?
+    /// How each argument was written (a string literal, a closure), when the
+    /// call came from code.
+    var syntax: [KArgSyntax] = []
 
     init(interp: KInterpreter, name: String, line: Int, args: [KV], labels: [String?], overload: KOverload?, slots: [Int],
          receiver: KV = .void, base: KView? = nil) {

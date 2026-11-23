@@ -138,7 +138,7 @@ struct KModifierBuilder {
                        @ViewBuilder _ apply: @escaping @MainActor (KCall, AnyView) -> V) {
         bridge.forms.append(.init(overload: KOverload(params: KSignature.parse(signature),
                                                       availability: introduced.map { .iOS($0) }, notes: notes, receiver: receiver),
-                                  apply: { c in AnyView(apply(c, c.view)) }))
+                                  apply: { c, v in AnyView(apply(c, v ?? c.view)) }))
     }
 
     /// An overload that works on the description of the view it's applied to
@@ -148,7 +148,7 @@ struct KModifierBuilder {
                              @ViewBuilder _ apply: @escaping @MainActor (KCall) -> V) {
         bridge.forms.append(.init(overload: KOverload(params: KSignature.parse(signature),
                                                       availability: introduced.map { .iOS($0) }, notes: notes, receiver: receiver),
-                                  apply: { c in AnyView(apply(c)) }))
+                                  apply: { c, _ in AnyView(apply(c)) }))
     }
 
     func forms<V: View>(_ signatures: [String], receiver: String? = nil, @ViewBuilder _ apply: @escaping @MainActor (KCall, AnyView) -> V) {
