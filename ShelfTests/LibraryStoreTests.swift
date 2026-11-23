@@ -3,7 +3,7 @@ import Testing
 @testable import Shelf
 
 /// A `LibraryStore` over a `FakeLibrary`, with its own cache, data, layout,
-/// `@AppStorage` suite and snapshots.
+/// `@AppStorage` suite, snapshots and permission ledger.
 @MainActor
 struct StoreHarness {
     let library = FakeLibrary()
@@ -14,6 +14,7 @@ struct StoreHarness {
     var cache: AppCache { AppCache(root: folder.appending(path: "apps")) }
     var defaults: UserDefaults { UserDefaults(suiteName: suite)! }
     var snapshots: LaunchSnapshots { LaunchSnapshots(root: folder.appending(path: "Snapshots")) }
+    var permissionsFile: URL { folder.appending(path: "permissions.json") }
 
     init() {
         store = Self.store(over: library, in: folder, suite: suite)
@@ -31,13 +32,17 @@ struct StoreHarness {
                             layoutURL: folder.appending(path: "layout.json"),
                             server: { api },
                             appStorage: AppStorageKeys(UserDefaults(suiteName: suite)!),
-                            snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")))
+                            snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")),
+                            permissions: PermissionGate(ledger: PermissionLedger(file: folder.appending(path: "permissions.json")),
+                                                        system: FixedSystemPermissions.allowingEverything(),
+                                                        asker: SilentAsker()))
     }
 
     /// Gives an app something of everything the phone keeps per app (its
     /// source is there already): a `DB` value not yet pushed, an
-    /// `@AppStorage` key and a launch snapshot.
+    /// `@AppStorage` key, a launch snapshot and a permission answer.
     func plant(_ slug: String) async throws {
+        store.permissions.ledger.set(.allowed, .location, for: slug, name: slug)
         let session = await store.data.open(slug, pullTimeout: .zero)
         try session.write(.int(1), for: "count")
         await store.data.close(session)
@@ -58,10 +63,12 @@ struct StoreHarness {
         if let snapshot = snapshots.folder(for: slug), FileManager.default.fileExists(atPath: snapshot.path(percentEncoded: false)) {
             found.insert("launch snapshot")
         }
+        // As the phone would find it after a relaunch: on disk.
+        if PermissionLedger(file: permissionsFile).answer(.location, for: slug) != nil { found.insert("permission grants") }
         return found
     }
 
-    var everything: Set<String> { ["source", "DB store", "@AppStorage", "launch snapshot"] }
+    var everything: Set<String> { ["source", "DB store", "@AppStorage", "launch snapshot", "permission grants"] }
 
     func cleanUp() {
         try? FileManager.default.removeItem(at: folder)
@@ -370,5 +377,20 @@ struct StoreHarness {
         await h.store.sync()
         #expect(h.store.app("habits") != nil)
         #expect(h.library.slugs.contains("habits"))
+    }
+
+    // MARK: Signing out
+
+    /// Sign Out takes every app's permission answers, and the file.
+    @Test func signingOutForgetsEveryPermission() async throws {
+        let h = try await library()
+        defer { h.cleanUp() }
+        #expect(h.leftovers("notes").contains("permission grants"))
+
+        await h.store.signOut()
+
+        #expect(h.store.permissions.ledger.entries.isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: h.permissionsFile.path(percentEncoded: false)))
+        #expect(PermissionLedger(file: h.permissionsFile).entries.isEmpty)
     }
 }
