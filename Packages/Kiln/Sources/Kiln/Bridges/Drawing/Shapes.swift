@@ -27,7 +27,7 @@ extension DrawingBridges {
         for name in ["UserShape", "PathShape"] {
             r.view(name, .drawing) { v in
                 v.engineOnly()
-                v.form("_:any") { c in KShapeKind.custom(c.r.customShape(name, c.a)).anyShape }
+                v.form("_:any") { c in c.r.shapeView(c.r.customShape(name, c.a)) { AnyView($0) } }
             }
         }
 
@@ -156,7 +156,7 @@ extension KRenderer {
         switch v.kind {
         case .primitive(let n, let args, let labels, _):
             if n == "UserShape" || n == "PathShape" {
-                return ShapeChain(kind: .custom(customShape(n, KArgs(args: args, labels: labels))))
+                return ShapeChain(kind: customShape(n, KArgs(args: args, labels: labels)))
             }
             guard ["Circle", "Rectangle", "RoundedRectangle", "Capsule", "Ellipse", "UnevenRoundedRectangle", "ContainerRelativeShape"].contains(n) else { return nil }
             return ShapeChain(kind: KShapeKind(n, KArgs(args: args, labels: labels)))
@@ -170,32 +170,44 @@ extension KRenderer {
     }
 
     func shapeModifier(_ chain: ShapeChain, _ m: KModifier) -> AnyView {
-        var shape = chain.kind.anyShape
-        if let t = chain.trim { shape = AnyShape(shape.trim(from: t.0, to: t.1)) }
-        switch m.name {
-        case "trim":
-            let from = m.arg("from")?.asDouble ?? 0, to = m.arg("to")?.asDouble ?? 1
-            return AnyView(AnyShape(shape.trim(from: from, to: to)))
-        case "fill":
-            if let style = shapeStyle(m.first) { return AnyView(shape.fill(style)) }
-            return AnyView(shape.fill(.foreground))
-        case "stroke", "strokeBorder":
-            let style = shapeStyle(m.unlabeled(0)) ?? AnyShapeStyle(.foreground)
-            var ss = StrokeStyle(lineWidth: m.arg("lineWidth")?.asDouble ?? 1)
-            if case .native(.strokeStyle(let k))? = m.arg("style") {
-                ss = StrokeStyle(lineWidth: k.lineWidth, lineCap: lineCap(k.lineCap), lineJoin: lineJoin(k.lineJoin), dash: k.dash.map { CGFloat($0) })
+        let r = self
+        return shapeView(chain.kind) { base in
+            var shape = base
+            if let t = chain.trim { shape = AnyShape(shape.trim(from: t.0, to: t.1)) }
+            switch m.name {
+            case "trim":
+                let from = m.arg("from")?.asDouble ?? 0, to = m.arg("to")?.asDouble ?? 1
+                return AnyView(AnyShape(shape.trim(from: from, to: to)))
+            case "fill":
+                if let style = r.shapeStyle(m.first) { return AnyView(shape.fill(style)) }
+                return AnyView(shape.fill(.foreground))
+            case "stroke", "strokeBorder":
+                let style = r.shapeStyle(m.unlabeled(0)) ?? AnyShapeStyle(.foreground)
+                var ss = StrokeStyle(lineWidth: m.arg("lineWidth")?.asDouble ?? 1)
+                if case .native(.strokeStyle(let k))? = m.arg("style") {
+                    ss = StrokeStyle(lineWidth: k.lineWidth, lineCap: r.lineCap(k.lineCap), lineJoin: r.lineJoin(k.lineJoin), dash: k.dash.map { CGFloat($0) })
+                }
+                if m.name == "strokeBorder", chain.trim == nil, !chain.kind.isUser { return chain.kind.strokeBorder(style, ss) }
+                return AnyView(shape.stroke(style, style: ss))
+            default:
+                return AnyView(shape)
             }
-            if m.name == "strokeBorder", chain.trim == nil { return chain.kind.strokeBorder(style, ss) }
-            return AnyView(shape.stroke(style, style: ss))
-        default:
-            return AnyView(shape)
         }
     }
 
-    func customShape(_ name: String, _ a: KArgs) -> AnyShape {
-        if name == "PathShape", case .native(.path(let box))? = a.first { return AnyShape(box.value.path) }
-        if case .structV(let s)? = a.first { return AnyShape(KUserShape(value: s, interp: interp)) }
-        return AnyShape(Rectangle())
+    /// A shape shown with `style` (its fill, stroke and trim). The app's own
+    /// shape is drawn by `KShapeHost`, so its `path(in:)` runs in a view's
+    /// `body`, on the main thread, even while SwiftUI animates it on its
+    /// render thread.
+    func shapeView(_ kind: KShapeKind, _ style: @escaping @MainActor (AnyShape) -> AnyView) -> AnyView {
+        if case .user(let app) = kind { return AnyView(KShapeHost(app: app, style: style)) }
+        return style(kind.anyShape)
+    }
+
+    func customShape(_ name: String, _ a: KArgs) -> KShapeKind {
+        if name == "PathShape", case .native(.path(let box))? = a.first { return .custom(AnyShape(box.value.path)) }
+        if let v = a.first, let t = v.userType, t.isShape, let app = KAppValue(v, interp) { return .user(app) }
+        return .custom(AnyShape(Rectangle()))
     }
 
     func lineCap(_ s: String) -> CGLineCap { s == "round" ? .round : (s == "square" ? .square : .butt) }
@@ -203,24 +215,54 @@ extension KRenderer {
 
 }
 
-/// The concrete shape types, so `strokeBorder` (InsettableShape only) works.
-/// A Shape struct written in the interpreted code: its `path(in:)` runs there.
-struct KUserShape: Shape {
-    let value: KStructValue
-    let interp: KInterpreter
+/// The app's own `Shape` (PLAN.md §1.5's Shape proxy), where a `Shape` value
+/// is needed (`.clipShape`, `.background(in:)`, `AnyShape`): `path(in:)`
+/// runs the app's code. `animatableData` is the app's (`AnimatablePair`,
+/// `@Animatable`, a hand-written one), read once on the main thread and then
+/// kept, because SwiftUI interpolates it on its render thread; the app's
+/// value gets it when `path(in:)` runs.
+struct KUserShape: Shape, @unchecked Sendable {
+    let app: KAppValue
+    var data: KAnimVector
+
+    @MainActor init(app: KAppValue) {
+        self.app = app
+        data = KAnimatable.data(app)
+    }
+
+    nonisolated var animatableData: KAnimVector {
+        get { data }
+        set { data = newValue }
+    }
 
     nonisolated func path(in rect: CGRect) -> Path {
-        MainActor.assumeIsolated {
-            guard let m = value.type.method("path") else { return Path(rect) }
-            let ctx = KSelfContext(type: value.type, location: .box(KBox(.structV(value))))
-            let r = KV.native(.rect(rect.minX, rect.minY, rect.width, rect.height))
-            do {
-                let result = try interp.entry { try interp.invoke(m, args: [r], labels: ["in"], selfContext: ctx, parent: interp.globalEnv) }
-                if case .native(.path(let box)) = result { return box.value.path }
-            } catch {
-                interp.report(error)
-            }
-            return Path()
+        let data = self.data
+        return KDelegates.onMain { KAnimatable.path(app, data, rect) }
+    }
+}
+
+/// The app's shape shown as a view: an `Animatable` view whose `body` draws
+/// the app's path for the size it's given, so the app's code runs on the
+/// main thread each frame SwiftUI animates it.
+struct KShapeHost: View, Animatable {
+    let app: KAppValue
+    var data: KAnimVector
+    let style: @MainActor (AnyShape) -> AnyView
+
+    init(app: KAppValue, style: @escaping @MainActor (AnyShape) -> AnyView) {
+        self.app = app
+        self.style = style
+        data = KAnimatable.data(app)
+    }
+
+    nonisolated var animatableData: KAnimVector {
+        get { data }
+        set { data = newValue }
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            style(AnyShape(MainActor.assumeIsolated { KAnimatable.path(app, data, CGRect(origin: .zero, size: geo.size)) }))
         }
     }
 }
@@ -228,6 +270,8 @@ struct KUserShape: Shape {
 enum KShapeKind {
     case circle, rectangle, capsule, ellipse, container
     case custom(AnyShape)
+    /// The app's own `Shape`.
+    case user(KAppValue)
     case rounded(Double, RoundedCornerStyle)
     case uneven(Double, Double, Double, Double)
 
@@ -251,7 +295,7 @@ enum KShapeKind {
         }
     }
 
-    var anyShape: AnyShape {
+    @MainActor var anyShape: AnyShape {
         switch self {
         case .circle: return AnyShape(Circle())
         case .rectangle: return AnyShape(Rectangle())
@@ -259,11 +303,14 @@ enum KShapeKind {
         case .ellipse: return AnyShape(Ellipse())
         case .container: return AnyShape(ContainerRelativeShape())
         case .custom(let s): return s
+        case .user(let app): return AnyShape(KUserShape(app: app))
         case .rounded(let r, let s): return AnyShape(RoundedRectangle(cornerRadius: r, style: s))
         case .uneven(let tl, let bl, let br, let tr):
             return AnyShape(UnevenRoundedRectangle(topLeadingRadius: tl, bottomLeadingRadius: bl, bottomTrailingRadius: br, topTrailingRadius: tr))
         }
     }
+
+    var isUser: Bool { if case .user = self { return true }; return false }
 
     func strokeBorder(_ style: AnyShapeStyle, _ ss: StrokeStyle) -> AnyView {
         switch self {

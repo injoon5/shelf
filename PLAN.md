@@ -418,6 +418,50 @@ Closures already cross from native code into the app (completion handlers, `Butt
 
 `async` requirements (a `Tool`'s `call`, an intent's `perform`) run as VM tasks the native side awaits. Proxies are declared in the registry, so the checker knows which protocols an app's types can adopt.
 
+Built ([Docs/bridges.md, "A protocol proxy"](Packages/Kiln/Docs/bridges.md#a-protocol-proxy)).
+
+- **The mechanism** (`Engine/KEProxies.swift`):
+  - A protocol bridge declares its requirements as the app writes them (`"path(in:)"`, `"animatableData?"` with a default, `"static transferRepresentation"`, `"async perform()"`) and a `proxy`: the native type standing for the app's value.
+  - `KAppValue` calls a requirement with its own step budget, reads and writes properties, and runs an `async` requirement as a VM task that native code awaits; cancelling the Swift task cancels it.
+  - The app's types are checked against the registry's requirements when the program loads: "Line 3: 'Wave' doesn't conform to 'Shape': it has no path(in:)".
+  - The manifest lists each protocol's `requirements`, and `proxy: true` where there is one.
+  - Hosts declare their own with `Kiln.registerProtocol` and call the app's value through `KilnAdopter` (`callAsync`), the path Round 4's `Tool` and Round 5's `TimelineProvider` and `AppIntent` take.
+- **SwiftUI's protocols:**
+  - `Shape`, animating through its own `animatableData`, nested `AnimatablePair`s, `CGPoint`/`CGSize`/`CGRect`/`Angle`, or `@Animatable`'s properties.
+  - `Animatable` views and modifiers.
+  - `ViewModifier`, with `@State`, through `.modifier` or the app's own `extension View`.
+  - `Transition` (iOS 17), and `AnyTransition` from modifiers, `.asymmetric` and `.combined(with:)`.
+  - `Layout`, with `LayoutSubviews`, `ProposedViewSize`, `ViewDimensions`, `ViewSpacing`, a cache and `animatableData`, plus `AnyLayout` over it or the stack layouts.
+- **Threads.** SwiftUI interpolates on its render thread, where the app's code can't run (the first Lab run crashed there). So proxies keep `animatableData` as a vector read on the main thread, and the app's shape is drawn by an `Animatable` view whose `body` runs `path(in:)` on the main thread each frame. Layout and a `Shape` value used as a clip wait for the main thread when SwiftUI calls them elsewhere.
+- **Representables.** `UIViewControllerRepresentable` and `UIViewRepresentable` with `makeCoordinator` and the app's `Coordinator` class, for an allowlist (`r.representableController`, `r.representableView`):
+  - `UIImagePickerController`, with the minimal surface: `.photoLibrary`, `allowsEditing`, `delegate`, `dismiss`;
+  - `UIVisualEffectView` with `UIBlurEffect`;
+  - `UIActivityIndicatorView`.
+
+  Anything else is an error naming what's allowed. `@Environment(\.dismiss)` in the struct is SwiftUI's real one.
+- **Delegates.** An app class adopting an Objective-C delegate protocol gets a `KilnForwardingProxy` (an `NSProxy`, in the new `KilnObjC` target, public runtime API only) that conforms at run time to each delegate protocol the class adopts. It answers `respondsToSelector:` with what the app implements, converts arguments (`KNativeValues`), and is emptied at teardown. Declared: `UIImagePickerControllerDelegate`, `UINavigationControllerDelegate` and `CLLocationManagerDelegate`. A Swift-only protocol (`DataScannerViewControllerDelegate`) subclasses `KAppDelegateObject`.
+- **`Transferable` and `FileDocument`:**
+  - `CodableRepresentation`, `DataRepresentation` and `ProxyRepresentation` through `TransferRepresentationBuilder`.
+  - `KTransferItem` is the native `Transferable`, and `KTransferables.importValue` goes the other way for Round 2's paste and drop.
+  - `ShareLink` shares a `String`, a `URL` or the app's `Transferable`.
+  - `FileDocument`'s proxy writes and reads through the app's `fileWrapper(configuration:)` and `init(configuration:)`, with `UTType` and `FileWrapper` bridged. Round 3 adds the pickers.
+- **Checks:**
+  - `ProxyTests` (28) and two Shelf tests that drive a UIKit delegate message into the app's coordinator and check the allowlist's error.
+  - Lab examples `WaveStudio`, `TagCloud` and `CardStyles` match native; a recording shows the custom wave interpolating in Kiln.
+  - Shelf fixtures `views-custom-protocols` and `views-uikit` (which covers Camera, Sharing and Files).
+  - The prompt lists the protocols that have proxies ("your own `Layout`"), with their notes (`PromptCatalog`).
+  - The picker and the share sheet, checked by hand on the simulator.
+  - `Tools/diff.sh` is clean, with the new inputs listed in `diff-expected.txt`.
+  - No benchmark is more than 10% slower than `after-1.8-check.json` ([Benchmarks](Packages/Kiln/Benchmarks/README.md#after-15-proxiesjson)).
+- **Not built here:**
+  - The camera (Round 3, §4.3).
+  - `CLLocationManager` (§4.6).
+  - `FileRepresentation` and the file pickers (§4.1).
+  - `.draggable`, paste and `ShareLink` for images, `Data` and several items (§3.2).
+  - `Tool`, `TimelineProvider` and `AppIntent` themselves (Rounds 4 and 5).
+  - A `Layout`'s `spacing(subviews:cache:)`, `explicitAlignment` and `layoutValue(key:value:)`.
+  - `strokeBorder` on the app's own `InsettableShape`.
+
 ### 1.6 Swift that should work and doesn't
 
 From the prompt's "What doesn't work", Shelf's fixtures, and the 0.2.1 patch:
@@ -541,6 +585,39 @@ By kind, across everything: views 68 of 96 in scope, modifiers 143 of 564, style
 - The coverage report runs, and its numbers are the baseline for Round 1.
 - Real `async` works: a fixture that sleeps, fetches with `try await`, and streams with `for await`.
 - The prompt is built from the manifest, and its "What doesn't work" section is regenerated from what actually fails. Done (§7).
+
+### §1 status
+
+Where the rewrite stands after §1.5, item by item.
+
+| | Status |
+|---|---|
+| 1.1 Into the repo | Done. |
+| 1.2 One engine | Done. |
+| 1.3 Code that can wait | Done as the fallback, a second evaluator (`KEAsync`) for code with `await`. **The bytecode VM isn't built.** Everything it was for works; speed is its only remaining reason, and it waits for after the registry, on `KEAsync`'s frames. |
+| 1.4 Bridges in a registry | Done. |
+| 1.5 Native code calling the app's code | Done: every proxy §1.5 lists for Rounds 1 to 3, the delegate and `async` mechanisms Rounds 3 to 5 build on, and their declarations in the registry and the manifest. What uses them later (the camera, `CLLocationManager`, the file pickers, `Tool`, widgets) is those rounds'. |
+| 1.6 Swift that should work | Done, except `@Generable` and `@Guide` (Round 4). |
+| 1.7 A context for each run | Done. |
+| 1.8 Checking before running | Done. §1.5's requirements are in the form its checker reads (`"name(labels:)"`, `?` for a default), and its prompt lists the protocols that have proxies, with their notes. |
+| 1.9 The coverage report | Done; rerun after each round. |
+
+**§1.10, tests:**
+
+- Kiln Lab stays, and each family §1.5 touched has an example compared against native: Drawing (`WaveStudio`), Layout (`TagCloud`), Core (`CardStyles`).
+- Unit tests per bridge: `RegistryTests`, `LanguageTests`, `ContextTests`, `ProxyTests`…
+- One fixture per prompt section, enforced by `everyPromptSectionHasAFixture`, now including `views-custom-protocols` and `views-uikit`.
+- **Sensors through the context with fakes:** the mechanism is §1.7's (`provide`, `isStub`). There are no sensor bridges yet, so there are no fakes yet; Round 3 adds both.
+- `KilnBench` runs in `Tools/iterate.sh` against the latest step (`after-1.5-proxies.json`).
+
+**§1.11, done when:**
+
+- **Example apps match native in Lab:** yes, the seven 0.2.1 examples and §1.5's three.
+- **Fixtures and `FeatureFixtureTests` pass, with `SourceRewriter`, `Prelude` and `ShelfDBProtocol` deleted:** yes; only a comment in `AppDefaults` still names `SourceRewriter`, as history.
+- **The 0.2.1 switch files are gone, and every bridge is in the registry:** yes.
+- **The coverage report runs and is Round 1's baseline:** yes (`COVERAGE.md`, regenerated with §1.5's bridges).
+- **Real `async`:** yes, the `async` fixture sleeps, fetches and streams.
+- **The prompt is built from the manifest, and "What doesn't work" is regenerated from what fails:** yes (§1.8). §1.5's protocols reach "What works" as "your own `Layout`" and so on, with their notes; the location delegate, which nothing calls until Round 3, is a stub there.
 
 ---
 

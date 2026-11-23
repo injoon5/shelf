@@ -1384,6 +1384,16 @@ extension KInterpreter {
         return t
     }
 
+    /// Starts a frame as a task: a protocol requirement native code awaits (KEProxies).
+    @discardableResult
+    func startTask(frame make: () throws -> KFrame, parent: KTask?, reportsErrors: Bool) -> KTask {
+        let t = newTask(parent: parent, reportsErrors: reportsErrors)
+        do { t.frames = [try make()] }
+        catch { t.frames = [KWaitFrame(.done(.failure(error)))] }
+        enqueue(t)
+        return t
+    }
+
     /// Starts the work a suspension stands for as a task.
     @discardableResult
     func startTask(_ s: KSuspension, parent: KTask?, reportsErrors: Bool) -> KTask {

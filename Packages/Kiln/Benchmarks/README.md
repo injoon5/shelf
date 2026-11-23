@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.8-check.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.5-proxies.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step (now `after-1.8-check.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.5-proxies.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -260,3 +260,12 @@ PLAN.md §1.8: `Kiln.check`, the static checker, measured with §1.6 merged, so 
 - **No input is slower.** Every input is within 3% of §1.6. `check` isn't on the path `run` and `validate` take; what §1.8 adds to it is the parser keeping `async` on functions and two flags on each overload.
 - Against `after-1.7-context.json` one run showed `apps/images.swift` 10.3% slower (0.39 to 0.43 ms) and the next 2.6%: noise at that size.
 - **`check` itself** takes a few milliseconds on the largest app (`CheckTests.testCheckIsFast`), and Shelf's slowest fixture checks and validates in about 12 ms on the simulator (`NewAppCheckTests.checkAndValidateAreFastEnough`).
+
+### after-1.5-proxies.json
+
+PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transition, representables, delegates, Transferable, FileDocument, async requirements). Measured with §1.8 merged, so the base is `after-1.8-check.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.5-proxies.json --compare Benchmarks/after-1.8-check.json` (21 samples). Load average about 3. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst are the model replies, 6 to 7% slower at about 0.3 ms each (a few hundredths of a millisecond); the example apps and fixtures are within 5%, and the compute workloads within 5%. Before the merge, against `after-1.6-language.json`, the worst was 4.4%.
+- **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
+- **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.

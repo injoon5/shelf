@@ -247,6 +247,92 @@ struct FeatureFixtureTests {
         #expect(console.contains("has associated values"), "\(console)")
     }
 
+    // MARK: Native code calling the app's code (PLAN.md §1.5)
+
+    /// A representable's controller is UIKit's, its coordinator is the app's
+    /// class, and a delegate message from UIKit reaches the app's method,
+    /// which writes through its `@Binding`.
+    @Test func imagePickerDelegateReachesTheAppsCoordinator() async throws {
+        let compiled = try KilnEngine.compile(#"""
+            import SwiftUI
+            import UIKit
+
+            struct ImagePicker: UIViewControllerRepresentable {
+                @Binding var picked: String
+                func makeUIViewController(context: Context) -> UIImagePickerController {
+                    let picker = UIImagePickerController()
+                    picker.sourceType = .photoLibrary
+                    picker.delegate = context.coordinator
+                    return picker
+                }
+                func updateUIViewController(_ picker: UIImagePickerController, context: Context) {}
+                func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+                class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+                    let parent: ImagePicker
+                    init(_ parent: ImagePicker) { self.parent = parent }
+                    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+                        if let image = info[.originalImage] as? UIImage {
+                            parent.picked = "\(Int(image.size.width))x\(Int(image.size.height))"
+                            print("picked", parent.picked)
+                        }
+                    }
+                }
+            }
+
+            struct ContentView: View {
+                @State private var picked = "none"
+                var body: some View {
+                    VStack {
+                        Text(picked)
+                        ImagePicker(picked: $picked)
+                    }
+                }
+            }
+            """#, context: Self.check())
+        defer { compiled.interp.tearDown(); compiled.interp.context.tearDown() }
+        let window = try Self.show(compiled)
+        defer { window.isHidden = true }
+        var picker: UIImagePickerController?
+        for _ in 0..<50 where picker == nil {
+            try await Task.sleep(for: .milliseconds(20))
+            picker = Self.find(UIImagePickerController.self, in: window.rootViewController)
+        }
+        let p = try #require(picker, "the app's representable didn't show a UIImagePickerController")
+        #expect(p.sourceType == .photoLibrary)
+        let delegate = try #require(p.delegate)
+        // Only what the app implements.
+        #expect(delegate.responds(to: #selector(UIImagePickerControllerDelegate.imagePickerController(_:didFinishPickingMediaWithInfo:))))
+        #expect(!delegate.responds(to: #selector(UIImagePickerControllerDelegate.imagePickerControllerDidCancel(_:))))
+        let image = UIGraphicsImageRenderer(size: CGSize(width: 12, height: 7)).image { _ in }
+        delegate.imagePickerController?(p, didFinishPickingMediaWithInfo: [.originalImage: image])
+        #expect(compiled.interp.console.contains("picked 12x7"), "\(compiled.interp.console) \(compiled.interp.errors)")
+        #expect(compiled.interp.errors.isEmpty, "\(compiled.interp.errors)")
+    }
+
+    /// A representable may only return a controller Kiln allows.
+    @Test func representableOutsideTheAllowlistIsAnError() throws {
+        let rendered = try Self.render(#"""
+            import SwiftUI
+            import UIKit
+            struct Wrong: UIViewControllerRepresentable {
+                func makeUIViewController(context: Context) -> UIViewController { UIImage(systemName: "star") }
+                func updateUIViewController(_ vc: UIViewController, context: Context) {}
+            }
+            struct ContentView: View {
+                var body: some View { Wrong() }
+            }
+            """#)
+        #expect(rendered.errors.contains { $0.contains("must return a controller Kiln allows (UIImagePickerController)") }, "\(rendered.errors)")
+    }
+
+    static func find<T: UIViewController>(_ type: T.Type, in vc: UIViewController?) -> T? {
+        guard let vc else { return nil }
+        if let t = vc as? T { return t }
+        for child in vc.children { if let t = find(type, in: child) { return t } }
+        return find(type, in: vc.presentedViewController)
+    }
+
     // MARK: Helpers
 
     /// The fixture as Shelf runs it: as written (plan §1.7 left nothing to rewrite).

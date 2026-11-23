@@ -20,14 +20,17 @@ WORK=$(mktemp -d -t kilniter)
 echo "== bench"
 # Against the latest recorded step (Benchmarks/README.md): an input more than
 # 10% slower is marked SLOWER.
-"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/after-1.8-check.json" | tee "$OUT/bench.txt"
+"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/after-1.5-proxies.json" | tee "$OUT/bench.txt"
 
 echo "== lab"
 cd "$KILN/Lab"
 python3 gen_native.py >/dev/null
 xcodegen generate --quiet
 xcrun simctl boot "$SIM" 2>/dev/null || true
-xcodebuild test -project KilnLab.xcodeproj -scheme KilnLab -destination "id=$SIM" \
+# KILN_DERIVED_DATA shares a DerivedData folder with other builds (a worktree's build/DerivedData).
+DERIVED=()
+[ -n "${KILN_DERIVED_DATA:-}" ] && DERIVED=(-derivedDataPath "$KILN_DERIVED_DATA")
+xcodebuild test -project KilnLab.xcodeproj -scheme KilnLab -destination "id=$SIM" "${DERIVED[@]}" \
   -parallel-testing-enabled NO -test-timeouts-enabled YES -default-test-execution-time-allowance 150 \
   -resultBundlePath "$WORK/run.xcresult" > "$WORK/test.log" 2>&1 || true
 grep -E "Test Case .*(passed|failed)|error:|BUILD FAILED" "$WORK/test.log" | sed 's/^.*Test Case/Test Case/' | cut -c1-160 > "$OUT/tests.txt" || true

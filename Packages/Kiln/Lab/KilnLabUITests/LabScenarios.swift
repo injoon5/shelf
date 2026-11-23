@@ -230,6 +230,50 @@ final class AppScenarios: LabCase {
     }
     func testChessNative() { chess("native") }
     func testChessKiln() { chess("kiln") }
+
+    // MARK: Wave studio (§1.5: custom shapes that animate, Animatable, Transition)
+
+    func wave(_ mode: String) {
+        launch("WaveStudio", mode)
+        snap("1 start")
+        tap("Toggle Weather")
+        snap("2 stormy")
+        tap("Fill Ring")
+        tap("Fill Ring")
+        tap("Fill Ring")
+        snap("3 ring full")
+    }
+    func testWaveStudioNative() { wave("native") }
+    func testWaveStudioKiln() { wave("kiln") }
+
+    // MARK: Tag cloud (§1.5: a custom Layout, AnyLayout)
+
+    func tags(_ mode: String) {
+        launch("TagCloud", mode)
+        snap("1 start")
+        tap("Add Tag")
+        tap("Add Tag")
+        snap("2 added tags")
+        tap("Switch Layout")
+        snap("3 stacked")
+    }
+    func testTagCloudNative() { tags("native") }
+    func testTagCloudKiln() { tags("kiln") }
+
+    // MARK: Card styles (§1.5: ViewModifiers, with state, animatable, as a transition)
+
+    func cards(_ mode: String) {
+        launch("CardStyles", mode)
+        snap("1 start")
+        tap("Tap")
+        tap("Tap")
+        snap("2 tapped twice")
+        tap("Shake")
+        tap("Toggle Note")
+        snap("3 note hidden")
+    }
+    func testCardStylesNative() { cards("native") }
+    func testCardStylesKiln() { cards("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

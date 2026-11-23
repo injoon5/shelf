@@ -107,6 +107,7 @@ final class DrawingBridges: KBridgeFamily {
         colors(r)
         motion(r)
         shapes(r)
+        animatable(r)
         images(r)
         effects(r)
     }
@@ -246,9 +247,13 @@ final class DrawingBridges: KBridgeFamily {
             }
             t.anyStatic { _, name in .native(.implicit(name, [])) }
         }
-        r.type("AnyTransition", .drawing, notes: "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.identity`.") { t in
+        r.type("AnyTransition", .drawing, notes: "The built-ins, `.asymmetric`, `.combined(with:)` and `.modifier(active:identity:)`.") { t in
             t.membersInManifest = true
             for name in ["opacity", "scale", "slide", "move", "push", "identity"] { t.staticProperty(name) { _ in .native(.transition(name, [])) } }
+            t.initializer("_:any") { c in c.args[0] }
+            t.staticMethod("modifier", "active:any identity:any") { c in .native(.transition("modifier", c.args)) }
+            t.staticMethod("asymmetric", "insertion:AnyTransition removal:AnyTransition") { c in .native(.transition("asymmetric", c.args)) }
+            t.method("combined", "with:AnyTransition") { c in .native(.transition("combined", [c.receiver, c.args[0]])) }
             t.anyStatic { _, name in .native(.transition(name, [])) }
             t.anyStaticMethod { c, name in .native(.transition(name, c.args)) }
         }
