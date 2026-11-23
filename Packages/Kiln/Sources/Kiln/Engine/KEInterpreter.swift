@@ -109,9 +109,17 @@ final class KInterpreter {
     var readTracker: KReadTracker?
     /// A global variable changed: re-render everything.
     var onGlobalChange: (() -> Void)?
+    /// A headless run (`validate`, the transcript): nothing really waits, and
+    /// tasks run when the probe drains them (KEAsync).
+    var headless: Bool
+    /// The task whose code is running now, if any (`Task.isCancelled`).
+    var currentTask: KTask?
+    /// Tasks, timers and teardown (KEAsync).
+    let runtime = KRuntime()
 
-    init(program: KEProgram) throws {
+    init(program: KEProgram, headless: Bool = false) throws {
         self.program = program
+        self.headless = headless
         register(program.types, parent: nil)
         for t in program.types where t.kind == .extensionType { applyExtension(t) }
         for t in program.types { applyNestedExtensions(t) }
@@ -280,10 +288,39 @@ final class KInterpreter {
     }
 
     func exec1(_ s: KEStmt, _ env: KEnv) throws -> KFlow {
+        do {
+            return try exec1Unlined(s, env)
+        } catch var err as KERuntimeError where err.line == 0 {
+            err.line = Self.line(of: s)
+            throw err
+        }
+    }
+
+    /// The line a statement starts on, when the tree knows it.
+    static func line(of s: KEStmt) -> Int {
+        switch s {
+        case .expr(let e), .throwStmt(let e): return e.line
+        case .variable(let d): return d.line
+        case .assign(_, _, _, let l), .returnStmt(_, let l): return l
+        case .ifStmt(let c, let body, _), .guardStmt(let c, let body), .whileStmt(let c, let body, _):
+            switch c.first {
+            case .expr(let e)?, .optionalBinding(_, let e)?, .casePattern(_, let e)?: if e.line > 0 { return e.line }
+            default: break
+            }
+            // `while true`: the condition has no line; the loop's first statement does.
+            return body.first.map(line(of:)) ?? 0
+        case .switchStmt(let e, _), .forIn(_, let e, _, _, _): return e.line
+        case .repeatWhile(let body, let e, _): return e.line > 0 ? e.line : (body.first.map(line(of:)) ?? 0)
+        default: return 0
+        }
+    }
+
+    private func exec1Unlined(_ s: KEStmt, _ env: KEnv) throws -> KFlow {
         try tick()
         switch s {
         case .expr(let e):
-            _ = try eval(e, env)
+            let v = try eval(e, env)
+            if case .native(.suspension) = v { try checkAwaited(v, e.line) }
             return .normal
 
         case .variable(let decl):
@@ -550,6 +587,7 @@ final class KInterpreter {
         case (.int, "Int"), (.double, "Double"), (.double, "CGFloat"), (.string, "String"), (.bool, "Bool"),
              (.array, "Array"), (.dict, "Dictionary"): return true
         case (.int, _), (.double, _), (.string, _), (.bool, _): return false
+        case (.native(.object("Error", _)), "CancellationError"): return KAsync.isCancellation(KEThrown(value: v))
         default:
             if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) }
             return true
@@ -892,6 +930,11 @@ final class KInterpreter {
 
     /// Call a user function or method with evaluated arguments.
     func invoke(_ decl: KEFuncDecl, args: [KV], labels: [String?], selfContext: KSelfContext?, parent: KEnv) throws -> KV {
+        // A function that waits runs when it's awaited, in a task (KEAsync).
+        // An init always runs to the end: an `await` in it is an error.
+        if decl.awaits, decl.name != "init" {
+            return deferredCall(decl, args: args, labels: labels, selfContext: selfContext, parent: parent)
+        }
         try tick()
         callDepth += 1
         defer { callDepth -= 1 }
@@ -962,6 +1005,7 @@ final class KInterpreter {
         case .user(let decl, let env, let ctx):
             return try invoke(decl, args: args, labels: labels, selfContext: ctx, parent: env)
         case .closure(let c, let captured):
+            if c.awaits { return deferredClosure(f, c, args) }
             try tick()
             callDepth += 1
             defer { callDepth -= 1 }

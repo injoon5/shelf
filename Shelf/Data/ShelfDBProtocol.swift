@@ -1,4 +1,5 @@
 import Foundation
+import Kiln
 import Synchronization
 
 /// Answers the private `db://` scheme from the open app's `DBSession`, without
@@ -13,8 +14,14 @@ import Synchronization
 ///
 /// The key is the `DB-Key` header when there is one, which is how the `DB`
 /// helper sends it (`Prelude`), and otherwise the URL's path after its first
-/// "/", percent-decoded. Requests are answered on the loading thread, never
-/// the main actor: Kiln holds the main thread while it waits for them.
+/// "/", percent-decoded.
+///
+/// Kiln asks first: `activate` installs `answerForKiln` as
+/// `Kiln.hostRequestHandler`, so the app's `DB` calls are answered on the main
+/// actor, at once, without waiting (Kiln no longer blocks the main thread on
+/// a request). Requests that come through `URLSession` itself are answered on
+/// the loading thread, as before. PLAN.md §1.7 replaces both with a `DB` host
+/// bridge.
 final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
     private struct Registration {
         var session: DBSession?
@@ -33,7 +40,8 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
 
     /// Routes `db://` requests on `URLSession.shared` to `session` until
     /// `deactivate`. Shelf runs one app at a time, so the slug is never in the URL.
-    static func activate(_ session: DBSession) {
+    @MainActor static func activate(_ session: DBSession) {
+        Kiln.hostRequestHandler = answerForKiln
         registration.withLock { registration in
             registration.session = session
             if !registration.registered {
@@ -45,7 +53,7 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
 
     /// Stops answering for `session`. A newer session that has since been
     /// activated is left alone.
-    static func deactivate(_ session: DBSession) {
+    @MainActor static func deactivate(_ session: DBSession) {
         registration.withLock { registration in
             guard registration.session === session else { return }
             registration.session = nil
@@ -54,6 +62,19 @@ final class ShelfDBProtocol: URLProtocol, @unchecked Sendable {
                 registration.registered = false
             }
         }
+    }
+
+    /// The table above for a request from the app's code (`Kiln.hostRequestHandler`):
+    /// nil for anything but `db://`, which goes to the network as usual.
+    @MainActor static func answerForKiln(_ request: URLRequest) -> KilnHostResponse? {
+        guard request.url?.scheme?.lowercased() == "db" else { return nil }
+        guard let session = current else { return KilnHostResponse(statusCode: 503) }
+        let reply = answer(
+            method: (request.httpMethod ?? "GET").uppercased(),
+            key: key(for: request),
+            body: { request.httpBody ?? request.httpBodyStream.map(drain) },
+            session: session)
+        return KilnHostResponse(statusCode: reply.status, body: reply.body)
     }
 
     // MARK: URLProtocol

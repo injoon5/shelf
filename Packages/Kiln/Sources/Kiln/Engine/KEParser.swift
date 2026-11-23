@@ -525,6 +525,12 @@ struct KEParser {
             return try parseLoop(label: w)
         }
 
+        // `async let x = …`: a child task (KEAsync).
+        if w == "async", ahead(1).isIdent("let") || ahead(1).isIdent("var") {
+            next()
+            return try parseVarDecl(attrs: attrs + [KEAttribute(name: "asyncLet", args: [])], mods: mods, inType: false).map { .variable($0) }
+        }
+
         switch w {
         case "let", "var":
             return try parseVarDecl(attrs: attrs, mods: mods, inType: false).map { .variable($0) }
@@ -653,10 +659,16 @@ struct KEParser {
     private mutating func parseLoop(label: String?) throws -> [KEStmt] {
         if eatIdent("for") {
             if eatIdent("case") {}
-            if atIdent("await") { next() }
+            // `for await x in s` / `for try await x in s`: the sequence is kept
+            // as an `await` so the loop runs where it can wait (KEAsync).
+            let tried = eatIdent("try")
+            var waits = false
+            if atIdent("await") { next(); waits = true }
             let pattern = try parsePattern(binding: true)
             guard eatIdent("in") else { throw error("expected 'in' in for loop") }
-            let seq = try parseExpression(noTrailing: true)
+            var seq = try parseExpression(noTrailing: true)
+            if waits { seq = .awaitExpr(seq) }
+            _ = tried
             var whereClause: KEExpr? = nil
             if eatIdent("where") { whereClause = try parseExpression(noTrailing: true) }
             return [.forIn(pattern, seq, whereClause, try parseBlock(), label: label)]

@@ -123,7 +123,10 @@ extension KInterpreter {
             }
             return try eval(x, env, expected)
         case .awaitExpr(let x):
-            return try eval(x, env, expected)
+            // Code that waits runs in KEAsync's frames; this code can't.
+            throw fail("'await' can't be used here: a view's body, a computed property, an init and other code that isn't async run to the end without waiting. Do the work in Task { … } or .task { … }, or in an async function called from one", x.line)
+        case .value(let v):
+            return coerce(v, to: expected)
         case .typeExpr(let t):
             if let ut = userType(t) { return .type(.user(ut)) }
             return .type(.builtin(t.description))

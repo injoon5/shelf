@@ -179,9 +179,10 @@ enum KModifiers {
         case "onDisappear":
             return AnyView(view.onDisappear(perform: r.action(arg("perform") ?? m.args.last)))
         case "task":
-            let run = r.action(m.args.last)
-            if let id = arg("id") { return AnyView(view.task(id: id) { run() }) }
-            return AnyView(view.task { run() })
+            // SwiftUI's own `.task`: cancelled when the view goes away, restarted when the id changes.
+            guard case .function(let fn)? = m.args.last else { return view }
+            if let id = arg("id") { return AnyView(view.task(id: id) { await interp.runViewTask(fn) }) }
+            return AnyView(view.task { await interp.runViewTask(fn) })
         case "onChange":
             let value = arg("of") ?? first ?? .void
             guard case .function(let fn)? = m.args.last else { return view }
@@ -198,8 +199,9 @@ enum KModifiers {
             return view
         case "onSubmit": return AnyView(view.onSubmit(r.action(m.args.last)))
         case "refreshable":
-            let run = r.action(m.args.last)
-            return AnyView(view.refreshable { run() })
+            // The spinner stays until the closure, which may wait, is done.
+            guard case .function(let fn)? = m.args.last else { return view }
+            return AnyView(view.refreshable { await interp.runViewTask(fn) })
         case "swipeActions":
             let content = r.renderContent(m.args.last)
             let edge: HorizontalEdge = { if case .native(.implicit("leading", _))? = arg("edge") { return .leading }; return .trailing }()

@@ -32,6 +32,8 @@
 > - `JSONEncoder().encode`, `[T].self`, and a decoded `UUID` staying a `UUID` (Shelf's former `kiln-0.2.1.patch`).
 > - `Tools/KilnBench` times Shelf's fixtures too, and [Benchmarks/](Benchmarks/) keeps the numbers each step is held to.
 > - One engine: the original interpreter is deleted (see [One engine](#one-engine)).
+> - A differential harness: `Kiln.transcript` and `Tools/diff.sh` compare everything a run shows against the engine before a change, on every input ([Benchmarks/differential.md](Benchmarks/differential.md)).
+> - Code that can wait: `async`/`await` really suspends and resumes, on frames that live on the heap (see [Code that can wait](#code-that-can-wait)).
 >
 > The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
 
@@ -123,7 +125,9 @@ let check = Kiln.validate(source)   // check.isValid, check.errors
 
 **SwiftUI.** Every `View` struct you write is hosted by a real SwiftUI view, so `@State` lives and dies by SwiftUI's own identity rules, and `@Binding`, `@StateObject`, `@ObservedObject`, `@EnvironmentObject`, `@Environment(\.dismiss)` and `@AppStorage` behave as compiled. `List` (rows, sections, `onDelete`), `Form`, `Section` headers and footers, `Picker` with tags (segmented, menu, wheel), `Stepper`, `Toggle`, `Slider`, `TextField` with text or `value:format:`, `DatePicker`, `NavigationStack` with `navigationDestination`, `TabView`, `.searchable`, sheets, alerts, toolbars, `Timer.publish` with `onReceive`, `withAnimation` and transitions, Swift Charts, custom `Shape`s and `Path`, grids, `GeometryReader`, and about 120 modifiers. Text is formatted the way SwiftUI formats it (`Text("\(1400) pages")` reads "1,400 pages").
 
-**Networking.** `try await URLSession.shared.data(from:)` (or `for:` a `URLRequest`), `dataTask(with:) { … }.resume()`, `URLComponents` and `URLQueryItem`, and `JSONDecoder().decode(T.self, from:)` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase`, optionals, defaults, nested types and raw-value enums.
+**Waiting.** `async` functions and closures, `await`, `Task {}` and `Task.detached {}`, `.task {}` and `.task(id:)` (cancelled when the view goes away), `.refreshable` that waits, `Task.sleep(for:)` and `(nanoseconds:)` that really wait, `Task.isCancelled` and `checkCancellation()`, `async let`, `withTaskGroup` and `withThrowingTaskGroup`, `for await` over task groups and `AsyncStream`s (`yield`, `finish`, `onTermination`, `makeStream`), `withCheckedContinuation`, and `await MainActor.run {}`. All of it runs on the main actor, like a SwiftUI app's own code, and none of it blocks the main thread.
+
+**Networking.** `try await URLSession.shared.data(from:)` (or `for:` a `URLRequest`), which waits without blocking, `dataTask(with:) { … }.resume()`, `URLComponents` and `URLQueryItem`, and `JSONDecoder().decode(T.self, from:)` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase`, optionals, defaults, nested types and raw-value enums.
 
 **Repeatable runs.** Set `Kiln.randomSeed` and `shuffled()`, `randomElement()` and `random(in:)` give the same numbers every run; `KilnRandom(seed:)` gives native Swift the same ones. A host app launched with `-KilnRandomSeed 7` starts seeded, which is handy in UI tests that need the same deal every run.
 
@@ -143,6 +147,22 @@ let check = Kiln.validate(source)   // check.isValid, check.errors
 
 Upstream 0.2.1 had two: the engine described above, and the original interpreter, which still ran code written in its guided dialect (`GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage`, `BarChart(` / `LineChart(`, `Map(latitude:`). This copy deletes the original interpreter, `Kiln.engine` with it, and `Kiln.register`, whose bridges only that interpreter read. Everything runs on one engine; code in the old dialect fails with its line (`Cannot find 'GameCanvas' in scope`).
 
+## Code that can wait
+
+Code with no `await` in it runs on the tree-walker, straight through. A function or closure whose body has an `await` runs as a task on a small resumable evaluator (`Engine/KEAsync.swift`): a stack of frames on the heap, each a state machine over one statement or expression, that steps until it needs a child frame, finishes, or waits on a suspension. When the suspension can't answer at once the task parks with its frames intact, and resumes on the main actor when it does. Inside a task, the statements that don't wait still run on the tree-walker.
+
+- **What can't wait.** Calling a function that waits doesn't run it: it returns a suspension that `await` runs in the awaiting task's own frames. So a view's `body`, computed properties, `init` and everything else the tree-walker runs go to the end, as in compiled Swift; an `await` there is an error with its line, and so is calling an `async` function without `await`.
+- **Natives that wait** return a `KSuspension`: `.async { … }` wraps Swift `async` work (cancelling the app's task cancels it), `.callback { ctx, resume in … }` wraps a callback. `KAsyncSequence.wrapping(name, sequence) { element in … }` makes a native `AsyncSequence` something the app can `for await` over.
+- **The budget is per stretch.** The step limit applies between two waits: a task that waits between steps runs as long as it likes, and a loop that never waits is still stopped, with its line.
+- **Teardown.** `KilnResult.tearDown()` cancels every task of a run, invalidates its timers, and runs none of its code again.
+- **Checking.** `validate` runs headless: sleeps return at once, the network fails at once (unless the host answers), and the tasks it starts run to their end before it returns, then are torn down.
+
+Why this and not a bytecode VM for all code, yet: [Benchmarks/README.md](Benchmarks/README.md#13-code-that-can-wait).
+
+## Checked against the engine before
+
+`Tools/diff.sh` runs every input (the example apps and replies, Shelf's fixtures, the workloads, the SwiftUI in Kiln's tests) on the engine at a base commit and on this checkout, and compares their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action. Inputs meant to differ are listed, with the reason, in `Tools/diff-expected.txt`. The last run is [Benchmarks/differential.md](Benchmarks/differential.md).
+
 ## API
 
 ```swift
@@ -154,9 +174,16 @@ public enum Kiln {
     static func looksLikeApp(_ code: String) -> Bool
     @MainActor static var randomSeed: UInt64?
     @MainActor static var hostImageProvider: ((String) -> Image?)?
+    /// Requests the host answers at once, before the network (Shelf's db://; §1.7 replaces it).
+    @MainActor static var hostRequestHandler: ((URLRequest) -> KilnHostResponse?)?
 }
 
-public struct KilnResult { let view: AnyView?; let consoleOutput: String; let errors: [String] }
+public struct KilnResult {
+    let view: AnyView?; let consoleOutput: String; let errors: [String]
+    @MainActor func tearDown()               // cancel every task, stop timers, run nothing more
+    @MainActor var activeTaskCount: Int
+}
+public struct KilnHostResponse { var statusCode: Int; var body: Data? }
 public struct KilnValidation { let errors: [String]; let warnings: [String]; var isValid: Bool }
 public struct KilnView<ErrorContent: View>: View { init(code: String) }
 public struct KilnRandom: RandomNumberGenerator { init(seed: UInt64?) }
@@ -167,7 +194,7 @@ public struct KilnRandom: RandomNumberGenerator { init(seed: UInt64?) }
 Kiln interprets; it does not compile, so some things are out of reach:
 
 - No UIKit or AppKit bridges (`UIViewRepresentable`), no SwiftData or Core Data, no third-party packages.
-- `async` code runs straight through: `Task.sleep` does not wait, and `await URLSession.shared.data(from:)` waits for the response (up to 20 seconds) before the next line runs. `dataTask(with:)` with a completion handler does not wait.
+- `await` inside an `if` or `switch` *expression*, on the left of an assignment, or in a `case` pattern isn't supported; use a statement. Inside an expression, the parts that wait are evaluated before the rest of it.
 - Protocols are accepted but conformance is not checked; user-defined property wrappers and result builders are not supported.
 
 When something is out of reach Kiln reports the line it stopped on instead of crashing.

@@ -18,9 +18,10 @@ import Kiln
 // The minimum is the steadiest number to compare two builds by.
 //
 // The network is never touched: every http(s) request fails at once with
-// "not connected", as in Shelf's fixture tests, and `db://` requests are
-// answered from an in-memory store keyed by the `DB-Key` header, as Shelf's
-// `ShelfDBProtocol` does. `--prelude FILE` appends FILE to every source that
+// "not connected", as in Shelf's fixture tests (and `validate` is headless, so
+// it fails them itself), and `db://` requests are answered from an in-memory
+// store keyed by the `DB-Key` header, through `Kiln.hostRequestHandler`, as
+// Shelf answers them. `--prelude FILE` appends FILE to every source that
 // uses `DB.`, the way Shelf's `SourceRewriter` appends its `DB` helper.
 
 /// The Swift source to run from a file: a .swift file as is, or a model reply
@@ -50,6 +51,15 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
             client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
             return
         }
+        let (status, reply) = Self.answer(request)
+        client?.urlProtocol(self, didReceive: HTTPURLResponse(url: url, statusCode: status, httpVersion: "HTTP/1.1", headerFields: nil)!,
+                            cacheStoragePolicy: .notAllowed)
+        if let reply { client?.urlProtocol(self, didLoad: reply) }
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    /// The `db://` store's answer: GET, PUT and DELETE by the `DB-Key` header.
+    static func answer(_ request: URLRequest) -> (Int, Data?) {
         let key = request.value(forHTTPHeaderField: "DB-Key") ?? ""
         var body = request.httpBody ?? Data()
         if body.isEmpty, let stream = request.httpBodyStream {
@@ -64,18 +74,15 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
         }
         var status = 200
         var reply: Data?
-        Self.lock.withLock {
+        lock.withLock {
             switch request.httpMethod ?? "GET" {
-            case "GET": if let value = Self.store[key] { reply = value } else { status = 404 }
-            case "PUT": Self.store[key] = body
-            case "DELETE": Self.store[key] = nil
+            case "GET": if let value = store[key] { reply = value } else { status = 404 }
+            case "PUT": store[key] = body
+            case "DELETE": store[key] = nil
             default: status = 405
             }
         }
-        client?.urlProtocol(self, didReceive: HTTPURLResponse(url: url, statusCode: status, httpVersion: "HTTP/1.1", headerFields: nil)!,
-                            cacheStoragePolicy: .notAllowed)
-        if let reply { client?.urlProtocol(self, didLoad: reply) }
-        client?.urlProtocolDidFinishLoading(self)
+        return (status, reply)
     }
     override func stopLoading() {}
 }
@@ -131,6 +138,12 @@ func round2(_ x: Double) -> Double { (x * 100).rounded() / 100 }
         }
     }
     URLProtocol.registerClass(OfflineProtocol.self)
+    // Since §1.3 `DB` asks the host, at once, instead of blocking on URLSession.
+    Kiln.hostRequestHandler = { request in
+        guard request.url?.scheme == "db" else { return nil }
+        let (status, body) = OfflineProtocol.answer(request)
+        return KilnHostResponse(statusCode: status, body: body)
+    }
     Kiln.randomSeed = 1
 
     var rows: [[String: Any]] = []
