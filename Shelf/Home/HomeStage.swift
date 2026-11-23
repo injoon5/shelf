@@ -60,6 +60,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private var displayLink: CADisplayLink?
     private var openRun: HomeModel.Run?
     private var shownDots: (shown: Bool, count: Int, page: Int)?
+    private var warmedUp = false
     private lazy var launchImpact = UIImpactFeedbackGenerator(style: .light, view: view)
 
     private let edgePan = UIPanGestureRecognizer()
@@ -92,7 +93,11 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
         view.addSubview(home)
         homeView = HomeView(model: model, library: library, overlay: overlay)
-        homeView.onPressApp = { [unowned self] slug in prefetchSnapshot(slug) }
+        homeView.onPressApp = { [unowned self] slug in
+            LaunchTiming.mark("press", slug)
+            prefetchSnapshot(slug)
+            prebuild(slug)
+        }
         home.addSubview(homeView)
         home.addSubview(backdrop)
         list = SearchList(model: model, library: library)
@@ -163,6 +168,13 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         holdAppearance()
+        if !warmedUp {
+            warmedUp = true
+            // Kiln's registry and engine, set up once, after the first frames
+            // and long before a finger can open anything: the first app
+            // opened then builds as fast as the rest.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { Prebuilds.warmUp() }
+        }
         #if DEBUG
         if let held = Demo.searchProgress {
             // As a finger holding a pull there would.
@@ -345,6 +357,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private var iconSize: CGFloat { geometry.iconSize }
 
     private func present(_ run: HomeModel.Run) {
+        LaunchTiming.mark("present", run.id)
         let bounds = view.bounds
         // From search, the card grows out of the row's icon, and the
         // keyboard goes; search stays under the card until it comes back.
@@ -356,7 +369,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
                                         pill: geometry.pillFrame, iconSize: size).frame
         let key = snapshotKey(run.source)
         let cached = snapshots.cached(run.id, key)
-        let card = AppCard(run: run, data: library.data, face: IconFace(run.app.meta),
+        let card = AppCard(run: run, runHost: library.host, permissions: library.permissions.forApp(run.app.meta),
+                           face: IconFace(run.app.meta),
                            surface: cached.map(Self.snapshotView) ?? launchSurface(run.source), screen: bounds.size,
                            iconSize: size, fullRadius: Display.cornerRadius, from: source)
         card.keepsPicture = { [unowned self, slug = run.id, source = run.source] picture in
@@ -394,6 +408,17 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         guard snapshots.cached(slug, key) == nil else { return }
         let scale = traitCollection.displayScale
         Task { [snapshots] in _ = await snapshots.load(slug, key, scale: scale) }
+    }
+
+    /// Starts building `slug` while a finger is down on its icon (plan §0.8
+    /// item 5): its source is parsed off the main thread, and its data's
+    /// pull from the server begins, so both are usually done by the time
+    /// the card comes to rest.
+    private func prebuild(_ slug: String) {
+        guard cards.isEmpty, let source = library.source(for: slug) else { return }
+        Prebuilds.shared.prepare(slug, source: source)
+        let data = library.data
+        Task { await data.prefetch(slug) }
     }
 
     /// What a snapshot of an app with `source` must match to be shown now:
@@ -462,6 +487,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     private func remove(_ card: AppCard) {
+        // The card has landed: the app stops (plan §1.7, §7).
+        card.tearDown()
         card.host.willMove(toParent: nil)
         card.host.view.removeFromSuperview()
         card.host.removeFromParent()

@@ -37,6 +37,9 @@ final class LibraryStore {
     @ObservationIgnored let data: AppData
     /// Each app's launch snapshot (plan §0.8).
     @ObservationIgnored let snapshots: LaunchSnapshots
+    /// Each app's settings (`@AppStorage`) and folder (plan §1.7).
+    @ObservationIgnored let defaults: AppDefaults
+    @ObservationIgnored let files: AppFiles
     /// What each app may use (plan §4.0): the ledger of its answers, and the
     /// gate every API that prompts goes through.
     @ObservationIgnored let permissions: PermissionGate
@@ -66,17 +69,19 @@ final class LibraryStore {
     /// pass their own. Without `permissions`, the ledger is in memory and
     /// nothing is ever asked.
     init(cache: AppCache, data: AppData, layoutURL: URL, server: @escaping @Sendable () -> API?,
-         appStorage: AppStorageKeys = AppStorageKeys(.standard), snapshots: LaunchSnapshots = .standard,
+         defaults: AppDefaults = .standard, files: AppFiles = .standard, snapshots: LaunchSnapshots = .standard,
          permissions: PermissionGate? = nil) {
         let permissions = permissions ?? .inMemory()
         self.cache = cache
         self.data = data
+        self.defaults = defaults
+        self.files = files
         self.snapshots = snapshots
         self.permissions = permissions
         self.layoutURL = layoutURL
         self.server = server
-        engine = SyncEngine(cache: cache, api: server, appStorage: appStorage,
-                            cleanup: .library(cache: cache, appStorage: appStorage, data: data, snapshots: snapshots,
+        engine = SyncEngine(cache: cache, api: server, defaults: defaults, files: files,
+                            cleanup: .library(cache: cache, defaults: defaults, files: files, data: data, snapshots: snapshots,
                                               permissions: permissions))
         isSignedIn = server() != nil
 
@@ -86,6 +91,11 @@ final class LibraryStore {
         lastSynced = index.syncedAt
         layout = (try? JSONDecoder().decode(Layout.self, from: Data(contentsOf: layoutURL))) ?? Layout()
         layout.reconcile(with: apps.map(\.slug))
+    }
+
+    /// What every run of one of the library's apps is given (plan §1.7).
+    var host: AppHost {
+        AppHost(data: data, defaults: defaults, files: files)
     }
 
     /// The server the library talks to: nil while signed out, and always
@@ -443,6 +453,9 @@ final class LibraryStore {
     init(demo apps: [CachedApp], dock: [String] = [], cache: AppCache) {
         self.cache = cache
         data = AppData(root: URL.temporaryDirectory.appending(path: "shelf-demo-data"), api: { nil })
+        // The demo's apps keep their settings and files apart from the real ones.
+        defaults = AppDefaults(legacy: .standard, prefix: "shelf.demo.")
+        files = AppFiles(root: URL.temporaryDirectory.appending(path: "shelf-demo-files", directoryHint: .isDirectory))
         snapshots = LaunchSnapshots(root: URL.temporaryDirectory.appending(path: "shelf-demo-snapshots"))
         // The demo's apps ask for real (the sheet, then iOS), but answer into
         // a ledger of their own.
@@ -451,7 +464,7 @@ final class LibraryStore {
             system: DeviceSystemPermissions(), asker: PermissionSheetAsker())
         layoutURL = cache.root.appending(path: "layout.json")
         server = { nil }
-        engine = SyncEngine(cache: cache, api: server)
+        engine = SyncEngine(cache: cache, api: server, defaults: defaults, files: files)
         isSignedIn = true
         isDemo = true
         self.apps = apps

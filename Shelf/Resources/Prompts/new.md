@@ -90,7 +90,7 @@ If you can't run commands, reply with the code as described above.
 
 ## Saving data
 
-Use `@AppStorage("key")` only for small preferences that wouldn't matter if lost: a `Bool`, `Int`, `Double` or `String`. Other apps can read it.
+Use `@AppStorage("key")` only for small preferences that wouldn't matter if lost: a `Bool`, `Int`, `Double` or `String`. It stays on this device, and each app has its own (so does `UserDefaults.standard`).
 
 Use `DB` for everything else. Shelf provides it, so don't declare your own `DB`. Values are JSON `Data`. DB data syncs to the user's other devices and works offline. Calls return immediately.
 

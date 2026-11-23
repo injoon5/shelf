@@ -281,6 +281,12 @@ final class StubAppPermissions: AppPermissions {
     }
 
     func request(_ capability: Capability) async -> Bool {
+        answer(capability)
+    }
+
+    /// The answer at once, recorded as a request: what a headless check,
+    /// which can't wait, gets (`PermissionsGate.answerWithoutAsking`).
+    func answer(_ capability: Capability) -> Bool {
         requested.append(capability)
         switch statuses[capability] ?? .notAsked {
         case .allowed: return true

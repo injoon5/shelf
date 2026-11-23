@@ -6,9 +6,7 @@ import Foundation
 ///
 /// Each thing Shelf keeps per app is one step. A feature that starts keeping
 /// something per app adds its step in `library(…)`, and from then on both
-/// ways of deleting clear it. Still to come:
-/// - the app's files (§4.1);
-/// - its widgets (§6).
+/// ways of deleting clear it. Still to come: its widgets (§6).
 ///
 /// The layout isn't a step: `LibraryStore` reconciles it with the library
 /// whenever the library changes, which drops the app's slot.
@@ -44,14 +42,16 @@ extension AppCleanup {
     /// demo, whose apps keep no data anyone would miss.
     static func library(
         cache: AppCache,
-        appStorage: AppStorageKeys,
+        defaults: AppDefaults,
+        files: AppFiles,
         data: AppData? = nil,
         snapshots: LaunchSnapshots? = nil,
         permissions: PermissionGate? = nil
     ) -> AppCleanup {
         var cleanup = AppCleanup()
             .adding("source") { cache.removeSource(for: $0) }
-            .adding("@AppStorage") { appStorage.remove(slug: $0) }
+            .adding("settings suite") { defaults.remove(slug: $0) }
+            .adding("files folder") { files.remove($0) }
         if let data {
             // Pending writes go with it, unpushed: the server's copy is going too.
             cleanup = cleanup.adding("DB store") { await data.remove($0) }

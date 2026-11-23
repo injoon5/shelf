@@ -7,7 +7,8 @@ This page is the guide for adding one. It has one worked example per kind:
 - [a view](#a-view);
 - [a modifier](#a-modifier);
 - [a type with an `async` method](#a-type-with-an-async-method);
-- [a host bridge](#a-host-bridge).
+- [a host bridge](#a-host-bridge);
+- [the run's context](#the-runs-context): files, settings, the capability gate, teardown and fakes, which every Round 3 bridge goes through.
 
 ## Where bridges live
 
@@ -210,34 +211,124 @@ r.type("WebPage", .web, notes: "Load a URL or HTML; read title, url and isLoadin
 
 ## A host bridge
 
-The app hosting Kiln registers its own bridges through the public API, with the same overload rules and errors. Values cross as `KilnValue`. Here is Shelf's `DB` in §1.7:
+The app hosting Kiln registers its own bridges through the public API, with the same overload rules and errors. Values cross as `KilnValue`. A host bridge is registered once, for the whole process; what's per run, it reaches through the run's context (`call.context`). Here is Shelf's `DB` (`Shelf/Data/DBBridge.swift`), whose store is the run's own:
 
 ```swift
-Kiln.registerType("DB", notes: "Synced key-value storage: Data under a string key.") { t in
+// Once, at launch.
+Kiln.registerType("DB", notes: "Synced key-value storage: JSON Data under a string key.") { t in
     t.staticMethod("load", "_:string") { call in
-        store.data(for: try call.string(0)).map { KilnValue(data: $0) } ?? .nil
+        guard let store = call.context.provided(DBSession.self) else { throw call.error("DB isn't available here") }
+        return store.value(for: try call.string(0)).map { KilnValue(data: $0.json) } ?? .nil
     }
     t.staticMethod("save", "_:string _:any") { call in
         guard let data = call.value(1)?.data else { throw call.error("needs Data") }
-        store.set(data, for: try call.string(0))
-        return .void
-    }
-    t.staticMethod("remove", "_:string") { call in
-        store.remove(try call.string(0))
+        try call.context.provided(DBSession.self)?.write(…, for: try call.string(0))
         return .void
     }
 }
+
+// Each run.
+let context = KilnContext(slug: app.slug, name: app.name, defaults: suite, files: KilnFiles(root: folder),
+                          capabilities: gate)
+context.provide(session)          // what `call.context.provided(DBSession.self)` finds
+let result = Kiln.run(source, context: context)
 ```
 
 `KilnCall` also has:
 
 - `json(_:)`, an app value encoded as `JSONEncoder` would encode it;
 - `decode(_:as:)`, JSON decoded into the app's type (`T.self` from `call.type(_:)`);
-- `receiver`, `setReceiver(_:)` and `error(_:)`.
+- `receiver`, `setReceiver(_:)` and `error(_:)`;
+- `context`, the run's `KilnContext` (next section).
 
 `KilnValue.async { … }` makes an async member. `Kiln.registerFunction(_:signature:_:)` adds a global function.
 
 Registering a host type again replaces it. Host bridges are in the manifest the running app exports, but not in the checked-in `kiln-manifest.json`, which is Kiln's own.
+
+## The run's context
+
+Every run has a `KilnContext` (PLAN.md §1.7, `Sources/Kiln/Context/`). The host makes one per open of an app and passes it to `Kiln.run(_:context:)`; `Kiln.validate` gets a stub one (`KilnContext.stub()`) unless it's given another, and `Kiln.run(_:)` alone gets `KilnContext.standard()`. A bridge reaches it as `c.context` (`KCall`) or `call.context` (`KilnCall`). It holds:
+
+| | What | A bridge uses |
+|---|---|---|
+| Identity | `slug`, `name` ("Run Tracker") | for messages and prompts |
+| Settings | `defaults`: the app's own `UserDefaults` suite. `@AppStorage` and `UserDefaults.standard` resolve to it | `c.context.defaults` |
+| Files | `files`: the app's folder (`KilnFiles`), laid out as an app container: `Documents`, `Library/Application Support`, `Library/Caches`, `tmp` | `try c.context.files.resolve(url)` |
+| Host values | anything the host put there with `provide(_:)`: Shelf's `DB` session, a fake sensor | `c.context.provided(FakeMotion.self)` |
+| Capabilities | the host's gate for this app (`KilnCapabilityGate`; Shelf's `AppPermissions`) | `c.context.capabilities.request(.location)` |
+| Teardown | what stops when the app's screen closes | `c.context.onTearDown { … }` |
+| Stub | `isStub`: a check, not a real run | use the fake, write nothing that lasts |
+| Errors | `onError`, which the host sets: every check, `body` and runtime error with its line (`KilnError`) | nothing: throw as usual |
+
+### Files
+
+Every path an app names goes through `files.resolve`, which standardizes it (`.` and `..`), follows symbolic links, and throws `KilnFiles.Refusal` for anything outside the folder or not a file URL. `FoundationBridges.file(c, "at")` does that for an argument and turns a refusal into the app's error with its line:
+
+```swift
+t.method("startRecording", "to:URL") { c in
+    let url = try FoundationBridges.file(c, "to")      // in the app's folder, or "Line 9: …: /etc/x is outside the app's folder"
+    …
+}
+```
+
+`URL.documentsDirectory`, `.applicationSupportDirectory`, `.cachesDirectory`, `.temporaryDirectory`, `FileManager.default.urls(for:in:)`, `Data(contentsOf:)`, `data.write(to:)`, `String(contentsOf:encoding:)` and `text.write(to:atomically:encoding:)` already resolve there (`Bridges/Foundation/FileSystem.swift`). A Foundation error the app can catch goes through `FoundationBridges.thrown(error, c)`, which leaves the folder's real place on the device out of the message. The host's Settings reads `files.usage()`.
+
+### Capabilities, as a suspension
+
+Asking is something `await` waits on. `c.context.capabilities.request(_:)` returns a `KSuspension` that resumes with `.bool(allowed)`:
+
+```swift
+// CLLocationManager().requestWhenInUseAuthorization(), then the delegate hears the answer.
+t.method("requestWhenInUseAuthorization", "") { c in
+    let manager = c.object(KLocationManager.self)
+    return .suspension(c.context.capabilities.request(.location))      // `await` resumes with true or false
+}
+
+// Or ask inside the bridge's own async work, then start the real thing only if allowed.
+t.method("requestLocation", "") { c in
+    let context = c.context
+    return .suspension(KSuspension.async(headless: { FakeLocation.here.kv }) {
+        guard await context.capabilities.ask(.location) else { throw KEThrown(value: KBuiltins.errorValue("Location is off for this app")) }
+        return try await RealLocation.once().kv
+    })
+}
+```
+
+- `capabilities.status(.camera)` is the answer without asking (`.notAsked`, `.allowed`, `.denied`), for `authorizationStatus`.
+- Headless (`validate`) or in a stub context, the request never waits and nobody is asked: the gate's `answerWithoutAsking` answers at once. `KilnStubCapabilities` (and Shelf's `StubAppPermissions`) allow everything by default and record each request in `requested`.
+- Cancelling the waiting task, or tearing the run down, resumes it with `false` and withdraws the host's prompt (`cancelRequests`).
+- A host bridge gets the same as a `KilnValue`: `call.context.capabilities.request(.location)`. `capabilities.ask(_:)` is the plain `async -> Bool` form.
+- The capabilities are `KilnCapability`: `camera`, `microphone`, `motion`, `location`, `photoLibraryAdd`, the same raw values as Shelf's `Capability`. What iOS doesn't ask about (the photo picker, files, the raw motion sensors) isn't gated.
+
+### Teardown
+
+Whatever a bridge starts that would outlive the screen registers how to stop it:
+
+```swift
+let manager = CMMotionManager()
+manager.startDeviceMotionUpdates(to: .main) { … }
+let token = c.context.onTearDown { manager.stopDeviceMotionUpdates() }
+// It stopped by itself (the app called stopDeviceMotionUpdates()): teardown needn't.
+token.cancel()
+```
+
+`context.tearDown()` (which `KilnResult.tearDown()` calls, and Shelf calls when a card closes) first cancels the run's tasks and timers, then runs the stoppers, last registered first, each once, then withdraws any permission request still waiting. Nothing of the app's code runs after it. A stopper registered after teardown runs at once. `URLSession`'s `dataTask` registers its cancel this way.
+
+### Stubs and fakes
+
+`KilnContext.stub()` is what a check runs with: empty throwaway settings and folder (removed at teardown), a gate that answers at once, `isStub` set. A bridge in a stub context does nothing real: no sensor, no network (requests fail at once, as offline), no prompt. Round 3's fakes go through `provide`: the host (or a test) provides a fake source, and the bridge prefers it:
+
+```swift
+let source: MotionSource = c.context.provided(FakeMotion.self) ?? (c.context.isStub ? FakeMotion.still : RealMotion())
+```
+
+### Errors
+
+The host sets `context.onError`. It hears each error once, as a `KilnError` with its `phase` (`.check`: the code doesn't parse or has no view; `.body`: a view's `body` failed, so what shows is broken; `.runtime`: an action, a task, a global), `line` and `message`, on the main actor and never during a SwiftUI update. Shelf shows its error screen for `.check` and `.body`.
+
+### Building off the main thread
+
+`Kiln.parse(source)` runs on any thread and returns a `KilnParsedSource`, which `Kiln.run(_:context:)` takes on the main actor. Shelf parses when a finger lands on the icon, so the card's open isn't held up by it.
 
 ## Protocols, environment values, property wrappers
 
