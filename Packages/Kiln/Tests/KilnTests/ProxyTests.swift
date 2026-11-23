@@ -456,7 +456,7 @@ final class ProxyTests: XCTestCase {
         var view = KAnimatableView(app: KAppValue(type: counter, value: .structV(KStructValue(type: counter, fields: ["value": .double(1)])), interp))
         XCTAssertEqual(view.animatableData, KAnimVector([1]))
         view.animatableData = KAnimVector([7])
-        XCTAssertEqual(view.app.structValue?.fields["value"], .double(7))
+        XCTAssertEqual(KAnimatable.applied(view.app, view.animatableData).structValue?.fields["value"], .double(7))
         result.tearDown()
     }
 

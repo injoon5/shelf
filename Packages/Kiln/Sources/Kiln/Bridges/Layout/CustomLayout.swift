@@ -213,13 +213,26 @@ extension KInterpreter {
 
 /// The app's `Layout`: SwiftUI asks it to size and place the subviews, and
 /// it asks the app's methods.
+///
+/// SwiftUI may lay out on its render thread while it animates, and the app's
+/// code runs on the main thread: off it, a call waits for the main thread
+/// (`KDelegates.onMain`). `animatableData` is kept, and given to the app's
+/// value when a method runs.
 struct KLayoutProxy: Layout, @unchecked Sendable {
-    var app: KAppValue
+    let base: KAppValue
+    var data: KAnimVector
     typealias Cache = KLayoutCache
 
+    @MainActor init(app: KAppValue) {
+        base = app
+        data = KAnimatable.data(app)
+    }
+
+    @MainActor var app: KAppValue { KAnimatable.applied(base, data) }
+
     nonisolated var animatableData: KAnimVector {
-        get { MainActor.assumeIsolated { KAnimatable.data(app) } }
-        set { MainActor.assumeIsolated { KAnimatable.setData(&app, newValue) } }
+        get { data }
+        set { data = newValue }
     }
 
     private static func cacheBinding(_ cache: KLayoutCache) -> KV {
@@ -227,9 +240,9 @@ struct KLayoutProxy: Layout, @unchecked Sendable {
     }
 
     nonisolated func makeCache(subviews: Subviews) -> KLayoutCache {
-        MainActor.assumeIsolated {
+        KDelegates.onMain {
             let cache = KLayoutCache()
-            if app.implements("makeCache", labels: ["subviews"]) {
+            if base.implements("makeCache", labels: ["subviews"]) {
                 var a = app
                 cache.value = a.callReporting("makeCache", [LayoutBridges.subviews(subviews)], labels: ["subviews"])
             }
@@ -239,11 +252,11 @@ struct KLayoutProxy: Layout, @unchecked Sendable {
 
     nonisolated func updateCache(_ cache: inout KLayoutCache, subviews: Subviews) {
         let c = cache
-        MainActor.assumeIsolated {
+        KDelegates.onMain {
             var a = app
-            if app.implements("updateCache", labels: [nil, "subviews"]) {
+            if base.implements("updateCache", labels: [nil, "subviews"]) {
                 _ = a.callReporting("updateCache", [Self.cacheBinding(c), LayoutBridges.subviews(subviews)], labels: [nil, "subviews"])
-            } else if app.implements("makeCache", labels: ["subviews"]) {
+            } else if base.implements("makeCache", labels: ["subviews"]) {
                 c.value = a.callReporting("makeCache", [LayoutBridges.subviews(subviews)], labels: ["subviews"])
             }
         }
@@ -251,7 +264,7 @@ struct KLayoutProxy: Layout, @unchecked Sendable {
 
     nonisolated func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout KLayoutCache) -> CGSize {
         let c = cache
-        return MainActor.assumeIsolated {
+        return KDelegates.onMain {
             var a = app
             let v = a.callReporting("sizeThatFits", [LayoutBridges.proposal(proposal), LayoutBridges.subviews(subviews), Self.cacheBinding(c)],
                                     labels: ["proposal", "subviews", "cache"], fallback: .nilValue)
@@ -262,7 +275,7 @@ struct KLayoutProxy: Layout, @unchecked Sendable {
 
     nonisolated func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout KLayoutCache) {
         let c = cache
-        MainActor.assumeIsolated {
+        KDelegates.onMain {
             var a = app
             _ = a.callReporting("placeSubviews", [.native(.rect(bounds.minX, bounds.minY, bounds.width, bounds.height)), LayoutBridges.proposal(proposal),
                                                   LayoutBridges.subviews(subviews), Self.cacheBinding(c)],

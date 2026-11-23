@@ -404,6 +404,23 @@ enum KAnimatable {
         }
     }
 
+    /// The app's `path(in:)` for `rect`, with `data` (SwiftUI's interpolated
+    /// animatable data) written into the value first.
+    static func path(_ app: KAppValue, _ data: KAnimVector, _ rect: CGRect) -> Path {
+        var a = app
+        if !data.values.isEmpty, data != Self.data(app) { setData(&a, data) }
+        let r = KV.native(.rect(rect.minX, rect.minY, rect.width, rect.height))
+        if case .native(.path(let box)) = a.callReporting("path", [r], labels: ["in"], fallback: .nilValue) { return box.value.path }
+        return Path()
+    }
+
+    /// The app's value with SwiftUI's interpolated data in it.
+    static func applied(_ app: KAppValue, _ data: KAnimVector) -> KAppValue {
+        var a = app
+        if !data.values.isEmpty, data != Self.data(app) { setData(&a, data) }
+        return a
+    }
+
     /// Whether the app's type animates anything (so a proxy bothers).
     static func animates(_ t: KType) -> Bool {
         !t.animatableProperties.isEmpty || t.computed["animatableData"] != nil || t.storedDecl("animatableData") != nil

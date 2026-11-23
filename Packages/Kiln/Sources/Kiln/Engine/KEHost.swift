@@ -141,15 +141,22 @@ struct KHostView: View {
 /// The app's `ViewModifier` (PLAN.md §1.5): SwiftUI's content goes to its
 /// `body(content:)`. Animatable, so an `Animatable` modifier interpolates.
 struct KModifierProxy: ViewModifier, Animatable {
-    var app: KAppValue
+    let app: KAppValue
+    /// Kept, not the app's code: SwiftUI interpolates it on its render thread.
+    var data: KAnimVector
+
+    init(app: KAppValue) {
+        self.app = app
+        data = KAnimatable.data(app)
+    }
 
     nonisolated var animatableData: KAnimVector {
-        get { MainActor.assumeIsolated { KAnimatable.data(app) } }
-        set { MainActor.assumeIsolated { KAnimatable.setData(&app, newValue) } }
+        get { data }
+        set { data = newValue }
     }
 
     func body(content: Content) -> some View {
-        if let s = app.structValue {
+        if let s = KAnimatable.applied(app, data).structValue {
             KModifierHost(value: s, interp: app.interp, content: AnyView(content))
         } else {
             content

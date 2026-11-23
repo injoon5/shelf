@@ -20,6 +20,7 @@ extension DrawingBridges {
     static func animatable(_ r: KRegistry) {
         r.proxy("Shape") { app in AnyShape(KUserShape(app: app)) }
         r.proxy("InsettableShape") { app in AnyShape(KUserShape(app: app)) }
+        // Drawn as a view (`KShapeHost`) wherever the app's shape is shown; as a `Shape` value above.
 
         r.protocolBridge("Animatable", .drawing, requirements: ["animatableData?"], support: .full,
                          notes: "A shape, view or `ViewModifier` with `animatableData` (a number, `AnimatablePair`, `CGPoint`, `Angle`…) or `@Animatable` is interpolated frame by frame inside `withAnimation`.") { app in
@@ -61,15 +62,22 @@ extension DrawingBridges {
 /// The app's `Animatable` view: SwiftUI interpolates its `animatableData`,
 /// and each frame's value is shown by the usual host (with its `@State`).
 struct KAnimatableView: View, Animatable {
-    var app: KAppValue
+    let app: KAppValue
+    /// Kept, not the app's code: SwiftUI interpolates it on its render thread.
+    var data: KAnimVector
+
+    init(app: KAppValue) {
+        self.app = app
+        data = KAnimatable.data(app)
+    }
 
     nonisolated var animatableData: KAnimVector {
-        get { MainActor.assumeIsolated { KAnimatable.data(app) } }
-        set { MainActor.assumeIsolated { KAnimatable.setData(&app, newValue) } }
+        get { data }
+        set { data = newValue }
     }
 
     var body: some View {
-        if let s = app.structValue { KHostView(value: s, interp: app.interp) }
+        if let s = KAnimatable.applied(app, data).structValue { KHostView(value: s, interp: app.interp) }
     }
 }
 
