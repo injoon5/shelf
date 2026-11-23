@@ -136,7 +136,6 @@ struct FeatureFixtureTests {
 
     @Test(arguments: [
         ("Canvas", #"Canvas { context, size in }"#, "Canvas isn't supported"),
-        ("Path as a view", #"Path { p in p.addRect(CGRect(x: 0, y: 0, width: 9, height: 9)) }"#, "Path isn't supported"),
         ("glassEffect", #"Text("x").glassEffect()"#, ".glassEffect()"),
         ("matchedGeometryEffect", #"Text("x").matchedGeometryEffect(id: "x", in: space)"#, ".matchedGeometryEffect()"),
     ])
@@ -144,6 +143,12 @@ struct FeatureFixtureTests {
         let rendered = try Self.render(Self.claimSource(body))
         let all = rendered.warnings + rendered.errors
         #expect(all.contains { $0.contains(warning) }, "\(claim) now works? \(all)")
+    }
+
+    /// "What works": a `Path` drawn directly, as a shape (PLAN.md §1.4 made `Path` a value).
+    @Test func pathDrawsAsAView() throws {
+        let rendered = try Self.render(Self.claimSource(#"Path { p in p.addRect(CGRect(x: 0, y: 0, width: 9, height: 9)) }.stroke(.blue)"#))
+        #expect(rendered.errors.isEmpty && rendered.warnings.isEmpty, "\(rendered)")
     }
 
     // MARK: Waiting (PLAN.md §1.3, §1.11's "real async works")

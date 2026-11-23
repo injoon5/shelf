@@ -34,6 +34,7 @@
 > - One engine: the original interpreter is deleted (see [One engine](#one-engine)).
 > - A differential harness: `Kiln.transcript` and `Tools/diff.sh` compare everything a run shows against the engine before a change, on every input ([Benchmarks/differential.md](Benchmarks/differential.md)).
 > - Code that can wait: `async`/`await` really suspends and resumes, on frames that live on the heap (see [Code that can wait](#code-that-can-wait)).
+> - A registry of bridges: every native view, modifier, type and function is declared once, by family, with its SwiftUI overloads; anything it doesn't have is an error with its line, and it exports `kiln-manifest.json` (see [Bridges](#bridges)).
 > - A coverage report: [COVERAGE.md](COVERAGE.md) compares Kiln with every view, modifier and style in the iOS SDK (see [Coverage](#coverage)).
 >
 > The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
@@ -175,9 +176,29 @@ Code with no `await` in it runs on the tree-walker, straight through. A function
 
 Why this and not a bytecode VM for all code, yet: [Benchmarks/README.md](Benchmarks/README.md#13-code-that-can-wait).
 
+## Bridges
+
+Everything native that an app's code can name is a bridge in one registry (`Sources/Kiln/Registry/`), declared in its family's folder (`Sources/Kiln/Bridges/Controls/`, `Layout/`, `Navigation/`, `Drawing/`, `Language/`, `Foundation/` and so on):
+
+- **views**, each with the overloads SwiftUI declares (`Toggle(_:isOn:)`, `Toggle(isOn:label:)`) and how it's built;
+- **modifiers**, the same way;
+- **types** (`Date`, `URLSession`, `String`): initializers, static members, properties and methods, where an `async` method returns what `await` waits on;
+- **global functions** (`print`, `withAnimation`);
+- **protocols** an app's types adopt, environment values and property wrappers, as declarations.
+
+A call picks its overload by labels and by how each argument is written (a closure, a string literal), as Swift does, then by what the running OS has. Each argument is evaluated against its parameter's kind: `.font(.title)` against `Font`, a title's string literal as a `LocalizedStringKey`, a binding checked to be one. The bridge gets values, through helpers that read the same everywhere (`c.binding("selection", Date.self)`, `c.content()`).
+
+**Nothing is skipped silently.** An unknown modifier is `Line 12: Kiln doesn't support the .glassEffect() modifier`, an unknown view is `Cannot find 'Canvas3D' in scope`, and a call no overload takes says which ones there are. Modifiers Kiln accepts without an effect yet (`.sensoryFeedback`, `.focused`, `.gesture`) are declared as stubs, and the manifest says so.
+
+The registry exports [`kiln-manifest.json`](kiln-manifest.json) (format: [Docs/manifest.md](Docs/manifest.md)), which the coverage report ([COVERAGE.md](COVERAGE.md)) and Shelf's prompt read. `Tools/manifest.sh` rewrites it; a test fails when it's stale.
+
+**The host adds its own** with the same rules: `Kiln.registerType("DB") { t in t.staticMethod("load", "_:string") { call in … } }`.
+
+How to add a bridge, with an example of each kind: [Docs/bridges.md](Docs/bridges.md).
+
 ## Checked against the engine before
 
-`Tools/diff.sh` runs every input (the example apps and replies, Shelf's fixtures, the workloads, the SwiftUI in Kiln's tests) on the engine at a base commit and on this checkout, and compares their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action. Inputs meant to differ are listed, with the reason, in `Tools/diff-expected.txt`. The last run is [Benchmarks/differential.md](Benchmarks/differential.md).
+`Tools/diff.sh` runs every input (the example apps and replies, Shelf's fixtures, the workloads, the SwiftUI in Kiln's tests) on the engine at a base commit (by default `b466f9c`, the engine before the registry) and on this checkout, and compares their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action. Inputs meant to differ are listed, with the reason, in `Tools/diff-expected.txt`. The last run is [Benchmarks/differential.md](Benchmarks/differential.md).
 
 ## API
 
@@ -192,6 +213,23 @@ public enum Kiln {
     @MainActor static var hostImageProvider: ((String) -> Image?)?
     /// Requests the host answers at once, before the network (Shelf's db://; §1.7 replaces it).
     @MainActor static var hostRequestHandler: ((URLRequest) -> KilnHostResponse?)?
+    /// A host bridge: a native type the app's code can name (Docs/bridges.md).
+    @MainActor static func registerType(_ name: String, family: KilnFamily = .host, notes: String? = nil, _ build: (KilnTypeBuilder) -> Void)
+    @MainActor static func registerFunction(_ name: String, signature: String? = nil, family: KilnFamily = .host, notes: String? = nil,
+                                            _ run: @escaping (KilnCall) throws -> KilnValue)
+    /// kiln-manifest.json's contents, the host's bridges included.
+    @MainActor static func manifestJSON() throws -> Data
+}
+
+public struct KilnTypeBuilder {   // initializer, staticProperty, staticMethod, property, method
+    func staticMethod(_ name: String, _ signature: String? = nil, notes: String? = nil, _ run: @escaping (KilnCall) throws -> KilnValue)
+    …
+}
+public final class KilnCall {      // the arguments: string(_:), int(_:), double(_:), bool(_:), value(_:), json(_:), decode(_:as:), error(_:)
+    var receiver: KilnValue; var line: Int
+}
+public struct KilnValue {          // .void, .nil, (string:), (int:), (double:), (bool:), (date:), (url:), (data:), (array:), (dictionary:),
+                                   // (object:type:), .async { … }
 }
 
 public struct KilnResult {
@@ -210,6 +248,7 @@ public struct KilnRandom: RandomNumberGenerator { init(seed: UInt64?) }
 Kiln interprets; it does not compile, so some things are out of reach:
 
 - No UIKit or AppKit bridges (`UIViewRepresentable`), no SwiftData or Core Data, no third-party packages.
+- Only what's in the registry runs. A view, modifier or initializer it doesn't have, or argument labels SwiftUI doesn't have, stop the code with an error and a line; [COVERAGE.md](COVERAGE.md) lists what's there.
 - `await` inside an `if` or `switch` *expression*, on the left of an assignment, or in a `case` pattern isn't supported; use a statement. Inside an expression, the parts that wait are evaluated before the rest of it.
 - Protocols are accepted but conformance is not checked; user-defined property wrappers and result builders are not supported.
 
