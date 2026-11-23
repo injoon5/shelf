@@ -1,6 +1,8 @@
 import Foundation
 import Kiln
 import os
+import QuartzCore
+import SwiftUI
 
 /// What Shelf gives every run of an app (plan §1.7): its data, its settings,
 /// its folder, and source parsed ahead of time.
@@ -172,6 +174,63 @@ final class Prebuilds {
     /// Kiln's registry and engine, warmed while nothing is moving: the first
     /// app opened after launch then builds as fast as the rest.
     static func warmUp() {
-        _ = Kiln.validate("import SwiftUI\nstruct ContentView: View { var body: some View { Text(\"\") } }", ticks: 1)
+        let start = CACurrentMediaTime()
+        let context = KilnContext.stub(slug: "warm-up", name: "Warm-up")
+        let result = Kiln.run(warmUpSource, context: context)
+        defer { result.tearDown() }
+        guard let view = result.view else { return }
+        // Drawn offscreen once: SwiftUI's and the renderer's first-time costs
+        // go here instead of into the first app's first frame.
+        let renderer = ImageRenderer(content: view.frame(width: 390, height: 600))
+        renderer.scale = 1
+        _ = renderer.uiImage
+        LaunchTiming.log.debug("warm-up \(Int((CACurrentMediaTime() - start) * 1000), privacy: .public) ms")
     }
+
+    /// The views apps use most, once each.
+    private static let warmUpSource = """
+    import SwiftUI
+    struct Item: Identifiable { let id = UUID(); var name: String; var done = false }
+    struct ContentView: View {
+        @State private var items = [Item(name: "One"), Item(name: "Two", done: true)]
+        @State private var text = ""
+        @State private var on = true
+        @State private var value = 0.5
+        var body: some View {
+            NavigationStack {
+                List {
+                    Section("Items") {
+                        ForEach(items) { item in
+                            HStack {
+                                Image(systemName: item.done ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(.tint)
+                                Text(item.name).font(.headline)
+                                Spacer()
+                                Text(Date(), style: .time).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    Section {
+                        TextField("Name", text: $text)
+                        Toggle("On", isOn: $on)
+                        Slider(value: $value)
+                        Button("Add") { items.append(Item(name: text)) }
+                            .buttonStyle(.borderedProminent)
+                    }
+                }
+                .navigationTitle("Warm-up")
+                .toolbar { Button("Edit", systemImage: "pencil") {} }
+            }
+            .overlay {
+                VStack(spacing: 8) {
+                    RoundedRectangle(cornerRadius: 12).fill(.blue.gradient).frame(height: 40)
+                    ProgressView(value: value)
+                    Label("Label", systemImage: "star").padding().background(.thinMaterial, in: Capsule())
+                }
+                .padding()
+                .opacity(0.01)
+            }
+        }
+    }
+    """
 }

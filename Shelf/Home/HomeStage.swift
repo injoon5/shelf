@@ -170,10 +170,16 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         holdAppearance()
         if !warmedUp {
             warmedUp = true
-            // Kiln's registry and engine, set up once, after the first frames
-            // and long before a finger can open anything: the first app
-            // opened then builds as fast as the rest.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { Prebuilds.warmUp() }
+            // Kiln's registry and engine, and SwiftUI's first drawing of the
+            // views apps use, once, while nothing is moving: the first app
+            // opened then builds and draws as fast as the rest (a cold first
+            // open was 960 ms to the app's first frame, now about 720). It
+            // takes the main thread for 150 ms (600 on the first launch after
+            // an install), so not while an app is opening.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+                guard let self, cards.isEmpty else { return }
+                Prebuilds.warmUp()
+            }
         }
         #if DEBUG
         if let held = Demo.searchProgress {

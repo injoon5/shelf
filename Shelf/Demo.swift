@@ -88,9 +88,73 @@ enum Demo {
                       cachedVersion: index == 4 ? nil : "demo", isNew: index == 2)
         }
         let cache = AppCache(root: URL.temporaryDirectory.appending(path: "shelf-demo"))
-        for app in cached { try? cache.writeSource(source, for: app.slug) }
+        for app in cached { try? cache.writeSource(sources[app.slug] ?? source, for: app.slug) }
         return LibraryStore(demo: cached, dock: all.isEmpty ? [] : ["habits", "todos"], cache: cache)
     }
+
+    /// Demo apps that keep something: Habits its count in `@AppStorage`,
+    /// Todos its list in `DB`, so a value surviving a close and a relaunch
+    /// can be seen.
+    static let sources: [String: String] = [
+        "habits": """
+        // Name: Habits
+        // Icon: checkmark.circle.fill
+        // Tint: green
+        import SwiftUI
+
+        struct ContentView: View {
+            @AppStorage("count") private var count = 0
+            var body: some View {
+                NavigationStack {
+                    List {
+                        Section("Kept with @AppStorage") {
+                            Stepper("Count: \\(count)", value: $count)
+                        }
+                    }
+                    .navigationTitle("Habits")
+                }
+            }
+        }
+        """,
+        "todos": """
+        // Name: Todos
+        // Icon: checklist
+        // Tint: blue
+        import SwiftUI
+
+        struct Todo: Identifiable, Codable, Equatable {
+            var id = UUID()
+            var title: String
+        }
+
+        struct ContentView: View {
+            @State private var todos: [Todo] = []
+            @State private var loadFailed = false
+            var body: some View {
+                NavigationStack {
+                    List {
+                        Section("Kept with DB") {
+                            ForEach(todos) { todo in Text(todo.title) }
+                                .onDelete { todos.remove(atOffsets: $0) }
+                        }
+                    }
+                    .navigationTitle("Todos")
+                    .toolbar {
+                        Button("Add", systemImage: "plus") { todos.append(Todo(title: "Todo \\(todos.count + 1)")) }
+                    }
+                    .onAppear {
+                        if let data = DB.load("todos") {
+                            if let saved = try? JSONDecoder().decode([Todo].self, from: data) { todos = saved } else { loadFailed = true }
+                        }
+                    }
+                    .onChange(of: todos) {
+                        if !loadFailed, let data = try? JSONEncoder().encode(todos) { DB.save("todos", data) }
+                    }
+                }
+            }
+        }
+        """,
+    ]
 
     static let source = """
     // Name: Demo
