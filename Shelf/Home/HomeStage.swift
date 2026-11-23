@@ -307,7 +307,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     private func present(_ run: HomeModel.Run) {
         let bounds = view.bounds
-        let icon = layout.iconFrame(run.id, preferResult: input.isSearching || search.isOpen)
+        let icon = iconFrame(run.id, preferResult: input.isSearching || search.isOpen)
         let source = CardMotion.landing(icon: icon, screenWidth: bounds.width,
                                         pill: layout.geometry.pillFrame, iconSize: iconSize).frame
         let face = CardFace(IconFace(run.app.meta), style: settings.iconStyle,
@@ -329,11 +329,20 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
         // An app deleted while its card was up has no icon to land on, even
         // if SwiftUI hasn't yet taken the icon's frame away.
-        let icon = library.app(card.slug) == nil ? nil : layout.iconFrame(card.slug, preferResult: false)
+        let icon = library.app(card.slug) == nil ? nil : iconFrame(card.slug, preferResult: false)
         let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
                                          pill: layout.geometry.pillFrame, iconSize: iconSize)
         card.close(to: landing.frame, fades: landing.fades, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
         startTicking()
+    }
+
+    /// Where `slug`'s icon is: as its view last reported it, or, for an
+    /// icon on a page out of view, which reports nothing, where the layout
+    /// puts it.
+    private func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
+        if let reported = layout.iconFrame(slug, preferResult: preferResult) { return reported }
+        guard let slot = library.layout.slot(of: slug) else { return nil }
+        return layout.geometry.iconFrame(at: slot, dockCount: library.layout.dock.count, page: model.page)
     }
 
     private func land(_ card: AppCard) {

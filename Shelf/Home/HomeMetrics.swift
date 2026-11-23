@@ -251,6 +251,20 @@ struct HomeGeometry: Equatable {
                        y: gridTop + iconSize / 2 + CGFloat(row) * rowPitch)
     }
 
+    /// Where the icon at `slot` is drawn while `page` is in view and the
+    /// dock holds `dockCount`: an icon on another page is a whole page's
+    /// width off to that side. What a card lands on when no view has
+    /// reported the icon's frame, as happens for pages out of view.
+    func iconFrame(at slot: Layout.Slot, dockCount: Int, page: Int) -> CGRect {
+        let center = switch slot {
+        case .dock(let index):
+            dockCenter(index, of: dockCount)
+        case .page(let p, let index):
+            iconCenter(index).applying(.init(translationX: CGFloat(p - page) * size.width, y: 0))
+        }
+        return CGRect(x: center.x - iconSize / 2, y: center.y - iconSize / 2, width: iconSize, height: iconSize)
+    }
+
     /// The grid slot nearest a point on a page, clamped to `count` slots.
     func gridIndex(at point: CGPoint, count: Int) -> Int {
         let column = min(max(Int(((point.x - sideInset - iconSize / 2) / columnPitch).rounded()), 0), Layout.columns - 1)
