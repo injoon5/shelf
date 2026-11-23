@@ -56,6 +56,11 @@ enum Demo {
     static let searchProgress: CGFloat? = UserDefaults.standard.object(forKey: "ShelfSearchProgress") == nil
         ? nil : CGFloat(UserDefaults.standard.double(forKey: "ShelfSearchProgress"))
 
+    /// The demo's server refuses every Delete App, this long after it was
+    /// asked: `-ShelfDemoDeleteFails YES`. The icon leaves, then comes back.
+    static let deleteFails = UserDefaults.standard.bool(forKey: "ShelfDemoDeleteFails")
+    static let deleteFailDelay: Double = 1
+
     static func library() -> LibraryStore {
         // `-ShelfDemoEmpty YES` shows the empty library instead.
         let defaults = UserDefaults.standard
