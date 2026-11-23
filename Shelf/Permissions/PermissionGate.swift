@@ -126,6 +126,8 @@ final class PermissionGate {
         asker.dismiss(for: slug)
         for (key, task) in inFlight where key.slug == slug {
             task.cancel()
+            // A request made from now on starts afresh, not on the cancelled one.
+            inFlight[key] = nil
         }
     }
 
