@@ -67,6 +67,7 @@ These were pasted in during the session; they are **not** from the simulator and
 | `real-device-longpress-menu-settings-style.png` | Long-press menu with Remove App / Require Face ID / Share App / Edit Home Screen and the widget-size row | The menu opens *beside* the lifted icon, and everything else dims. |
 | `real-device-extra-2.png` | Long-press menu on a different icon (Developer) with labels visible | Same menu style; the other icons' labels are dimmed along with the icons. |
 | `app-library-search.png` | App Library search (framed mockup of a real device, scaled) | The target for Shelf's search (PLAN.md §0.3): field and round ✕ on top (Shelf puts them at the bottom), letter sections, icon + name rows with hairline separators from the name's edge, a cloud glyph for apps not downloaded, the A–Z # index on the right, over a heavily blurred, darkened Home Screen. Structure only; measure from a simulator capture. |
+| `glass-icon-1.png` … `glass-icon-4.png` | Four iOS 27 Home Screen icons, close up | The look Shelf's icons should get (PLAN.md, Glass icons): rim highlight, light at the edges, depth in the glyph. Capture fresh ones from the simulator before copying details. |
 
 ## Not captured, and why
 

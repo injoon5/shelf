@@ -574,6 +574,17 @@ The system asks once for Shelf, and Shelf decides per app:
 
 ---
 
+## Glass icons (just before Round 5)
+
+Shelf's icons are flat. They should look like iOS 27's, which have depth: a lit rim, light caught at the edges, and a glyph that sits in the glass. References: `design/reference/springboard/glass-icon-1.png` to `-4.png` (local only).
+
+**Hand this to a subagent: the Fable model, at high effort.** Its brief:
+- capture reference icons from a real iOS 27 simulator (Springboard at 3x, light and dark, close up);
+- copy the details into Shelf's `IconView` (§0.2);
+- compare side by side with the captures until they match.
+
+---
+
 ## 6. Round 5: widgets on Shelf's Home Screen
 
 Apps declare widgets in their own file, with ordinary WidgetKit code, and Shelf shows them on its own Home Screen next to the icons, as Springboard does. All of it runs inside Shelf. There's no widget extension, no App Group, and no memory limit beyond the app's own, and a widget reads the same `DB` as its app, in the same process.
@@ -651,7 +662,8 @@ Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later
 3. The §1.3 VM spike against the fixtures. Go, or switch to the fallback.
 4. §1.4 to §1.11: the registry, porting, proxies, language fixes, context, checker, coverage. Merge when §1.11 holds. Then the second half of §0.8 (building off the main thread).
 5. Round 1. Then Round 2, Round 3 and Round 4, each on its own branch, each merged when its "done when" holds.
-6. Round 5, widgets on Shelf's Home Screen. It can move ahead of Rounds 2–4 if wanted.
+6. Glass icons, designed by a Fable subagent at high effort, just before Round 5.
+7. Round 5, widgets on Shelf's Home Screen. It can move ahead of Rounds 2–4 if wanted, and glass icons move with it.
 
 For Kiln work, every merge includes: the coverage report regenerated, the prompt regenerated, new fixtures, Lab parity, no benchmark regressions, and the README updated.
 
