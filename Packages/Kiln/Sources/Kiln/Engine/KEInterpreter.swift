@@ -960,7 +960,8 @@ final class KInterpreter {
         if let box = t.staticBoxes[name] { return box.value }
         guard let decl = t.staticDecls[name] else {
             if let c = t.enumCase(name) { return .enumV(KEnumValue(type: t, caseName: c.name, payload: [])) }
-            throw fail("Type '\(t.name)' has no member '\(name)'")
+            // What Swift synthesizes (`allCases`), static methods, nested types: `Kind.allCases.map { … }`.
+            return try staticMember(t, name, 0)
         }
         let ctx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
         if decl.isComputed {

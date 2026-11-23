@@ -178,4 +178,29 @@ final class LanguageTests: XCTestCase {
         print(pets.filter { $0 is Dog }.count)
         """, prints: "a makes a sound\nd barks\np barks\n2\n")
     }
+
+    func testConformanceDecidesWhatWorks() {
+        expect("""
+        struct Point { var x = 0 }
+        print(Point() == Point())
+        """, fails: "Binary operator '==' can't compare two 'Point' values: 'Point' isn't Equatable")
+        expect("""
+        enum Size { case s, m }
+        print(Size.allCases)
+        """, fails: "Type 'Size' has no member 'allCases': add `: CaseIterable`")
+        expect("""
+        struct Box { var w = 1 }
+        print([Box(), Box()].sorted())
+        """, fails: "'Box' isn't Comparable")
+        // Synthesized where Swift synthesizes them, and inherited through protocols.
+        expect("""
+        enum Size: CaseIterable { case s, m }
+        protocol Keyed: Hashable {}
+        struct Tag: Keyed { var name = "a" }
+        enum Load { case idle, busy(Int) }
+        print(Size.allCases.map { "\\($0)" }.joined(separator: ","), Size.s == .s, Tag() == Tag(), Set([Tag(), Tag()]).count)
+        let p: Load? = nil
+        print(p == nil)
+        """, prints: "s,m true true 1\ntrue\n")
+    }
 }

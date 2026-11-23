@@ -273,6 +273,9 @@ extension KInterpreter {
 
     func staticMember(_ t: KType, _ name: String, _ line: Int) throws -> KV {
         if name == "allCases", t.isEnum, t.staticDecls["allCases"] == nil {
+            guard t.conformances.contains("CaseIterable") else {
+                throw fail("Type '\(t.name)' has no member 'allCases': add `: CaseIterable` to its declaration", line)
+            }
             return .array(t.cases.filter { $0.associated.isEmpty }.map { .enumV(KEnumValue(type: t, caseName: $0.name, payload: [])) })
         }
         if name == "self" { return .type(.user(t)) }
@@ -487,8 +490,10 @@ extension KInterpreter {
         let b = try eval(r, env, typeRef(of: a) ?? numericContext)
         if case .native(.implicit) = a, let t = typeRef(of: b) { a = coerce(a, to: t) }
         switch op {
-        case "==": return .bool(equal(a, coerce(b, to: typeRef(of: a))))
-        case "!=": return .bool(!equal(a, coerce(b, to: typeRef(of: a))))
+        case "==", "!=":
+            let rhs = coerce(b, to: typeRef(of: a))
+            try requireEquatable(a, rhs, op, line)
+            return .bool(equal(a, rhs) == (op == "=="))
         case "===": return .bool(equal(a, b))
         case "!==": return .bool(!equal(a, b))
         case "<", ">", "<=", ">=": return .bool(try compare(op, a, b, line))
@@ -501,6 +506,25 @@ extension KInterpreter {
 
     func equal(_ a: KV, _ b: KV) -> Bool { a == b }
 
+    /// `a == b` needs Equatable, as in Swift: an enum without payloads has it;
+    /// a struct, a class or an enum with payloads declares it (or `Hashable`,
+    /// `Comparable`…) or writes `static func ==`. Comparing with `nil` is fine.
+    func requireEquatable(_ a: KV, _ b: KV, _ op: String, _ line: Int) throws {
+        guard !a.isNil, !b.isNil else { return }
+        for v in [a, b] {
+            guard let t = v.userType, !t.conformances.contains("Equatable"), t.staticMethods["=="] == nil else { continue }
+            throw fail("Binary operator '\(op)' can't compare two '\(t.name)' values: '\(t.name)' isn't Equatable. Add `: Equatable` to its declaration", line)
+        }
+    }
+
+    /// Ordering an app's type needs Comparable: `<`, `sorted()`, `max()`.
+    func comparableFailure(_ a: KV, _ b: KV, _ line: Int) -> KERuntimeError {
+        if let t = a.userType ?? b.userType {
+            return fail("'\(t.name)' isn't Comparable: add `: Comparable` and `static func <`, or sort with sorted(by:)", line)
+        }
+        return fail("Can't compare \(describe(a)) and \(describe(b))", line)
+    }
+
     func compare(_ op: String, _ a: KV, _ b: KV, _ line: Int) throws -> Bool {
         let c: Int
         switch (a, b) {
@@ -508,6 +532,7 @@ extension KInterpreter {
         case (.string(let x), .string(let y)): c = x < y ? -1 : (x > y ? 1 : 0)
         case (.native(.date(let x)), .native(.date(let y))): c = x < y ? -1 : (x > y ? 1 : 0)
         case (.enumV(let x), .enumV(let y)) where x.type === y.type:
+            guard x.type.conformances.contains("Comparable") || x.type.staticMethods["<"] != nil else { throw comparableFailure(a, b, line) }
             if x.type.methods["<"] != nil || x.type.staticMethods["<"] != nil, let f = x.type.staticMethods["<"]?.first {
                 let lt = truthy(try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv))
                 let gt = truthy(try invoke(f, args: [b, a], labels: [nil, nil], selfContext: nil, parent: globalEnv))
@@ -528,7 +553,7 @@ extension KInterpreter {
             let gt = truthy(try invoke(f, args: [b, a], labels: [nil, nil], selfContext: nil, parent: globalEnv))
             c = lt ? -1 : (gt ? 1 : 0)
         default:
-            guard let x = a.asDouble, let y = b.asDouble else { throw fail("Can't compare \(describe(a)) and \(describe(b))", line) }
+            guard let x = a.asDouble, let y = b.asDouble else { throw comparableFailure(a, b, line) }
             c = x < y ? -1 : (x > y ? 1 : 0)
         }
         switch op {
