@@ -1,0 +1,139 @@
+{
+  "entries": [
+    {
+      "id": "mapkit-views",
+      "what": "MapKit views (`Map`, `Marker`, Look Around)",
+      "reason": "Too much for the value. Geocoding stays (§4.6).",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "families": ["Maps"] }
+    },
+    {
+      "id": "custom-cameras",
+      "what": "Custom cameras with `AVCaptureSession`",
+      "reason": "A live preview layer and session management; `UIImagePickerController` covers taking a photo (§4.3).",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "ids": ["modifier:onCameraCaptureEvent", "content:CameraCaptureAccessory"] }
+    },
+    {
+      "id": "metal-shaders",
+      "what": "Metal shaders (`colorEffect`, `distortionEffect`, `layerEffect` with `ShaderLibrary`)",
+      "reason": "They need a compiled Metal library, and run off the main thread at frame rate.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "ids": ["modifier:colorEffect", "modifier:distortionEffect", "modifier:layerEffect", "type:Shader", "type:ShaderLibrary"] }
+    },
+    {
+      "id": "swiftdata-coredata",
+      "what": "SwiftData, Core Data",
+      "reason": "`DB` is the synced store.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "families": ["Data"] }
+    },
+    {
+      "id": "background-modes",
+      "what": "Background modes (location, audio, refresh)",
+      "reason": "Apps run only while their card is open.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "ids": ["modifier:Scene.backgroundTask"] }
+    },
+    {
+      "id": "documents-windows-scenes",
+      "what": "iOS 27's `Document` protocol, documents, multiple windows and scenes, commands",
+      "reason": "A Shelf app is one screen inside a card. `WindowGroup` stays: it's the app's root.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": [
+        { "idPatterns": ["^modifier:Scene\\."] },
+        { "kinds": ["content"], "conformsTo": ["Scene", "Commands", "SceneAccessoryContent"], "except": ["content:WindowGroup"] },
+        { "families": ["Scenes"], "names": ["DocumentLaunchView", "NewDocumentButton", "openWindow", "dismissWindow", "pushWindow", "openDocument", "newDocument", "documentConfiguration", "supportsMultipleWindows", "openImmersiveSpace", "dismissImmersiveSpace", "supportsRemoteScenes", "navigationDocument", "focusedSceneValue", "focusedSceneObject", "handlesExternalEvents", "sceneAccessory", "windowToolbarFullScreenVisibility", "allowsWindowActivationEvents", "staticAllowsWindowActivationEvents", "onInteractiveResizeChange", "dismissWindowBehavior", "windowResizability", "openSettings", "documentBrowserContextMenu", "documentLaunchTitle", "documentLaunchSubtitle"] }
+      ]
+    },
+    {
+      "id": "uikit-beyond-allowlist",
+      "what": "UIKit beyond the representable allowlist (`UIApplicationDelegateAdaptor`)",
+      "reason": "Each controller is bridged on purpose, and the app delegate is Shelf's.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "ids": ["wrapper:UIApplicationDelegateAdaptor"] }
+    },
+    {
+      "id": "health-home-accessories",
+      "what": "Bluetooth, NFC, HealthKit, HomeKit (and WorkoutKit)",
+      "reason": "Entitlements, or delegate-heavy APIs for little use here.",
+      "status": "wontDo",
+      "source": "PLAN.md Won't do",
+      "match": { "modules": ["_HomeKit_SwiftUI", "_WorkoutKit_SwiftUI", "_SecureElementCredential_SwiftUI"] }
+    },
+    {
+      "id": "translation",
+      "what": "Translation (`translationPresentation`, `translationTask`)",
+      "reason": "On PLAN.md's Later list.",
+      "status": "later",
+      "source": "PLAN.md Later",
+      "match": { "families": ["Translation"] }
+    },
+    {
+      "id": "storekit",
+      "what": "StoreKit views and purchase modifiers",
+      "reason": "Purchases need App Store products and an app record; Shelf apps aren't sold through the App Store.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["Store"] }
+    },
+    {
+      "id": "wallet-apple-pay",
+      "what": "Apple Pay and Wallet buttons",
+      "reason": "They need a merchant ID, pass type IDs and entitlements that Shelf can't grant per app.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["Wallet"] }
+    },
+    {
+      "id": "3d-and-games",
+      "what": "RealityKit, SceneKit and SpriteKit views, game controllers",
+      "reason": "Scene graphs of subclassed native nodes, run at frame rate; see subclassing native classes. `Canvas` and `TimelineView` cover 2D games.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["3D & Games"] }
+    },
+    {
+      "id": "musickit",
+      "what": "MusicKit views (`ArtworkImage`, the music picker, subscription offer)",
+      "reason": "MusicKit is registered per bundle ID, so every app would share Shelf's.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["Media"] }
+    },
+    {
+      "id": "sign-in-with-apple",
+      "what": "Sign in with Apple",
+      "reason": "Needs an entitlement and server-side token checks per app.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["Sign-in"] }
+    },
+    {
+      "id": "system-services",
+      "what": "Siri and Shortcuts views, Screen Time, managed apps, PermissionKit, device discovery, screen capture",
+      "reason": "Entitlement-gated, or they register the app with the system, which a Shelf app can't do.",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": { "families": ["System services"] }
+    },
+    {
+      "id": "xcode-previews",
+      "what": "Xcode previews (`#Preview`, `@Previewable`, `preview*` modifiers)",
+      "reason": "There's no canvas in Shelf; `#Preview` blocks are skipped when read (§1.6).",
+      "status": "wontDo",
+      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "match": [
+        { "ids": ["macro:Preview", "macro:Previewable"] },
+        { "kinds": ["modifier"], "patterns": ["^preview(Context|Device|DisplayName|InterfaceOrientation|Layout)$"] }
+      ]
+    }
+  ]
+}

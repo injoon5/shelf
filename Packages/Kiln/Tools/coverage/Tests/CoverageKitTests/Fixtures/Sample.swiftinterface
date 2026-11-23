@@ -1,0 +1,141 @@
+// swift-interface-format-version: 1.0
+// swift-module-flags: -target arm64e-apple-ios27.1 -module-name SampleUI -package-name SampleUI
+import Swift
+@_exported import SwiftUICore
+import _Concurrency
+@available(iOS 13.0, macOS 10.15, *)
+public protocol View {
+  associatedtype Body : SwiftUICore::View
+  @SwiftUICore::ViewBuilder @_Concurrency::MainActor @preconcurrency var body: Self.Body { get }
+}
+public protocol Animatable {
+}
+@available(iOS 13.0, *)
+public protocol Shape : SampleUI.Animatable, SwiftUICore.View, Swift.Sendable {
+  func path(in rect: CoreGraphics.CGRect) -> SampleUI.Path
+}
+public protocol ToolbarContent {
+}
+public protocol CustomizableToolbarContent : SampleUI.ToolbarContent {
+}
+public protocol Gesture {
+  associatedtype Value
+}
+public struct Path {
+}
+#if compiler(>=5.3) && $TildeSendable
+@available(iOS 16.0, macOS 13.0, *)
+nonisolated public struct Gadget<Label> : SwiftUICore.View, ~Swift.Sendable where Label : SwiftUICore.View {
+  public var body: some SwiftUICore.View {
+    get
+  }
+}
+#else
+@available(iOS 16.0, macOS 13.0, *)
+nonisolated public struct Gadget<Label> : SwiftUICore.View where Label : SwiftUICore.View {
+  public var body: some SwiftUICore.View {
+    get
+  }
+}
+#endif
+@available(iOS 16.0, macOS 13.0, *)
+extension SampleUI.Gadget where Label == SwiftUICore.Text {
+  public init(_ titleKey: SwiftUICore.LocalizedStringKey, selection: SwiftUICore.Binding<Foundation.Date>)
+  @_alwaysEmitIntoClient public init<S>(_ title: S, isOn: SwiftUICore.Binding<Swift.Bool>) where S : Swift.StringProtocol {
+    self.init(title, selection: .constant(.now)) { "{ not a brace }" }
+  }
+}
+@available(iOS, unavailable)
+@available(macOS 14.0, *)
+public struct MacOnlyView : SwiftUICore.View {
+  public var body: Swift.Never { get }
+}
+public struct _HiddenView : SwiftUICore.View {
+}
+public struct Wedge : SampleUI.Shape {
+  public func path(in rect: CoreGraphics.CGRect) -> SampleUI.Path
+}
+@available(iOS 13.0, macOS 10.15, *)
+extension SwiftUICore.View {
+  nonisolated public func gadgetPadding(_ length: CoreGraphics.CGFloat) -> some SwiftUICore.View
+
+  @available(iOS 27.0, macOS 27.0, *)
+  nonisolated public func gadgetPadding(_ edges: SwiftUICore.Edge.Set = .all, length: CoreGraphics.CGFloat? = nil) -> some SwiftUICore.View
+
+  @available(iOS, unavailable)
+  nonisolated public func macOnlyModifier() -> some SwiftUICore.View
+
+  @available(iOS, introduced: 13.0, deprecated: 17.0, message: "Use gadgetPadding")
+  nonisolated public func oldPadding() -> some SwiftUICore.View
+
+  @available(iOS, introduced: 15.0, deprecated: 100000.0, message: "Soon")
+  nonisolated public func softDeprecated() -> some SwiftUICore.View
+
+  @inlinable nonisolated public func inlined(_ value: Swift.Int) -> SwiftUICore.ModifiedContent<Self, SampleUI.EmptyModifier> {
+    if value > 0 {
+      return modifier(EmptyModifier())
+    }
+    return modifier(EmptyModifier())
+  }
+
+  public func helper() -> Swift.Int
+
+  nonisolated public func _privateModifier() -> some SwiftUICore.View
+}
+@available(anyAppleOS 27, *)
+extension SwiftUICore::View {
+  nonisolated public func swipeThing(isEnabled: Swift::Bool = true, @SwiftUICore::ViewBuilder content: () -> some SwiftUICore::View) -> some SwiftUICore::View
+}
+extension SampleUI.Shape {
+  public func rotation(_ angle: SwiftUICore.Angle) -> SampleUI.RotatedShape<Self>
+  public func fill<S>(_ content: S) -> some SwiftUICore.View where S : SwiftUICore.ShapeStyle
+}
+@available(iOS 26.0, *)
+public struct Spacer : SampleUI.ToolbarContent, SampleUI.CustomizableToolbarContent {
+  public init()
+}
+@available(iOS 27.0, *)
+extension SampleUI.CustomizableToolbarContent {
+  public func priority(_ p: Swift.Int) -> some SampleUI.CustomizableToolbarContent
+}
+public struct Swish : SampleUI.Gesture {
+  public typealias Value = Swift.Void
+  public init(minimumDistance: CoreGraphics.CGFloat = 10)
+}
+extension SampleUI.Gesture {
+  public func onEnded(_ action: @escaping (Self.Value) -> Swift.Void) -> SampleUI._EndedGesture<Self>
+}
+@available(iOS 15.0, *)
+@preconcurrency @_Concurrency.MainActor public protocol PrimitiveGadgetStyle {
+}
+@available(iOS 15.0, *)
+public struct FancyGadgetStyle : SampleUI.PrimitiveGadgetStyle {
+  public init()
+}
+@available(iOS 15.0, *)
+extension SampleUI.PrimitiveGadgetStyle where Self == SampleUI.FancyGadgetStyle {
+  @export(implementation) nonisolated public static var fancy: SampleUI.FancyGadgetStyle {
+    get {
+        .init()
+    }
+  }
+}
+public struct Animation {
+}
+extension SampleUI.Animation {
+  public static let bouncy: SampleUI.Animation
+  public static func spring(duration: Swift.Double = 0.5, bounce: Swift.Double = 0.0) -> SampleUI.Animation
+}
+public struct EnvironmentValues {
+}
+extension SampleUI.EnvironmentValues {
+  public var gadgetTint: SwiftUICore.Color? {
+    get
+    set
+  }
+}
+@frozen @propertyWrapper public struct Remembered<Value> {
+  public var wrappedValue: Value { get nonmutating set }
+}
+public func == (lhs: SampleUI.Path, rhs: SampleUI.Path) -> Swift.Bool
+public macro Entry() = #externalMacro(module: "SwiftUIMacros", type: "EntryMacro")
