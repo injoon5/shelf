@@ -19,6 +19,9 @@ enum PromptCatalog {
             var summary: String
             var supported: Int
             var stubs: Int
+            /// "What works" in one line, written by Kiln for a family that's
+            /// nearly all of SwiftUI's; nil lists the family's names.
+            var line: String?
         }
         struct Gap: Decodable {
             var id: String
@@ -77,6 +80,11 @@ enum PromptCatalog {
         var out: [String] = []
         for f in listedFamilies(m) {
             let working = m.symbols.filter { $0.family == f.name && $0.support != "stub" }
+            if let line = f.line {
+                out.append("- **\(f.name):** \(line).")
+                for note in notes(working) { out.append("  - \(note)") }
+                continue
+            }
             var groups: [[String]] = []
             groups.append(names(working.filter { ["view", "content", "gesture"].contains($0.kind) }))
             groups.append(names(working.filter { $0.kind == "wrapper" }))

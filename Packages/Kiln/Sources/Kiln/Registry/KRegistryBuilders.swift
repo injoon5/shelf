@@ -106,6 +106,18 @@ extension KRegistry {
         add(b)
     }
 
+    /// An environment value read from SwiftUI's own environment where the
+    /// view is shown, and optionally written by `.environment(\.name, v)`.
+    func liveEnvironment(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil,
+                         file: String = #fileID, read: @escaping @MainActor (EnvironmentValues, KInterpreter) -> KV,
+                         write: (@MainActor (AnyView, KV, KCall) -> AnyView)? = nil) {
+        let b = KEnvironmentBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file))
+        b.value = { interp in read(EnvironmentValues(), interp) }
+        b.live = read
+        b.write = write
+        add(b)
+    }
+
     func wrapper(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil, file: String = #fileID) {
         add(KWrapperBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file)))
     }
@@ -205,6 +217,8 @@ struct KModifierBuilder {
     func text(_ f: @escaping @MainActor (KCall, Text) -> Text?) { bridge.text = f }
 
     func styles(_ owner: String, _ names: [String]) { bridge.styles = (owner, names) }
+    /// Sample arguments `Kiln.validate` passes a closure argument, by label.
+    func probe(_ f: @escaping @MainActor (String?, KInterpreter) -> [KV]?) { bridge.probe = f }
     var owner: String? { get { bridge.owner } nonmutating set { bridge.owner = newValue } }
 }
 

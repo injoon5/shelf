@@ -10,20 +10,16 @@ final class ListsBridges: KBridgeFamily {
     override class func register(into r: KRegistry) {
         views(r)
         rows(r)
+        collections(r)
     }
 
     // MARK: Views
 
     static func views(_ r: KRegistry) {
-        r.view("List", .lists, support: .partial, notes: "Rows, sections, `onDelete` and `onMove`; `selection:` isn't kept.") { v in
-            v.forms(["selection:binding? content:content", "_:any id:any? selection:binding? content:content"]) { c in
-                if let data = c.first, c.a.lastFunction != nil, c.a.firstIsUnlabeled, !c.r.isFunction(data) {
-                    let rows = c.r.forEachRows(c.a)
-                    List { ForEach(rows) { row in c.r.renderList(row.views) } }
-                } else {
-                    List { c.content() }
-                }
-            }
+        r.view("List", .lists, notes: "Rows, sections, `ForEach` with `onDelete` and `onMove`; `selection:` one value (an optional) or a `Set` (with `EditButton`); `children:` for an outline.") { v in
+            v.forms(["selection:binding? content:content", "_:any id:any? selection:binding? rowContent:content",
+                     "_:any id:any? editActions:any selection:binding? rowContent:content",
+                     "_:any id:any? children:any selection:binding? rowContent:content"]) { c in list(c) }
         }
         r.view("Form", .lists) { v in
             v.form("content:content") { c in Form { c.content() } }
@@ -33,10 +29,22 @@ final class ListsBridges: KBridgeFamily {
                 let rows = c.r.forEachRows(c.a)
                 ForEach(rows) { row in c.r.renderList(row.views) }
             }
+            v.forms(["_:any editActions:any content:content", "_:any id:any editActions:any content:content"]) { c in editableRows(c) }
+            // `ForEach(subviews: content) { subview in … }` (Layout/Subviews.swift).
+            v.forms(["subviews:any content:content", "sections:any content:content"]) { c in LayoutBridges.forEachSubview(c) }
         }
         r.view("Section", .lists) { v in
             v.forms(["_:title content:content", "content:content header:content? footer:content?", "header:any footer:any? content:content",
                      "footer:any content:content"]) { c in section(c) }
+            v.forms(["_:title isExpanded:binding content:content", "isExpanded:binding content:content header:content"]) { c in
+                if let b = c.kbinding("isExpanded") {
+                    if let t = ControlsBridges.stringTitle(c) {
+                        Section(t, isExpanded: c.r.boolBinding(b)) { c.content("content") }
+                    } else {
+                        Section(isExpanded: c.r.boolBinding(b)) { c.content("content") } header: { c.content("header") }
+                    }
+                }
+            }
         }
         r.view("GroupBox", .lists) { v in
             v.forms(["_:title content:content", "content:content label:content", "label:any content:content", "content:content"]) { c in
@@ -47,6 +55,10 @@ final class ListsBridges: KBridgeFamily {
                 } else {
                     GroupBox { c.r.renderContent(c.a.lastFunction) }
                 }
+            }
+            // Inside a `GroupBoxStyle`'s `makeBody`.
+            v.form("_:any") { c in
+                if let conf = KStyles.configuration(c[0], "GroupBoxStyle"), let native = conf.native as? GroupBoxStyleConfiguration { GroupBox(native) }
             }
         }
         r.view("DisclosureGroup", .lists, support: .partial) { v in
@@ -128,27 +140,35 @@ final class ListsBridges: KBridgeFamily {
                 }
             }
         }
-        r.modifier("listRowSeparator", .lists, support: .partial) { m in
-            m.form("_:Visibility edges:any?") { c, view in
-                if c.symbol(0) == "hidden" { view.listRowSeparator(.hidden) } else { view }
+        r.modifier("listRowSeparator", .lists) { m in
+            m.form("_:Visibility edges:any?") { c, view in view.listRowSeparator(KControlValues.visibility(c[0]), edges: verticalEdges(c["edges"])) }
+        }
+        r.modifier("listRowInsets", .lists) { m in
+            m.form("_:any?") { c, view in
+                if let e = KLayout.edgeInsets(c[0]) { view.listRowInsets(e) } else if c[0]?.isNil == false { view.listRowInsets(EdgeInsets()) } else { view.listRowInsets(nil) }
+            }
+            m.form("_:Edge.Set _:number?", introduced: "26.0") { c, view in
+                if #available(iOS 26.0, macOS 26.0, *) { AnyView(view.listRowInsets(c.edges(0), c.cg(1))) } else { view }
             }
         }
-        r.modifier("listRowInsets", .lists, support: .partial, notes: "Always zero insets.") { m in
-            m.form("_:any?") { _, view in view.listRowInsets(EdgeInsets()) }
+        r.modifier("listSectionSeparator", .lists) { m in
+            m.form("_:Visibility edges:any?") { c, view in view.listSectionSeparator(KControlValues.visibility(c[0]), edges: verticalEdges(c["edges"])) }
         }
-        r.modifier("listSectionSeparator", .lists, support: .stub) { m in m.stub(["_:Visibility edges:any?"]) }
-        r.modifier("headerProminence", .lists, support: .stub) { m in m.stub(["_:Prominence"]) }
+        r.modifier("headerProminence", .lists) { m in
+            m.form("_:Prominence") { c, view in view.headerProminence(c.symbol(0) == "increased" ? .increased : .standard) }
+        }
         r.modifier("scrollContentBackground", .lists) { m in
-            m.form("_:Visibility") { c, view in
-                if c.symbol(0) == "hidden" { view.scrollContentBackground(.hidden) } else { view }
-            }
+            m.form("_:Visibility") { c, view in view.scrollContentBackground(KControlValues.visibility(c[0])) }
         }
-        r.modifier("swipeActions", .lists, support: .partial, notes: "On `List` rows.") { m in
+        r.modifier("swipeActions", .lists, notes: "On `List` rows, and (iOS 27) on any view in a scroll view marked `.swipeActionsContainer()`.") { m in
             m.form("edge:HorizontalEdge? allowsFullSwipe:bool? content:content") { c, view in
                 let content = c.content("content")
                 view.swipeActions(edge: c.symbol("edge") == "leading" ? .leading : .trailing,
                                   allowsFullSwipe: c.bool("allowsFullSwipe", default: true)) { content }
             }
+            m.form("edge:HorizontalEdge? allowsFullSwipe:bool? content:content onPresentationChanged:closure", introduced: "27.0") { c, view in swipeActionsNotified(c, view) }
+            m.probe { label, _ in label == "onPresentationChanged" ? [.bool(true)] : [] }
+            m.form("edge:HorizontalEdge? allowsFullSwipe:bool? content:content", receiver: "TabContent") { _, view in view }
         }
     }
 

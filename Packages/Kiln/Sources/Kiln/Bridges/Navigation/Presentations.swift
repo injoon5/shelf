@@ -8,11 +8,18 @@ import SwiftUI
 extension NavigationBridges {
     static func presentations(_ r: KRegistry) {
         for name in ["sheet", "fullScreenCover", "popover"] {
-            r.modifier(name, .navigation, support: name == "popover" ? .partial : .full,
-                       notes: name == "popover" ? "Shown as a sheet." : nil) { m in
+            r.modifier(name, .navigation,
+                       notes: name == "popover" ? "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`." : nil) { m in
                 let extra = name == "popover" ? "attachmentAnchor:any? arrowEdge:any? " : "onDismiss:action? "
                 m.forms(["isPresented:binding \(extra)content:content", "item:binding \(extra)content:content"]) { c, view in sheet(c, view, name) }
+                if name == "popover" {
+                    m.form("isPresented:binding attachmentAnchor:any? arrowEdge:any? content:content", receiver: "TabContent") { _, view in view }
+                }
             }
+        }
+        r.modifier("popoverCore", .navigation, introduced: "18.1", notes: "Shown as `.popover`.") { m in
+            m.forms(["isPresented:binding attachmentAnchor:any arrowEdges:any? isDetachable:bool content:content",
+                     "item:binding attachmentAnchor:any arrowEdges:any? content:content"]) { c, view in sheet(c, view, "popover") }
         }
         r.modifier("alert", .navigation, support: .partial, notes: "Buttons and a message; or the old `Alert(title:message:dismissButton:)`, shown with one OK button.") { m in
             m.forms(["_:title isPresented:binding actions:content", "_:title isPresented:binding actions:content message:content",
@@ -41,19 +48,12 @@ extension NavigationBridges {
             t.initializer("title:any message:any? primaryButton:any secondaryButton:any") { c in .tuple(c.args, c.labels) }
             t.initializer { c in .tuple(c.args, c.labels) }
         }
-        r.modifier("presentationDetents", .navigation) { m in
-            m.form("_:any selection:binding?") { c, view in view.presentationDetents(detents(c[0])) }
-        }
-        r.modifier("presentationDragIndicator", .navigation, support: .partial, notes: "Always visible.") { m in
-            m.form("_:Visibility") { _, view in view.presentationDragIndicator(.visible) }
-        }
-        r.modifier("presentationCornerRadius", .navigation, support: .stub) { m in m.stub(["_:number?"]) }
-        r.modifier("interactiveDismissDisabled", .navigation, support: .stub) { m in m.stub(["_:bool?"]) }
         r.modifier("contextMenu", .navigation, support: .partial, notes: "Its menu items; `preview:` isn't shown.") { m in
             m.forms(["menuItems:content", "menuItems:content preview:content"]) { c, view in
                 let content = c.content("menuItems")
                 view.contextMenu { content }
             }
+            m.form("menuItems:content", receiver: "TabContent") { _, view in view }
         }
     }
 
@@ -73,6 +73,7 @@ extension NavigationBridges {
         let r = c.r
         guard let fn = c.last, r.isFunction(fn) else { return view }
         let onDismiss = r.action(c["onDismiss"])
+        if name == "popover" { return popover(c, view, fn) }
         if let b = c.kbinding("item") {
             let item = Binding<KSheetItem?>(get: { let v = b.get(); return v.isNil ? nil : KSheetItem(value: v) },
                                             set: { b.set($0?.value ?? .nilValue) })
@@ -90,7 +91,27 @@ extension NavigationBridges {
             return AnyView(view.fullScreenCover(isPresented: shown, onDismiss: onDismiss) { KLazyView { r.renderContent(fn) } })
         }
         #endif
-        return AnyView(view.sheet(isPresented: shown, onDismiss: onDismiss) { KLazyView { r.renderContent(fn) } })
+        return AnyView(KZoomScope { view.sheet(isPresented: shown, onDismiss: onDismiss) { KLazyView { r.renderContent(fn) } } })
+    }
+
+    @MainActor static func popover(_ c: KCall, _ view: AnyView, _ fn: KV) -> AnyView {
+        let r = c.r
+        let edge: Edge? = {
+            switch c.symbol("arrowEdge") ?? c.symbol("arrowEdges") {
+            case "top": return .top
+            case "bottom": return .bottom
+            case "leading": return .leading
+            case "trailing": return .trailing
+            default: return nil
+            }
+        }()
+        if let b = c.kbinding("item") {
+            let item = Binding<KSheetItem?>(get: { let v = b.get(); return v.isNil ? nil : KSheetItem(value: v) },
+                                            set: { b.set($0?.value ?? .nilValue) })
+            return AnyView(view.popover(item: item, arrowEdge: edge) { it in KLazyView { r.renderContent(fn, [it.value]) } })
+        }
+        guard let b = c.kbinding("isPresented") else { return view }
+        return AnyView(view.popover(isPresented: r.boolBinding(b), arrowEdge: edge) { KLazyView { r.renderContent(fn) } })
     }
 
     @MainActor static func alert(_ c: KCall, _ view: AnyView) -> AnyView {

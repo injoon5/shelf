@@ -139,6 +139,8 @@ final class KInterpreter {
     var builtinConformances: [String: Set<String>] = [:]
     /// `@Entry var accent = Color.blue` in `extension EnvironmentValues` (KEMacros), by owner and name.
     var entries: [String: [String: KEVarDecl]] = [:]
+    /// Which app types read a live environment value (KEHost), by type.
+    var liveEnvironmentTypes: [ObjectIdentifier: Bool] = [:]
     /// The short names of nested types (`CodingKeys`), so other names skip that lookup.
     var nestedNames: Set<String> = []
 

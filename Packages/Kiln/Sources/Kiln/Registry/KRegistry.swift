@@ -110,6 +110,24 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         }
     }
 
+    /// "What works" for the family in one tight line, written by hand when
+    /// its symbols are nearly all of SwiftUI's and listing them would be long.
+    /// nil: the prompt lists the family's names. Keep it true as bridges change.
+    public var promptLine: String? {
+        switch self {
+        case .controls:
+            return "every SwiftUI control and style: `Button` (`.glass`, `.glassProminent`), `Toggle`, `Picker`, `DatePicker` (`.graphical`), `MultiDatePicker`, `Slider` (`SliderTick`), `Stepper`, `ColorPicker`, `TextField`, `SecureField`, `TextEditor`, `Menu` (`primaryAction:`), `ControlGroup`, `Gauge`, `ProgressView`, `LabeledContent`, `RenameButton`, `Link`; your own `ButtonStyle`, `ToggleStyle`, `LabelStyle` and the other `makeBody(configuration:)` styles"
+        case .layout:
+            return "stacks, grids, `ScrollView` with `ScrollPosition`, `.paging` and `.viewAligned` targets, `.scrollTransition` and the `onScroll…` events, `GeometryReader`, `.onGeometryChange`, `ViewThatFits`, `.containerRelativeFrame`, `.safeAreaInset`, `.contentMargins`, `.alignmentGuide`, `Group(subviews:)` and `ForEach(subviews:)` with `.containerValue`, your own `Layout`, iOS 27.1's `ArrangementView`, and every frame, padding and scroll modifier"
+        case .lists:
+            return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
+        case .navigation:
+            return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        default:
+            return nil
+        }
+    }
+
     /// The folder under `Sources/Kiln/Bridges/`, and the suffix of its class.
     var folder: String {
         switch self {
@@ -477,6 +495,10 @@ final class KViewBridge: KBridge {
 final class KModifierBridge: KBridge {
     /// `.name`, for messages.
     lazy var display = "." + name
+    /// What `Kiln.validate` (and the transcript) pass a closure argument
+    /// that isn't view content, by its label: `alignmentGuide`'s
+    /// `computeValue` gets a `ViewDimensions`. nil: called with nothing.
+    var probe: (@MainActor (String?, KInterpreter) -> [KV]?)?
     struct Form {
         let overload: KOverload
         /// The view with the modifier applied. `c.base` is the description of
@@ -569,6 +591,12 @@ final class KProtocolBridge: KBridge {
 /// An `@Environment` value: its default, before the view sees SwiftUI's.
 final class KEnvironmentBridge: KBridge {
     var value: @MainActor (KInterpreter) -> KV = { _ in .nilValue }
+    /// Read from SwiftUI's real environment where the view is shown
+    /// (`\.editMode`, `\.isSearching`): a view that reads one is hosted
+    /// inside a reader of `EnvironmentValues`.
+    var live: (@MainActor (EnvironmentValues, KInterpreter) -> KV)?
+    /// Written by `.environment(\.key, value)`.
+    var write: (@MainActor (AnyView, KV, KCall) -> AnyView)?
 }
 
 /// A property wrapper the engine implements (`@State`, `@AppStorage`).
@@ -578,6 +606,11 @@ final class KWrapperBridge: KBridge {}
 
 @MainActor
 final class KRegistry {
+    /// Properties of SwiftUI's symbolic values (`phase.isScrolling` on
+    /// `.idle`, `mode.isEditing` on `.active`), by property name: nil when the
+    /// value isn't one the bridge knows.
+    var implicitProperties: [String: @MainActor (String, [KV]) -> KV?] = [:]
+
     /// Kiln's own bridges plus the host's.
     static let shared: KRegistry = {
         let r = KRegistry()

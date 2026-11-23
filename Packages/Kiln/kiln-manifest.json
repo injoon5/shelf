@@ -8,34 +8,38 @@
       "supported" : 27
     },
     {
+      "line" : "every SwiftUI control and style: `Button` (`.glass`, `.glassProminent`), `Toggle`, `Picker`, `DatePicker` (`.graphical`), `MultiDatePicker`, `Slider` (`SliderTick`), `Stepper`, `ColorPicker`, `TextField`, `SecureField`, `TextEditor`, `Menu` (`primaryAction:`), `ControlGroup`, `Gauge`, `ProgressView`, `LabeledContent`, `RenameButton`, `Link`; your own `ButtonStyle`, `ToggleStyle`, `LabelStyle` and the other `makeBody(configuration:)` styles",
       "name" : "Controls",
       "stubs" : 0,
       "summary" : "buttons, toggles, pickers, sliders, text fields and the other controls",
-      "supported" : 61
+      "supported" : 138
     },
     {
       "name" : "Text",
       "stubs" : 0,
       "summary" : "text and fonts",
-      "supported" : 42
+      "supported" : 50
     },
     {
+      "line" : "stacks, grids, `ScrollView` with `ScrollPosition`, `.paging` and `.viewAligned` targets, `.scrollTransition` and the `onScroll…` events, `GeometryReader`, `.onGeometryChange`, `ViewThatFits`, `.containerRelativeFrame`, `.safeAreaInset`, `.contentMargins`, `.alignmentGuide`, `Group(subviews:)` and `ForEach(subviews:)` with `.containerValue`, your own `Layout`, iOS 27.1's `ArrangementView`, and every frame, padding and scroll modifier",
       "name" : "Layout",
-      "stubs" : 3,
+      "stubs" : 0,
       "summary" : "stacks, grids, scroll views, frames and padding",
-      "supported" : 96
+      "supported" : 163
     },
     {
+      "line" : "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier",
       "name" : "Lists",
-      "stubs" : 2,
+      "stubs" : 0,
       "summary" : "lists, forms and sections",
-      "supported" : 21
+      "supported" : 49
     },
     {
+      "line" : "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`",
       "name" : "Navigation",
-      "stubs" : 4,
+      "stubs" : 0,
       "summary" : "navigation stacks, tabs, toolbars, sheets and alerts",
-      "supported" : 40
+      "supported" : 184
     },
     {
       "name" : "Gestures",
@@ -63,9 +67,9 @@
     },
     {
       "name" : "Accessibility",
-      "stubs" : 5,
+      "stubs" : 3,
       "summary" : "accessibility labels, hints and values",
-      "supported" : 3
+      "supported" : 10
     },
     {
       "name" : "Charts",
@@ -203,6 +207,22 @@
   "schemaVersion" : 1,
   "symbols" : [
     {
+      "family" : "Navigation",
+      "id" : "content:AnyTabContent",
+      "introduced" : "18.0",
+      "kind" : "content",
+      "name" : "AnyTabContent",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "content:AreaMark",
       "kind" : "content",
@@ -247,6 +267,24 @@
       ],
       "source" : "Sources/Kiln/Charts.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "content:DefaultToolbarItem",
+      "introduced" : "26.0",
+      "kind" : "content",
+      "name" : "DefaultToolbarItem",
+      "notes" : "Moves the system's `.search`, `.sidebarToggle` or `.title` item.",
+      "overloads" : [
+        {
+          "labels" : [
+            "kind",
+            "placement"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -356,17 +394,70 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "content:SliderTick",
+      "kind" : "content",
+      "name" : "SliderTick",
+      "notes" : "In a `Slider`'s `ticks:`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "label"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "content:SliderTickContentForEach",
+      "kind" : "content",
+      "name" : "SliderTickContentForEach",
+      "notes" : "In a `Slider`'s `ticks:`: one `SliderTick` per element.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Navigation",
       "id" : "content:Tab",
       "kind" : "content",
       "name" : "Tab",
-      "notes" : "With a title, `systemImage:` and `value:`; `role:` is ignored.",
+      "notes" : "A title with `systemImage:` or `image:`, `value:` for `TabView(selection:)`, and `role: .search`.",
       "overloads" : [
         {
           "labels" : [
             "_",
             "image",
             "value",
+            "role",
             "content"
           ]
         },
@@ -381,6 +472,45 @@
           "labels" : [
             "_",
             "systemImage",
+            "role",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "systemImage",
+            "value",
+            "role",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "role",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "role",
+            "content",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
             "value",
             "role",
             "content"
@@ -395,8 +525,37 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "content:TabSection",
+      "introduced" : "18.0",
+      "kind" : "content",
+      "name" : "TabSection",
+      "notes" : "Groups tabs in the iPad sidebar; on iPhone its tabs are in the tab bar.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content",
+            "header"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -419,7 +578,7 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -427,16 +586,79 @@
       "id" : "content:ToolbarItemGroup",
       "kind" : "content",
       "name" : "ToolbarItemGroup",
-      "notes" : "In `.toolbar { }`, by placement.",
+      "notes" : "In `.toolbar { }`: several items at one placement.",
       "overloads" : [
         {
           "labels" : [
             "placement",
             "content"
           ]
+        },
+        {
+          "labels" : [
+            "placement",
+            "content",
+            "label"
+          ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "content:ToolbarOverflowMenu",
+      "introduced" : "27.0",
+      "kind" : "content",
+      "name" : "ToolbarOverflowMenu",
+      "notes" : "Items for the toolbar's overflow (…) menu.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "content:ToolbarSpacer",
+      "introduced" : "26.0",
+      "kind" : "content",
+      "name" : "ToolbarSpacer",
+      "notes" : "Separates toolbar items: `.flexible` (the default) or `.fixed`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "placement"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "content:ToolbarTitleMenu",
+      "kind" : "content",
+      "name" : "ToolbarTitleMenu",
+      "notes" : "A menu on the navigation title.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -468,6 +690,17 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "environment:buttonRepeatBehavior",
+      "kind" : "environment",
+      "name" : "buttonRepeatBehavior",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Environment",
       "id" : "environment:calendar",
       "kind" : "environment",
@@ -490,6 +723,39 @@
       "support" : "full"
     },
     {
+      "family" : "Controls",
+      "id" : "environment:controlSize",
+      "kind" : "environment",
+      "name" : "controlSize",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "environment:defaultMinListHeaderHeight",
+      "kind" : "environment",
+      "name" : "defaultMinListHeaderHeight",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "environment:defaultMinListRowHeight",
+      "kind" : "environment",
+      "name" : "defaultMinListRowHeight",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Environment",
       "id" : "environment:dismiss",
       "kind" : "environment",
@@ -498,6 +764,40 @@
 
       ],
       "source" : "Sources/Kiln/Environment.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:dismissSearch",
+      "kind" : "environment",
+      "name" : "dismissSearch",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:editMode",
+      "kind" : "environment",
+      "name" : "editMode",
+      "notes" : "`editMode?.wrappedValue` is `.active` or `.inactive` (`isEditing`); set it to start editing.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "environment:headerProminence",
+      "kind" : "environment",
+      "name" : "headerProminence",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
       "support" : "full"
     },
     {
@@ -513,6 +813,94 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "environment:isEnabled",
+      "kind" : "environment",
+      "name" : "isEnabled",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:isPresented",
+      "kind" : "environment",
+      "name" : "isPresented",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "environment:isScrollEnabled",
+      "kind" : "environment",
+      "name" : "isScrollEnabled",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:isSearching",
+      "kind" : "environment",
+      "name" : "isSearching",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:isTabBarShowingSections",
+      "kind" : "environment",
+      "name" : "isTabBarShowingSections",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "environment:labelIconToTitleSpacing",
+      "kind" : "environment",
+      "name" : "labelIconToTitleSpacing",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "environment:labelReservedIconWidth",
+      "kind" : "environment",
+      "name" : "labelReservedIconWidth",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "environment:labelsVisibility",
+      "kind" : "environment",
+      "name" : "labelsVisibility",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Environment",
       "id" : "environment:locale",
       "kind" : "environment",
@@ -521,6 +909,28 @@
 
       ],
       "source" : "Sources/Kiln/Environment.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "environment:menuIndicatorVisibility",
+      "kind" : "environment",
+      "name" : "menuIndicatorVisibility",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:navigationLinkIndicatorVisibility",
+      "kind" : "environment",
+      "name" : "navigationLinkIndicatorVisibility",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
       "support" : "full"
     },
     {
@@ -534,6 +944,52 @@
       ],
       "source" : "Sources/Kiln/Environment.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:searchSuggestionsPlacement",
+      "kind" : "environment",
+      "name" : "searchSuggestionsPlacement",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:tabViewBottomAccessoryPlacement",
+      "kind" : "environment",
+      "name" : "tabViewBottomAccessoryPlacement",
+      "notes" : "`.inline` while the tab bar is minimized, else `.expanded`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:toolbarLabelStyle",
+      "kind" : "environment",
+      "name" : "toolbarLabelStyle",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "environment:toolbarVerticalEdge",
+      "kind" : "environment",
+      "name" : "toolbarVerticalEdge",
+      "notes" : "iOS 27.1.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Environment",
@@ -1170,6 +1626,94 @@
       "owner" : "AsyncThrowingStream",
       "source" : "Sources/Kiln/Concurrency.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.append",
+      "kind" : "member",
+      "name" : "append",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.backgroundColor",
+      "kind" : "member",
+      "name" : "backgroundColor",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.characters",
+      "kind" : "member",
+      "name" : "characters",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.description",
+      "kind" : "member",
+      "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.font",
+      "kind" : "member",
+      "name" : "font",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.foregroundColor",
+      "kind" : "member",
+      "name" : "foregroundColor",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Text",
+      "id" : "member:AttributedString.link",
+      "kind" : "member",
+      "name" : "link",
+      "overloads" : [
+
+      ],
+      "owner" : "AttributedString",
+      "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
     },
     {
       "family" : "Environment",
@@ -3864,6 +4408,62 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "member:GeometryProxy.bounds",
+      "kind" : "member",
+      "name" : "bounds",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "GeometryProxy",
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:GeometryProxy.frame",
+      "kind" : "member",
+      "name" : "frame",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "GeometryProxy",
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:GeometryProxy.safeAreaInsets",
+      "kind" : "member",
+      "name" : "safeAreaInsets",
+      "overloads" : [
+
+      ],
+      "owner" : "GeometryProxy",
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:GeometryProxy.size",
+      "kind" : "member",
+      "name" : "size",
+      "overloads" : [
+
+      ],
+      "owner" : "GeometryProxy",
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Networking",
       "id" : "member:HTTPURLResponse.statusCode",
       "kind" : "member",
@@ -4499,6 +5099,22 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.subscript",
+      "kind" : "member",
+      "name" : "subscript",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:Locale.current",
       "kind" : "member",
@@ -4530,6 +5146,109 @@
       "owner" : "MainActor",
       "source" : "Sources/Kiln/Concurrency.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationPath.append",
+      "kind" : "member",
+      "name" : "append",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "NavigationPath",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationPath.count",
+      "kind" : "member",
+      "name" : "count",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationPath",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationPath.isEmpty",
+      "kind" : "member",
+      "name" : "isEmpty",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationPath",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationPath.removeLast",
+      "kind" : "member",
+      "name" : "removeLast",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "NavigationPath",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationTransition.automatic",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationTransition",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationTransition.crossFade",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "crossFade",
+      "notes" : "iOS 27.",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationTransition",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:NavigationTransition.zoom",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "zoom",
+      "notes" : "From the view marked `.matchedTransitionSource(id:in:)` with the same id.",
+      "overloads" : [
+        {
+          "labels" : [
+            "sourceID",
+            "in"
+          ],
+          "notes" : "From the view marked `.matchedTransitionSource(id:in:)` with the same id."
+        }
+      ],
+      "owner" : "NavigationTransition",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
     },
     {
       "family" : "Foundation",
@@ -4695,6 +5414,114 @@
       "owner" : "Path",
       "source" : "Sources/Kiln/Shapes.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationDetent.fraction",
+      "kind" : "member",
+      "name" : "fraction",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "PresentationDetent",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationDetent.height",
+      "kind" : "member",
+      "name" : "height",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "PresentationDetent",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationDetent.large",
+      "kind" : "member",
+      "name" : "large",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationDetent",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationDetent.medium",
+      "kind" : "member",
+      "name" : "medium",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationDetent",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationSizing.automatic",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationSizing",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationSizing.fitted",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "fitted",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationSizing",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationSizing.form",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "form",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationSizing",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:PresentationSizing.page",
+      "introduced" : "18.0",
+      "kind" : "member",
+      "name" : "page",
+      "overloads" : [
+
+      ],
+      "owner" : "PresentationSizing",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -4958,6 +5785,121 @@
       "owner" : "RelativeDateTimeFormatter",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollPosition.edge",
+      "kind" : "member",
+      "name" : "edge",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollPosition",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollPosition.isPositionedByUser",
+      "kind" : "member",
+      "name" : "isPositionedByUser",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollPosition",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollPosition.point",
+      "kind" : "member",
+      "name" : "point",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollPosition",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollPosition.scrollTo",
+      "kind" : "member",
+      "name" : "scrollTo",
+      "overloads" : [
+        {
+          "labels" : [
+            "edge"
+          ]
+        },
+        {
+          "labels" : [
+            "id",
+            "anchor"
+          ]
+        },
+        {
+          "labels" : [
+            "point"
+          ]
+        },
+        {
+          "labels" : [
+            "x"
+          ]
+        },
+        {
+          "labels" : [
+            "x",
+            "y"
+          ]
+        },
+        {
+          "labels" : [
+            "y"
+          ]
+        }
+      ],
+      "owner" : "ScrollPosition",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollPosition.viewID",
+      "kind" : "member",
+      "name" : "viewID",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollPosition",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollTargetBehavior.paging",
+      "kind" : "member",
+      "name" : "paging",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollTargetBehavior",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ScrollTargetBehavior.viewAligned",
+      "kind" : "member",
+      "name" : "viewAligned",
+      "overloads" : [
+
+      ],
+      "owner" : "ScrollTargetBehavior",
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -6975,7 +7917,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -6987,7 +7929,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -6999,7 +7941,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7011,7 +7953,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7023,7 +7965,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7035,7 +7977,43 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.largeSubtitle",
+      "kind" : "member",
+      "name" : "largeSubtitle",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.largeTitle",
+      "kind" : "member",
+      "name" : "largeTitle",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.navigation",
+      "kind" : "member",
+      "name" : "navigation",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7047,7 +8025,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7059,7 +8037,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7071,7 +8049,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7083,7 +8061,55 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.secondaryAction",
+      "kind" : "member",
+      "name" : "secondaryAction",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.status",
+      "kind" : "member",
+      "name" : "status",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.subtitle",
+      "kind" : "member",
+      "name" : "subtitle",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.title",
+      "kind" : "member",
+      "name" : "title",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7095,7 +8121,19 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "member:ToolbarItemPlacement.topBarPinnedTrailing",
+      "kind" : "member",
+      "name" : "topBarPinnedTrailing",
+      "overloads" : [
+
+      ],
+      "owner" : "ToolbarItemPlacement",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -7107,7 +8145,7 @@
 
       ],
       "owner" : "ToolbarItemPlacement",
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -8990,6 +10028,464 @@
       "support" : "stub"
     },
     {
+      "family" : "Accessibility",
+      "id" : "modifier:TabContent.accessibilityHint",
+      "kind" : "modifier",
+      "name" : "accessibilityHint",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isEnabled"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Accessibility",
+      "id" : "modifier:TabContent.accessibilityIdentifier",
+      "kind" : "modifier",
+      "name" : "accessibilityIdentifier",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isEnabled"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Accessibility",
+      "id" : "modifier:TabContent.accessibilityInputLabels",
+      "kind" : "modifier",
+      "name" : "accessibilityInputLabels",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isEnabled"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Accessibility",
+      "id" : "modifier:TabContent.accessibilityLabel",
+      "kind" : "modifier",
+      "name" : "accessibilityLabel",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isEnabled"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Accessibility",
+      "id" : "modifier:TabContent.accessibilityValue",
+      "kind" : "modifier",
+      "name" : "accessibilityValue",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isEnabled"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.badge",
+      "kind" : "modifier",
+      "name" : "badge",
+      "notes" : "A count or text, on a list row or a tab.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.contextMenu",
+      "kind" : "modifier",
+      "name" : "contextMenu",
+      "notes" : "Its menu items; `preview:` isn't shown.",
+      "overloads" : [
+        {
+          "labels" : [
+            "menuItems"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Presentations.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.customizationBehavior",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "customizationBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.customizationID",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "customizationID",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.defaultSectionExpansion",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "defaultSectionExpansion",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.defaultVisibility",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "defaultVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:TabContent.disabled",
+      "kind" : "modifier",
+      "name" : "disabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:TabContent.help",
+      "kind" : "modifier",
+      "name" : "help",
+      "notes" : "Shown when a pointer hovers (iPad with a trackpad); nothing on touch.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:TabContent.hidden",
+      "kind" : "modifier",
+      "name" : "hidden",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Layout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.popover",
+      "kind" : "modifier",
+      "name" : "popover",
+      "notes" : "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "attachmentAnchor",
+            "arrowEdge",
+            "content"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Presentations.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.sectionActions",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "sectionActions",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:TabContent.swipeActions",
+      "kind" : "modifier",
+      "name" : "swipeActions",
+      "notes" : "On `List` rows, and (iOS 27) on any view in a scroll view marked `.swipeActionsContainer()`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "edge",
+            "allowsFullSwipe",
+            "content"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Lists.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:TabContent.tabPlacement",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabPlacement",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.axisBehavior",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "axisBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.contentMarginsRemoved",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "contentMarginsRemoved",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.customizationBehavior",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "customizationBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.defaultCustomization",
+      "kind" : "modifier",
+      "name" : "defaultCustomization",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "options"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.matchedTransitionSource",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "matchedTransitionSource",
+      "notes" : "The namespace is the navigation stack's (or the sheet's): ids must be unique there.",
+      "overloads" : [
+        {
+          "labels" : [
+            "id",
+            "in"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.sharedBackgroundVisibility",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "sharedBackgroundVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:ToolbarContent.visibilityPriority",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "visibilityPriority",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "owner" : "ToolbarContent",
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "modifier:accentColor",
       "kind" : "modifier",
@@ -9081,6 +10577,21 @@
     },
     {
       "family" : "Accessibility",
+      "id" : "modifier:accessibilityInputLabels",
+      "kind" : "modifier",
+      "name" : "accessibilityInputLabels",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Accessibility.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Accessibility",
       "id" : "modifier:accessibilityLabel",
       "kind" : "modifier",
       "name" : "accessibilityLabel",
@@ -9107,7 +10618,30 @@
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
-      "support" : "stub"
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:actionSheet",
+      "kind" : "modifier",
+      "name" : "actionSheet",
+      "notes" : "Old; shown as a `confirmationDialog`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "item",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -9154,6 +10688,23 @@
         }
       ],
       "source" : "Sources/Kiln/Presentations.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:alignmentGuide",
+      "kind" : "modifier",
+      "name" : "alignmentGuide",
+      "notes" : "`.center` sets both axes' guides.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "computeValue"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
       "support" : "partial"
     },
     {
@@ -9211,6 +10762,22 @@
     },
     {
       "family" : "Layout",
+      "id" : "modifier:arrangementViewStyle",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "arrangementViewStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
       "id" : "modifier:aspectRatio",
       "kind" : "modifier",
       "name" : "aspectRatio",
@@ -9238,6 +10805,23 @@
         }
       ],
       "source" : "Sources/Kiln/Focus.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:axisBehavior",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "axisBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -9281,10 +10865,10 @@
       "support" : "full"
     },
     {
-      "family" : "Navigation",
-      "id" : "modifier:badge",
+      "family" : "Controls",
+      "id" : "modifier:backgroundStyle",
       "kind" : "modifier",
-      "name" : "badge",
+      "name" : "backgroundStyle",
       "overloads" : [
         {
           "labels" : [
@@ -9292,7 +10876,38 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:badge",
+      "kind" : "modifier",
+      "name" : "badge",
+      "notes" : "A count or text, on a list row or a tab.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:badgeProminence",
+      "kind" : "modifier",
+      "name" : "badgeProminence",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
       "support" : "full"
     },
     {
@@ -9407,9 +11022,42 @@
     },
     {
       "family" : "Controls",
+      "id" : "modifier:buttonRepeatBehavior",
+      "kind" : "modifier",
+      "name" : "buttonRepeatBehavior",
+      "notes" : "`.enabled`: holding the button repeats its action.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:buttonSizing",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "buttonSizing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "modifier:buttonStyle",
       "kind" : "modifier",
       "name" : "buttonStyle",
+      "notes" : "Every built-in style, `.glass` and `.glassProminent` included, or your own `ButtonStyle` or `PrimitiveButtonStyle`.",
       "overloads" : [
         {
           "labels" : [
@@ -9418,7 +11066,7 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -9746,6 +11394,129 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "modifier:containerCornerOffset",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "containerCornerOffset",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "sizeToFit"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:containerRelativeFrame",
+      "kind" : "modifier",
+      "name" : "containerRelativeFrame",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "alignment"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "alignment",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "count",
+            "span",
+            "spacing",
+            "alignment"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:containerShape",
+      "kind" : "modifier",
+      "name" : "containerShape",
+      "notes" : "A built-in shape (`RoundedRectangle(cornerRadius: 20)`, `Capsule()`) for `ContainerRelativeShape` inside.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:containerValue",
+      "kind" : "modifier",
+      "name" : "containerValue",
+      "notes" : "Declare the key with `extension ContainerValues { @Entry var icon: String = \"\" }`; read it as `subview.containerValues.icon`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:contentMargins",
+      "kind" : "modifier",
+      "name" : "contentMargins",
+      "notes" : "Edges and a length or `EdgeInsets`, `for: .scrollContent` or `.scrollIndicators`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_",
+            "for"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:contentMarginsRemoved",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "contentMarginsRemoved",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Gestures",
       "id" : "modifier:contentShape",
       "kind" : "modifier",
@@ -9766,6 +11537,24 @@
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:contentToolbar",
+      "introduced" : "18.4",
+      "kind" : "modifier",
+      "name" : "contentToolbar",
+      "notes" : "visionOS and macOS place these; on iPhone it shows nothing.",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "full"
     },
     {
@@ -9823,6 +11612,21 @@
     },
     {
       "family" : "Controls",
+      "id" : "modifier:controlGroupStyle",
+      "kind" : "modifier",
+      "name" : "controlGroupStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "modifier:controlSize",
       "kind" : "modifier",
       "name" : "controlSize",
@@ -9834,6 +11638,27 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:coordinateSpace",
+      "kind" : "modifier",
+      "name" : "coordinateSpace",
+      "notes" : "`.coordinateSpace(.named(\"list\"))` or `name:`, read by `proxy.frame(in: .named(\"list\"))`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "name"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
       "support" : "full"
     },
     {
@@ -9853,6 +11678,47 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "modifier:customizationBehavior",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "customizationBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ],
+          "receiver" : "TabContent"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:customizationID",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "customizationID",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "modifier:datePickerStyle",
       "kind" : "modifier",
@@ -9865,7 +11731,40 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:defaultAdaptableTabBarPlacement",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "defaultAdaptableTabBarPlacement",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:defaultCustomization",
+      "kind" : "modifier",
+      "name" : "defaultCustomization",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "options"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -9877,10 +11776,120 @@
           "labels" : [
             "_"
           ]
+        },
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
         }
       ],
-      "source" : "Sources/Kiln/Layout.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:defaultSectionExpansion",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "defaultSectionExpansion",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:defaultTabBarPlacement",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "defaultTabBarPlacement",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:defaultVisibility",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "defaultVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:deleteDisabled",
+      "kind" : "modifier",
+      "name" : "deleteDisabled",
+      "notes" : "On a row of a `ForEach` with `onDelete`/`onMove` or `editActions`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:dialogIcon",
+      "kind" : "modifier",
+      "name" : "dialogIcon",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:dialogSuppressionToggle",
+      "kind" : "modifier",
+      "name" : "dialogSuppressionToggle",
+      "notes" : "macOS shows it in a dialog; on iPhone it shows nothing.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "isSuppressed"
+          ]
+        },
+        {
+          "labels" : [
+            "isSuppressed"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Controls",
@@ -9895,6 +11904,49 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:disclosureGroupStyle",
+      "kind" : "modifier",
+      "name" : "disclosureGroupStyle",
+      "notes" : "`.automatic`, or your own `DisclosureGroupStyle`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:dismissalConfirmationDialog",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "dismissalConfirmationDialog",
+      "notes" : "Asks before a sheet is swiped or cancelled away, when `shouldPresent` is true.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "shouldPresent",
+            "actions"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "shouldPresent",
+            "actions",
+            "message"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
       "support" : "full"
     },
     {
@@ -9996,6 +12048,37 @@
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:findDisabled",
+      "kind" : "modifier",
+      "name" : "findDisabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:findNavigator",
+      "kind" : "modifier",
+      "name" : "findNavigator",
+      "notes" : "Find (and replace) in a `TextEditor`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
       "support" : "full"
     },
     {
@@ -10147,6 +12230,21 @@
       "support" : "full"
     },
     {
+      "family" : "Controls",
+      "id" : "modifier:formStyle",
+      "kind" : "modifier",
+      "name" : "formStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "modifier:frame",
       "kind" : "modifier",
@@ -10211,7 +12309,22 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:geometryGroup",
+      "kind" : "modifier",
+      "name" : "geometryGroup",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
     },
     {
       "family" : "Gestures",
@@ -10252,6 +12365,82 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "modifier:gridCellAnchor",
+      "kind" : "modifier",
+      "name" : "gridCellAnchor",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:gridCellColumns",
+      "kind" : "modifier",
+      "name" : "gridCellColumns",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:gridCellUnsizedAxes",
+      "kind" : "modifier",
+      "name" : "gridCellUnsizedAxes",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:gridColumnAlignment",
+      "kind" : "modifier",
+      "name" : "gridColumnAlignment",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:groupBoxStyle",
+      "kind" : "modifier",
+      "name" : "groupBoxStyle",
+      "notes" : "`.automatic`, or your own `GroupBoxStyle`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Lists",
       "id" : "modifier:headerProminence",
       "kind" : "modifier",
@@ -10264,13 +12453,14 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "stub"
+      "support" : "full"
     },
     {
-      "family" : "Accessibility",
+      "family" : "Controls",
       "id" : "modifier:help",
       "kind" : "modifier",
       "name" : "help",
+      "notes" : "Shown when a pointer hovers (iPad with a trackpad); nothing on touch.",
       "overloads" : [
         {
           "labels" : [
@@ -10278,8 +12468,8 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Accessibility.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -10381,6 +12571,21 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "modifier:indexViewStyle",
+      "kind" : "modifier",
+      "name" : "indexViewStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "modifier:inset",
       "kind" : "modifier",
@@ -10399,6 +12604,45 @@
     },
     {
       "family" : "Navigation",
+      "id" : "modifier:inspector",
+      "kind" : "modifier",
+      "name" : "inspector",
+      "notes" : "A trailing column on iPad; a sheet on iPhone.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:inspectorColumnWidth",
+      "kind" : "modifier",
+      "name" : "inspectorColumnWidth",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "min",
+            "ideal",
+            "max"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
       "id" : "modifier:interactiveDismissDisabled",
       "kind" : "modifier",
       "name" : "interactiveDismissDisabled",
@@ -10409,8 +12653,8 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Presentations.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -10475,6 +12719,38 @@
     },
     {
       "family" : "Controls",
+      "id" : "modifier:labelIconToTitleSpacing",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "labelIconToTitleSpacing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:labelReservedIconWidth",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "labelReservedIconWidth",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "modifier:labelStyle",
       "kind" : "modifier",
       "name" : "labelStyle",
@@ -10486,6 +12762,68 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:labeledContentStyle",
+      "kind" : "modifier",
+      "name" : "labeledContentStyle",
+      "notes" : "`.automatic`, or your own `LabeledContentStyle`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:labelsHidden",
+      "kind" : "modifier",
+      "name" : "labelsHidden",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:labelsVisibility",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "labelsVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:layoutDirectionBehavior",
+      "kind" : "modifier",
+      "name" : "layoutDirectionBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
       "support" : "full"
     },
     {
@@ -10501,6 +12839,23 @@
         }
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:layoutValue",
+      "kind" : "modifier",
+      "name" : "layoutValue",
+      "notes" : "Read in your `Layout` as `subview[Key.self]`; the key's `defaultValue` when a view doesn't set it.",
+      "overloads" : [
+        {
+          "labels" : [
+            "key",
+            "value"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
       "support" : "full"
     },
     {
@@ -10541,6 +12896,21 @@
     },
     {
       "family" : "Lists",
+      "id" : "modifier:listItemTint",
+      "kind" : "modifier",
+      "name" : "listItemTint",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
       "id" : "modifier:listRowBackground",
       "kind" : "modifier",
       "name" : "listRowBackground",
@@ -10559,16 +12929,22 @@
       "id" : "modifier:listRowInsets",
       "kind" : "modifier",
       "name" : "listRowInsets",
-      "notes" : "Always zero insets.",
       "overloads" : [
         {
           "labels" : [
             "_"
           ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_",
+            "_"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Lists",
@@ -10584,7 +12960,72 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listRowSeparatorTint",
+      "kind" : "modifier",
+      "name" : "listRowSeparatorTint",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "edges"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listRowSpacing",
+      "kind" : "modifier",
+      "name" : "listRowSpacing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listSectionIndexVisibility",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "listSectionIndexVisibility",
+      "notes" : "Shows the index of `sectionIndexLabel`s down the side of a `List`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listSectionMargins",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "listSectionMargins",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
     },
     {
       "family" : "Lists",
@@ -10600,7 +13041,38 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "stub"
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listSectionSeparatorTint",
+      "kind" : "modifier",
+      "name" : "listSectionSeparatorTint",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "edges"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:listSectionSpacing",
+      "kind" : "modifier",
+      "name" : "listSectionSpacing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
     },
     {
       "family" : "Lists",
@@ -10651,6 +13123,91 @@
         }
       ],
       "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:matchedTransitionSource",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "matchedTransitionSource",
+      "notes" : "The namespace is the navigation stack's (or the sheet's): ids must be unique there.",
+      "overloads" : [
+        {
+          "labels" : [
+            "id",
+            "in"
+          ]
+        },
+        {
+          "labels" : [
+            "id",
+            "in",
+            "configuration"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:menuActionDismissBehavior",
+      "kind" : "modifier",
+      "name" : "menuActionDismissBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:menuIndicator",
+      "kind" : "modifier",
+      "name" : "menuIndicator",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:menuOrder",
+      "kind" : "modifier",
+      "name" : "menuOrder",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:menuStyle",
+      "kind" : "modifier",
+      "name" : "menuStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
       "support" : "full"
     },
     {
@@ -10715,6 +13272,22 @@
       "support" : "full"
     },
     {
+      "family" : "Lists",
+      "id" : "modifier:moveDisabled",
+      "kind" : "modifier",
+      "name" : "moveDisabled",
+      "notes" : "On a row of a `ForEach` with `onDelete`/`onMove` or `editActions`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Text",
       "id" : "modifier:multilineTextAlignment",
       "kind" : "modifier",
@@ -10749,7 +13322,7 @@
       "id" : "modifier:navigationBarHidden",
       "kind" : "modifier",
       "name" : "navigationBarHidden",
-      "notes" : "Hides the back button only.",
+      "notes" : "Old; prefer `.toolbar(.hidden, for: .navigationBar)`.",
       "overloads" : [
         {
           "labels" : [
@@ -10758,7 +13331,56 @@
         }
       ],
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationBarItems",
+      "kind" : "modifier",
+      "name" : "navigationBarItems",
+      "notes" : "Old; prefer `.toolbar`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "leading"
+          ]
+        },
+        {
+          "labels" : [
+            "leading",
+            "trailing"
+          ]
+        },
+        {
+          "labels" : [
+            "trailing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationBarTitle",
+      "kind" : "modifier",
+      "name" : "navigationBarTitle",
+      "notes" : "Old; `.navigationTitle` and `.navigationBarTitleDisplayMode`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "displayMode"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -10780,7 +13402,7 @@
       "id" : "modifier:navigationDestination",
       "kind" : "modifier",
       "name" : "navigationDestination",
-      "notes" : "`for:` with any type the links push, and `isPresented:`.",
+      "notes" : "`for:` with any type the links push, `isPresented:`, and `item:`.",
       "overloads" : [
         {
           "labels" : [
@@ -10793,16 +13415,125 @@
             "isPresented",
             "destination"
           ]
+        },
+        {
+          "labels" : [
+            "item",
+            "destination"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationLinkIndicatorVisibility",
+      "introduced" : "17.0",
+      "kind" : "modifier",
+      "name" : "navigationLinkIndicatorVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationSplitViewColumnWidth",
+      "kind" : "modifier",
+      "name" : "navigationSplitViewColumnWidth",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "min",
+            "ideal",
+            "max"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationSplitViewStyle",
+      "kind" : "modifier",
+      "name" : "navigationSplitViewStyle",
+      "notes" : "`.balanced`, `.prominentDetail`, or your own `NavigationSplitViewStyle`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationSubtitle",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "navigationSubtitle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
       "id" : "modifier:navigationTitle",
       "kind" : "modifier",
       "name" : "navigationTitle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationTransition",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "navigationTransition",
+      "notes" : "`.zoom(sourceID:in:)` from a `.matchedTransitionSource`, `.crossFade` (iOS 27) or `.automatic`, on the pushed or presented view.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:navigationViewStyle",
+      "kind" : "modifier",
+      "name" : "navigationViewStyle",
+      "notes" : "Old; on iPhone every style is a stack.",
       "overloads" : [
         {
           "labels" : [
@@ -10905,6 +13636,31 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "modifier:onGeometryChange",
+      "kind" : "modifier",
+      "name" : "onGeometryChange",
+      "notes" : "`of:` turns the view's `GeometryProxy` into a value; `action:` runs when it changes.",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "of",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "of",
+            "action"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Gestures",
       "id" : "modifier:onHover",
       "kind" : "modifier",
@@ -10978,6 +13734,85 @@
       ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:onScrollGeometryChange",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "onScrollGeometryChange",
+      "notes" : "`of:` reads `contentOffset`, `contentSize`, `containerSize`, `visibleRect` or `bounds`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "of",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "of",
+            "action"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:onScrollPhaseChange",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "onScrollPhaseChange",
+      "notes" : "`old` and `new` are `.idle`, `.tracking`, `.interacting`, `.decelerating` or `.animating`; `isScrolling`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:onScrollTargetVisibilityChange",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "onScrollTargetVisibilityChange",
+      "notes" : "The ids of the views of the `.scrollTargetLayout()` on screen.",
+      "overloads" : [
+        {
+          "labels" : [
+            "idType",
+            "threshold",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:onScrollVisibilityChange",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "onScrollVisibilityChange",
+      "overloads" : [
+        {
+          "labels" : [
+            "threshold",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
     },
     {
       "family" : "Focus & Keyboard",
@@ -11064,6 +13899,22 @@
     },
     {
       "family" : "Layout",
+      "id" : "modifier:overlayArrangementEdge",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "overlayArrangementEdge",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
       "id" : "modifier:padding",
       "kind" : "modifier",
       "name" : "padding",
@@ -11091,6 +13942,21 @@
     },
     {
       "family" : "Controls",
+      "id" : "modifier:paletteSelectionEffect",
+      "kind" : "modifier",
+      "name" : "paletteSelectionEffect",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "modifier:pickerStyle",
       "kind" : "modifier",
       "name" : "pickerStyle",
@@ -11102,14 +13968,14 @@
         }
       ],
       "source" : "Sources/Kiln/ControlStyles.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Navigation",
       "id" : "modifier:popover",
       "kind" : "modifier",
       "name" : "popover",
-      "notes" : "Shown as a sheet.",
+      "notes" : "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`.",
       "overloads" : [
         {
           "labels" : [
@@ -11129,7 +13995,36 @@
         }
       ],
       "source" : "Sources/Kiln/Presentations.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:popoverCore",
+      "introduced" : "18.1",
+      "kind" : "modifier",
+      "name" : "popoverCore",
+      "notes" : "Shown as `.popover`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "attachmentAnchor",
+            "arrowEdges",
+            "isDetachable",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "item",
+            "attachmentAnchor",
+            "arrowEdges",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Presentations.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -11169,6 +14064,80 @@
     },
     {
       "family" : "Navigation",
+      "id" : "modifier:presentationBackground",
+      "kind" : "modifier",
+      "name" : "presentationBackground",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "alignment",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:presentationBackgroundInteraction",
+      "kind" : "modifier",
+      "name" : "presentationBackgroundInteraction",
+      "notes" : "`.enabled`, `.enabled(upThrough: .medium)`, `.disabled`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:presentationCompactAdaptation",
+      "kind" : "modifier",
+      "name" : "presentationCompactAdaptation",
+      "notes" : "`.popover` keeps a popover a popover on iPhone; `.sheet`, `.fullScreenCover`, `.none`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:presentationContentInteraction",
+      "kind" : "modifier",
+      "name" : "presentationContentInteraction",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
       "id" : "modifier:presentationCornerRadius",
       "kind" : "modifier",
       "name" : "presentationCornerRadius",
@@ -11179,14 +14148,15 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Presentations.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
       "id" : "modifier:presentationDetents",
       "kind" : "modifier",
       "name" : "presentationDetents",
+      "notes" : "`.medium`, `.large`, `.fraction(_:)`, `.height(_:)`; `selection:` follows the one shown.",
       "overloads" : [
         {
           "labels" : [
@@ -11195,7 +14165,7 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Presentations.swift",
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
       "support" : "full"
     },
     {
@@ -11203,7 +14173,6 @@
       "id" : "modifier:presentationDragIndicator",
       "kind" : "modifier",
       "name" : "presentationDragIndicator",
-      "notes" : "Always visible.",
       "overloads" : [
         {
           "labels" : [
@@ -11211,8 +14180,41 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Presentations.swift",
-      "support" : "partial"
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:presentationPlacement",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "presentationPlacement",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:presentationSizing",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "presentationSizing",
+      "notes" : "`.form`, `.page`, `.fitted`: how big a sheet is on iPad.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Environment",
@@ -11276,6 +14278,22 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "modifier:renameAction",
+      "kind" : "modifier",
+      "name" : "renameAction",
+      "notes" : "What a `RenameButton` runs: a closure, or a focus binding to set.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "modifier:renderingMode",
       "kind" : "modifier",
@@ -11289,6 +14307,89 @@
         }
       ],
       "source" : "Sources/Kiln/Images.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:reorderContainer",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "reorderContainer",
+      "notes" : "`move` gets a `ReorderDifference`: `sources` (the ids moved) and `destination.position`, `.before(id)` or `.end` (and `destination.collectionID`).",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "in",
+            "isEnabled",
+            "move"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "isEnabled",
+            "move"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "itemID",
+            "in",
+            "isEnabled",
+            "move"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "itemID",
+            "isEnabled",
+            "move"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:reorderable",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "reorderable",
+      "notes" : "On a `ForEach` inside a `.reorderContainer(for:)`: its rows can be dragged into a new order.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "receiver" : "DynamicViewContent"
+        },
+        {
+          "labels" : [
+            "collectionID"
+          ],
+          "receiver" : "DynamicViewContent"
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:replaceDisabled",
+      "kind" : "modifier",
+      "name" : "replaceDisabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
       "support" : "full"
     },
     {
@@ -11362,11 +14463,30 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "modifier:safeAreaBar",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "safeAreaBar",
+      "notes" : "A bar that scroll edge effects blur under, like `.safeAreaInset`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "edge",
+            "alignment",
+            "spacing",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "modifier:safeAreaInset",
       "kind" : "modifier",
       "name" : "safeAreaInset",
-      "notes" : "`.top` and `.bottom`.",
       "overloads" : [
         {
           "labels" : [
@@ -11378,7 +14498,28 @@
         }
       ],
       "source" : "Sources/Kiln/Layout.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:safeAreaPadding",
+      "kind" : "modifier",
+      "name" : "safeAreaPadding",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -11475,6 +14616,37 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "modifier:scrollBounceBehavior",
+      "kind" : "modifier",
+      "name" : "scrollBounceBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "axes"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:scrollClipDisabled",
+      "kind" : "modifier",
+      "name" : "scrollClipDisabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Lists",
       "id" : "modifier:scrollContentBackground",
       "kind" : "modifier",
@@ -11487,6 +14659,21 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:scrollDisabled",
+      "kind" : "modifier",
+      "name" : "scrollDisabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
       "support" : "full"
     },
     {
@@ -11506,6 +14693,40 @@
     },
     {
       "family" : "Layout",
+      "id" : "modifier:scrollEdgeEffectHidden",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "scrollEdgeEffectHidden",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:scrollEdgeEffectStyle",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "scrollEdgeEffectStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
       "id" : "modifier:scrollIndicators",
       "kind" : "modifier",
       "name" : "scrollIndicators",
@@ -11522,9 +14743,71 @@
     },
     {
       "family" : "Layout",
+      "id" : "modifier:scrollIndicatorsFlash",
+      "kind" : "modifier",
+      "name" : "scrollIndicatorsFlash",
+      "overloads" : [
+        {
+          "labels" : [
+            "onAppear"
+          ]
+        },
+        {
+          "labels" : [
+            "trigger"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:scrollInputBehavior",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "scrollInputBehavior",
+      "notes" : "Hand-gesture and look input are visionOS and watchOS; on iPhone it changes nothing.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:scrollPosition",
+      "kind" : "modifier",
+      "name" : "scrollPosition",
+      "notes" : "A `ScrollPosition` binding, or `id:` bound to the id of the view at the top (with `.scrollTargetLayout()`).",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "anchor"
+          ]
+        },
+        {
+          "labels" : [
+            "id",
+            "anchor"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
       "id" : "modifier:scrollTargetBehavior",
       "kind" : "modifier",
       "name" : "scrollTargetBehavior",
+      "notes" : "`.paging`, or `.viewAligned` with `.scrollTargetLayout()` on the stack inside.",
       "overloads" : [
         {
           "labels" : [
@@ -11532,8 +14815,8 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Layout.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -11547,16 +14830,170 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Layout.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:scrollTransition",
+      "kind" : "modifier",
+      "name" : "scrollTransition",
+      "notes" : "`content` takes opacity, scale, offset, rotation, blur and color effects.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "axis",
+            "transition"
+          ]
+        },
+        {
+          "labels" : [
+            "axis",
+            "transition"
+          ]
+        },
+        {
+          "labels" : [
+            "topLeading",
+            "bottomTrailing",
+            "axis",
+            "transition"
+          ]
+        },
+        {
+          "labels" : [
+            "transition"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchCompletion",
+      "kind" : "modifier",
+      "name" : "searchCompletion",
+      "notes" : "On a suggestion: tapping it fills the field with this text (or adds this token).",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchDictationBehavior",
+      "kind" : "modifier",
+      "name" : "searchDictationBehavior",
+      "notes" : "Inline dictation is visionOS's; on iPhone the field keeps its usual dictation.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchPresentationToolbarBehavior",
+      "kind" : "modifier",
+      "name" : "searchPresentationToolbarBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchScopes",
+      "kind" : "modifier",
+      "name" : "searchScopes",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "activation",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "scopes"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchSuggestions",
+      "kind" : "modifier",
+      "name" : "searchSuggestions",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:searchToolbarBehavior",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "searchToolbarBehavior",
+      "notes" : "`.minimize`: the search field shrinks to a button in the toolbar.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
       "id" : "modifier:searchable",
       "kind" : "modifier",
       "name" : "searchable",
-      "notes" : "`text:` and `prompt:`.",
+      "notes" : "`text:` with `placement:`, `prompt:` and `isPresented:`; `tokens:` (with `token:`) and `suggestions:`.",
       "overloads" : [
+        {
+          "labels" : [
+            "text",
+            "editableTokens",
+            "placement",
+            "prompt",
+            "token"
+          ]
+        },
         {
           "labels" : [
             "text",
@@ -11571,10 +15008,95 @@
             "placement",
             "prompt"
           ]
+        },
+        {
+          "labels" : [
+            "text",
+            "placement",
+            "prompt",
+            "suggestions"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "tokens",
+            "isPresented",
+            "placement",
+            "prompt",
+            "token"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "tokens",
+            "placement",
+            "prompt",
+            "token"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "tokens",
+            "suggestedTokens",
+            "placement",
+            "prompt",
+            "token"
+          ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:sectionActions",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "sectionActions",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:sectionIndexLabel",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "sectionIndexLabel",
+      "notes" : "On a `Section`: its letter in the list's index.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:selectionDisabled",
+      "kind" : "modifier",
+      "name" : "selectionDisabled",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
     },
     {
       "family" : "Haptics",
@@ -11626,6 +15148,23 @@
     },
     {
       "family" : "Navigation",
+      "id" : "modifier:sharedBackgroundVisibility",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "sharedBackgroundVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
       "id" : "modifier:sheet",
       "kind" : "modifier",
       "name" : "sheet",
@@ -11670,6 +15209,144 @@
       ],
       "source" : "Sources/Kiln/Gestures.swift",
       "support" : "stub"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:size",
+      "kind" : "modifier",
+      "name" : "size",
+      "notes" : "On a built-in shape: draws it at that size, anchored at the top leading corner or `anchor:`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "anchor"
+          ],
+          "receiver" : "Shape"
+        },
+        {
+          "labels" : [
+            "width",
+            "height",
+            "anchor"
+          ],
+          "receiver" : "Shape"
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:sliderThumbVisibility",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "sliderThumbVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:splitArrangementFixedLayoutSize",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "splitArrangementFixedLayoutSize",
+      "overloads" : [
+        {
+          "labels" : [
+            "horizontal",
+            "vertical"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:splitArrangementLayoutRatio",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "splitArrangementLayoutRatio",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "minHorizontal",
+            "idealHorizontal",
+            "maxHorizontal",
+            "minVertical",
+            "idealVertical",
+            "maxVertical"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:splitArrangementLayoutSize",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "splitArrangementLayoutSize",
+      "overloads" : [
+        {
+          "labels" : [
+            "minWidth",
+            "idealWidth",
+            "maxWidth",
+            "minHeight",
+            "idealHeight",
+            "maxHeight"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:statusBar",
+      "kind" : "modifier",
+      "name" : "statusBar",
+      "notes" : "Old; `.statusBarHidden(_:)`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "hidden"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:statusBarHidden",
+      "kind" : "modifier",
+      "name" : "statusBarHidden",
+      "notes" : "Hides the status bar while the app's card is open.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Text",
@@ -11761,7 +15438,7 @@
       "id" : "modifier:swipeActions",
       "kind" : "modifier",
       "name" : "swipeActions",
-      "notes" : "On `List` rows.",
+      "notes" : "On `List` rows, and (iOS 27) on any view in a scroll view marked `.swipeActionsContainer()`.",
       "overloads" : [
         {
           "labels" : [
@@ -11769,10 +15446,36 @@
             "allowsFullSwipe",
             "content"
           ]
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "edge",
+            "allowsFullSwipe",
+            "content",
+            "onPresentationChanged"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "modifier:swipeActionsContainer",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "swipeActionsContainer",
+      "notes" : "Lets `.swipeActions` work on the views of a `ScrollView`'s stack.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -11816,6 +15519,22 @@
     },
     {
       "family" : "Navigation",
+      "id" : "modifier:tabBarMinimizeBehavior",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "tabBarMinimizeBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
       "id" : "modifier:tabItem",
       "kind" : "modifier",
       "name" : "tabItem",
@@ -11826,7 +15545,147 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabPlacement",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabPlacement",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewBottomAccessory",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "tabViewBottomAccessory",
+      "notes" : "A bar above the tab bar (a mini player); `isEnabled:` hides it.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "isEnabled",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewCustomization",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabViewCustomization",
+      "notes" : "Bound to a `TabViewCustomization` in `@State`; the iPad sidebar's edits are kept while the app is open.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewSearchActivation",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "tabViewSearchActivation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewSidebarBottomBar",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabViewSidebarBottomBar",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewSidebarFooter",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabViewSidebarFooter",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewSidebarHeader",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "tabViewSidebarHeader",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:tabViewStyle",
+      "kind" : "modifier",
+      "name" : "tabViewStyle",
+      "notes" : "`.page` (a swiping carousel, with `indexDisplayMode:`), `.sidebarAdaptable`, `.tabBarOnly`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
       "support" : "full"
     },
     {
@@ -11902,6 +15761,21 @@
     },
     {
       "family" : "Controls",
+      "id" : "modifier:textEditorStyle",
+      "kind" : "modifier",
+      "name" : "textEditorStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "modifier:textFieldStyle",
       "kind" : "modifier",
       "name" : "textFieldStyle",
@@ -11928,6 +15802,40 @@
         }
       ],
       "source" : "Sources/Kiln/Focus.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:textInputBorderShape",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "textInputBorderShape",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "modifier:textInputFormattingControlVisibility",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "textInputFormattingControlVisibility",
+      "notes" : "Shows or hides the formatting controls of a `TextEditor` bound to an `AttributedString`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
       "support" : "full"
     },
     {
@@ -11965,6 +15873,7 @@
       "id" : "modifier:toggleStyle",
       "kind" : "modifier",
       "name" : "toggleStyle",
+      "notes" : "`.switch`, `.button`, or your own `ToggleStyle`.",
       "overloads" : [
         {
           "labels" : [
@@ -11980,7 +15889,7 @@
       "id" : "modifier:toolbar",
       "kind" : "modifier",
       "name" : "toolbar",
-      "notes" : "Items by placement; `.toolbar(.hidden)` isn't supported.",
+      "notes" : "Items by placement, in order, with `ToolbarSpacer`s; `.toolbar(.hidden, for:)` hides a bar.",
       "overloads" : [
         {
           "labels" : [
@@ -11992,10 +15901,21 @@
           "labels" : [
             "content"
           ]
+        },
+        {
+          "labels" : [
+            "id",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "removing"
+          ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -12010,8 +15930,25 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarBackgroundVisibility",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "toolbarBackgroundVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -12026,8 +15963,170 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarMinimizationBehavior",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "toolbarMinimizationBehavior",
+      "notes" : "`.onScrollDown`, `.onScrollUp` or `.never`, for the bars named.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarMinimizationRestoration",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "toolbarMinimizationRestoration",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarMinimizationSafeAreaAdjustment",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "toolbarMinimizationSafeAreaAdjustment",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarOverflowMenu",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "toolbarOverflowMenu",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarRole",
+      "kind" : "modifier",
+      "name" : "toolbarRole",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarTitleDisplayMode",
+      "kind" : "modifier",
+      "name" : "toolbarTitleDisplayMode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarTitleMenu",
+      "kind" : "modifier",
+      "name" : "toolbarTitleMenu",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarVerticalBehavior",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "toolbarVerticalBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarVerticalCompressionBehavior",
+      "introduced" : "27.1",
+      "kind" : "modifier",
+      "name" : "toolbarVerticalCompressionBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "modifier:toolbarVisibility",
+      "introduced" : "18.0",
+      "kind" : "modifier",
+      "name" : "toolbarVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "for"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
     },
     {
       "family" : "Text",
@@ -12109,6 +16208,23 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "modifier:visibilityPriority",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "visibilityPriority",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "ToolbarContent"
+        }
+      ],
+      "source" : "Sources/Kiln/Toolbars.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "modifier:zIndex",
       "kind" : "modifier",
@@ -12147,6 +16263,30 @@
       ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "protocol:ArrangementViewStyle",
+      "kind" : "protocol",
+      "name" : "ArrangementViewStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `primary` and `secondary`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:ButtonStyle",
+      "kind" : "protocol",
+      "name" : "ButtonStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isPressed`, `role`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
     },
     {
       "family" : "Location",
@@ -12198,6 +16338,30 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "protocol:ContainerValueKey",
+      "kind" : "protocol",
+      "name" : "ContainerValueKey",
+      "notes" : "Prefer `@Entry` in `extension ContainerValues`; a key type's `defaultValue` isn't read.",
+      "requirements" : [
+        "defaultValue"
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:ControlGroupStyle",
+      "kind" : "protocol",
+      "name" : "ControlGroupStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Language",
       "id" : "protocol:CustomStringConvertible",
       "kind" : "protocol",
@@ -12209,12 +16373,36 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "protocol:DatePickerStyle",
+      "kind" : "protocol",
+      "name" : "DatePickerStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `selection`, `$selection`, `minimumDate`, `maximumDate`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "protocol:Decodable",
       "kind" : "protocol",
       "name" : "Decodable",
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:DisclosureGroupStyle",
+      "kind" : "protocol",
+      "name" : "DisclosureGroupStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`, `isExpanded`, `$isExpanded`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
     },
     {
       "family" : "Foundation",
@@ -12258,6 +16446,42 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "protocol:FormStyle",
+      "kind" : "protocol",
+      "name" : "FormStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:GaugeStyle",
+      "kind" : "protocol",
+      "name" : "GaugeStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `value`, `label`, `currentValueLabel`, `minimumValueLabel`, `maximumValueLabel`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:GroupBoxStyle",
+      "kind" : "protocol",
+      "name" : "GroupBoxStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Language",
       "id" : "protocol:Hashable",
       "kind" : "protocol",
@@ -12292,6 +16516,30 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "protocol:LabelStyle",
+      "kind" : "protocol",
+      "name" : "LabelStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `title`, `icon`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:LabeledContentStyle",
+      "kind" : "protocol",
+      "name" : "LabeledContentStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "protocol:Layout",
       "kind" : "protocol",
@@ -12309,6 +16557,17 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "protocol:LayoutValueKey",
+      "kind" : "protocol",
+      "name" : "LayoutValueKey",
+      "requirements" : [
+        "defaultValue"
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "protocol:LocalizedError",
       "kind" : "protocol",
@@ -12318,6 +16577,30 @@
       ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:MenuStyle",
+      "kind" : "protocol",
+      "name" : "MenuStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: show the menu with `Menu(configuration)`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:NavigationSplitViewStyle",
+      "kind" : "protocol",
+      "name" : "NavigationSplitViewStyle",
+      "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
     },
     {
       "family" : "Environment",
@@ -12340,6 +16623,30 @@
       "support" : "partial"
     },
     {
+      "family" : "Controls",
+      "id" : "protocol:PrimitiveButtonStyle",
+      "kind" : "protocol",
+      "name" : "PrimitiveButtonStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `role`, `trigger()`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:ProgressViewStyle",
+      "kind" : "protocol",
+      "name" : "ProgressViewStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `fractionCompleted`, `label`, `currentValueLabel`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "protocol:Shape",
       "kind" : "protocol",
@@ -12349,6 +16656,30 @@
         "path(in:)"
       ],
       "source" : "Sources/Kiln/Core.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:TextEditorStyle",
+      "kind" : "protocol",
+      "name" : "TextEditorStyle",
+      "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "protocol:ToggleStyle",
+      "kind" : "protocol",
+      "name" : "ToggleStyle",
+      "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isOn`, `$isOn`, `isMixed`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
+      "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
     {
@@ -12462,6 +16793,45 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "style:ArrangementViewStyle.automatic",
+      "introduced" : "27.1",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "ArrangementViewStyle",
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "style:ArrangementViewStyle.overlay",
+      "introduced" : "27.1",
+      "kind" : "style",
+      "name" : "overlay",
+      "overloads" : [
+
+      ],
+      "owner" : "ArrangementViewStyle",
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "style:ArrangementViewStyle.split",
+      "introduced" : "27.1",
+      "kind" : "style",
+      "name" : "split",
+      "overloads" : [
+
+      ],
+      "owner" : "ArrangementViewStyle",
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "style:ButtonStyle.automatic",
       "kind" : "style",
@@ -12511,6 +16881,30 @@
     },
     {
       "family" : "Controls",
+      "id" : "style:ButtonStyle.glass",
+      "kind" : "style",
+      "name" : "glass",
+      "overloads" : [
+
+      ],
+      "owner" : "ButtonStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ButtonStyle.glassProminent",
+      "kind" : "style",
+      "name" : "glassProminent",
+      "overloads" : [
+
+      ],
+      "owner" : "ButtonStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "style:ButtonStyle.plain",
       "kind" : "style",
       "name" : "plain",
@@ -12518,6 +16912,66 @@
 
       ],
       "owner" : "ButtonStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ControlGroupStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "ControlGroupStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ControlGroupStyle.compactMenu",
+      "kind" : "style",
+      "name" : "compactMenu",
+      "overloads" : [
+
+      ],
+      "owner" : "ControlGroupStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ControlGroupStyle.menu",
+      "kind" : "style",
+      "name" : "menu",
+      "overloads" : [
+
+      ],
+      "owner" : "ControlGroupStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ControlGroupStyle.navigation",
+      "kind" : "style",
+      "name" : "navigation",
+      "overloads" : [
+
+      ],
+      "owner" : "ControlGroupStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:ControlGroupStyle.palette",
+      "kind" : "style",
+      "name" : "palette",
+      "overloads" : [
+
+      ],
+      "owner" : "ControlGroupStyle",
       "source" : "Sources/Kiln/ControlStyles.swift",
       "support" : "full"
     },
@@ -12571,6 +17025,54 @@
     },
     {
       "family" : "Controls",
+      "id" : "style:DisclosureGroupStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "DisclosureGroupStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:FormStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "FormStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:FormStyle.columns",
+      "kind" : "style",
+      "name" : "columns",
+      "overloads" : [
+
+      ],
+      "owner" : "FormStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:FormStyle.grouped",
+      "kind" : "style",
+      "name" : "grouped",
+      "overloads" : [
+
+      ],
+      "owner" : "FormStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "style:GaugeStyle.accessoryCircular",
       "kind" : "style",
       "name" : "accessoryCircular",
@@ -12579,6 +17081,90 @@
       ],
       "owner" : "GaugeStyle",
       "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GaugeStyle.accessoryCircularCapacity",
+      "kind" : "style",
+      "name" : "accessoryCircularCapacity",
+      "overloads" : [
+
+      ],
+      "owner" : "GaugeStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GaugeStyle.accessoryLinear",
+      "kind" : "style",
+      "name" : "accessoryLinear",
+      "overloads" : [
+
+      ],
+      "owner" : "GaugeStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GaugeStyle.accessoryLinearCapacity",
+      "kind" : "style",
+      "name" : "accessoryLinearCapacity",
+      "overloads" : [
+
+      ],
+      "owner" : "GaugeStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GaugeStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "GaugeStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GaugeStyle.linearCapacity",
+      "kind" : "style",
+      "name" : "linearCapacity",
+      "overloads" : [
+
+      ],
+      "owner" : "GaugeStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:GroupBoxStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "GroupBoxStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:IndexViewStyle.page",
+      "kind" : "style",
+      "name" : "page",
+      "overloads" : [
+
+      ],
+      "owner" : "IndexViewStyle",
+      "source" : "Sources/Kiln/Tabs.swift",
       "support" : "full"
     },
     {
@@ -12626,6 +17212,18 @@
 
       ],
       "owner" : "LabelStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:LabeledContentStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "LabeledContentStyle",
       "source" : "Sources/Kiln/ControlStyles.swift",
       "support" : "full"
     },
@@ -12703,6 +17301,114 @@
     },
     {
       "family" : "Controls",
+      "id" : "style:MenuStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "MenuStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:MenuStyle.borderlessButton",
+      "kind" : "style",
+      "name" : "borderlessButton",
+      "overloads" : [
+
+      ],
+      "owner" : "MenuStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:MenuStyle.button",
+      "kind" : "style",
+      "name" : "button",
+      "overloads" : [
+
+      ],
+      "owner" : "MenuStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationSplitViewStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationSplitViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationSplitViewStyle.balanced",
+      "kind" : "style",
+      "name" : "balanced",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationSplitViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationSplitViewStyle.prominentDetail",
+      "kind" : "style",
+      "name" : "prominentDetail",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationSplitViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationViewStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationViewStyle.columns",
+      "kind" : "style",
+      "name" : "columns",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:NavigationViewStyle.stack",
+      "kind" : "style",
+      "name" : "stack",
+      "overloads" : [
+
+      ],
+      "owner" : "NavigationViewStyle",
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "style:PickerStyle.automatic",
       "kind" : "style",
       "name" : "automatic",
@@ -12775,6 +17481,18 @@
     },
     {
       "family" : "Controls",
+      "id" : "style:PickerStyle.tabs",
+      "kind" : "style",
+      "name" : "tabs",
+      "overloads" : [
+
+      ],
+      "owner" : "PickerStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
       "id" : "style:PickerStyle.wheel",
       "kind" : "style",
       "name" : "wheel",
@@ -12822,10 +17540,94 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "style:TabViewStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "TabViewStyle",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:TabViewStyle.page",
+      "kind" : "style",
+      "name" : "page",
+      "overloads" : [
+
+      ],
+      "owner" : "TabViewStyle",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:TabViewStyle.sidebarAdaptable",
+      "kind" : "style",
+      "name" : "sidebarAdaptable",
+      "overloads" : [
+
+      ],
+      "owner" : "TabViewStyle",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "style:TabViewStyle.tabBarOnly",
+      "kind" : "style",
+      "name" : "tabBarOnly",
+      "overloads" : [
+
+      ],
+      "owner" : "TabViewStyle",
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:TextEditorStyle.automatic",
+      "kind" : "style",
+      "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "TextEditorStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:TextEditorStyle.plain",
+      "kind" : "style",
+      "name" : "plain",
+      "overloads" : [
+
+      ],
+      "owner" : "TextEditorStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "style:TextFieldStyle.automatic",
       "kind" : "style",
       "name" : "automatic",
+      "overloads" : [
+
+      ],
+      "owner" : "TextFieldStyle",
+      "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "style:TextFieldStyle.bordered",
+      "kind" : "style",
+      "name" : "bordered",
       "overloads" : [
 
       ],
@@ -12892,6 +17694,24 @@
       "owner" : "ToggleStyle",
       "source" : "Sources/Kiln/ControlStyles.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "type:ActionSheet",
+      "kind" : "type",
+      "name" : "ActionSheet",
+      "notes" : "Shown as a `.confirmationDialog`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "title",
+            "message",
+            "buttons"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "partial"
     },
     {
       "family" : "Navigation",
@@ -13037,6 +17857,32 @@
       "kind" : "type",
       "name" : "AsyncThrowingStream",
       "source" : "Sources/Kiln/Concurrency.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Text",
+      "id" : "type:AttributedString",
+      "kind" : "type",
+      "name" : "AttributedString",
+      "notes" : "`AttributedString(\"…\")` and `AttributedString(markdown:)`, attributes set on the whole string (`foregroundColor`, `backgroundColor`, `font`, `link`), `append`, and `String(s.characters)`. Ranges and runs aren't bridged.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "markdown"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/AttributedText.swift",
       "support" : "partial"
     },
     {
@@ -13515,6 +18361,18 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "type:GeometryProxy",
+      "kind" : "type",
+      "name" : "GeometryProxy",
+      "notes" : "`size`, `safeAreaInsets`, `frame(in: .local / .global / .named(…) / .scrollView)` and `bounds(of:)`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:Gradient",
       "kind" : "type",
@@ -13763,6 +18621,39 @@
       "support" : "partial"
     },
     {
+      "family" : "Navigation",
+      "id" : "type:NavigationPath",
+      "kind" : "type",
+      "name" : "NavigationPath",
+      "notes" : "`append`, `removeLast()`, `count`, `isEmpty`; `NavigationPath()` or from an array.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "type:NavigationTransition",
+      "introduced" : "18.0",
+      "kind" : "type",
+      "name" : "NavigationTransition",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:NumberFormatter",
       "kind" : "type",
@@ -13770,6 +18661,29 @@
       "notes" : "`numberStyle`, the fraction digits and `currencyCode`; other settings are ignored.",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "type:PresentationDetent",
+      "kind" : "type",
+      "name" : "PresentationDetent",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "type:PresentationSizing",
+      "introduced" : "18.0",
+      "kind" : "type",
+      "name" : "PresentationSizing",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -13859,6 +18773,70 @@
     },
     {
       "family" : "Layout",
+      "id" : "type:ScrollPosition",
+      "kind" : "type",
+      "name" : "ScrollPosition",
+      "notes" : "`ScrollPosition(edge:)`, `(id:)`, `(x:y:)`; `scrollTo(id:)`, `scrollTo(edge:)`, `scrollTo(x:y:)`; `viewID`, `edge`, `point`, `isPositionedByUser`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "id",
+            "anchor"
+          ]
+        },
+        {
+          "labels" : [
+            "idType"
+          ]
+        },
+        {
+          "labels" : [
+            "idType",
+            "edge"
+          ]
+        },
+        {
+          "labels" : [
+            "idType",
+            "point"
+          ]
+        },
+        {
+          "labels" : [
+            "idType",
+            "x"
+          ]
+        },
+        {
+          "labels" : [
+            "idType",
+            "x",
+            "y"
+          ]
+        },
+        {
+          "labels" : [
+            "idType",
+            "y"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:ScrollTargetBehavior",
+      "kind" : "type",
+      "name" : "ScrollTargetBehavior",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Scrolling.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
       "id" : "type:ScrollViewProxy",
       "kind" : "type",
       "name" : "ScrollViewProxy",
@@ -13867,6 +18845,17 @@
       ],
       "source" : "Sources/Kiln/Layout.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "type:SearchFieldPlacement",
+      "kind" : "type",
+      "name" : "SearchFieldPlacement",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Search.swift",
+      "support" : "full"
     },
     {
       "family" : "Language",
@@ -13993,6 +18982,22 @@
       "support" : "partial"
     },
     {
+      "family" : "Navigation",
+      "id" : "type:TabViewCustomization",
+      "introduced" : "18.0",
+      "kind" : "type",
+      "name" : "TabViewCustomization",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Concurrency",
       "id" : "type:Task",
       "kind" : "type",
@@ -14056,7 +19061,7 @@
       "overloads" : [
 
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
+      "source" : "Sources/Kiln/Toolbars.swift",
       "support" : "partial"
     },
     {
@@ -14577,6 +19582,24 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "view:ArrangementView",
+      "introduced" : "27.1",
+      "kind" : "view",
+      "name" : "ArrangementView",
+      "notes" : "A primary and a secondary view, split or overlaid by `.arrangementViewStyle(.split)` or `.overlay`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "primary",
+            "secondary"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "view:AsyncImage",
       "kind" : "view",
@@ -14614,6 +19637,11 @@
       "kind" : "view",
       "name" : "Button",
       "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
         {
           "labels" : [
             "_",
@@ -14665,6 +19693,22 @@
       ],
       "source" : "Sources/Kiln/Controls.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "view:ButtonBorderShape",
+      "kind" : "view",
+      "name" : "ButtonBorderShape",
+      "notes" : "As a shape it can't be `.fill`ed; use `Capsule()`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "partial"
     },
     {
       "family" : "Drawing",
@@ -14824,7 +19868,7 @@
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -14880,7 +19924,26 @@
       "overloads" : [
         {
           "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
             "_",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "systemImage",
             "content"
           ]
         },
@@ -14904,7 +19967,7 @@
       "id" : "view:DatePicker",
       "kind" : "view",
       "name" : "DatePicker",
-      "notes" : "`displayedComponents` `.date` and `.hourAndMinute`; an `in:` range isn't enforced.",
+      "notes" : "`displayedComponents` `.date`, `.hourAndMinute` or both, with an `in:` range (`date...`, `...date` or `a...b`); every style, `.graphical` included.",
       "overloads" : [
         {
           "labels" : [
@@ -14938,7 +20001,7 @@
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Lists",
@@ -15007,6 +20070,18 @@
       "support" : "full"
     },
     {
+      "family" : "Lists",
+      "id" : "view:EditableCollectionContent",
+      "kind" : "view",
+      "name" : "EditableCollectionContent",
+      "notes" : "What `ForEach($items, editActions:)` makes.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "view:Ellipse",
       "kind" : "view",
@@ -15064,6 +20139,22 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "view:EquatableView",
+      "kind" : "view",
+      "name" : "EquatableView",
+      "notes" : "Shows its content; Kiln redraws it with its parent.",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Lists",
       "id" : "view:ForEach",
       "kind" : "view",
@@ -15079,7 +20170,34 @@
         {
           "labels" : [
             "_",
+            "editActions",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
             "id",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "editActions",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "sections",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "subviews",
             "content"
           ]
         }
@@ -15112,22 +20230,57 @@
           "labels" : [
             "value",
             "in",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "label",
+            "currentValueLabel"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "label",
+            "currentValueLabel",
+            "markedValueLabels"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
             "label",
             "currentValueLabel",
             "minimumValueLabel",
             "maximumValueLabel"
           ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "label",
+            "currentValueLabel",
+            "minimumValueLabel",
+            "maximumValueLabel",
+            "markedValueLabels"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Layout",
       "id" : "view:GeometryReader",
       "kind" : "view",
       "name" : "GeometryReader",
-      "notes" : "`proxy.size`.",
+      "notes" : "The closure gets a `GeometryProxy`: `size`, `safeAreaInsets`, `frame(in:)`, `bounds(of:)`.",
       "overloads" : [
         {
           "labels" : [
@@ -15136,7 +20289,7 @@
         }
       ],
       "source" : "Sources/Kiln/Layout.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -15182,6 +20335,18 @@
           "labels" : [
             "content"
           ]
+        },
+        {
+          "labels" : [
+            "sections",
+            "transform"
+          ]
+        },
+        {
+          "labels" : [
+            "subviews",
+            "transform"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Core.swift",
@@ -15193,6 +20358,11 @@
       "kind" : "view",
       "name" : "GroupBox",
       "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
         {
           "labels" : [
             "_",
@@ -15218,6 +20388,30 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "view:GroupElementsOfContent",
+      "kind" : "view",
+      "name" : "GroupElementsOfContent",
+      "notes" : "What `Group(subviews:transform:)` makes.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "view:GroupSectionsOfContent",
+      "kind" : "view",
+      "name" : "GroupSectionsOfContent",
+      "notes" : "What `Group(sections:transform:)` makes.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
       "support" : "full"
     },
     {
@@ -15289,6 +20483,11 @@
       "overloads" : [
         {
           "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
             "_",
             "image"
           ]
@@ -15315,6 +20514,11 @@
       "kind" : "view",
       "name" : "LabeledContent",
       "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
         {
           "labels" : [
             "_",
@@ -15477,14 +20681,32 @@
       "id" : "view:List",
       "kind" : "view",
       "name" : "List",
-      "notes" : "Rows, sections, `onDelete` and `onMove`; `selection:` isn't kept.",
+      "notes" : "Rows, sections, `ForEach` with `onDelete` and `onMove`; `selection:` one value (an optional) or a `Set` (with `EditButton`); `children:` for an outline.",
       "overloads" : [
         {
           "labels" : [
             "_",
             "id",
+            "children",
             "selection",
-            "content"
+            "rowContent"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "editActions",
+            "selection",
+            "rowContent"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "selection",
+            "rowContent"
           ]
         },
         {
@@ -15495,7 +20717,7 @@
         }
       ],
       "source" : "Sources/Kiln/Lists.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Controls",
@@ -15505,6 +20727,11 @@
       "overloads" : [
         {
           "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
             "_",
             "content"
           ]
@@ -15512,6 +20739,21 @@
         {
           "labels" : [
             "_",
+            "content",
+            "primaryAction"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image",
             "content",
             "primaryAction"
           ]
@@ -15525,6 +20767,14 @@
         },
         {
           "labels" : [
+            "_",
+            "systemImage",
+            "content",
+            "primaryAction"
+          ]
+        },
+        {
+          "labels" : [
             "content",
             "label"
           ]
@@ -15534,6 +20784,43 @@
             "content",
             "label",
             "primaryAction"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Controls.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "view:MultiDatePicker",
+      "kind" : "view",
+      "name" : "MultiDatePicker",
+      "notes" : "`selection` is a `Set<DateComponents>`; read `.year`, `.month` and `.day` from each.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "selection"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "selection",
+            "in"
+          ]
+        },
+        {
+          "labels" : [
+            "selection",
+            "in",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "selection",
+            "label"
           ]
         }
       ],
@@ -15579,11 +20866,12 @@
       "id" : "view:NavigationSplitView",
       "kind" : "view",
       "name" : "NavigationSplitView",
-      "notes" : "Shown as a stack of its sidebar.",
+      "notes" : "Two or three columns on iPad; on iPhone it's a stack from the sidebar. `columnVisibility:` and `preferredCompactColumn:` are kept.",
       "overloads" : [
         {
           "labels" : [
             "columnVisibility",
+            "preferredCompactColumn",
             "sidebar",
             "content",
             "detail"
@@ -15592,30 +20880,36 @@
         {
           "labels" : [
             "columnVisibility",
+            "preferredCompactColumn",
             "sidebar",
             "detail"
           ]
         }
       ],
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Navigation",
       "id" : "view:NavigationStack",
       "kind" : "view",
       "name" : "NavigationStack",
-      "notes" : "`path:` isn't kept; push with `NavigationLink(value:)` and `.navigationDestination(for:)`.",
+      "notes" : "Push with `NavigationLink(value:)` and `.navigationDestination(for:)`; `path:` is an array of values or a `NavigationPath`.",
       "overloads" : [
         {
           "labels" : [
             "path",
             "root"
           ]
+        },
+        {
+          "labels" : [
+            "root"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -15630,6 +20924,44 @@
         }
       ],
       "source" : "Sources/Kiln/Navigation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "view:OutlineGroup",
+      "kind" : "view",
+      "name" : "OutlineGroup",
+      "notes" : "Over a tree: `OutlineGroup(items, children: \\.children) { item in … }`, with `id:` or `Identifiable` items.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "children",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "children",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Lists",
+      "id" : "view:OutlineSubgroupChildren",
+      "kind" : "view",
+      "name" : "OutlineSubgroupChildren",
+      "notes" : "The children an `OutlineGroup` shows under a row.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/ListCollections.swift",
       "support" : "full"
     },
     {
@@ -15710,6 +21042,7 @@
       "id" : "view:ProgressView",
       "kind" : "view",
       "name" : "ProgressView",
+      "notes" : "Indeterminate, `value:total:`, `timerInterval:countsDown:`, or your own `ProgressViewStyle`.",
       "overloads" : [
         {
           "labels" : [
@@ -15735,6 +21068,20 @@
         },
         {
           "labels" : [
+            "timerInterval",
+            "countsDown"
+          ]
+        },
+        {
+          "labels" : [
+            "timerInterval",
+            "countsDown",
+            "label",
+            "currentValueLabel"
+          ]
+        },
+        {
+          "labels" : [
             "value",
             "total"
           ]
@@ -15749,7 +21096,7 @@
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -15791,6 +21138,22 @@
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Controls",
+      "id" : "view:RenameButton",
+      "kind" : "view",
+      "name" : "RenameButton",
+      "notes" : "Runs the nearest `.renameAction { }`.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
       "support" : "full"
     },
     {
@@ -15862,6 +21225,13 @@
         },
         {
           "labels" : [
+            "_",
+            "isExpanded",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
             "content",
             "header",
             "footer"
@@ -15878,6 +21248,13 @@
             "header",
             "footer",
             "content"
+          ]
+        },
+        {
+          "labels" : [
+            "isExpanded",
+            "content",
+            "header"
           ]
         }
       ],
@@ -15902,6 +21279,13 @@
             "_",
             "text",
             "prompt"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "prompt",
+            "label"
           ]
         }
       ],
@@ -15958,7 +21342,7 @@
       "id" : "view:Slider",
       "kind" : "view",
       "name" : "Slider",
-      "notes" : "Labels and `onEditingChanged` are accepted but not shown.",
+      "notes" : "Labels, `step:`, `neutralValue:`, `enabledBounds:`, and tick marks (`ticks: { SliderTick(0.5) }`, iOS 26).",
       "overloads" : [
         {
           "labels" : [
@@ -15976,12 +21360,62 @@
             "value",
             "in",
             "step",
+            "neutralValue",
+            "enabledBounds",
+            "label",
+            "currentValueLabel",
+            "minimumValueLabel",
+            "maximumValueLabel",
+            "tick",
             "onEditingChanged"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "neutralValue",
+            "enabledBounds",
+            "label",
+            "currentValueLabel",
+            "minimumValueLabel",
+            "maximumValueLabel",
+            "ticks",
+            "onEditingChanged"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "onEditingChanged"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "onEditingChanged",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "onEditingChanged",
+            "minimumValueLabel",
+            "maximumValueLabel",
+            "label"
           ]
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -16051,11 +21485,47 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "view:Subview",
+      "kind" : "view",
+      "name" : "Subview",
+      "notes" : "A resolved subview: show it, modify it, and read `id` and `containerValues`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "view:SubviewsCollection",
+      "kind" : "view",
+      "name" : "SubviewsCollection",
+      "notes" : "`Group(subviews:)`'s subviews: an array you can count, index, slice and `ForEach` over.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "view:SubviewsCollectionSlice",
+      "kind" : "view",
+      "name" : "SubviewsCollectionSlice",
+      "notes" : "A slice of the subviews (`subviews.prefix(3)`, `subviews.dropFirst()`).",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Navigation",
       "id" : "view:TabView",
       "kind" : "view",
       "name" : "TabView",
-      "notes" : "Tabs from `.tabItem` or `Tab`.",
+      "notes" : "`Tab`s (with `value:`, `role: .search`) and `TabSection`s, or views with `.tabItem`; `selection:` is the tab's value.",
       "overloads" : [
         {
           "labels" : [
@@ -16064,8 +21534,8 @@
           ]
         }
       ],
-      "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
     },
     {
       "family" : "Text",
@@ -16093,6 +21563,15 @@
         },
         {
           "labels" : [
+            "timerInterval",
+            "pauseTime",
+            "countsDown",
+            "showsHours"
+          ],
+          "notes" : "A live countdown or count-up over a `start...end` range of dates."
+        },
+        {
+          "labels" : [
             "verbatim"
           ]
         }
@@ -16105,15 +21584,22 @@
       "id" : "view:TextEditor",
       "kind" : "view",
       "name" : "TextEditor",
+      "notes" : "`selection:` isn't kept.",
       "overloads" : [
         {
           "labels" : [
             "text"
           ]
+        },
+        {
+          "labels" : [
+            "text",
+            "selection"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
-      "support" : "full"
+      "support" : "partial"
     },
     {
       "family" : "Controls",
@@ -16141,6 +21627,15 @@
         {
           "labels" : [
             "_",
+            "text",
+            "selection",
+            "prompt",
+            "axis"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
             "value",
             "format",
             "prompt"
@@ -16150,12 +21645,64 @@
           "labels" : [
             "_",
             "value",
-            "formatter"
+            "formatter",
+            "onEditingChanged",
+            "onCommit"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "value",
+            "formatter",
+            "prompt"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "prompt",
+            "axis",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "text",
+            "selection",
+            "prompt",
+            "axis",
+            "label"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "format",
+            "prompt",
+            "label"
           ]
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Controls",
+      "id" : "view:TextInputBorderShape",
+      "introduced" : "27.0",
+      "kind" : "view",
+      "name" : "TextInputBorderShape",
+      "notes" : "For `.textInputBorderShape(_:)`: `.capsule`, `.roundedRectangle` or `.automatic`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
     },
     {
       "family" : "Core",
@@ -16180,6 +21727,18 @@
       "kind" : "view",
       "name" : "Toggle",
       "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image",
+            "isOn"
+          ]
+        },
         {
           "labels" : [
             "_",
@@ -16398,6 +21957,18 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "wrapper:ScaledMetric",
+      "kind" : "wrapper",
+      "name" : "ScaledMetric",
+      "notes" : "Scaled once, when the view appears.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Environment",
       "id" : "wrapper:SceneStorage",
       "kind" : "wrapper",
@@ -16529,6 +22100,36 @@
       "reason" : "There's no canvas in Shelf; `#Preview` blocks are skipped when read (§1.6).",
       "status" : "wontDo",
       "what" : "Xcode previews (`#Preview`, `@Previewable`, `preview*` modifiers)"
+    },
+    {
+      "id" : "private-style-protocols",
+      "reason" : "SwiftUI keeps their requirements private (`_makeView`, `_body`), so no app can adopt them, compiled or not. The built-in styles all work.",
+      "status" : "wontDo",
+      "what" : "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle` or `IndexViewStyle`"
+    },
+    {
+      "id" : "tables",
+      "reason" : "On iPhone a `Table` collapses to its first column with no headers, so it's a `List` that's harder to write; use a `List` of rows, or a `Grid` for columns.",
+      "status" : "wontDo",
+      "what" : "`Table`, its columns, rows and styles"
+    },
+    {
+      "id" : "list-insert-drop",
+      "reason" : "It hands the app `NSItemProvider`s from a drag, which arrive with drag and drop (§4.1).",
+      "status" : "later",
+      "what" : "`.onInsert(of:perform:)`: dropping items into a list"
+    },
+    {
+      "id" : "custom-presentation-detent",
+      "reason" : "SwiftUI calls its static `height(in:)` while it lays out the sheet, off the main actor, where Kiln's code can't run; `.fraction(_:)` and `.height(_:)` cover the same sizes.",
+      "status" : "wontDo",
+      "what" : "`PresentationDetent.custom(_:)` with your own `CustomPresentationDetent`"
+    },
+    {
+      "id" : "search-selection",
+      "reason" : "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
+      "status" : "later",
+      "what" : "`.searchSelection(_:)`: the selected range in the search field"
     }
   ]
 }
