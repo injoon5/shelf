@@ -24,8 +24,8 @@ struct Jiggle: ViewModifier {
 
 /// The jiggle at one moment. Glass can't be turned: turned as a view or
 /// drawn in a turned shape, it leaves a second outline and material past
-/// its edges. So a Clear icon's tile only bobs, upright, and its glyph and
-/// label turn by `jiggleTurn`.
+/// its edges. So a Clear icon's tile sways and bobs, upright, and its glyph
+/// and label turn by `jiggleTurn`.
 private struct Tilt: ViewModifier, Animatable {
     var angle: Double
     var shift: CGFloat
@@ -40,7 +40,7 @@ private struct Tilt: ViewModifier, Animatable {
         content
             .rotationEffect(.degrees(turnsGlass ? 0 : angle))
             .environment(\.jiggleTurn, .degrees(turnsGlass ? angle : 0))
-            .offset(y: shift)
+            .offset(x: turnsGlass ? angle / HomeMetrics.jiggleAngle * HomeMetrics.jiggleSway : 0, y: shift)
     }
 }
 

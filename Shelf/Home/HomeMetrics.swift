@@ -171,6 +171,8 @@ enum HomeMetrics {
     static let editButtonTop: CGFloat = 19
     static let jiggleAngle: Double = 1.6
     static let jiggleShift: CGFloat = 0.6
+    /// A Clear icon's tile can't turn, so it sways this far side to side instead.
+    static let jiggleSway: CGFloat = 1.2
     /// How close to a screen edge a dragged icon flips the page.
     static let pageFlipEdge: CGFloat = 28
     static let bannerTopGap: CGFloat = 4
