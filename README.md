@@ -2,7 +2,7 @@
 
 An iPhone Home Screen for apps you make yourself.
 
-Every app on Shelf is a single SwiftUI file that a model wrote for you. The files live on [ij5.dev](https://ij5.dev). Shelf syncs them to the phone, shows them as icons on a Springboard-style Home Screen, and runs them on the device with [Kiln](https://github.com/haplollc/Kiln), an interpreter for Swift. There's no compiler, no Xcode project per app, and no App Store. Describe an app, and a minute later it's an icon you can tap.
+Every app on Shelf is a single SwiftUI file that a model wrote for you. The files live on [ij5.dev](https://ij5.dev). Shelf syncs them to the phone, shows them as icons on a Springboard-style Home Screen, and runs them on the device with Kiln, an interpreter for Swift. Kiln began as [haplollc/Kiln](https://github.com/haplollc/Kiln); Shelf keeps its own copy in [Packages/Kiln/](Packages/Kiln/) and is rebuilding it there. There's no compiler, no Xcode project per app, and no App Store. Describe an app, and a minute later it's an icon you can tap.
 
 Shelf needs iOS 27.
 
@@ -20,9 +20,9 @@ Shelf needs iOS 27.
 
 ## What's next
 
-[PLAN.md](PLAN.md) starts with Shelf itself: an audit of how the Home Screen behaves, moving the Home Screen to UIKit and Core Animation (the sheets stay SwiftUI), search rebuilt as App Library's list, deleting apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a better launch screen. Then it takes Kiln into this repo and rebuilds it:
+[PLAN.md](PLAN.md) starts with Shelf itself: an audit of how the Home Screen behaves, moving the Home Screen to UIKit and Core Animation (the sheets stay SwiftUI), search rebuilt as App Library's list, deleting apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a better launch screen. Then it rebuilds Kiln, which is now in this repo and down to one engine:
 
-- **The rebuild:** one engine instead of two, real `async`, and a registry of bridges that also drives the prompt and a coverage report.
+- **The rebuild:** a bytecode VM with real `async`, and a registry of bridges that also drives the prompt and a coverage report.
 - **Then, in rounds:**
   - the rest of SwiftUI;
   - haptics, sharing, text parsing, units, audio, `WebView`, `Chart3D` and WebSockets;
@@ -35,11 +35,11 @@ Shelf needs iOS 27.
 You need Xcode 27 and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```sh
-./Scripts/bootstrap.sh     # fetches Kiln 0.2.1, applies Vendor/kiln-0.2.1.patch, generates Shelf.xcodeproj
+./Scripts/bootstrap.sh     # generates Shelf.xcodeproj
 open Shelf.xcodeproj
 ```
 
-The Xcode project is generated from `project.yml` and isn't committed. Change `project.yml`, not the project, and run the bootstrap again.
+The Xcode project is generated from `project.yml` and isn't committed. Change `project.yml`, not the project, and run the bootstrap again. Kiln is a local Swift package in `Packages/Kiln`, so nothing is fetched.
 
 **On a phone:** put your team in `Config/Local.xcconfig` (not committed), then bootstrap again.
 
@@ -105,7 +105,7 @@ Shelf/
   Resources/  prompts and the app icon
 ShelfTests/   unit tests
 fixtures/     API responses, reply-parser cases, one feature app per prompt section
-Vendor/       the Kiln patch; Kiln itself is fetched by the bootstrap and not committed
+Packages/Kiln/  Kiln, the interpreter apps run on: forked from upstream 0.2.1, with its own tests, Kiln Lab, and benchmarks
 design/       Springboard reference measurements and notes
 ```
 
@@ -128,7 +128,7 @@ Decisions that aren't obvious from the code:
 - **Icons are light or dark.** Dark icons are near-black tiles with the glyph in the app's colour, as Springboard's are. Clear isn't drawn any more; Settings still offers it until Icon Appearance replaces the setting (PLAN.md §0.5).
 - **Apps can't overwrite each other's settings.** Kiln puts `@AppStorage` in the shared `UserDefaults.standard`, so Shelf rewrites each key to `<slug>.<key>` before running an app. It's not a security boundary, so Shelf keeps nothing of its own there.
 - **`DB` is plain networking.** Kiln can already make requests, so Shelf appends a small `DB` helper to apps that use it. The helper talks to a `db://` URL scheme that Shelf answers on the phone from a local store, which syncs with ij5.dev. The key travels in a `DB-Key` header, because a key in the URL would be cut at `?` or `#`.
-- **Kiln is patched.** 0.2.1 couldn't write JSON: `JSONEncoder().encode` was missing, `[Todo].self` threw, and a decoded `UUID` came back as a `String`. `Vendor/kiln-0.2.1.patch` fixes all three. The rebuild in PLAN.md replaces it.
+- **Kiln lives here.** It was a pinned upstream tag plus a patch; now it's `Packages/Kiln`, a local package whose module is still `Kiln`. The first two commits that brought it in are upstream 0.2.1 untouched, then the patch Shelf needed (0.2.1 couldn't write JSON: `JSONEncoder().encode` was missing, `[Todo].self` threw, and a decoded `UUID` came back as a `String`), so it can be offered back. Changes to Kiln are timed against 0.2.1 with `Packages/Kiln/Benchmarks/run.sh` ([Benchmarks/](Packages/Kiln/Benchmarks/README.md)); more than 10% slower on any app blocks a merge.
 - **Deleting an app deletes everything, everywhere.** Delete App sends `DELETE /api/apps/{slug}?data=delete`, which drops the app, every version Revert could reach, its data and its unused install keys (a live update key would otherwise make the app again). On the phone, `AppCleanup` is the one list of what an app leaves behind (source, `DB` store with its pending writes, `@AppStorage`, launch snapshot), and a sync that finds an app gone runs the same list, so other phones follow. The icon goes at once, but the phone's copy only once the server answers, so a refusal brings the icon back with nothing lost. On screen it is Springboard's, measured frame by frame: the system alert ("Delete “Habits”?", Cancel and Delete), then the icon shrinks to nothing about its centre in 200 ms and the others close up 230 ms later on a spring fitted to Springboard's. An icon that comes back before it has gone turns around where it is. Offline, the copy goes at once and the deletion waits in `deletions.json` for the next sync, which sends it before listing apps.
 - **The server keeps history.** `POST /api/apps/{slug}/revert` backs the Revert menu item. `rev` comes from a counter table, not `MAX(rev) + 1`, which could go backwards after a purge. A closed sheet's unused install key is reused while it has ten minutes left, since the server allows twenty live keys.
 
@@ -147,4 +147,4 @@ Decisions that aren't obvious from the code:
 
 ## Credits
 
-Kiln is by [@jc_builds](https://twitter.com/jc_builds) at [Haplo](https://haploapp.com), MIT-licensed.
+Kiln is by [@jc_builds](https://twitter.com/jc_builds) at [Haplo](https://haploapp.com): [haplollc/Kiln](https://github.com/haplollc/Kiln), MIT-licensed. Shelf's copy in `Packages/Kiln` started from its 0.2.1 release and keeps its [LICENSE](Packages/Kiln/LICENSE).

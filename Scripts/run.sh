@@ -9,5 +9,5 @@ UDID="${1:-booted}"
 xcodebuild build -project Shelf.xcodeproj -scheme Shelf \
   -destination "generic/platform=iOS Simulator" \
   -derivedDataPath build/DerivedData ARCHS=arm64 ONLY_ACTIVE_ARCH=YES 2>&1 \
-  | grep -E "error|warning: |\*\* " | grep -v "Vendor/Kiln\|appintentsmetadata" | sort -u || true
+  | grep -E "error|warning: |\*\* " | grep -v "Packages/Kiln\|appintentsmetadata" | sort -u || true
 xcrun simctl install "$UDID" build/DerivedData/Build/Products/Debug-iphonesimulator/Shelf.app

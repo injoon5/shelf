@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 to §0.4, §0.7, and items 1–4 of §0.8 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1 to §0.4, §0.7, items 1–4 of §0.8, and §1.1 and §1.2 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -322,6 +322,8 @@ Kiln becomes Shelf's package. The parser and the value model are kept. The way c
 
 - Delete the old interpreter: `Parser/`, `Runtime/`, `Renderer/`, `Interpreter/`, `SwiftRunner.swift`, whatever in `Validator/` only it uses, the tests that only cover it, and `Kiln.engine`.
 - Delete the dialect check in `KEEngine.swift`, and the prompt's "don't write `GameCanvas(`" rule.
+
+Built. Kiln is in `Packages/Kiln` (upstream 0.2.1, then the patch, each its own commit), and only `Engine/` is left. `Kiln.register` went too: only the old interpreter read it, and §1.4's registry replaces it. The dialect check turned out to be most of what `Kiln.run` cost: deleting it made `run` 4 to 5 times faster on every app, while the interpreter itself, timed by compute workloads, didn't move ([Benchmarks](Packages/Kiln/Benchmarks/README.md)). So §1.3's bar is `after-1.2-one-engine.json`, which is stricter than 0.2.1's.
 
 ### 1.3 Code that can wait: bytecode and a resumable VM
 
