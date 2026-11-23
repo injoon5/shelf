@@ -11,6 +11,8 @@ import SwiftUI
 
 extension DrawingBridges {
     static let shapeNames = ["Circle", "Rectangle", "RoundedRectangle", "Capsule", "Ellipse", "UnevenRoundedRectangle", "ContainerRelativeShape"]
+    /// Shapes the renderer's `ShapeChain` reads, Round 1's included.
+    static let chainShapeNames: Set<String> = Set(shapeNames + ["ConcentricRectangle"])
 
     static func shapes(_ r: KRegistry) {
         let signatures: [String: [String]] = [
@@ -94,13 +96,6 @@ extension DrawingBridges {
             }
         }
 
-        r.view("Canvas", .drawing, support: .stub, notes: "Draws nothing yet: draw with a custom `Shape` instead.") { v in
-            v.form("opaque:bool? colorMode:any? rendersAsynchronously:bool? renderer:closure") { c in
-                let _ = c.interp.warn("Canvas isn't supported in Kiln yet; it draws nothing.")
-                EmptyView()
-            }
-        }
-
         // Modifiers that keep a shape a shape.
         r.modifier("fill", .drawing) { m in
             m.formOnBase("_:ColorOrStyle? style:any?", receiver: "Shape") { c in shapeModifier(c) }
@@ -114,11 +109,6 @@ extension DrawingBridges {
         }
         r.modifier("trim", .drawing) { m in
             m.formOnBase("from:number? to:number?", receiver: "Shape") { c in shapeModifier(c) }
-        }
-        for (name, sigs) in [("inset", ["by:number"]), ("rotation", ["_:Angle anchor:UnitPoint?"]), ("scale", ["_:number anchor:UnitPoint?", "x:number? y:number? anchor:UnitPoint?"])] {
-            r.modifier(name, .drawing, support: .stub, notes: "Accepted on a shape, with no effect yet.") { m in
-                for s in sigs { m.formOnBase(s, receiver: "Shape") { c in shapeModifier(c) } }
-            }
         }
     }
 
@@ -150,6 +140,14 @@ extension KRenderer {
     struct ShapeChain {
         var kind: KShapeKind
         var trim: (Double, Double)? = nil
+        /// `rotation`, `scale`, `union`… in order (ShapesAndStyles.swift).
+        var ops: [(AnyShape) -> AnyShape] = []
+
+        func applied(_ shape: AnyShape) -> AnyShape {
+            var s = shape
+            for op in ops { s = op(s) }
+            return s
+        }
     }
 
     func shapeChain(_ v: KView) -> ShapeChain? {
@@ -158,11 +156,24 @@ extension KRenderer {
             if n == "UserShape" || n == "PathShape" {
                 return ShapeChain(kind: customShape(n, KArgs(args: args, labels: labels)))
             }
-            guard ["Circle", "Rectangle", "RoundedRectangle", "Capsule", "Ellipse", "UnevenRoundedRectangle", "ContainerRelativeShape"].contains(n) else { return nil }
+            if n == "AnyShape", let shape = DrawingBridges.shapeArg(args.first, self) { return ShapeChain(kind: .custom(shape)) }
+            guard DrawingBridges.chainShapeNames.contains(n) else { return nil }
             return ShapeChain(kind: KShapeKind(n, KArgs(args: args, labels: labels)))
         case .modified(let base, let m) where m.name == "trim":
             guard var chain = shapeChain(base) else { return nil }
             chain.trim = (m.arg("from")?.asDouble ?? 0, m.arg("to")?.asDouble ?? 1)
+            return chain
+        case .modified(let base, let m) where m.name == "inset":
+            guard let chain = shapeChain(base), chain.trim == nil, chain.ops.isEmpty, let inset = chain.kind.inset(m.arg("by")?.cg ?? 0) else { return nil }
+            return ShapeChain(kind: .custom(inset))
+        case .modified(let base, let m):
+            guard var chain = shapeChain(base), let op = shapeOperation(m) else { return nil }
+            if let t = chain.trim {
+                // A trim before the operation is part of the shape it works on.
+                let before = chain
+                chain = ShapeChain(kind: .custom(AnyShape(before.applied(before.kind.anyShape).trim(from: t.0, to: t.1))))
+            }
+            chain.ops.append(op)
             return chain
         default:
             return nil
@@ -172,7 +183,7 @@ extension KRenderer {
     func shapeModifier(_ chain: ShapeChain, _ m: KModifier) -> AnyView {
         let r = self
         return shapeView(chain.kind) { base in
-            var shape = base
+            var shape = chain.applied(base)
             if let t = chain.trim { shape = AnyShape(shape.trim(from: t.0, to: t.1)) }
             switch m.name {
             case "trim":
@@ -187,7 +198,7 @@ extension KRenderer {
                 if case .native(.strokeStyle(let k))? = m.arg("style") {
                     ss = StrokeStyle(lineWidth: k.lineWidth, lineCap: r.lineCap(k.lineCap), lineJoin: r.lineJoin(k.lineJoin), dash: k.dash.map { CGFloat($0) })
                 }
-                if m.name == "strokeBorder", chain.trim == nil, !chain.kind.isUser { return chain.kind.strokeBorder(style, ss) }
+                if m.name == "strokeBorder", chain.trim == nil, chain.ops.isEmpty, !chain.kind.isUser { return chain.kind.strokeBorder(style, ss) }
                 return AnyView(shape.stroke(style, style: ss))
             default:
                 return AnyView(shape)
@@ -282,6 +293,8 @@ enum KShapeKind {
         case "Capsule": self = .capsule
         case "Ellipse": self = .ellipse
         case "ContainerRelativeShape": self = .container
+        case "ConcentricRectangle":
+            if #available(iOS 26, macOS 26, *) { self = .custom(AnyShape(ConcentricRectangle())) } else { self = .container }
         case "RoundedRectangle":
             var style: RoundedCornerStyle = .circular
             if case .native(.implicit("continuous", _))? = a["style"] { style = .continuous }
@@ -311,6 +324,21 @@ enum KShapeKind {
     }
 
     var isUser: Bool { if case .user = self { return true }; return false }
+
+    /// `inset(by:)` on a shape that's insettable.
+    @MainActor func inset(_ amount: CGFloat) -> AnyShape? {
+        switch self {
+        case .circle: return AnyShape(Circle().inset(by: amount))
+        case .rectangle: return AnyShape(Rectangle().inset(by: amount))
+        case .capsule: return AnyShape(Capsule().inset(by: amount))
+        case .ellipse: return AnyShape(Ellipse().inset(by: amount))
+        case .container: return AnyShape(ContainerRelativeShape().inset(by: amount))
+        case .rounded(let r, let s): return AnyShape(RoundedRectangle(cornerRadius: r, style: s).inset(by: amount))
+        case .uneven(let tl, let bl, let br, let tr):
+            return AnyShape(UnevenRoundedRectangle(topLeadingRadius: tl, bottomLeadingRadius: bl, bottomTrailingRadius: br, topTrailingRadius: tr).inset(by: amount))
+        default: return nil
+        }
+    }
 
     func strokeBorder(_ style: AnyShapeStyle, _ ss: StrokeStyle) -> AnyView {
         switch self {

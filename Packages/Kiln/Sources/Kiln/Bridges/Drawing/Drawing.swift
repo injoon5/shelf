@@ -110,6 +110,9 @@ final class DrawingBridges: KBridgeFamily {
         animatable(r)
         images(r)
         effects(r)
+        canvas(r)
+        KAffines.register(r)
+        round1(r)
     }
 
     // MARK: Colors and styles
