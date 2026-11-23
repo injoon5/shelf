@@ -102,3 +102,36 @@ struct SpringValue: Equatable, Sendable {
         abs(value(at: now) - target) <= tolerance && abs(velocity(at: now)) / 120 <= tolerance
     }
 }
+
+/// The time a card's flight is solved at: the display's, except that it
+/// never moves on by more than `RunnerMetrics.maxFrameStep` from one frame
+/// to the next, and not at all from the frame a flight sets off on to the
+/// next after it has paused.
+///
+/// So every frame of a flight is seen. Opening an app builds its card, its
+/// hosting controller and its launch surface on the main thread, which on
+/// a cold open holds up the next frame by 50–90 ms (measured on the
+/// simulator). On the display's clock the spring ran on regardless: the
+/// first frame anyone saw was a card already most of the way to full
+/// screen, and the icon never visibly grew. On this one the card's first
+/// frame is its icon, and the frames after a hitch carry on from there.
+struct CardClock: Equatable, Sendable {
+    /// The time of the frame on screen.
+    private(set) var now: Double = 0
+    /// The display's time of that frame; nil while paused.
+    private var shown: Double?
+
+    /// Moves on to the frame shown at the display's `time`, and returns
+    /// the clock's time for it.
+    @discardableResult
+    mutating func advance(to time: Double) -> Double {
+        if let shown { now += min(max(time - shown, 0), RunnerMetrics.maxFrameStep) }
+        shown = time
+        return now
+    }
+
+    /// Stops until the next frame, which shows where it stopped.
+    mutating func pause() {
+        shown = nil
+    }
+}

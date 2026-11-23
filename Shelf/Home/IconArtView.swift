@@ -39,6 +39,14 @@ class IconArtView: UIView {
     private let pie = InstallPieLayer()
     private let pressed = CAShapeLayer()
 
+    /// Whether the tile, the glyph and the rim are drawn. A card's face
+    /// stops drawing them once the app's picture covers it, so nothing of
+    /// the icon is left under the app (`CardFaceView.setContentOpacity`).
+    /// The outline still clips whatever is inside.
+    var showsArt = true {
+        didSet { if showsArt != oldValue { repaint() } }
+    }
+
     private var isPending = false
     private var isSlow = false
     private var slowTask: Task<Void, Never>?
@@ -93,7 +101,9 @@ class IconArtView: UIView {
         let palette = IconPalette(face, tone: traitCollection.iconTone)
         let scale = traitCollection.displayScale > 0 ? traitCollection.displayScale : 3
         withoutActions {
-            tile.colors = [palette.top.cgColor, palette.bottom.cgColor]
+            tile.colors = showsArt ? [palette.top.cgColor, palette.bottom.cgColor] : [UIColor.clear.cgColor, UIColor.clear.cgColor]
+            glyph.isHidden = !showsArt
+            rim.isHidden = !showsArt
             glyph.contents = IconGlyph.image(face.symbol, iconSize: iconSize, color: palette.glyph, scale: scale).cgImage
             glyph.contentsScale = scale
             glyph.bounds = CGRect(x: 0, y: 0, width: iconSize, height: iconSize)

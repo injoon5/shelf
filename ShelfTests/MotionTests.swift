@@ -418,7 +418,8 @@ struct CardReleaseTests {
         // Grown past full screen, above the limit, on its way back.
         face.place(CardFrame(rect: CGRect(x: -6, y: -12, width: 414, height: 898), radius: 57))
         let full = CardFrame(rect: CGRect(origin: .zero, size: screen), radius: 55)
-        face.fly(to: full, Motion.cardOpen, velocity: CardVelocity(center: .zero, size: CGSize(width: 40, height: 80), radius: 0), at: 0)
+        face.fly(to: full, Motion.cardOpen, velocity: CardVelocity(center: .zero, size: CGSize(width: 40, height: 80), radius: 0))
+        #expect(!face.step(at: 0))
         #expect(!face.step(at: 1.0 / 120))
         #expect(face.shown.rect.minY < 0)
         #expect(face.layer.animationKeys() == nil)
@@ -430,6 +431,95 @@ struct CardReleaseTests {
                                         finger: CGPoint(x: 201, y: 860), translation: .zero, direction: .up,
                                         screenHeight: screen.height).frame
         #expect(picked.isClose(to: caught, within: 0.000_1))
+    }
+
+    private func makeFace(iconSize: CGFloat = 62) -> CardFaceView {
+        CardFaceView(face: IconFace(AppMeta(slug: "a", name: "A", version: "1")), iconSize: iconSize, screen: screen, fullRadius: 55)
+    }
+
+    /// The same centre and size; the corner is drawn for the size.
+    private func samePlace(_ a: CardFrame, _ b: CardFrame) -> Bool {
+        a.isClose(to: CardFrame(center: b.center, size: b.size, radius: a.radius), within: 0.000_1)
+    }
+
+    /// Weather's slot, top row, second column.
+    private let icon = CardFrame(rect: CGRect(x: 124, y: 90, width: 62, height: 62), radius: HomeMetrics.iconRadius(62))
+    private var full: CardFrame { CardFrame(rect: CGRect(origin: .zero, size: screen), radius: 55) }
+
+    /// However late the first frame after the tap is (a cold open holds up
+    /// the main thread while the card is built), it shows the card on its
+    /// icon, and the next shows it grown by no more than a frame's worth:
+    /// every frame of the growth is seen, as Springboard's is. (The user's
+    /// "this is wrong": on the display's clock, the first frame anyone saw
+    /// was a card already most of the way to full screen.)
+    @Test(arguments: [0.0, 0.09, 0.5, 1000])
+    func theCardsFirstFrameIsItsIcon(hitch: Double) {
+        let face = makeFace()
+        face.place(icon)
+        face.fly(to: full, Motion.cardOpen, leansFrom: CGPoint(x: icon.center.x, y: icon.center.y))
+        let start = 50.0
+        #expect(!face.step(at: start + hitch))
+        #expect(face.shown.isClose(to: icon, within: 0.000_1))
+        #expect(face.lean == .none)
+        #expect(!face.step(at: start + hitch + 0.3))
+        let reference = CardFlight(from: icon, velocity: .zero, to: full, springs: Motion.cardOpen,
+                                   slowdown: Motion.Spring.slowdown, at: 0)
+        #expect(samePlace(face.shown, reference.frame(at: RunnerMetrics.maxFrameStep)))
+        // Frame by frame at 60 Hz, it runs on the display's time.
+        #expect(!face.step(at: start + hitch + 0.3 + 1.0 / 60))
+        #expect(samePlace(face.shown, reference.frame(at: RunnerMetrics.maxFrameStep + 1.0 / 60)))
+    }
+
+    /// At every point of an open and a close, the app's picture is exactly
+    /// the card: as wide, its top at the card's top, cropped at the bottom
+    /// by the outline that clips the whole card. A snapshot fading in over
+    /// the launch surface is the same size and in the same place.
+    @Test func thePictureIsAlwaysTheCard() throws {
+        let face = makeFace()
+        face.place(icon)
+        face.show(UIView())
+        let opening = CardFlight(from: icon, velocity: .zero, to: full, springs: Motion.cardOpen, at: 0)
+        let closing = CardFlight(from: full, velocity: .zero, to: icon, springs: Motion.cardClose, at: 0)
+        let frames = stride(from: 0.0, through: 0.6, by: 1.0 / 60).flatMap { [opening.frame(at: $0), closing.frame(at: $0)] }
+        for frame in frames + [CardFrame(rect: CGRect(x: -6, y: -12, width: 414, height: 898), radius: 57)] {
+            face.place(frame)
+            let picture = face.content.frame
+            let outline = try #require((face.layer.mask as? CAShapeLayer)?.path?.boundingBox)
+            let card = IconArtView.centered(frame.size)
+            #expect(abs(outline.minX - card.minX) < 0.01 && abs(outline.maxX - card.maxX) < 0.01)
+            #expect(abs(outline.minY - card.minY) < 0.01 && abs(outline.maxY - card.maxY) < 0.01)
+            #expect(abs(picture.minX - card.minX) < 0.01 && abs(picture.maxX - card.maxX) < 0.01)
+            #expect(abs(picture.minY - card.minY) < 0.01)
+            #expect(picture.maxY >= card.maxY - 0.01)
+            #expect(face.layer.position == frame.center)
+        }
+        face.setContentOpacity(1)
+        let snapshot = UIView()
+        face.show(snapshot, fading: true)
+        #expect(snapshot.superview === face.content)
+        #expect(snapshot.frame == face.content.bounds)
+        // The surface stays under it, opaque, until it has faded in.
+        #expect(face.content.subviews.count == 2)
+    }
+
+    /// The icon's face is gone once the picture covers the card, opening
+    /// (past the crossfade's end, 0.5) and closing alike, and is back as
+    /// soon as any of it shows through.
+    @Test func theIconIsGoneOnceThePictureCoversTheCard() {
+        let face = makeFace()
+        for step in 0...100 {
+            let progress = CGFloat(step) / 100
+            for opening in [true, false] {
+                let look = CardMotion.look(progress: progress, opening: opening)
+                face.setContentOpacity(look.content)
+                let covered = progress >= (opening ? RunnerMetrics.launchFade.upperBound : RunnerMetrics.contentFade.upperBound)
+                if covered { #expect(look.content == 1) }
+                #expect(face.showsArt == (look.content < 1))
+                if progress <= (opening ? RunnerMetrics.launchFade.lowerBound : RunnerMetrics.contentFade.lowerBound) {
+                    #expect(face.showsArt)
+                }
+            }
+        }
     }
 
     /// The card lands where its icon will be once the Home Screen behind it
@@ -462,6 +552,25 @@ struct CardReleaseTests {
             #expect(!landing.fades)
             stage.setBackdrop(0)
         }
+    }
+}
+
+/// The clock a card's flight runs on.
+struct CardClockTests {
+    @Test func itRunsOnTheDisplaysTimeButNeverJumps() {
+        var clock = CardClock()
+        // The first frame shows where it set off.
+        #expect(clock.advance(to: 10) == 0)
+        #expect(abs(clock.advance(to: 10 + 1.0 / 60) - 1.0 / 60) < 1e-12)
+        // A frame held up 90 ms moves it on by two frames' worth.
+        #expect(abs(clock.advance(to: 10 + 1.0 / 60 + 0.09) - (1.0 / 60 + RunnerMetrics.maxFrameStep)) < 1e-12)
+        // Never backwards.
+        let now = clock.now
+        #expect(clock.advance(to: 5) == now)
+        // Paused, the next frame shows where it stopped.
+        clock.pause()
+        #expect(clock.advance(to: 99) == now)
+        #expect(abs(clock.advance(to: 99 + 1.0 / 120) - (now + 1.0 / 120)) < 1e-12)
     }
 }
 

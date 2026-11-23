@@ -92,6 +92,9 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
     /// A tap on a minus badge: the app asks to be deleted, and the alert
     /// (`DeleteAlert`) asks the person.
     lazy var onDelete: (String) -> Void = { [unowned self] id in model.askToDelete(id) }
+    /// A finger has come down on an app's icon, which a tap would open:
+    /// the stage starts reading its launch snapshot (`StageController`).
+    var onPressApp: (String) -> Void = { _ in }
     private lazy var deleteImpact = UIImpactFeedbackGenerator(style: HomeMetrics.deleteImpact, view: self)
 
     init(model: HomeModel, library: LibraryStore, overlay: HomeOverlay) {
@@ -122,6 +125,7 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
         touch.onPress = { [unowned self] icon, pressed in
             // In edit mode a touch is a pickup, never a press.
             if !pressed || !model.isEditing { icon.setPressed(pressed) }
+            if pressed, !model.isEditing, case .app(let app) = icon.item { onPressApp(app.slug) }
         }
         touch.onTap = { [unowned self] icon, point in tapped(icon, at: point) }
         touch.addTarget(self, action: #selector(touched(_:)))

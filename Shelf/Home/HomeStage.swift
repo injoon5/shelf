@@ -92,6 +92,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
         view.addSubview(home)
         homeView = HomeView(model: model, library: library, overlay: overlay)
+        homeView.onPressApp = { [unowned self] slug in prefetchSnapshot(slug) }
         home.addSubview(homeView)
         home.addSubview(backdrop)
         list = SearchList(model: model, library: library)
@@ -376,6 +377,18 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         startTicking()
     }
 
+    /// Reads `slug`'s launch snapshot into memory while a finger is down on
+    /// its icon, so a tap opens on it from the card's first frame. Read on
+    /// the tap instead, it arrived a few frames into the growth on a cold
+    /// open, after the plain surface had already shown.
+    private func prefetchSnapshot(_ slug: String) {
+        guard cards.isEmpty, let source = library.source(for: slug) else { return }
+        let key = snapshotKey(source)
+        guard snapshots.cached(slug, key) == nil else { return }
+        let scale = traitCollection.displayScale
+        Task { [snapshots] in _ = await snapshots.load(slug, key, scale: scale) }
+    }
+
     /// What a snapshot of an app with `source` must match to be shown now:
     /// the appearance the person chose (not one an app forced) and the
     /// text size.
@@ -509,7 +522,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         for card in cards {
             if card.phase == .closing {
                 let landing = landing(for: card.slug)
-                card.follow(landing: landing.frame, fades: landing.fades, at: time)
+                card.follow(landing: landing.frame, fades: landing.fades)
             }
             let arrived = card.phase != .held && card.step(at: time)
             card.tick()
