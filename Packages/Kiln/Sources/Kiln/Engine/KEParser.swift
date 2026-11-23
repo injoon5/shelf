@@ -906,7 +906,7 @@ struct KEParser {
                 var args: [KEArg] = []
                 while !at("]") {
                     var label: String? = nil
-                    if let l = cur.identValue, ahead(1).isPunct(":"), !Self.keywords.contains(l) { label = l; next(); next() }
+                    if let l = cur.identValue, ahead(1).isPunct(":"), !Self.keywords.contains(l) || l == "default" { label = l; next(); next() }
                     args.append(KEArg(label: label, value: try parseExpression()))
                     if !eat(",") { break }
                 }
