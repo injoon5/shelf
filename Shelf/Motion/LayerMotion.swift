@@ -24,6 +24,7 @@ extension CALayer {
         animation.toValue = value
         animation.initialVelocity = spring.played(velocity: velocity)
         animation.duration = animation.settlingDuration
+        animation.preferredFrameRateRange = Motion.frameRate
         add(animation, forKey: keyPath)
     }
 

@@ -235,6 +235,9 @@ final class IconView: UIView {
         group.animations = [rotation, lift]
         group.duration = Motion.jigglePeriod * Motion.Spring.slowdown
         group.repeatCount = .infinity
+        // The display's full rate, 120 Hz on ProMotion: at 60 a small
+        // rotation steps visibly.
+        group.preferredFrameRateRange = Motion.frameRate
         // Each icon starts at its own moment; until then it is at rest,
         // which is where the swing starts, so nothing jumps.
         group.beginTime = layer.convertTime(CACurrentMediaTime(), from: nil) + delay * Motion.Spring.slowdown

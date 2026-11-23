@@ -71,7 +71,9 @@ enum Motion {
     static let pieFill = Spring(duration: 0.5, bounce: 0)
 
     /// What follows the cards every frame (the Home Screen's scale, blur
-    /// and dim) runs at the display's full rate, 120 Hz on ProMotion.
+    /// and dim), the layer springs and the jiggle run at the display's full
+    /// rate, 120 Hz on ProMotion (with `CADisableMinimumFrameDurationOnPhone`
+    /// in Info.plist, without which an iPhone app stops at 60).
     static let frameRate = CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
 
     // MARK: Fades
