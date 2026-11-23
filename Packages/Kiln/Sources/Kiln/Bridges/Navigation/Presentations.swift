@@ -117,3 +117,17 @@ extension NavigationBridges {
         }
     }
 }
+
+/// `.sheet(item:)` needs an Identifiable item.
+struct KSheetItem: Identifiable {
+    let value: KV
+    var id: KV { value }
+}
+
+extension KModifier {
+    func unlabeledFunction(_ n: Int) -> KV? {
+        let u = zip(labels, args).filter { $0.0 == nil }.map(\.1).filter { if case .function = $0 { return true }; return false }
+        return n < u.count ? u[n] : nil
+    }
+}
+

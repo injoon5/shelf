@@ -91,6 +91,16 @@ final class ListsBridges: KBridgeFamily {
                 }
             }
         }
+        r.modifier("refreshable", .lists, notes: "The spinner stays until the closure, which may wait, is done.") { m in
+            m.form("action:action") { c, view in
+                if let fn = c.function("action") {
+                    let interp = c.interp
+                    view.refreshable { await interp.runViewTask(fn) }
+                } else {
+                    view
+                }
+            }
+        }
         r.modifier("listStyle", .lists, support: .partial) { m in
             m.styles("ListStyle", ["plain", "inset", "sidebar", "insetGrouped", "grouped", "automatic"])
             m.form("_:ListStyle") { c, view in

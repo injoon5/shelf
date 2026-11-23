@@ -240,3 +240,22 @@ final class DrawingBridges: KBridgeFamily {
         }
     }
 }
+
+extension Color {
+    /// A UIKit semantic color by name, without importing UIKit on macOS.
+    init(uiColorCompat name: String) {
+        #if canImport(UIKit)
+        let map: [String: UIColor] = [
+            "systemBackground": .systemBackground, "secondarySystemBackground": .secondarySystemBackground,
+            "tertiarySystemBackground": .tertiarySystemBackground, "systemGroupedBackground": .systemGroupedBackground,
+            "secondarySystemGroupedBackground": .secondarySystemGroupedBackground, "systemGray2": .systemGray2,
+            "systemGray3": .systemGray3, "systemGray4": .systemGray4, "systemGray5": .systemGray5, "systemGray6": .systemGray6,
+            "tertiaryLabel": .tertiaryLabel, "separator": .separator, "systemFill": .systemFill,
+            "secondarySystemFill": .secondarySystemFill, "tertiarySystemFill": .tertiarySystemFill,
+        ]
+        self = Color(uiColor: map[name] ?? .systemGray)
+        #else
+        self = .gray
+        #endif
+    }
+}

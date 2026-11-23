@@ -28,7 +28,8 @@ extension KInterpreter {
         if let style = Self.styleName(name) {
             return .native(.implicit(style, try evalArgs(argExprs, env)))
         }
-        return try KBuiltins.callGlobal(name, argExprs, env, self, line, expected)
+        _ = try evalArgs(argExprs, env)
+        throw fail("Cannot find '\(name)' in scope", line)
     }
 
     /// A view: the overload picked, its arguments evaluated, and the view's
@@ -65,7 +66,7 @@ extension KInterpreter {
     /// `.name(…)` on a view: the modifier's bridge, its arguments evaluated.
     func applyModifier(_ v: KView, _ name: String, _ argExprs: [KEArg], _ env: KEnv, _ line: Int) throws -> KV {
         guard let b = registry.modifier(name) else {
-            return try KBuiltins.legacyViewMethod(self, v, name, argExprs, env, line)
+            throw fail("Kiln doesn't support the .\(name)() modifier", line)
         }
         let labels = argExprs.map(\.label)
         let display = "." + name
@@ -96,7 +97,9 @@ extension KInterpreter {
                 if let v = try any(&c, name) { return v }
             }
         }
-        return try KBuiltins.staticMember(typeName, name, self, line)
+        if name == "self" { return .type(.builtin(typeName)) }
+        // Other members of SwiftUI's types are symbolic until a view reads them (`Edge.Set.all`).
+        return .native(.implicit(name, []))
     }
 
     /// `Type.name(…)` for a native type.
@@ -115,7 +118,10 @@ extension KInterpreter {
                 if let v = try any(&c, name) { return v }
             }
         }
-        return try KBuiltins.callStatic(typeName, name, argExprs, env, self, line, expected)
+        let args = try evalArgs(argExprs, env)
+        if name == "init" { return try callNamedValues(typeName, args, argExprs.map(\.label), line) }
+        // An unknown static call on a SwiftUI type: a symbolic value (`.degrees(90)` written in full).
+        return .native(.implicit(name, args))
     }
 
     // MARK: Members of native values
@@ -147,7 +153,9 @@ extension KInterpreter {
                 if let v = try any(&c, name) { return v }
             }
         }
-        return try KBuiltins.member(base, name, self, line)
+        // `[Todo].self` and `[String: Todo].self`: the literal is already the type's description.
+        if name == "self" { return base }
+        throw fail("Value of type '\(KRegistry.typeName(of: base))' has no member '\(name)'", line)
     }
 
     /// `value.name(…)` on a native value. Returns the result and, for a
@@ -179,8 +187,8 @@ extension KInterpreter {
                 if let v = try any(&c, name) { return (v, k == 0 ? c.mutated : nil) }
             }
         }
-        let args = try argExprs.map { try eval($0.value, env, nil) }
-        return try KBuiltins.callMethod(base, name, args, argExprs.map(\.label), self, line)
+        _ = try evalArgs(argExprs, env)
+        throw fail("Value of type '\(KRegistry.typeName(of: base))' has no method '\(name)'", line)
     }
 
     /// `value.name = newValue` on a native reference (a formatter, a request).
@@ -199,7 +207,7 @@ extension KInterpreter {
                 if try any(&c, name) { return true }
             }
         }
-        return KBuiltins.setNativeMember(n, name, value)
+        return false
     }
 
     /// Calling a native value: `dismiss()`, a stored `.degrees` called later.
@@ -209,7 +217,8 @@ extension KInterpreter {
         if let ms = registry.type(tn)?.methods["callAsFunction"] {
             return try runBridge(ms, "\(tn)()", argExprs, env, line: line, receiver: base).0
         }
-        return try KBuiltins.callNative(n, try evalArgs(argExprs, env), argExprs.map(\.label), self, line)
+        _ = try evalArgs(argExprs, env)
+        throw fail("\(n.kindName) is not a function", line)
     }
 
     // MARK: Implicit members
@@ -220,7 +229,7 @@ extension KInterpreter {
     func resolveImplicit(_ name: String, _ args: [KV], expectedType: String?, labels: [String?] = []) -> KV? {
         if let e = expectedType, let f = registry.type(e)?.implicit, let v = f(name, args, labels) { return v }
         if let f = registry.contextFreeMember(name), let v = f(args, labels, expectedType) { return v }
-        return KBuiltins.implicit(name, args, expectedType: expectedType, labels: labels)
+        return nil
     }
 
     // MARK: Environment and globals
@@ -228,14 +237,12 @@ extension KInterpreter {
     /// What `@Environment(\.key)` reads before SwiftUI's own values arrive.
     func environmentDefault(_ decl: KEVarDecl) -> KV {
         guard case .keyPath(_, let comps)? = decl.wrapperAttribute?.args.first?.value.keyPathComponents else { return .nilValue }
-        if let b = registry.environment[comps.last ?? ""] { return b.value(self) }
-        return KBuiltins.environmentDefault(decl, self)
+        return registry.environment[comps.last ?? ""]?.value(self) ?? .nilValue
     }
 
     /// A bare name the registry knows as a constant (`pi`).
     func nativeConstant(_ name: String) -> KV? {
-        if let c = registry.constant(name) { return c(self) }
-        return KBuiltins.globalConstant(name)
+        registry.constant(name).map { $0(self) }
     }
 }
 
@@ -254,7 +261,7 @@ extension KInterpreter {
 extension KInterpreter {
     /// Whether `name` is a modifier (so `Color.red.opacity(…)` is the view's).
     func isModifierName(_ name: String) -> Bool {
-        registry.modifier(name) != nil || KBuiltins.modifierNames.contains(name)
+        registry.modifier(name) != nil
     }
 }
 
@@ -322,9 +329,28 @@ extension KRenderer {
     }
 
     /// A modifier on a `Text` that keeps it one, or nil.
-    func textModifier(_ t: Text, _ base: KView, _ m: KModifier) -> Text?? {
-        guard let b = interp.registry.modifier(m.name) else { return .none }
-        guard let f = b.text, let (_, c) = modifierCall(b, base, m) else { return .some(nil) }
-        return .some(f(c, t))
+    func textModifier(_ t: Text, _ base: KView, _ m: KModifier) -> Text? {
+        guard let b = interp.registry.modifier(m.name), let f = b.text, let (_, c) = modifierCall(b, base, m) else { return nil }
+        return f(c, t)
+    }
+}
+
+extension KInterpreter {
+    /// `[Habit]()`, `[String: Int]()`, `Set<Int>()`: a type written as an expression, called.
+    func constructType(_ t: KETypeRef, _ args: [KV], _ labels: [String?], _ line: Int) throws -> KV {
+        switch t.core {
+        case .array:
+            if let r = labels.firstIndex(of: "repeating") {
+                return .array(Array(repeating: args[r], count: labels.firstIndex(of: "count").flatMap { args[$0].asInt } ?? 0))
+            }
+            if let f = args.first { return .array(try sequence(f)) }
+            return .array([])
+        case .dictionary: return .dict([:])
+        case .named(let n, _):
+            if n == "Set" { return .set(Set(try args.first.map { try sequence($0) } ?? [])) }
+            return try callNamedValues(n, args, labels, line)
+        default:
+            return .nilValue
+        }
     }
 }

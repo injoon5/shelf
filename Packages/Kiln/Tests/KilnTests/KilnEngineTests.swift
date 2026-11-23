@@ -25,10 +25,13 @@ final class KilnEngineTests: XCTestCase {
             XCTAssertEqual(v.errors, [], url.lastPathComponent)
             XCTAssertTrue(v.renderedContent, url.lastPathComponent)
         }
+        // Replies that write something SwiftUI doesn't have stop there, with
+        // its line (PLAN.md §1.4: unknown names aren't skipped silently).
+        let invalid = ["expense.md": ["Line 40: Kiln doesn't support the .stepValue() modifier"]]
         for url in replies {
             let code = Kiln.swiftSource(fromMarkdown: try String(contentsOf: url, encoding: .utf8))
             let v = Kiln.validate(code)
-            XCTAssertEqual(v.errors, [], url.lastPathComponent)
+            XCTAssertEqual(v.errors, invalid[url.lastPathComponent] ?? [], url.lastPathComponent)
             XCTAssertTrue(v.renderedContent, url.lastPathComponent)
         }
     }

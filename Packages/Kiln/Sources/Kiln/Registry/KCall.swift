@@ -400,7 +400,7 @@ extension KInterpreter {
         if let f = registry.function(name) { return try runBridge(f.forms, name, values: args, labels: labels, line: line).0 }
         if let t = registry.type(name), !t.inits.isEmpty { return try runBridge(t.inits, name, values: args, labels: labels, line: line).0 }
         if let style = Self.styleName(name) { return .native(.implicit(style, args)) }
-        return try KBuiltins.construct(name, args, labels, self, line)
+        throw fail("Cannot find '\(name)' in scope", line)
     }
 }
 

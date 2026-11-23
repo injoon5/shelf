@@ -65,7 +65,8 @@ def compare(out, expected_path, base_bin, new_bin, prelude, repo, inputs):
         same = sum(1 for r in rows if r[1] == "identical")
         exp = sum(1 for r in rows if r[1] == "expected")
         f.write("# Differential check\n\n")
-        f.write("Every input run on the engine before §1.3 (`cc388b1`) and on this one, comparing their transcripts: "
+        base = os.environ.get("KILN_DIFF_BASE", "base")
+        f.write(f"Every input run on the engine at `{base}` and on this one, comparing their transcripts: "
                 "the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again "
                 "after each scripted action (`onAppear` and `.task` first, then each button and tap). "
                 "`Tools/diff.sh` writes this file.\n\n")

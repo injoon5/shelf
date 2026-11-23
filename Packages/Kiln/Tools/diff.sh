@@ -1,6 +1,6 @@
 #!/bin/zsh
-# The differential check (PLAN.md §1.3): runs every input on the engine at
-# BASE (default: cc388b1, the one engine before §1.3) and on this checkout,
+# The differential check (PLAN.md §1.3, §1.4): runs every input on the engine at
+# BASE (default: b466f9c, the engine before §1.4's registry) and on this checkout,
 # and compares their transcripts (Kiln.transcript: the view tree, console,
 # errors with lines, and state after each scripted action).
 #   Tools/diff.sh [OUT.md] [--base REF]
@@ -10,7 +10,7 @@ set -e
 KILN=${0:A:h:h}
 REPO=$(git -C "$KILN" rev-parse --show-toplevel)
 OUT="$KILN/Benchmarks/differential.md"
-BASE=cc388b1
+BASE=b466f9c
 while (( $# )); do
   case $1 in
     --base) BASE=$2; shift 2 ;;
@@ -40,6 +40,6 @@ INPUTS=("$KILN"/Examples/Apps/*.swift "$KILN"/Examples/AppleIntelligence/*.md "$
         "$KILN"/Examples/LibraryApp.swift "$REPO"/fixtures/apps/*.swift "$KILN"/Benchmarks/Workloads/*.swift
         "$WORK"/inputs/tests/*.swift)
 PRELUDE="$KILN/Benchmarks/shelf-db-prelude.swift"
-python3 "$KILN/Tools/diff.py" compare "$OUT" "$KILN/Tools/diff-expected.txt" \
+KILN_DIFF_BASE=$BASE python3 "$KILN/Tools/diff.py" compare "$OUT" "$KILN/Tools/diff-expected.txt" \
   "$WORK/Kiln/Tools/KilnDiff/.build/release/KilnDiff" "$KILN/Tools/KilnDiff/.build/release/KilnDiff" \
   "$PRELUDE" "$REPO" "${INPUTS[@]}"

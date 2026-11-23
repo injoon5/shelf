@@ -196,3 +196,26 @@ final class NavigationBridges: KBridgeFamily {
         }
     }
 }
+
+/// Toolbar items grouped by placement (ToolbarContent needs a static shape).
+struct KToolbar: ToolbarContent {
+    let groups: [String: [AnyView]]
+
+    func items(_ key: String) -> some View {
+        ForEach(Array((groups[key] ?? []).enumerated()), id: \.offset) { _, v in v }
+    }
+
+    var body: some ToolbarContent {
+        ToolbarItemGroup(placement: .automatic) { items("automatic") }
+        ToolbarItemGroup(placement: .principal) { items("principal") }
+        ToolbarItemGroup(placement: .cancellationAction) { items("cancellationAction") }
+        ToolbarItemGroup(placement: .confirmationAction) { items("confirmationAction") }
+        ToolbarItemGroup(placement: .destructiveAction) { items("destructiveAction") }
+        ToolbarItemGroup(placement: .primaryAction) { items("primaryAction") }
+        #if os(iOS)
+        ToolbarItemGroup(placement: .topBarLeading) { items("topBarLeading") }
+        ToolbarItemGroup(placement: .topBarTrailing) { items("topBarTrailing") }
+        ToolbarItemGroup(placement: .bottomBar) { items("bottomBar") }
+        #endif
+    }
+}

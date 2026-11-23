@@ -174,9 +174,9 @@ extension KInterpreter {
                 guard let first = args.first else { continue }
                 let v = try eval(first.value, env)
                 if let spec = args.first(where: { $0.label == "specifier" }) {
-                    s += KBuiltins.format(try eval(spec.value, env).asString ?? "%@", [v], self)
+                    s += KFormatting.format(try eval(spec.value, env).asString ?? "%@", [v], self)
                 } else if let fmt = args.first(where: { $0.label == "format" }) {
-                    s += KBuiltins.formatted(v, try eval(fmt.value, env), self)
+                    s += KFormatting.formatted(v, try eval(fmt.value, env), self)
                 } else if args.contains(where: { $0.label == "style" }), case .native(.date(let d)) = v {
                     s += d.formatted(date: .abbreviated, time: .shortened)
                 } else if localized, case .int(let i) = v {
@@ -723,13 +723,13 @@ extension KInterpreter {
 
         case .typeExpr(let t):
             if let ut = userType(t) { return try construct(ut, argExprs, env, line) }
-            return try KBuiltins.constructType(t, try evalArgs(argExprs, env), labels, self, line)
+            return try constructType(t, try evalArgs(argExprs, env), labels, line)
 
         case .array(let elems) where elems.count == 1:
             if case .ident(let n, _) = elems[0], n.first?.isUppercase == true, env.lookup(n) == nil {
-                return try KBuiltins.constructType(.array(.named(n, [])), try evalArgs(argExprs, env), labels, self, line)
+                return try constructType(.array(.named(n, [])), try evalArgs(argExprs, env), labels, line)
             }
-            if case .array = elems[0] { return try KBuiltins.constructType(.array(.named("Array", [])), try evalArgs(argExprs, env), labels, self, line) }
+            if case .array = elems[0] { return try constructType(.array(.named("Array", [])), try evalArgs(argExprs, env), labels, line) }
             return try callValue(try eval(callee, env), argExprs, env, line)
 
         case .dictionary(let pairs) where pairs.count == 1:
