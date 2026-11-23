@@ -73,6 +73,7 @@ struct IconFace: Equatable {
 struct IconArt: View {
     @Environment(ShelfSettings.self) private var settings
     @Environment(\.colorScheme) private var scheme
+    @Environment(\.jiggleTurn) private var turn
     var face: IconFace
     var size: CGFloat
     /// Off while an install pie stands where the glyph goes.
@@ -89,9 +90,10 @@ struct IconArt: View {
             .foregroundStyle(glyphStyle(style))
             .opacity(showsGlyph ? 1 : 0)
             .frame(width: size, height: size)
+            .rotationEffect(turn)
             .background { fill(style) }
-            .modifier(IconGlass(isOn: style == .clear, scheme: scheme, shape: shape))
-            .overlay { rim }
+            .modifier(IconGlass(isOn: style == .clear, scheme: scheme, shape: shape.rotation(turn)))
+            .overlay { rim.rotationEffect(turn) }
             .compositingGroup()
     }
 
@@ -136,10 +138,10 @@ struct IconOutline: Shape {
 }
 
 /// Clear icons are the Home Screen's own glass.
-private struct IconGlass: ViewModifier {
+private struct IconGlass<S: Shape>: ViewModifier {
     var isOn: Bool
     var scheme: ColorScheme
-    var shape: RoundedRectangle
+    var shape: S
 
     func body(content: Content) -> some View {
         if isOn {
@@ -209,6 +211,7 @@ struct IconPress: ViewModifier {
             .overlay {
                 HomeMetrics.iconShape(size)
                     .fill(.black.opacity(isPressed ? HomeMetrics.pressedDim : 0))
+                    .modifier(JiggleTurn())
                     .allowsHitTesting(false)
             }
             // Down is instant; only the release eases.
@@ -237,6 +240,7 @@ struct IconLabel: View {
         .foregroundStyle(.white)
         .shadow(color: .black.opacity(HomeMetrics.labelShadowOpacity), radius: HomeMetrics.labelShadowRadius, y: HomeMetrics.labelShadowY)
         .frame(width: width)
+        .modifier(JiggleTurn())
         .animation(Motion.quick, value: isNew)
     }
 }

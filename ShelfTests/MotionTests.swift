@@ -38,13 +38,13 @@ struct CardMotionTests {
 
     @Test func thePointUnderTheFingerStaysUnderIt() {
         let full = CardFrame(rect: CGRect(x: 0, y: 0, width: width, height: height), radius: 55)
-        let finger = CGPoint(x: 201, y: 862)
-        let translation = CGPoint(x: 20, y: -300)
+        let finger = CGPoint(x: 201, y: 40)
+        let translation = CGPoint(x: 20, y: 300)
         let tracked = CardMotion.tracked(start: full, startScale: 1, finger: finger, translation: translation,
-                                         direction: .up, screenHeight: height).frame
+                                         screenHeight: height).frame
         let ratio = tracked.size.width / full.size.width
         #expect(ratio < 1)
-        // The finger began at the card's bottom-centre and is still there.
+        // The finger began near the card's top-centre and is still there.
         let now = CGPoint(x: finger.x + translation.x, y: finger.y + translation.y)
         let fraction = (now.y - tracked.rect.minY) / tracked.size.height
         #expect(abs(fraction - finger.y / height) < 0.001)
@@ -57,18 +57,13 @@ struct CardMotionTests {
         let small = CardFrame(rect: CGRect(x: 100, y: 100, width: caughtWidth, height: caughtWidth * 2), radius: 16)
         let scale = small.size.width / width
         let still = CardMotion.tracked(start: small, startScale: scale, finger: small.center, translation: .zero,
-                                       direction: .up, screenHeight: height)
+                                       screenHeight: height)
         #expect(abs(still.frame.size.width - small.size.width) < 0.001)
         #expect(still.travel > 0)
-        // Dragged down, toward full screen, it grows.
-        let down = CardMotion.tracked(start: small, startScale: scale, finger: small.center,
-                                      translation: CGPoint(x: 0, y: 200), direction: .up, screenHeight: height)
-        #expect(down.frame.size.width > small.size.width)
-    }
-
-    @Test func aDragDownFromTheStatusBarCloses() {
-        #expect(CloseDirection.down.travel(CGPoint(x: 0, y: 80)) == 80)
-        #expect(CloseDirection.up.travel(CGPoint(x: 0, y: 80)) == -80)
+        // Dragged up, toward full screen, it grows.
+        let up = CardMotion.tracked(start: small, startScale: scale, finger: small.center,
+                                    translation: CGPoint(x: 0, y: -200), screenHeight: height)
+        #expect(up.frame.size.width > small.size.width)
     }
 
     @Test func releasesDecideByFlickThenByWhereTheCardWouldCoast() {

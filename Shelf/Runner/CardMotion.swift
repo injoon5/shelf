@@ -22,20 +22,9 @@ struct CardFrame: Equatable {
     }
 }
 
-/// Which way a drag closes the card: up from the bottom edge (and when a
-/// moving card is caught), or down from the status bar.
-enum CloseDirection: Sendable {
-    case up, down
-
-    /// How far a drag of `translation` has gone toward closing.
-    func travel(_ translation: CGPoint) -> CGFloat {
-        self == .up ? -translation.y : translation.y
-    }
-}
-
 /// The rules an app's card moves by, apart from any view, so they can be tested.
 ///
-/// A drag is measured as travel toward closing. The card's scale is a
+/// A drag is measured as travel toward closing, which is down. The card's scale is a
 /// function of that travel alone, so a card caught anywhere in flight is
 /// picked up at the travel that gives its current scale, and from then on
 /// behaves as if it had been dragged there.
@@ -80,9 +69,9 @@ enum CardMotion {
     /// at `startScale` of the screen's width; `finger` is where the touch
     /// began. The point under the finger stays under it as the card scales.
     static func tracked(start: CardFrame, startScale: CGFloat, finger: CGPoint, translation: CGPoint,
-                        direction: CloseDirection, screenHeight: CGFloat) -> (frame: CardFrame, travel: CGFloat) {
+                        screenHeight: CGFloat) -> (frame: CardFrame, travel: CGFloat) {
         let floor = floor(startScale: startScale)
-        let travel = travel(scale: startScale, screenHeight: screenHeight, floor: floor) + direction.travel(translation)
+        let travel = travel(scale: startScale, screenHeight: screenHeight, floor: floor) + translation.y
         let ratio = scale(travel: travel, screenHeight: screenHeight, floor: floor) / max(startScale, .ulpOfOne)
         let center = CGPoint(x: finger.x + translation.x + (start.center.x - finger.x) * ratio,
                              y: finger.y + translation.y + (start.center.y - finger.y) * ratio)

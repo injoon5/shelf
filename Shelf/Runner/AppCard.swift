@@ -175,7 +175,7 @@ final class AppCard {
     private let screen: CGSize
     private let iconSize: CGFloat
     private let fullRadius: CGFloat
-    private var grab: (frame: CardFrame, scale: CGFloat, finger: CGPoint, direction: CloseDirection)?
+    private var grab: (frame: CardFrame, scale: CGFloat, finger: CGPoint)?
     private var travel: CGFloat = 0
 
     var slug: String { run.id }
@@ -254,19 +254,19 @@ final class AppCard {
 
     /// A finger has caught the card at `finger`: it stops where it is on
     /// screen and from now on follows the finger.
-    func hold(finger: CGPoint, direction: CloseDirection) {
+    func hold(finger: CGPoint) {
         heldFrom = phase
         if phase == .open { takePicture() }
         phase = .held
         let frame = face.freeze()
-        grab = (frame, frame.size.width / screen.width, finger, direction)
+        grab = (frame, frame.size.width / screen.width, finger)
         travel = 0
     }
 
     func move(_ translation: CGPoint) {
         guard let grab else { return }
         let tracked = CardMotion.tracked(start: grab.frame, startScale: grab.scale, finger: grab.finger,
-                                         translation: translation, direction: grab.direction, screenHeight: screen.height)
+                                         translation: translation, screenHeight: screen.height)
         travel = tracked.travel
         face.place(tracked.frame)
     }
@@ -276,7 +276,7 @@ final class AppCard {
     func release(velocity: CGPoint) -> (closes: Bool, centerVelocity: CGPoint, widthVelocity: CGFloat) {
         guard let grab else { return (false, .zero, 0) }
         self.grab = nil
-        let travelVelocity = grab.direction.travel(velocity)
+        let travelVelocity = velocity.y
         let slope = CardMotion.scaleSlope(travel: travel, screenHeight: screen.height,
                                           floor: CardMotion.floor(startScale: grab.scale))
         let widthVelocity = grab.frame.size.width / max(grab.scale, .ulpOfOne) * slope * travelVelocity

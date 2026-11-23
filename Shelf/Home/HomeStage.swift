@@ -90,8 +90,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private var displayLink: CADisplayLink?
     private var input = StageInput()
 
-    private let edgePan = UIPanGestureRecognizer()
-    private let stripPan = UIPanGestureRecognizer()
+    private let closeDrag = UIPanGestureRecognizer()
+    /// Where the touch the close drag is following began.
+    private var closeStart = CGPoint.zero
     private let grab = ImmediatePanGestureRecognizer()
     private let pull = UIPanGestureRecognizer()
 
@@ -152,11 +153,10 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         backdropBlur.alpha = 0
         view.addSubview(cardsView)
 
-        edgePan.addTarget(self, action: #selector(closePan(_:)))
-        stripPan.addTarget(self, action: #selector(closePan(_:)))
+        closeDrag.addTarget(self, action: #selector(closePan(_:)))
         grab.addTarget(self, action: #selector(grabPan(_:)))
         pull.addTarget(self, action: #selector(pullPan(_:)))
-        for recognizer in [edgePan, stripPan, grab, pull] as [UIGestureRecognizer] {
+        for recognizer in [closeDrag, grab, pull] as [UIGestureRecognizer] {
             recognizer.delegate = self
             view.addGestureRecognizer(recognizer)
         }
@@ -420,16 +420,15 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: Gestures
 
-    /// Up from the bottom edge, or down from the status bar: the open app
-    /// follows the finger, and closes or goes back on release.
+    /// Down anywhere on the open app: it follows the finger, and closes or
+    /// goes back on release.
     @objc private func closePan(_ recognizer: UIPanGestureRecognizer) {
-        let direction: CloseDirection = recognizer === stripPan ? .down : .up
         switch recognizer.state {
         case .began:
             guard let card = openCard else { return }
             heldCard = card
             let start = recognizer.location(in: view) - recognizer.translation(in: view)
-            card.hold(finger: start, direction: direction)
+            card.hold(finger: start)
             card.move(recognizer.translation(in: view))
             startTicking()
         case .changed:
@@ -449,7 +448,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             let point = recognizer.location(in: view)
             guard let card = movingCard(at: point) else { return }
             heldCard = card
-            card.hold(finger: point, direction: .up)
+            card.hold(finger: point)
             startTicking()
         case .changed:
             heldCard?.move(recognizer.translation(in: view))
@@ -503,14 +502,30 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
+    private var startsInStrip: Bool {
+        closeStart.y < max(view.safeAreaInsets.top, RunnerMetrics.dismissStrip)
+    }
+
+    /// Whether a scroll view of the open app under `point` is scrolled down
+    /// from its top, so a drag down there scrolls it rather than closing.
+    private func isScrolledDown(at point: CGPoint) -> Bool {
+        var current = cardsView.hitTest(view.convert(point, to: cardsView), with: nil)
+        while let candidate = current, candidate !== cardsView {
+            if let scroll = candidate as? UIScrollView, scroll.isScrollEnabled,
+               scroll.contentOffset.y > -scroll.adjustedContentInset.top + RunnerMetrics.restTolerance {
+                return true
+            }
+            current = candidate.superview
+        }
+        return false
+    }
+
     func gestureRecognizer(_ recognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let point = touch.location(in: view)
         switch recognizer {
-        case edgePan:
-            // The home indicator's strip, where the system's own swipe home starts.
-            return openCard != nil && point.y > view.bounds.height - max(view.safeAreaInsets.bottom, RunnerMetrics.homeEdge)
-        case stripPan:
-            return openCard != nil && point.y < max(view.safeAreaInsets.top, RunnerMetrics.dismissStrip)
+        case closeDrag:
+            closeStart = point
+            return openCard != nil
         case grab:
             return movingCard(at: point) != nil
         case pull:
@@ -522,12 +537,15 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
         switch recognizer {
-        case stripPan, pull:
-            let velocity = (recognizer as! UIPanGestureRecognizer).velocity(in: view)
+        case closeDrag:
+            let velocity = closeDrag.velocity(in: view)
+            guard velocity.y > abs(velocity.x) else { return false }
+            // A list scrolled down is scrolled back up first, as with the
+            // system's own pull to close. From the status bar, down always closes.
+            return startsInStrip || !isScrolledDown(at: closeStart)
+        case pull:
+            let velocity = pull.velocity(in: view)
             return velocity.y > abs(velocity.x)
-        case edgePan:
-            let velocity = edgePan.velocity(in: view)
-            return -velocity.y > abs(velocity.x)
         default:
             return true
         }
@@ -536,9 +554,12 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     func gestureRecognizer(_ recognizer: UIGestureRecognizer,
                            shouldBeRequiredToFailBy other: UIGestureRecognizer) -> Bool {
         switch recognizer {
-        case edgePan, stripPan:
-            // The app's own drags wait to see whether this is a close.
-            return other.view?.isDescendant(of: cardsView) == true
+        case closeDrag:
+            // The app's own drags and scrolls wait to see whether this is a
+            // close. Its taps and long presses don't wait for a finger that
+            // may never move, except on the status bar.
+            guard other.view?.isDescendant(of: cardsView) == true else { return false }
+            return startsInStrip || other is UIPanGestureRecognizer
         case pull:
             // The pages wait to see whether this is a pull down; it decides
             // as soon as the finger has moved, so they lose nothing.

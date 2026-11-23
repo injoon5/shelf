@@ -60,7 +60,7 @@ Then connect Shelf to `http://localhost:8787` with the token whose hash is `AUTH
 
 **The Home Screen is measured from Springboard, not the plan's starting values.** The numbers were read out of screenshots of the real Home Screen on an iPhone 17 (`design/reference/`): 64 pt icons rather than 60, a dock inset 17 pt on every side rather than 12 and 8, and an icon corner of 26% rather than 22.37%, which is the rounder outline iOS 26 and 27 draw. The dock, the search pill and the search field are one definition of clear system glass, which is what measures the same as Springboard's dock over the same backdrop.
 
-**Apps open and close as cards Shelf drives, in UIKit.** The plan's `fullScreenCover` with a zoom transition closed like a sheet sliding over a grey scrim. Now `HomeStage` owns the Home Screen's layers and an app is a card that follows the finger over the live Home Screen and springs into its icon with the gesture's velocity. Every retargeted animation starts from the presentation layer, so a card can be caught mid-flight. An app closes with a swipe up from the bottom edge or a drag down from the status bar; Shelf defers the system's own edge gestures only while an app is open.
+**Apps open and close as cards Shelf drives, in UIKit.** The plan's `fullScreenCover` with a zoom transition closed like a sheet sliding over a grey scrim. Now `HomeStage` owns the Home Screen's layers and an app is a card that follows the finger over the live Home Screen and springs into its icon with the gesture's velocity. Every retargeted animation starts from the presentation layer, so a card can be caught mid-flight. An app closes with a drag down anywhere on it, as the zoom transition's did; a list scrolled down scrolls back up first, and from the status bar down always closes. The bottom edge stays the system's; Shelf defers only the top edge, and only while an app is open.
 
 **Search sits above the keyboard, and the pill becomes it.** The plan moved the field to the top of the screen, which left nothing to morph. The pill is one piece of glass that stretches into the field as the finger pulls down, or on a tap, and rides up with the keyboard, as on iOS 27.
 
@@ -80,7 +80,6 @@ Then connect Shelf to `http://localhost:8787` with the token whose hash is `AUTH
 **Not done**
 
 - The 120 fps check in Instruments (§13.1) and a frame-by-frame comparison of a finger-driven close against Springboard's: the simulator can't be made to perform the system's home gesture, so there is no recording to compare with.
-- With an app's own keyboard up, the swipe from the bottom edge lands on the keyboard and can't close the app. The drag from the status bar still does.
 - Everything under "Later" in the plan.
 
 ## Layout

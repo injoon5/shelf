@@ -2,12 +2,9 @@ import SwiftUI
 
 /// The runner's sizes, kept out of its views like the Home Screen's.
 enum RunnerMetrics {
-    /// The strip along the top where a downward drag always closes the app,
-    /// when the status bar is shorter than this.
+    /// The strip along the top where a drag down always closes the app,
+    /// whatever the app does with drags, when the status bar is shorter than this.
     static let dismissStrip: CGFloat = 44
-    /// The strip along the bottom where a swipe up closes the app, when the
-    /// home indicator's safe area is shorter than this.
-    static let homeEdge: CGFloat = 24
 
     // MARK: The card under a finger
 

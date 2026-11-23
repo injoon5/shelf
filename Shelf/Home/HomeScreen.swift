@@ -19,12 +19,10 @@ struct HomeScreen: View {
                                     pageCount: model.pageCount(library.layout.pages), page: model.page))
             .ignoresSafeArea()
             .statusBarHidden(model.isEditing)
-            // With an app open, the first swipe up from the bottom edge is
-            // Shelf's, and takes the app back to the Home Screen; a second
-            // leaves Shelf. The same at the top, where a pull down closes the
-            // app before it opens Notification Center. With none open, the
-            // system has the edges to itself.
-            .defersSystemGestures(on: model.run == nil ? [] : [.top, .bottom])
+            // With an app open, a pull down from the status bar closes the
+            // app before it opens Notification Center. The bottom edge is
+            // always the system's.
+            .defersSystemGestures(on: model.run == nil ? [] : [.top])
             .sheet(item: $model.sheet) { sheet in
                 switch sheet {
                 case .settings: SettingsView()
