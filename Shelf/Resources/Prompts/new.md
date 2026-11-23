@@ -72,6 +72,14 @@ If you can't run commands, reply with the code as described above.
 - Swift Charts: `Chart` with `BarMark`, `LineMark`, `PointMark`, `AreaMark`, `RuleMark`, `SectorMark` and `RectangleMark`.
 - `withAnimation`, `.animation(_:value:)`, transitions.
 
+**Your types in SwiftUI's protocols**
+- A `Shape` with `animatableData` (a number, nested `AnimatablePair`s, `CGPoint`, `Angle`) animates frame by frame, and so does a `View` or `ViewModifier` that adopts `Animatable`.
+- `Layout`: `sizeThatFits(proposal:subviews:cache:)` and `placeSubviews(in:proposal:subviews:cache:)`, with `subview.sizeThatFits(_:)`, `place(at:anchor:proposal:)`, `dimensions(in:)` and a cache. Use it as `MyLayout { … }`, or switch with `AnyLayout(MyLayout())` and `AnyLayout(VStackLayout())`.
+- `ViewModifier` with `.modifier(…)` or your own `extension View { func card() -> some View { modifier(Card()) } }`; it can have `@State`.
+- `Transition` (`body(content:phase:)`) with `.transition(MyTransition())`, and `.transition(.modifier(active:identity:))`, `.asymmetric` and `.combined(with:)`.
+- `ShareLink` for a `String`, a `URL`, or your own `Transferable` type (`CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation`) with `preview: SharePreview("…")`.
+- UIKit, only in a `UIViewControllerRepresentable` for `UIImagePickerController` with `sourceType = .photoLibrary` and a `Coordinator` class as its delegate, or a `UIViewRepresentable` for `UIVisualEffectView(effect: UIBlurEffect(style:))` and `UIActivityIndicatorView`. Show the picker in a `.sheet`, and close it with `@Environment(\.dismiss)`.
+
 **Time**
 - `Timer.publish(every:on:in:).autoconnect()` with `.onReceive`.
 - `TimelineView`.
@@ -132,11 +140,11 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`, o
 
 ## What doesn't work
 
-- UIKit, `UIViewRepresentable`, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
+- UIKit beyond the representables above, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
 - Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
 - A view, modifier or initializer Kiln doesn't have stops the app with an error that names it and its line, and so do argument labels SwiftUI doesn't have (`.blur(10)` for `.blur(radius: 10)`). That includes `matchedGeometryEffect` and `glassEffect`.
 - `Canvas` draws nothing. Draw with a custom `Shape` or a `Path` instead.
-- `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
+- `.focused` and `.sensoryFeedback` show up but do nothing, so `@FocusState` can't move the keyboard focus.
 
 ## Design
 
