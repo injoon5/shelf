@@ -11,7 +11,7 @@ struct SearchResults: View {
     var bottom: CGFloat
 
     var body: some View {
-        let results = library.apps.matching(model.query)
+        let results = library.items.matching(model.query)
         ScrollView {
             Group {
                 if results.isEmpty {
@@ -23,8 +23,8 @@ struct SearchResults: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.fixed(geometry.labelWidth), spacing: geometry.columnPitch - geometry.labelWidth),
                                              count: Layout.columns),
                               spacing: geometry.rowPitch - geometry.cellHeight) {
-                        ForEach(results) { app in
-                            HomeIcon(app: app, geometry: geometry, labelSize: labelSize)
+                        ForEach(results) { item in
+                            HomeIcon(item: item, geometry: geometry, labelSize: labelSize)
                                 .frame(height: geometry.cellHeight, alignment: .top)
                                 .environment(\.iconPlace, .result)
                         }
@@ -53,22 +53,5 @@ struct SearchResults: View {
         .background {
             Color.clear.contentShape(.rect).onTapGesture { model.endSearch() }
         }
-    }
-}
-
-extension [CachedApp] {
-    /// Apps whose name matches `query`: names that start with it first, then
-    /// names that contain it, each in alphabetical order. An empty query
-    /// matches everything.
-    func matching(_ query: String) -> [CachedApp] {
-        let needle = query.trimmingCharacters(in: .whitespaces)
-        let sorted = sorted { $0.meta.name.localizedStandardCompare($1.meta.name) == .orderedAscending }
-        guard !needle.isEmpty else { return sorted }
-        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
-        let starts = sorted.filter { $0.meta.name.range(of: needle, options: options.union(.anchored)) != nil }
-        let contains = sorted.filter { app in
-            app.meta.name.range(of: needle, options: options) != nil && !starts.contains(app)
-        }
-        return starts + contains
     }
 }

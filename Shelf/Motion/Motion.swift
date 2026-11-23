@@ -93,6 +93,11 @@ enum Motion {
     static let pageDotsStay: Duration = .seconds(1)
     static let copiedStay: Duration = .milliseconds(1500)
     static let pageFlipHold: Duration = .milliseconds(600)
+    /// A dragged icon that has left a drop target with no other target
+    /// hearing of it for this long was let go of outside any: the system
+    /// ended the drag without a drop. Crossing from one target into another
+    /// is reported at once, so this only has to outlast a frame or two.
+    static let dragLost: Duration = .milliseconds(250)
     /// How long a landed card stays on its icon after the icon has been
     /// shown beneath it, so there is never a frame with neither.
     static let cardHandoff: Duration = .milliseconds(50)

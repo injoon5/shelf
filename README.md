@@ -64,7 +64,7 @@ xcodebuild test -project Shelf.xcodeproj -scheme Shelf \
   -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData
 ```
 
-They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout, the motion curves, and the feature apps in `fixtures/apps/`.
+They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the motion curves, and the feature apps in `fixtures/apps/`.
 
 ## The server
 
@@ -116,6 +116,8 @@ Decisions that aren't obvious from the code:
 - **Measured from Springboard.** The Home Screen's numbers come from screenshots of the real one on an iPhone 17 ([design/reference/](design/reference/)): 64 pt icons, a dock inset 17 pt on every side, and a 26% icon corner, the rounder outline of iOS 26 and 27. The dock, the search pill and the search field share one definition of clear system glass, never a hand-made blur.
 - **Apps are cards Shelf drives in UIKit.** A SwiftUI `fullScreenCover` with a zoom transition closed like a sheet. Instead, `HomeStage` owns the layers. A card follows the finger over the live Home Screen and springs into its icon with the gesture's velocity. Every animation starts from the presentation layer, so a card can be caught mid-flight. The system's edge gestures are deferred only while an app is open.
 - **Search is the pill.** The pill is one piece of glass that stretches into the search field as you pull down (or tap) and rides up with the keyboard, as on iOS 27.
+- **Settings is an icon like any other.** It sits in the layout under `:settings`, which no slug can be, so it moves to any page or within the four-place dock and search finds it. It can't be deleted, its menu has only Edit Home Screen, and a tap opens the Settings sheet.
+- **Pages don't shift under a drag.** A page that a drag empties stays until Done, as on Springboard. Done drops it, and the page in view follows its icons.
 - **A long press means one thing at a time.** On a still Home Screen it opens the icon's menu; once icons jiggle, it starts a drag. Offered together, the menu's preview swallows the drag. Edit mode starts from the menu or from a long press on the wallpaper.
 - **Icon styles are Color and Clear.** Color draws dark tiles in dark mode, as Springboard does.
 - **Apps can't overwrite each other's settings.** Kiln puts `@AppStorage` in the shared `UserDefaults.standard`, so Shelf rewrites each key to `<slug>.<key>` before running an app. It's not a security boundary, so Shelf keeps nothing of its own there.

@@ -36,6 +36,7 @@ struct GridDropDelegate: DropDelegate {
 
     func dropExited(info: DropInfo) {
         model.cancelFlip()
+        model.dragExited()
     }
 
     func performDrop(info: DropInfo) -> Bool {
@@ -56,16 +57,22 @@ struct DockDropDelegate: DropDelegate {
     func dropUpdated(info: DropInfo) -> DropProposal? {
         guard let slug = model.dragMoved() else { return DropProposal(operation: .cancel) }
         let dock = library.layout.dock
+        // A full dock refuses a newcomer. The system then ends the drag with
+        // no drop, and `dropExited` is all anyone hears of it.
         guard library.layout.dockHasRoom(for: slug) else { return DropProposal(operation: .forbidden) }
         let isPinned = dock.contains(slug)
 
-        let pinned = isPinned ? dock.count : dock.count + 1
+        let count = isPinned ? dock.count : dock.count + 1
         let x = info.location.x + geometry.dockFrame.minX
-        let target = Layout.Slot.dock(index: geometry.pinnedIndex(at: x, pinned: pinned))
+        let target = Layout.Slot.dock(index: geometry.dockIndex(at: x, of: count))
         if library.layout.slot(of: slug) != target {
             withAnimation(Motion.reorder) { _ = library.move(slug, to: target) }
         }
         return DropProposal(operation: .move)
+    }
+
+    func dropExited(info: DropInfo) {
+        model.dragExited()
     }
 
     func performDrop(info: DropInfo) -> Bool {
