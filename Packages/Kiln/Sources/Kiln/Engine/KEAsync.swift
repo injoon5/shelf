@@ -416,7 +416,7 @@ enum KAwaitScan {
     static func expr(_ e: KEExpr) -> Bool {
         switch e {
         case .awaitExpr: return true
-        case .closure, .int, .double, .bool, .nilLit, .ident, .implicitMember, .keyPath, .selfRef, .typeExpr, .value:
+        case .closure, .int, .double, .bool, .nilLit, .ident, .implicitMember, .keyPath, .selfRef, .typeExpr, .value, .regex:
             return false
         case .string(let segs):
             return segs.contains { if case .interp(let args) = $0 { return args.contains { expr($0.value) } }; return false }

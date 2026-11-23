@@ -525,4 +525,49 @@ final class LanguageTests: XCTestCase {
         let d = try? JSONEncoder().encode(Plain())
         """, fails: "'Plain' isn't Encodable, so it can't be written as JSON: add `: Codable`")
     }
+
+    // MARK: Regex literals
+
+    func testRegexLiterals() {
+        expect(#"""
+        let text = "Order 66 shipped on 2024-03-09"
+        if let m = text.firstMatch(of: /(\d{4})-(\d{2})-(\d{2})/) {
+            print(m.0, m.1, m.output.3)
+        }
+        let named = #/(?<word>[a-z]+)-(?<num>\d+)/#
+        if let m = "id: abc-42".firstMatch(of: named) { print(m.word, m.num) }
+        print(text.contains(/\d+/), "nope".contains(/\d/))
+        print(text.replacing(/\d/, with: "#"))
+        print("a1b22".replacing(/\d+/) { m in "<\(m.0)>" })
+        print("1 22 333".matches(of: /\d+/).map { $0.0 })
+        print("2024".wholeMatch(of: /\d+/) != nil, "20x4".wholeMatch(of: /\d+/) == nil)
+        let half = 10 / 2 / 5
+        print(half)
+        let r = try Regex("[A-Z]+")
+        print("abcDEFgh".firstMatch(of: r)!.0)
+        let path = #/a/b/#
+        print("xa/by".contains(path))
+        let spaced = #/
+          (\d+)   # digits
+          \s*
+          (kg|g)  # unit
+        /#
+        if let m = "12 kg".wholeMatch(of: spaced) { print(m.1, m.2) }
+        func kind(_ s: String) -> String {
+            switch s {
+            case /\d+/: return "number"
+            case /[a-z]+/: return "word"
+            default: return "other"
+            }
+        }
+        print(kind("123"), kind("abc"), kind("a1"))
+        """#, prints: "2024-03-09 2024 09\nabc 42\ntrue false\nOrder ## shipped on ####-##-##\na<1>b<22>\n[\"1\", \"22\", \"333\"]\ntrue true\n1\nDEF\ntrue\n12 kg\nnumber word other\n")
+    }
+
+    func testBadRegexIsAnErrorWithItsLine() {
+        expect("""
+        let a = 1
+        let r = /(unclosed/
+        """, fails: "Line 2: Invalid regex /(unclosed/")
+    }
 }

@@ -18,6 +18,7 @@ struct KEToken: CustomStringConvertible {
         case string([KEStrPart], multiline: Bool)
         case op(String)           // operator character runs: + - == ?? ..< ...
         case punct(Character)     // ( ) [ ] { } , : ; . @ # \
+        case regex(String)        // /\d+/ and #/…/#, as the pattern's source (extended syntax prefixed with (?x))
         case eof
     }
     var kind: Kind
@@ -38,6 +39,7 @@ struct KEToken: CustomStringConvertible {
         case .string: return "string literal"
         case .op(let o): return o
         case .punct(let c): return String(c)
+        case .regex: return "regex literal"
         case .eof: return "end of file"
         }
     }
@@ -116,7 +118,11 @@ struct KELexer {
             sawSpace = false
             sawNewline = false
 
-            if c == "\"" || (c == "#" && (peek(1) == "\"" || (peek(1) == "#" && peek(2) == "\""))) {
+            if c == "#", peek(1) == "/" || (peek(1) == "#" && peek(2) == "/") {
+                tok.kind = try lexExtendedRegex()
+            } else if c == "/", Self.regexMayStart(after: tokens.last), let pattern = scanBareRegex() {
+                tok.kind = .regex(pattern)
+            } else if c == "\"" || (c == "#" && (peek(1) == "\"" || (peek(1) == "#" && peek(2) == "\""))) {
                 tok.kind = try lexString()
             } else if c.isNumber {
                 tok.kind = try lexNumber()
@@ -158,6 +164,68 @@ struct KELexer {
                 throw KESyntaxError(message: "unexpected character '\(c)'", line: startLine, col: startCol)
             }
             tokens.append(tok)
+        }
+    }
+
+    // MARK: Regex literals
+
+    /// Where an expression can start, `/` opens a regex literal (`x = /\d+/`,
+    /// `.firstMatch(of: /a/)`, `case /b/:`); after a value it divides.
+    private static let regexKeywords: Set<String> = ["return", "case", "in", "where", "if", "guard", "while", "try", "await",
+                                                     "else", "throw", "is", "as", "some", "any", "repeat", "switch"]
+    static func regexMayStart(after prev: KEToken?) -> Bool {
+        guard let prev else { return true }
+        switch prev.kind {
+        case .op: return true
+        case .punct(let p): return "([{,:;".contains(p)
+        case .ident(let w): return regexKeywords.contains(w)
+        default: return false
+        }
+    }
+
+    /// `/…/` on one line: it can't start with a space (so `a / b / c` divides),
+    /// and `\/` and `/` inside `[…]` don't close it. nil when it isn't a regex.
+    private mutating func scanBareRegex() -> String? {
+        guard let first = peek(1), first != " ", first != "\t", first != "\n", first != "/", first != "*", first != "=" else { return nil }
+        var k = 1
+        var inClass = false
+        var out = ""
+        while let ch = peek(k), ch != "\n" {
+            if ch == "\\", let n = peek(k + 1) { out.append(ch); out.append(n); k += 2; continue }
+            if ch == "[" { inClass = true } else if ch == "]" { inClass = false }
+            if ch == "/" && !inClass {
+                guard out.last != " " else { return nil }
+                for _ in 0...k { advance() }
+                return out
+            }
+            out.append(ch)
+            k += 1
+        }
+        return nil
+    }
+
+    /// `#/…/#`: `/` needs no escape; with a newline right after `#/`, extended
+    /// syntax (whitespace and `#` comments ignored) over several lines.
+    private mutating func lexExtendedRegex() throws -> KEToken.Kind {
+        let startLine = line + lineOffset
+        var hashes = 0
+        while peek() == "#" { hashes += 1; advance() }
+        advance()   // /
+        let extended = peek() == "\n"
+        var out = ""
+        while true {
+            guard let ch = peek() else { throw KESyntaxError(message: "unterminated regex literal", line: startLine, col: 0) }
+            if ch == "/" {
+                var k = 1
+                while k <= hashes, peek(k) == "#" { k += 1 }
+                if k == hashes + 1 {
+                    for _ in 0..<k { advance() }
+                    return .regex(extended ? "(?x)" + out : out)
+                }
+            }
+            if ch == "\n" && !extended { throw KESyntaxError(message: "unterminated regex literal", line: startLine, col: 0) }
+            out.append(ch)
+            advance()
         }
     }
 

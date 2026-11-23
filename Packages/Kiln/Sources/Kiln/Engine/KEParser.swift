@@ -1150,6 +1150,7 @@ struct KEParser {
         switch t.kind {
         case .int(let i): next(); return .int(i)
         case .double(let d): next(); return .double(d)
+        case .regex(let pattern): next(); return .regex(pattern, line: line)
         case .string(let parts, _):
             next()
             var segs: [KEStringSegment] = []

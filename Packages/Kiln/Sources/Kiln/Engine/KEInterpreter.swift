@@ -646,6 +646,8 @@ final class KInterpreter {
         case .expression(let e):
             let target = try eval(e, env, typeRef(of: value))
             if case .range = target { return rangeContains(target, value) }
+            // `case /\d+/:` matches the whole string.
+            if let r = KBuiltins.regexBox(target), case .string(let s) = value { return (try? r.regex.wholeMatch(in: s)) != nil }
             if case .function(let f) = target { return truthy(try call(f, [value], [nil])) }
             return target == value
         case .typeCheck(let t):

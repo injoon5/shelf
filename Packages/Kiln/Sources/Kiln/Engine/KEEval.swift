@@ -127,6 +127,8 @@ extension KInterpreter {
             throw fail("'await' can't be used here: a view's body, a computed property, an init and other code that isn't async run to the end without waiting. Do the work in Task { … } or .task { … }, or in an async function called from one", x.line)
         case .value(let v):
             return coerce(v, to: expected)
+        case .regex(let pattern, let line):
+            return try KBuiltins.regex(pattern, self, line)
         case .typeExpr(let t):
             if let ut = userType(t) { return .type(.user(ut)) }
             return .type(.builtin(t.description))
@@ -517,7 +519,9 @@ extension KInterpreter {
         case "<", ">", "<=", ">=": return .bool(try compare(op, a, b, line))
         case "..<": return .range(a, b, closed: false)
         case "...": return .range(a, b, closed: true)
-        case "~=": return .bool(rangeContains(a, b) || equal(a, b))
+        case "~=":
+            if let r = KBuiltins.regexBox(a), case .string(let s) = b { return .bool((try? r.regex.wholeMatch(in: s)) != nil) }
+            return .bool(rangeContains(a, b) || equal(a, b))
         default: return try arithmetic(op, a, b, line)
         }
     }

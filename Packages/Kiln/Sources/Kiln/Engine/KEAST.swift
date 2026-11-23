@@ -106,11 +106,12 @@ indirect enum KEExpr {
     case switchExpr(KEExpr, [KESwitchCase])
     case assign(String, KEExpr, KEExpr, line: Int)      // a = b / a += b inside closures used as expressions
     case value(KV)                                      // an already-evaluated value (an `await`'s result, KEAsync)
+    case regex(String, line: Int)                       // /\d+/, #/…/# (Bridges/Language/Regex.swift)
 
     var line: Int {
         switch self {
         case .ident(_, let l), .implicitMember(_, let l), .member(_, _, let l), .call(_, _, let l),
-             .subscriptAccess(_, _, let l), .binary(_, _, _, let l), .selfRef(let l), .assign(_, _, _, let l): return l
+             .subscriptAccess(_, _, let l), .binary(_, _, _, let l), .selfRef(let l), .assign(_, _, _, let l), .regex(_, let l): return l
         case .closure(let c): return c.line
         case .optionalChain(let e), .prefix(_, let e), .postfix(_, let e), .cast(let e, _, _),
              .tryExpr(_, let e), .awaitExpr(let e): return e.line

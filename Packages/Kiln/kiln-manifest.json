@@ -4051,6 +4051,94 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "member:Regex.Match.output",
+      "kind" : "member",
+      "name" : "output",
+      "overloads" : [
+
+      ],
+      "owner" : "Regex.Match",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.Match.range",
+      "kind" : "member",
+      "name" : "range",
+      "overloads" : [
+
+      ],
+      "owner" : "Regex.Match",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.firstMatch",
+      "kind" : "member",
+      "name" : "firstMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.ignoresCase",
+      "kind" : "member",
+      "name" : "ignoresCase",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.prefixMatch",
+      "kind" : "member",
+      "name" : "prefixMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Regex.wholeMatch",
+      "kind" : "member",
+      "name" : "wholeMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "Regex",
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:RelativeDateTimeFormatter.localizedString",
       "kind" : "member",
@@ -5121,6 +5209,22 @@
     },
     {
       "family" : "Language",
+      "id" : "member:String.firstMatch",
+      "kind" : "member",
+      "name" : "firstMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
       "id" : "member:String.formatted",
       "kind" : "member",
       "name" : "formatted",
@@ -5325,6 +5429,22 @@
     },
     {
       "family" : "Language",
+      "id" : "member:String.matches",
+      "kind" : "member",
+      "name" : "matches",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
       "id" : "member:String.padding",
       "kind" : "member",
       "name" : "padding",
@@ -5337,6 +5457,22 @@
       "id" : "member:String.prefix",
       "kind" : "member",
       "name" : "prefix",
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.prefixMatch",
+      "kind" : "member",
+      "name" : "prefixMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
@@ -5373,6 +5509,31 @@
       "id" : "member:String.removeLast",
       "kind" : "member",
       "name" : "removeLast",
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.replacing",
+      "kind" : "member",
+      "name" : "replacing",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "maxReplacements",
+            "with"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "with",
+            "maxReplacements"
+          ]
+        }
+      ],
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
@@ -5490,6 +5651,22 @@
       "owner" : "String",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:String.wholeMatch",
+      "kind" : "member",
+      "name" : "wholeMatch",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ]
+        }
+      ],
+      "owner" : "String",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
     },
     {
       "family" : "Language",
@@ -11271,6 +11448,34 @@
       "kind" : "type",
       "name" : "Range",
       "source" : "Sources/Kiln/Collections.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Regex",
+      "kind" : "type",
+      "name" : "Regex",
+      "notes" : "From `/…/`, `#/…/#` or `try Regex(\"…\")`. §1.6 has the basics: `firstMatch`, `wholeMatch`, `contains`, `replacing`, `matches(of:)`, `case /…/:`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Regex.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Regex.Match",
+      "kind" : "type",
+      "name" : "Regex.Match",
+      "notes" : "`match.0`, `match.1`, `match.name`, `match.output`, `match.range` (character offsets).",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Regex.swift",
       "support" : "partial"
     },
     {
