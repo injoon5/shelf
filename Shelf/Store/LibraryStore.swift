@@ -35,7 +35,11 @@ final class LibraryStore {
     /// Every app's data. The runner, the New App preview and Settings reach
     /// it through the library, so the demo's apps write only to the demo's.
     @ObservationIgnored let data: AppData
+    /// Each app's launch snapshot (plan §0.8).
+    @ObservationIgnored let snapshots: LaunchSnapshots
     @ObservationIgnored private let layoutURL: URL
+    /// Apps on their way out: a sync that lands meanwhile doesn't bring them back.
+    @ObservationIgnored private var deleting: Set<String> = []
     @ObservationIgnored private var generation = 0
     /// Which sync `isSyncing` is about: an abandoned one never clears it.
     @ObservationIgnored private var syncID = 0
@@ -52,15 +56,18 @@ final class LibraryStore {
                   server: { Account.api })
     }
 
-    /// The library kept in `cache`, `data` and `layoutURL`, talking to
-    /// whatever `server` returns: nil while signed out. Tests pass their own.
+    /// The library kept in `cache`, `data`, `snapshots` and `layoutURL`,
+    /// talking to whatever `server` returns: nil while signed out. Tests
+    /// pass their own.
     init(cache: AppCache, data: AppData, layoutURL: URL, server: @escaping @Sendable () -> API?,
-         appStorage: AppStorageKeys = AppStorageKeys(.standard)) {
+         appStorage: AppStorageKeys = AppStorageKeys(.standard), snapshots: LaunchSnapshots = .standard) {
         self.cache = cache
         self.data = data
+        self.snapshots = snapshots
         self.layoutURL = layoutURL
         self.server = server
-        engine = SyncEngine(cache: cache, api: server, appStorage: appStorage)
+        engine = SyncEngine(cache: cache, api: server, appStorage: appStorage,
+                            cleanup: .library(cache: cache, appStorage: appStorage, data: data, snapshots: snapshots))
         isSignedIn = server() != nil
 
         // Read before the first frame, so the Home Screen never flashes empty.
@@ -118,6 +125,10 @@ final class LibraryStore {
             tokenRejected = false
             loadFailure = nil
             hideBanner()
+            // A deletion made offline that the server then refused: the app
+            // is back, and says why as any failure does.
+            let settled = generation
+            if let refusal = await engine.takeRefusals().last, generation == settled { report(refusal) }
             let slugs = apps.map(\.slug)
             Task { await data.pull(slugs) }
         } catch {
@@ -179,7 +190,7 @@ final class LibraryStore {
         switch event {
         case .listed(let listed):
             // Icons take their final place now and fill in as sources arrive.
-            apps = listed
+            apps = listed.filter { !deleting.contains($0.slug) }
             reconcileLayout()
         case .downloading(let slug):
             downloading.insert(slug)
@@ -189,7 +200,7 @@ final class LibraryStore {
     }
 
     private func apply(_ index: LibraryIndex) {
-        apps = index.apps
+        apps = index.apps.filter { !deleting.contains($0.slug) }
         lastSynced = index.syncedAt
         reconcileLayout()
     }
@@ -269,6 +280,7 @@ final class LibraryStore {
         hideBanner()
         layout = Layout()
         try? FileManager.default.removeItem(at: layoutURL)
+        snapshots.removeAll()
     }
 
     private func abandonSync() async {
@@ -286,6 +298,13 @@ final class LibraryStore {
     /// that follows lands the icon like any other, pie and blue dot included.
     func install(slug: String, name: String, icon: String?, tint: Tint, source: String) async throws(API.Failure) {
         guard let api else { throw .unauthorized }
+        // An app deleted offline under this slug goes first, or the next
+        // sync would delete this one in its place.
+        do {
+            try await engine.sendQueuedDeletion(of: slug)
+        } catch {
+            throw error as? API.Failure ?? .offline
+        }
         _ = try await api.install(slug: slug, name: name, icon: icon, tint: tint, source: source)
         Task { await sync() }
     }
@@ -301,12 +320,93 @@ final class LibraryStore {
         }
     }
 
+    // MARK: Deleting apps
+
+    /// How Delete App ended.
+    enum Deletion: Equatable, Sendable {
+        /// Gone everywhere: here, and on the server.
+        case deleted
+        /// Offline. Gone from this phone; the next sync tells the server.
+        case queued
+        /// The server refused. The app is back in `apps`, in its old place in
+        /// `layout`, and the failure has been reported as a failed sync's is.
+        case restored(API.Failure)
+        /// Not an app that can be deleted: Settings' reserved entry, anything
+        /// else that isn't a valid slug, or no account to delete it from.
+        case refused
+    }
+
+    /// Delete App (plan §0.4). The app leaves `apps` and `layout` at once,
+    /// before the server is asked, so its icon can leave with it.
+    ///
+    /// Once the server answers, everything the phone keeps for it goes too
+    /// (`AppCleanup`: source, `DB` store with its pending writes,
+    /// `@AppStorage`, launch snapshot), and the same happens on every other
+    /// phone at its next sync. Offline, the phone's copy goes now and the
+    /// deletion waits in a persisted queue that the next sync sends before
+    /// it lists apps. If the server refuses, nothing on the phone has been
+    /// touched and the icon comes back: see `Deletion.restored`.
+    @discardableResult
+    func delete(_ slug: String) async -> Deletion {
+        guard AppMeta.isValidSlug(slug), isSignedIn else { return .refused }
+        guard let position = apps.firstIndex(where: { $0.slug == slug }) else {
+            // Already gone, by a sync that landed while the alert was up.
+            return .deleted
+        }
+        let before = layout
+        let slot = layout.slot(of: slug)
+        apps.remove(at: position)
+        reconcileLayout()
+        if isDemo { return .deleted }
+        let after = layout
+
+        let account = self.account
+        deleting.insert(slug)
+        defer { deleting.remove(slug) }
+        do {
+            let (result, index) = try await engine.delete(slug)
+            let deletion: Deletion = result == .queued ? .queued : .deleted
+            guard account == self.account else { return deletion }
+            deleting.remove(slug)
+            apply(index)
+            return deletion
+        } catch {
+            let failure = error as? API.Failure ?? .offline
+            // Signed out meanwhile: there's no library to put it back in.
+            guard account == self.account else { return .restored(failure) }
+            deleting.remove(slug)
+            apply(cache.readIndex())
+            restore(slug, to: slot, layoutBefore: before, layoutAfter: after)
+            report(error)
+            return .restored(failure)
+        }
+    }
+
+    /// Puts a deleted app's icon back where it was. If nothing has moved
+    /// since it left, that's the whole layout as it was, so a page it had to
+    /// itself comes back too. If something has (a drag in edit mode while the
+    /// server answered), that move stays and the icon goes back to its slot.
+    private func restore(_ slug: String, to slot: Layout.Slot?, layoutBefore before: Layout, layoutAfter after: Layout) {
+        guard app(slug) != nil else { return }
+        var restored = before
+        restored.reconcile(with: apps.map(\.slug))
+        var current = layout
+        current.reconcile(with: apps.filter { $0.slug != slug }.map(\.slug))
+        if current == after {
+            layout = restored
+        } else if let slot {
+            layout.move(slug, to: slot)
+        }
+        commitLayout()
+    }
+
     #if DEBUG
     /// A library with no server behind it, for previews and screenshots:
     /// `apps`, with their sources already in `cache`. It never syncs.
     init(demo apps: [CachedApp], dock: [String] = [], cache: AppCache) {
         self.cache = cache
         data = AppData(root: URL.temporaryDirectory.appending(path: "shelf-demo-data"), api: { nil })
+        snapshots = LaunchSnapshots(root: URL.temporaryDirectory.appending(path: "shelf-demo-snapshots"))
         layoutURL = cache.root.appending(path: "layout.json")
         server = { nil }
         engine = SyncEngine(cache: cache, api: server)

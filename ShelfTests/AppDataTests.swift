@@ -314,6 +314,41 @@ struct DataHarness {
         #expect(!FileManager.default.fileExists(atPath: h.root.path(percentEncoded: false)))
     }
 
+    /// Delete App: the store goes with its pending writes, nothing is pushed,
+    /// and a session the app still holds writes nowhere.
+    @Test func removeDropsTheStoreAndItsPendingWrites() async throws {
+        let h = DataHarness()
+        defer { h.cleanUp() }
+        let store = h.store(pushDelay: .milliseconds(100))
+        let todos = await store.open("todos")
+        try todos.write(.int(1), for: "saved")
+        await store.close(todos)
+        #expect(h.remote.value("todos", "saved") == .int(1))
+        h.remote.update { $0.offline = true }
+        try todos.write(.int(2), for: "pending")
+        let notes = await store.open("notes")
+        try notes.write(.int(1), for: "n")
+        await store.close(notes)
+        #expect(await eventually { h.file("todos")?.dirty == ["pending"] })
+
+        await store.remove("todos")
+        try todos.write(.int(3), for: "after")
+        h.remote.update { $0.offline = false }
+
+        try await Task.sleep(for: .milliseconds(300))
+        await store.pushAll()
+        #expect(h.remote.row("todos", "pending") == nil)
+        #expect(h.remote.row("todos", "after") == nil)
+        #expect(h.file("todos") == nil)
+        #expect(await store.usage()["todos"] == nil)
+        // The other app's pending write still goes.
+        #expect(h.remote.value("notes", "n") == .int(1))
+        // Made again under the same slug, it starts empty.
+        let again = await store.open("todos", pullTimeout: .zero)
+        #expect(again.value(for: "pending") == nil)
+        #expect(again !== todos)
+    }
+
     @Test func reloadsWhatWasSaved() async throws {
         let h = DataHarness()
         defer { h.cleanUp() }
