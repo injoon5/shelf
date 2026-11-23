@@ -140,6 +140,8 @@ struct KModifier {
     var args: [KV]
     var labels: [String?]
     var line: Int
+    /// The overload its bridge picked when the code ran.
+    var bound: KBound? = nil
 
     func arg(_ label: String?) -> KV? {
         if let i = labels.firstIndex(where: { $0 == label }) { return args[i] }
@@ -167,7 +169,12 @@ final class KView {
         case error(String)
     }
     let kind: Kind
-    init(_ kind: Kind) { self.kind = kind }
+    /// For a primitive: the overload its bridge picked when the code ran.
+    let bound: KBound?
+    init(_ kind: Kind, bound: KBound? = nil) {
+        self.kind = kind
+        self.bound = bound
+    }
 
     static func primitive(_ name: String, _ args: [KV], _ labels: [String?], line: Int) -> KView { KView(.primitive(name, args, labels, line: line)) }
     static func custom(_ s: KStructValue) -> KView { KView(.custom(s)) }

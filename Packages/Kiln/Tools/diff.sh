@@ -18,13 +18,14 @@ while (( $# )); do
   esac
 done
 WORK=${TMPDIR:-/tmp}/kilndiff
-rm -rf "$WORK/Kiln/Sources" "$WORK/inputs"
+rm -rf "$WORK/Kiln/Sources" "$WORK/inputs" "$WORK/Kiln/Tools/KilnDiff/Sources"
 mkdir -p "$WORK/Kiln" "$WORK/inputs/tests"
 
 echo "== baseline engine at $BASE"
 git -C "$REPO" archive "$BASE" Packages/Kiln/Package.swift Packages/Kiln/Sources | tar -x -C "$WORK/Kiln" --strip-components 2
 cp "$KILN/Sources/Kiln/Engine/KETranscript.swift" "$WORK/Kiln/Sources/Kiln/Engine/"
-cp "$KILN/Tools/KilnDiff/BaselineShim.swift" "$WORK/Kiln/Sources/Kiln/Engine/"
+# An engine from before §1.3 has no transcript shim of its own.
+[ -f "$WORK/Kiln/Sources/Kiln/Engine/KETranscriptShim.swift" ] || cp "$KILN/Tools/KilnDiff/BaselineShim.swift" "$WORK/Kiln/Sources/Kiln/Engine/"
 mkdir -p "$WORK/Kiln/Tools/KilnDiff/Sources/KilnDiff"
 cp "$KILN/Tools/KilnDiff/Package.swift" "$WORK/Kiln/Tools/KilnDiff/"
 cp "$KILN/Tools/KilnDiff/Sources/KilnDiff/main.swift" "$WORK/Kiln/Tools/KilnDiff/Sources/KilnDiff/"

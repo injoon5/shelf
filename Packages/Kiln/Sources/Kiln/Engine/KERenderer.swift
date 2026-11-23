@@ -235,6 +235,7 @@ struct KRenderer {
         case .textConcat: return AnyView(text(v) ?? Text(""))
         case .custom(let s): return AnyView(KHostView(value: s, interp: interp))
         case .primitive(let name, let args, let labels, let line):
+            if let b = interp.registry.view(name) { return renderBridge(b, KArgs(args: args, labels: labels), line, v.bound) }
             return primitive(name, KArgs(args: args, labels: labels), line)
         case .modified(let base, let m):
             return modified(base, m)
@@ -487,6 +488,7 @@ struct KRenderer {
             return ta + tb
         case .modified(let base, let m):
             guard var t = text(base) else { return nil }
+            if let bridged = textModifier(t, base, m) { return bridged }
             switch m.name {
             case "bold": t = t.bold(m.first.map { interp.truthy($0) } ?? true)
             case "italic": t = t.italic()
@@ -1043,6 +1045,7 @@ struct KRenderer {
     // MARK: Modifiers
 
     func modified(_ base: KView, _ m: KModifier) -> AnyView {
+        if let b = interp.registry.modifier(m.name) { return renderModifier(b, base, m) }
         switch m.name {
         case "fill", "stroke", "strokeBorder", "trim", "inset", "rotation", "scale":
             if let shape = shapeChain(base) { return shapeModifier(shape, m) }

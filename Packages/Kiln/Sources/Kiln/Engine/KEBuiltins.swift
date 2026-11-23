@@ -12,6 +12,17 @@ import SwiftUI
 @MainActor
 enum KBuiltins {
 
+    /// The engine before the registry: a modifier evaluated by name. (Goes when every modifier is a bridge.)
+    static func legacyViewMethod(_ interp: KInterpreter, _ v: KView, _ name: String, _ argExprs: [KEArg], _ env: KEnv, _ line: Int) throws -> KV {
+        let args = try argExprs.enumerated().map { i, a -> KV in
+            if i == 0, a.label == nil, localizedTitleModifiers.contains(name), case .string(let segs) = a.value {
+                return .string(try interp.stringLiteral(segs, env, localized: true))
+            }
+            return try interp.eval(a.value, env, modifierArgType(name, a.label))
+        }
+        return .view(.modified(v, KModifier(name: name, args: args, labels: argExprs.map(\.label), line: line)))
+    }
+
     // MARK: - Catalog
 
     static let viewNames: Set<String> = [
