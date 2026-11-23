@@ -1303,6 +1303,8 @@ final class KChecker {
         }
         walkArgs(args, c, wait: .unknown)
         if decls.extensionMembers.contains(name) { return .view }
+        // A method of the value itself (`Circle().path(in:)`).
+        if registry.type("View")?.methods[name] != nil { return .unknown }
         var candidates = Array(registry.modifiers.keys)
         candidates += decls.extensions["View"].map { Array($0.instance.keys) } ?? []
         report(.unknownModifier, line, "Kiln doesn't support the .\(name)() modifier",

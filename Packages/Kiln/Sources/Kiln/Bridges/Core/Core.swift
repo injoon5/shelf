@@ -18,6 +18,7 @@ final class CoreBridges: KBridgeFamily {
         protocols(r)
         representables(r)
         values(r)
+        round1(r)
     }
 
     // MARK: Views
@@ -33,18 +34,6 @@ final class CoreBridges: KBridgeFamily {
         }
         r.view("AnyView", .core) { v in
             v.form("_:any") { c in c.r.renderList(KBuiltins.asViews(c[0] ?? .void, c.interp)) }
-        }
-        r.view("TimelineView", .core, support: .partial, notes: "`.periodic(from:by:)` and `.everyMinute`; the closure gets `context.date`.") { v in
-            v.form("_:any content:content") { c in
-                let fn = c.contentValue(nil)
-                let interval: Double = {
-                    if case .native(.implicit(_, let pa))? = c[0], let by = pa.last?.asDouble { return by }
-                    return 1
-                }()
-                TimelineView(.periodic(from: .now, by: interval)) { ctx in
-                    c.r.renderContent(fn, [.tuple([.native(.date(ctx.date))], ["date"])])
-                }
-            }
         }
     }
 

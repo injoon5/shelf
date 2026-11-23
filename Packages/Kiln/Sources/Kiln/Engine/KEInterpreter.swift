@@ -148,6 +148,8 @@ final class KInterpreter {
 
     /// What the code has printed.
     var console = ""
+    /// A native value type's new value after a property setter (`context.opacity = 0.5`), for `write` to store.
+    var lastNativeMutation: KV?
     /// Set when an `init?` body executes `return nil`.
     var returnedNil = false
     var errors: [String] = []
@@ -964,7 +966,10 @@ final class KInterpreter {
                 // `point.x += 4`, `size.width = 10`, `rect.origin = p`: value types, written back.
                 try write(base, .native(Self.geometryMember(n, name, newValue)!))
             case .native(let n) where try setNativeMember(n, name, newValue):
-                return   // a Foundation object (DateFormatter, JSONDecoder, URLComponents …) is a reference
+                // A Foundation object (DateFormatter, JSONDecoder, URLComponents …) is a
+                // reference; a native value type (`GraphicsContext`) is written back.
+                if let mutated = lastNativeMutation { lastNativeMutation = nil; try write(base, mutated) }
+                return
             default:
                 throw fail("Can't set '\(name)' on \(describe(container))")
             }

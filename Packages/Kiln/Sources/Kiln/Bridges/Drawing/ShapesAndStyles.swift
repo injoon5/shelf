@@ -223,6 +223,10 @@ extension KRenderer {
         case "transform":
             let t = KAffines.affine(a.first)
             return { AnyShape($0.transform(t)) }
+        case "offset":
+            if case .native(.size(let w, let h))? = a.first { return { AnyShape($0.offset(CGSize(width: w, height: h))) } }
+            let x = a["x"]?.cg ?? 0, y = a["y"]?.cg ?? 0
+            return { AnyShape($0.offset(x: x, y: y)) }
         case "union", "intersection", "subtracting", "symmetricDifference", "lineIntersection", "lineSubtraction":
             guard let other = DrawingBridges.shapeArg(a.first, self) else { return nil }
             let eo = a["eoFill"].map { interp.truthy($0) } ?? false
@@ -281,6 +285,18 @@ extension KRenderer {
             return nil
         default:
             return nil
+        }
+    }
+
+    /// `.red.opacity(0.5).shadow(.drop(radius: 2))`: a color written as a view
+    /// with style modifiers on it, as the shape style SwiftUI makes of it.
+    func styledColor(_ v: KView) -> AnyShapeStyle? {
+        guard case .modified(let base, let m) = v.kind, ["shadow", "blendMode", "opacity"].contains(m.name) else { return nil }
+        guard let inner = shapeStyle(.view(base)) else { return nil }
+        switch m.name {
+        case "shadow": return AnyShapeStyle(inner.shadow(shadowStyle(m.first)))
+        case "blendMode": return AnyShapeStyle(inner.blendMode(blendModeValue(m.first)))
+        default: return AnyShapeStyle(inner.opacity(m.first?.asDouble ?? 1))
         }
     }
 

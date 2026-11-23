@@ -248,6 +248,40 @@ extension DrawingBridges {
         r.modifier("symbolVariant", .drawing) { m in
             m.form("_:SymbolVariants") { c, view in view.symbolVariant(KSymbolEffects.variants(c.symbol(0))) }
         }
+        r.modifier("symbolColorRenderingMode", .drawing, introduced: "26.0") { m in
+            m.form("_:any") { c, view in
+                if #available(iOS 26, macOS 26, *) {
+                    switch c.symbol(0) {
+                    case "gradient": AnyView(view.symbolColorRenderingMode(.gradient))
+                    case "flat": AnyView(view.symbolColorRenderingMode(.flat))
+                    default: AnyView(view.symbolColorRenderingMode(nil))
+                    }
+                } else {
+                    view
+                }
+            }
+        }
+        r.modifier("symbolVariableValueMode", .drawing, introduced: "26.0") { m in
+            m.form("_:any") { c, view in
+                if #available(iOS 26, macOS 26, *) {
+                    switch c.symbol(0) {
+                    case "draw": AnyView(view.symbolVariableValueMode(.draw))
+                    case "color": AnyView(view.symbolVariableValueMode(.color))
+                    default: AnyView(view.symbolVariableValueMode(nil))
+                    }
+                } else {
+                    view
+                }
+            }
+        }
+        r.extend("Animation") { t in
+            t.staticMethod("timingCurve", "_:number _:number _:number _:number duration:number?") { c in
+                KDrawing.animation("timingCurve", c.args, c.labels).map { .native(.animation(KRef($0))) } ?? .nilValue
+            }
+            t.staticMethod("timingCurve", "_:UnitCurve duration:number") { c in
+                KDrawing.animation("timingCurve", c.args, c.labels).map { .native(.animation(KRef($0))) } ?? .nilValue
+            }
+        }
         r.type("SymbolVariants", .drawing) { t in
             t.internal()
             t.anyStatic { _, name in .native(.implicit(name, [])) }

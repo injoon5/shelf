@@ -90,6 +90,12 @@ enum KDrawing {
             if let r = arg("response") { return .spring(response: r, dampingFraction: arg("dampingFraction") ?? 0.825) }
             if let d = arg("duration") { return .spring(duration: d, bounce: arg("bounce") ?? 0) }
             return .spring()
+        case "timingCurve":
+            // `.timingCurve(0.2, 0.8, 0.2, 1, duration:)`, or a `UnitCurve` and a duration.
+            let numbers = zip(args, labels).filter { $0.1 == nil }.compactMap { $0.0.asDouble }
+            if numbers.count >= 4 { return .timingCurve(numbers[0], numbers[1], numbers[2], numbers[3], duration: duration ?? 0.35) }
+            if let curve = args.first?.boxed(UnitCurve.self) { return .timingCurve(curve, duration: duration ?? 0.35) }
+            return .easeInOut
         case "bouncy": return .bouncy
         case "snappy": return .snappy
         case "smooth": return .smooth
@@ -99,6 +105,8 @@ enum KDrawing {
 
     static let animationNames = ["default", "easeInOut", "easeIn", "easeOut", "linear", "spring", "interactiveSpring", "interpolatingSpring",
                                  "bouncy", "snappy", "smooth"]
+    /// Static methods with no property form (`Animation.timingCurve(…)`).
+    static let animationFunctions = ["timingCurve"]
 }
 
 @objc(KilnBridges_Drawing)

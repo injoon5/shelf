@@ -230,6 +230,8 @@ extension EnvironmentBridges {
         r.environmentValue("scenePhase", .environment, notes: "`.active` while the app's card is open; `.inactive` while it's closing; `.background` when Shelf is.",
                            value: { _ in .native(.implicit("active", [])) }, read: { env, interp in
             .native(.implicit(min(KilnScenePhase(env.scenePhase), interp.context.scenePhase).name, []))
+        }, write: { env, v, _ in
+            env.scenePhase = name(v) == "background" ? .background : (name(v) == "inactive" ? .inactive : .active)
         })
         r.environmentValue("undoManager", .environment, support: .partial, notes: "`undo()`, `redo()`, `canUndo`, `canRedo` and `registerUndo(withTarget:handler:)`.",
                            value: { _ in .nilValue }, read: { env, _ in env.undoManager.map { .native(.object("UndoManager", KRef($0))) } ?? .nilValue })

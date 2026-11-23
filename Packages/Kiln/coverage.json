@@ -5,8 +5,9 @@
   "entries" : [
     {
       "family" : "Accessibility",
+      "notes" : "Built by the compiler or by other modifiers; no author writes them.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "plumbing",
       "symbol" : {
         "conformsTo" : "AccessibilityRotorContent",
         "deprecated" : false,
@@ -30,8 +31,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "AccessibilityRotorContent",
         "deprecated" : false,
@@ -190,8 +192,9 @@
     },
     {
       "family" : "Accessibility",
+      "notes" : "Built by the compiler or by other modifiers; no author writes them.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "plumbing",
       "symbol" : {
         "conformsTo" : "AccessibilityRotorContent",
         "deprecated" : false,
@@ -215,8 +218,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "AxisContent",
         "deprecated" : false,
@@ -249,8 +253,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -309,9 +314,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -395,8 +400,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "A function's plot is sampled at 200 points of `domain:` (or the x scale's).",
+      "overloadsCovered" : 10,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -612,8 +619,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "AxisContent",
         "deprecated" : false,
@@ -726,9 +734,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -830,8 +838,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -1286,8 +1295,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "KeyframeTrackContent",
         "deprecated" : false,
@@ -2190,9 +2200,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2228,8 +2238,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "A function's plot is sampled at 200 points of `domain:` (or the x scale's).",
+      "overloadsCovered" : 9,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2367,8 +2379,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "KeyframeTrackContent",
         "deprecated" : false,
@@ -2394,8 +2407,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "KeyframeTrackContent",
         "deprecated" : false,
@@ -2419,8 +2433,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2444,9 +2459,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2502,8 +2517,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2573,9 +2589,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 9,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2709,8 +2725,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2894,9 +2911,9 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -2988,8 +3005,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 10,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -3126,7 +3144,7 @@
       "family" : "Charts",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -3153,8 +3171,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ChartContent",
         "deprecated" : false,
@@ -3337,8 +3356,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "KeyframeTrackContent",
         "deprecated" : false,
@@ -6957,8 +6977,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accentColor",
@@ -6981,8 +7002,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityAssistiveAccessEnabled",
@@ -7005,8 +7027,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityDifferentiateWithoutColor",
@@ -7029,8 +7052,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityDimFlashingLights",
@@ -7053,8 +7077,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityEnabled",
@@ -7077,8 +7102,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityInvertColors",
@@ -7101,8 +7127,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityLargeContentViewerEnabled",
@@ -7125,8 +7152,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityPlayAnimatedImages",
@@ -7149,8 +7177,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityPrefersCrossFadeTransitions",
@@ -7173,8 +7202,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityQuickActionsEnabled",
@@ -7197,8 +7227,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityReduceHighlightingEffects",
@@ -7221,8 +7252,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityReduceMotion",
@@ -7245,8 +7277,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityReduceTransparency",
@@ -7269,8 +7302,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityShowBorders",
@@ -7293,8 +7327,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : true,
         "id" : "environment:accessibilityShowButtonShapes",
@@ -7317,8 +7352,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilitySwitchControlEnabled",
@@ -7341,8 +7377,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:accessibilityVoiceOverEnabled",
@@ -7365,8 +7402,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:allowedDynamicRange",
@@ -7389,8 +7427,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:allowsTightening",
@@ -7413,8 +7452,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:appearsActive",
@@ -7485,8 +7525,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:autocorrectionDisabled",
@@ -7509,8 +7550,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:backgroundMaterial",
@@ -7533,8 +7575,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:backgroundProminence",
@@ -7557,8 +7600,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:backgroundStyle",
@@ -7581,8 +7625,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:badgeProminence",
@@ -7630,8 +7675,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:buttonSizing",
@@ -7704,8 +7750,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:colorSchemeContrast",
@@ -7728,8 +7775,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:contentTransition",
@@ -7752,8 +7800,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:contentTransitionAddsDrawingGroup",
@@ -7873,8 +7922,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:defaultAppStorageDefaults",
@@ -7971,8 +8021,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:description",
@@ -7995,8 +8046,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:disableAutocorrection",
@@ -8094,8 +8146,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:displayScale",
@@ -8167,8 +8220,10 @@
     },
     {
       "family" : "Text",
+      "notes" : "Compare with `<`, or read `isAccessibilitySize`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:dynamicTypeSize",
@@ -8217,8 +8272,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:findContext",
@@ -8241,8 +8297,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:font",
@@ -8265,8 +8322,10 @@
     },
     {
       "family" : "Text",
+      "notes" : "For `font.resolve(in:)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:fontResolutionContext",
@@ -8289,8 +8348,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:foregroundColor",
@@ -8338,8 +8398,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:horizontalScrollBounceBehavior",
@@ -8362,8 +8423,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:horizontalScrollIndicatorVisibility",
@@ -8386,10 +8448,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Always `.compact`.",
       "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:horizontalSizeClass",
@@ -8412,8 +8473,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:imageScale",
@@ -8461,8 +8523,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isFocusEffectEnabled",
@@ -8485,8 +8548,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isFocused",
@@ -8509,8 +8573,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isHoverEffectEnabled",
@@ -8533,8 +8598,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isLuminanceReduced",
@@ -8582,8 +8648,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isSceneCaptured",
@@ -8681,8 +8748,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isTabViewSidebarAvailable",
@@ -8705,8 +8773,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isUserAuthenticationEnabled",
@@ -8729,8 +8798,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:keyboardShortcut",
@@ -8828,8 +8898,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:layoutDirection",
@@ -8852,8 +8923,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:legibilityWeight",
@@ -8876,8 +8948,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:lineHeight",
@@ -8900,8 +8973,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:lineLimit",
@@ -8924,8 +8998,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:lineSpacing",
@@ -8948,8 +9023,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:listRowSpacing",
@@ -8972,8 +9048,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:listSectionSpacing",
@@ -9045,8 +9122,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:materialActiveAppearance",
@@ -9094,8 +9172,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:menuOrder",
@@ -9118,8 +9197,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:minimumScaleFactor",
@@ -9166,8 +9246,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:multilineTextAlignment",
@@ -9215,8 +9296,10 @@
     },
     {
       "family" : "Text",
+      "notes" : "Web, mail, phone and Maps links open (outside Shelf); other schemes are refused.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:openURL",
@@ -9264,8 +9347,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:overlayArrangementZIndex",
@@ -9288,8 +9372,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:pixelLength",
@@ -9312,8 +9397,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:preferredPencilDoubleTapAction",
@@ -9336,8 +9422,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:preferredPencilSqueezeAction",
@@ -9410,8 +9497,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:realHorizontalSizeClass",
@@ -9434,8 +9522,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:realVerticalSizeClass",
@@ -9482,8 +9571,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "A set: `redactionReasons.contains(.placeholder)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:redactionReasons",
@@ -9506,8 +9597,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "nil outside a `.refreshable` view; `await refresh?()`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:refresh",
@@ -9530,8 +9623,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:rename",
@@ -9578,8 +9672,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "`.active` while the app's card is open; `.inactive` while it's closing; `.background` when Shelf is.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:scenePhase",
@@ -9602,8 +9698,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:scrollDismissesKeyboardMode",
@@ -9651,8 +9748,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:sidebarRowSize",
@@ -9675,8 +9773,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:sizeCategory",
@@ -9699,8 +9798,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:splitArrangementAxis",
@@ -9797,8 +9897,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:symbolColorRenderingMode",
@@ -9821,8 +9922,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:symbolRenderingMode",
@@ -9845,8 +9947,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:symbolVariableValueMode",
@@ -9869,8 +9972,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:symbolVariants",
@@ -9893,8 +9997,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:systemPrefersReducedResourceUsage",
@@ -9917,8 +10022,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:tabBarPlacement",
@@ -9967,8 +10073,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:textCase",
@@ -9991,8 +10098,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:textContentType",
@@ -10015,8 +10123,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:textSelectionAffinity",
@@ -10039,8 +10148,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:timeZone",
@@ -10063,8 +10173,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:tint",
@@ -10087,8 +10198,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:tintColor",
@@ -10162,8 +10274,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:truncationMode",
@@ -10186,8 +10299,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "`undo()`, `redo()`, `canUndo`, `canRedo` and `registerUndo(withTarget:handler:)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:undoManager",
@@ -10210,8 +10325,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:verticalScrollBounceBehavior",
@@ -10234,8 +10350,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:verticalScrollIndicatorVisibility",
@@ -10258,10 +10375,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Always `.compact`.",
       "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:verticalSizeClass",
@@ -10332,8 +10448,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:AnyGesture",
@@ -10356,8 +10473,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:DragGesture",
@@ -10402,8 +10520,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:ExclusiveGesture",
@@ -10454,8 +10573,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:LongPressGesture",
@@ -10490,8 +10610,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:MagnificationGesture",
@@ -10514,8 +10635,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:MagnifyGesture",
@@ -10548,8 +10670,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:RotateGesture",
@@ -10582,8 +10705,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:RotationGesture",
@@ -10606,8 +10730,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:SequenceGesture",
@@ -10631,8 +10756,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:SimultaneousGesture",
@@ -10656,8 +10782,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Each touch in `events`: `id`, `location`, `phase` and `kind`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:SpatialEventGesture",
@@ -10680,8 +10808,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Its value has `location`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:SpatialTapGesture",
@@ -10726,8 +10856,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "gesture:TapGesture",
@@ -10760,8 +10891,10 @@
     },
     {
       "family" : "Core",
+      "notes" : "On a `Shape`, view or `ViewModifier`: its number, point, size, rect and angle properties animate.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "macro:Animatable",
@@ -10784,8 +10917,9 @@
     },
     {
       "family" : "Core",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "macro:AnimatableIgnored",
@@ -10808,8 +10942,10 @@
     },
     {
       "family" : "Core",
+      "notes" : "In `extension EnvironmentValues`, `FocusedValues`, `ContainerValues` or `Transaction`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "macro:Entry",
@@ -11233,8 +11369,10 @@
     },
     {
       "family" : "Core",
+      "notes" : "As the property wrapper.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "macro:State",
@@ -11736,8 +11874,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.timingCurve",
@@ -11887,8 +12026,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.offset",
@@ -12583,8 +12723,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ContentTransition.identity",
@@ -12609,8 +12750,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ContentTransition.interpolate",
@@ -12635,8 +12777,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ContentTransition.numericText",
@@ -12671,8 +12814,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ContentTransition.opacity",
@@ -12697,8 +12841,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ContentTransition.symbolEffect",
@@ -12892,8 +13037,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.default",
@@ -13171,8 +13317,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Glass.clear",
@@ -13197,8 +13344,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Glass.identity",
@@ -13223,8 +13371,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Glass.regular",
@@ -14058,7 +14207,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.angularGradient",
@@ -14207,7 +14356,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.blendMode",
@@ -14314,7 +14463,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.conicGradient",
@@ -14405,7 +14554,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.ellipticalGradient",
@@ -14472,8 +14621,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.fill",
@@ -14580,7 +14730,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.image",
@@ -14635,7 +14785,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.linearGradient",
@@ -14698,8 +14848,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.link",
@@ -14752,7 +14903,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.opacity",
@@ -14831,8 +14982,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.placeholder",
@@ -14938,8 +15090,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.quinary",
@@ -14965,7 +15118,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.radialGradient",
@@ -15113,8 +15266,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.selection",
@@ -15167,7 +15321,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.shadow",
@@ -15408,8 +15562,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.windowBackground",
@@ -16001,8 +16156,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.blurReplace",
@@ -16091,8 +16247,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.offset",
@@ -16155,8 +16312,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.properties",
@@ -16273,8 +16431,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.symbolEffect",
@@ -16512,8 +16671,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.accessibilityHidden",
@@ -16548,8 +16708,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.accessibilityIdentifier",
@@ -16584,8 +16745,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.accessibilityLabel",
@@ -16670,8 +16832,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.accessibilityValue",
@@ -16756,8 +16919,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.alignsMarkStylesWithPlotArea",
@@ -16782,8 +16946,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.annotation",
@@ -16852,8 +17017,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.blur",
@@ -16878,8 +17044,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.clipShape",
@@ -16905,8 +17072,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.compositingLayer",
@@ -17026,8 +17194,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.interpolationMethod",
@@ -17052,8 +17221,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.lineStyle",
@@ -17108,8 +17278,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.mask",
@@ -17134,8 +17305,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.offset",
@@ -17208,8 +17380,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.opacity",
@@ -17285,8 +17458,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.shadow",
@@ -17314,8 +17488,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.symbol",
@@ -17370,8 +17545,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.symbolSize",
@@ -17446,8 +17622,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.zIndex",
@@ -17472,8 +17649,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.exclusively",
@@ -17498,8 +17676,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.map",
@@ -17524,8 +17703,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.onChanged",
@@ -17550,8 +17730,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.onEnded",
@@ -17576,8 +17757,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.sequenced",
@@ -17602,8 +17784,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.simultaneously",
@@ -17690,8 +17873,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Resets the `@GestureState` when the gesture ends or is cancelled.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Gesture.updating",
@@ -19832,8 +20017,10 @@
     },
     {
       "family" : "Accessibility",
+      "notes" : "Deprecated: prefer `accessibilityLabel` and the rest.",
+      "overloadsCovered" : 24,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibility",
@@ -20087,8 +20274,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 11,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityAction",
@@ -20344,8 +20532,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityActions",
@@ -20380,8 +20569,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityActivationPoint",
@@ -20479,8 +20669,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityAddTraits",
@@ -20514,8 +20705,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityAdjustableAction",
@@ -20550,7 +20742,7 @@
     {
       "family" : "Accessibility",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityChartDescriptor",
@@ -20570,12 +20762,14 @@
             "signature" : "func accessibilityChartDescriptor<R>(_ representable: R) -> some View where R : AXChartDescriptorRepresentable"
           }
         ]
-      }
+      },
+      "wontDo" : "chart-descriptors"
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityChildren",
@@ -20599,8 +20793,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 21,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityCustomContent",
@@ -20866,8 +21061,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityDefaultFocus",
@@ -20892,8 +21088,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityDirectTouch",
@@ -20929,8 +21126,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityDragPoint",
@@ -21128,8 +21326,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityDropPoint",
@@ -21327,8 +21526,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityElement",
@@ -21352,8 +21552,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityFocused",
@@ -21388,8 +21589,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityHeading",
@@ -21433,8 +21635,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityHidden",
@@ -21490,7 +21693,7 @@
     },
     {
       "family" : "Accessibility",
-      "overloadsCovered" : 8,
+      "overloadsCovered" : 16,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -21674,7 +21877,7 @@
     },
     {
       "family" : "Accessibility",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 4,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -21732,8 +21935,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityIgnoresInvertColors",
@@ -21899,7 +22103,7 @@
     },
     {
       "family" : "Accessibility",
-      "overloadsCovered" : 12,
+      "overloadsCovered" : 21,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -22133,8 +22337,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityLabeledPair",
@@ -22160,8 +22365,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityLinkedGroup",
@@ -22186,8 +22392,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityRemoveTraits",
@@ -22221,8 +22428,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityRepresentation",
@@ -22246,8 +22454,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityRespondsToUserInteraction",
@@ -22303,8 +22512,10 @@
     },
     {
       "family" : "Accessibility",
+      "notes" : "Entries with `id:` find views with the same `.id`, or `.accessibilityRotorEntry(id:in:)`.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityRotor",
@@ -22553,8 +22764,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityRotorEntry",
@@ -22579,8 +22791,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityScrollAction",
@@ -22614,8 +22827,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityScrollStatus",
@@ -22717,8 +22931,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityShowsLargeContentViewer",
@@ -22752,8 +22967,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilitySortPriority",
@@ -22787,8 +23003,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityTextContentType",
@@ -22832,7 +23049,7 @@
     },
     {
       "family" : "Accessibility",
-      "overloadsCovered" : 8,
+      "overloadsCovered" : 16,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -23016,8 +23233,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityZoomAction",
@@ -23559,8 +23777,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:allowedDynamicRange",
@@ -23620,8 +23839,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:allowsTightening",
@@ -23681,8 +23901,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "Read in `overlayPreferenceValue` with a `GeometryReader`'s `proxy[anchor]`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:anchorPreference",
@@ -23766,8 +23988,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:antialiased",
@@ -23969,8 +24192,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:assistiveAccessNavigationIcon",
@@ -24004,8 +24228,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "`URLSession.shared`; Shelf apps share one session.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:asyncImageURLSession",
@@ -24030,7 +24256,7 @@
     {
       "family" : "Text",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:attributedTextFormattingDefinition",
@@ -24070,12 +24296,14 @@
             "signature" : "func attributedTextFormattingDefinition<S>(_ scope: S.Type) -> some View where S : AttributeScope"
           }
         ]
-      }
+      },
+      "wontDo" : "rich-text-formatting"
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:autocapitalization",
@@ -24255,8 +24483,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:backgroundExtensionEffect",
@@ -24290,8 +24519,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:backgroundPreferenceValue",
@@ -24497,9 +24727,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Always `.normal`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:blendMode",
@@ -24825,8 +25055,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartAngleSelection",
@@ -24850,8 +25081,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartBackground",
@@ -24876,8 +25108,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "A dictionary literal's order isn't kept: use `domain:` and `range:` to fix the legend's order.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartForegroundStyleScale",
@@ -24966,8 +25200,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartGesture",
@@ -24991,10 +25226,9 @@
     },
     {
       "family" : "Charts",
-      "notes" : "`.hidden` hides it; content isn't customized yet.",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartLegend",
@@ -25043,8 +25277,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartLineStyleScale",
@@ -25120,8 +25355,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartOverlay",
@@ -25146,8 +25382,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartPlotStyle",
@@ -25171,8 +25408,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartScrollPosition",
@@ -25226,8 +25464,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "`.valueAligned(unit:)` and `.valueAligned(matching:)` with `DateComponents`; `.paging`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartScrollTargetBehavior",
@@ -25251,8 +25491,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartScrollableAxes",
@@ -25276,8 +25517,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartSymbolScale",
@@ -25384,8 +25626,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartSymbolSizeScale",
@@ -25474,10 +25717,10 @@
     },
     {
       "family" : "Charts",
-      "notes" : "`.hidden` hides it; content isn't customized yet.",
+      "notes" : "`.hidden`, or `AxisMarks` with grid lines, ticks and labels.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXAxis",
@@ -25511,8 +25754,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXAxisLabel",
@@ -25578,8 +25822,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXAxisStyle",
@@ -25603,8 +25848,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "`domain:` a range or the values in order, and `type:`.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXScale",
@@ -25662,8 +25909,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "The binding's type is the axis's: `String?`, `Int?`, `Double?` or `Date?`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXSelection",
@@ -25697,8 +25946,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "For a date axis, `length:` is in seconds.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartXVisibleDomain",
@@ -25722,10 +25973,10 @@
     },
     {
       "family" : "Charts",
-      "notes" : "`.hidden` hides it; content isn't customized yet.",
+      "notes" : "`.hidden`, or `AxisMarks` with grid lines, ticks and labels.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYAxis",
@@ -25759,8 +26010,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYAxisLabel",
@@ -25826,8 +26078,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYAxisStyle",
@@ -25851,10 +26104,10 @@
     },
     {
       "family" : "Charts",
-      "notes" : "`domain:` as a numeric range.",
-      "overloadsCovered" : 1,
+      "notes" : "`domain:` a range or the values in order, and `type:`.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYScale",
@@ -25912,8 +26165,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "The binding's type is the axis's: `String?`, `Int?`, `Double?` or `Date?`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYSelection",
@@ -25947,8 +26202,10 @@
     },
     {
       "family" : "Charts",
+      "notes" : "For a date axis, `length:` is in seconds.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartYVisibleDomain",
@@ -26277,8 +26534,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "Deprecated in SwiftUI: prefer `.environment(\\.colorScheme, .dark)`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:colorScheme",
@@ -27001,10 +27260,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "`.numericText()`; anything else cross-fades.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:contentTransition",
@@ -27293,7 +27551,7 @@
     {
       "family" : "Text",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:customAttribute",
@@ -27313,7 +27571,8 @@
             "signature" : "func customAttribute<T>(_ value: T) -> Text where T : TextAttribute"
           }
         ]
-      }
+      },
+      "wontDo" : "render-thread-protocols"
     },
     {
       "family" : "Sharing",
@@ -27343,8 +27602,10 @@
     },
     {
       "family" : "Text",
+      "notes" : "Links, phone numbers and dates in text become tappable.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:dataDetection",
@@ -27422,7 +27683,7 @@
     {
       "family" : "Scenes",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultAppStorage",
@@ -27442,12 +27703,14 @@
             "signature" : "func defaultAppStorage(_ store: UserDefaults) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "scene-overlays-and-storage"
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultFocus",
@@ -27473,8 +27736,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultHoverEffect",
@@ -27571,8 +27835,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "iOS's own edge gestures wait; Shelf's close gestures (up from the bottom, down from the top) still close the app.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defersSystemGestures",
@@ -27720,8 +27986,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:disableAutocorrection",
@@ -28395,8 +28662,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:dynamicTypeSize",
@@ -28456,10 +28724,10 @@
     },
     {
       "family" : "Environment",
-      "notes" : "`\\.colorScheme`, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.",
+      "notes" : "SwiftUI's values that can be set, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:environment",
@@ -29252,8 +29520,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:flipsForRightToLeftLayoutDirection",
@@ -29277,8 +29546,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:focusEffectDisabled",
@@ -29302,8 +29572,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:focusable",
@@ -29338,9 +29609,10 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Accepted; `@FocusState` doesn't move the keyboard focus yet.",
+      "notes" : "With `@FocusState`: setting it moves the keyboard, and tapping a field sets it.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:focused",
@@ -29375,8 +29647,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:focusedObject",
@@ -29494,9 +29767,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Accepted; `@FocusedValue` reads its `@Entry` default.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:focusedValue",
@@ -29650,8 +29923,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fontWidth",
@@ -29952,9 +30226,10 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Accepted, but no gesture runs yet.",
+      "notes" : "Any gesture, composed or your own; Shelf's close gestures win at the screen's edges.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:gesture",
@@ -30012,8 +30287,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "iOS 26's Liquid Glass, in a capsule unless `in:` gives a shape.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:glassEffect",
@@ -30038,8 +30315,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:glassEffectID",
@@ -30064,8 +30342,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:glassEffectTransition",
@@ -30089,8 +30368,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:glassEffectUnion",
@@ -30272,8 +30552,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Apple Watch's double tap; on an iPhone, nothing.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:handGestureShortcut",
@@ -30470,9 +30752,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Accepted, but no gesture runs yet.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:highPriorityGesture",
@@ -30520,8 +30802,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:hoverEffect",
@@ -30567,8 +30850,9 @@
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:hoverEffectDisabled",
@@ -30760,9 +31044,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Accepted on a shape, with no effect yet.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:inset",
@@ -30852,8 +31136,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:interactionActivityTrackingTag",
@@ -30903,8 +31188,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:interpolation",
@@ -30928,8 +31214,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:intersection",
@@ -31086,8 +31373,10 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "notes" : "With a hardware keyboard.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:keyboardShortcut",
@@ -31170,8 +31459,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:keyframeAnimator",
@@ -31476,8 +31766,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:lineHeight",
@@ -31501,8 +31792,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:lineIntersection",
@@ -31620,8 +31912,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:lineSubtraction",
@@ -32040,8 +32333,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:luminanceToAlpha",
@@ -32469,8 +32763,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "With an `@Namespace` of the same view, or one passed down as `Namespace.ID`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:matchedGeometryEffect",
@@ -32538,8 +32834,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:materialActiveAppearance",
@@ -34014,7 +34311,7 @@
     {
       "family" : "Scenes",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onContinueUserActivity",
@@ -34035,12 +34332,14 @@
             "signature" : "func onContinueUserActivity(_ activityType: String, perform action: @escaping (NSUserActivity) -> ()) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "urls-and-handoff"
     },
     {
       "family" : "Gestures",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onContinuousHover",
@@ -34341,8 +34640,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "A foldable device's hinge; each context has `hinge`, nil when there's none.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onHingeChange",
@@ -34367,8 +34668,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "A pointer over the view (a trackpad or mouse with an iPad); never on an iPhone.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onHover",
@@ -34506,8 +34809,10 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "notes" : "With a hardware keyboard, on a focused view.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onKeyPress",
@@ -34700,7 +35005,7 @@
     {
       "family" : "Core",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onOpenURL",
@@ -34730,12 +35035,15 @@
             "signature" : "func onOpenURL(prefersInApp: Bool) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "urls-and-handoff"
     },
     {
       "family" : "Gestures",
+      "notes" : "An Apple Pencil's double tap, on an iPad.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onPencilDoubleTap",
@@ -34759,8 +35067,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "An Apple Pencil Pro's squeeze, on an iPad: `.active` then `.ended`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onPencilSqueeze",
@@ -34784,8 +35094,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onPreferenceChange",
@@ -34987,6 +35298,7 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "With a `CGPoint` parameter, the tap's location.",
       "overloadsCovered" : 3,
       "round" : 1,
       "status" : "supported",
@@ -35174,8 +35486,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:overlayPreferenceValue",
@@ -35427,7 +35740,7 @@
     {
       "family" : "Scenes",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:persistentSystemOverlays",
@@ -35447,12 +35760,14 @@
             "signature" : "func persistentSystemOverlays(_ visibility: Visibility) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "scene-overlays-and-storage"
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:phaseAnimator",
@@ -36103,8 +36418,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:preference",
@@ -36611,8 +36927,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:privacySensitive",
@@ -36737,8 +37054,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "A `ProjectionTransform` made from a `CGAffineTransform`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:projectionEffect",
@@ -36873,8 +37192,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:redacted",
@@ -37174,9 +37494,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Accepted on a shape, with no effect yet.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:rotation",
@@ -37416,9 +37736,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Accepted on a shape, with no effect yet.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scale",
@@ -37583,8 +37903,9 @@
     },
     {
       "family" : "Scenes",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scenePadding",
@@ -37724,8 +38045,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollDismissesKeyboard",
@@ -38092,8 +38414,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchFocused",
@@ -39064,9 +39387,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Accepted, but no gesture runs yet.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:simultaneousGesture",
@@ -39226,8 +39549,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:speechAdjustedPitch",
@@ -39261,8 +39585,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:speechAlwaysIncludesPunctuation",
@@ -39296,8 +39621,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:speechAnnouncementsQueued",
@@ -39331,8 +39657,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:speechSpellsOutCharacters",
@@ -39869,10 +40196,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Always `.done`.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:submitLabel",
@@ -39896,8 +40222,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:submitScope",
@@ -40393,8 +40720,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:subtracting",
@@ -40488,8 +40816,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolColorRenderingMode",
@@ -40523,9 +40852,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Accepted; the symbol doesn't animate yet.",
+      "notes" : "`.bounce`, `.pulse`, `.variableColor`, `.scale`, `.appear`, `.disappear`, `.breathe`, `.wiggle`, `.rotate` and `.drawOn`, with their directions and options.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolEffect",
@@ -40563,8 +40893,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolEffectsRemoved",
@@ -40624,8 +40955,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolVariableValueMode",
@@ -40659,8 +40991,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolVariant",
@@ -40684,8 +41017,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symmetricDifference",
@@ -41177,8 +41511,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textContentType",
@@ -41335,7 +41670,7 @@
     {
       "family" : "Text",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textRenderer",
@@ -41355,12 +41690,14 @@
             "signature" : "func textRenderer<T>(_ renderer: T) -> some View where T : TextRenderer"
           }
         ]
-      }
+      },
+      "wontDo" : "render-thread-protocols"
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textScale",
@@ -41447,8 +41784,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textVariant",
@@ -41997,8 +42335,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transaction",
@@ -42070,8 +42409,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transform",
@@ -42095,8 +42435,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transformAnchorPreference",
@@ -42122,8 +42463,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transformEffect",
@@ -42147,8 +42489,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transformEnvironment",
@@ -42173,8 +42516,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transformPreference",
@@ -42368,8 +42712,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:typeSelectEquivalent",
@@ -42423,8 +42768,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:typesettingLanguage",
@@ -42533,8 +42879,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:union",
@@ -42559,8 +42906,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:unredacted",
@@ -42585,7 +42933,7 @@
     {
       "family" : "Scenes",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:userActivity",
@@ -42619,7 +42967,8 @@
             "signature" : "func userActivity<P>(_ activityType: String, element: P?, _ update: @escaping (P, NSUserActivity) -> ()) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "urls-and-handoff"
     },
     {
       "family" : "Wallet",
@@ -42648,8 +42997,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "Its closure runs on the main thread when the view's frame changes, so a scroll-driven effect follows one frame behind.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:visualEffect",
@@ -42953,8 +43304,9 @@
     },
     {
       "family" : "Text",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:writingDirection",
@@ -43071,8 +43423,9 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "Deprecated in SwiftUI: an `Animatable` `ViewModifier`, which animates the same way.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:AnimatableModifier",
@@ -43137,8 +43490,8 @@
       }
     },
     {
-      "family" : "Charts",
-      "round" : 1,
+      "family" : "Chart3D",
+      "round" : 2,
       "status" : "missing",
       "symbol" : {
         "deprecated" : false,
@@ -43189,7 +43542,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:CustomAnimation",
@@ -43200,7 +43553,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "render-thread-protocols"
     },
     {
       "family" : "Controls",
@@ -43238,8 +43592,9 @@
     },
     {
       "family" : "Core",
+      "notes" : "Your own property wrappers can adopt it; `update()` isn't called, and `@State` inside one isn't kept.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:DynamicProperty",
@@ -43254,8 +43609,9 @@
     },
     {
       "family" : "Environment",
+      "notes" : "Or `@Entry` in `extension EnvironmentValues`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:EnvironmentKey",
@@ -43270,8 +43626,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "notes" : "Or `@Entry var key: Value?` in `extension FocusedValues`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:FocusedValueKey",
@@ -43320,8 +43677,9 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Your own gesture: `var body: some Gesture` built from the others.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:Gesture",
@@ -43522,8 +43880,9 @@
     },
     {
       "family" : "Environment",
+      "notes" : "Set with `.preference(key:value:)`; read with `.onPreferenceChange` or `.overlayPreferenceValue`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:PreferenceKey",
@@ -43721,7 +44080,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:TextRenderer",
@@ -43732,7 +44091,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "render-thread-protocols"
     },
     {
       "family" : "Controls",
@@ -43770,8 +44130,9 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "Your own `animatableData` type animates through its stored numbers.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:VectorArithmetic",
@@ -43821,7 +44182,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:VisualEffect",
@@ -43832,7 +44193,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "render-thread-protocols"
     },
     {
       "family" : "Layout",
@@ -46510,8 +46872,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:AnyGradient",
@@ -46534,8 +46897,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:AnyShapeStyle",
@@ -46584,8 +46948,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:AsymmetricTransition",
@@ -46609,8 +46974,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:BackgroundStyle",
@@ -46658,8 +47024,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:BlurReplaceTransition",
@@ -46682,8 +47049,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ChartProxy",
@@ -46698,8 +47066,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ContentTransition",
@@ -46768,8 +47137,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:FillShapeStyle",
@@ -46792,8 +47162,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:FillStyle",
@@ -46841,8 +47212,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ForegroundStyle",
@@ -46883,8 +47255,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:Glass",
@@ -46932,8 +47305,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "Fill, stroke, text, images, symbols, transforms, clips, layers and filters; a value, like SwiftUI's.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:GraphicsContext",
@@ -46974,8 +47349,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:HierarchicalShapeStyle",
@@ -47015,8 +47391,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:IdentityTransition",
@@ -47039,8 +47416,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ImagePaint",
@@ -47065,8 +47443,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:KeyframeTimeline",
@@ -47090,8 +47469,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:LinkShapeStyle",
@@ -47114,8 +47494,9 @@
     },
     {
       "family" : "Core",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:LocalizedStringKey",
@@ -47156,8 +47537,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:Material",
@@ -47172,8 +47554,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:MoveTransition",
@@ -47274,8 +47657,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:OffsetTransition",
@@ -47298,8 +47682,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:OpacityTransition",
@@ -47322,8 +47707,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:PlaceholderTextShapeStyle",
@@ -47346,8 +47732,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:PlottableValue",
@@ -47414,8 +47801,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:PushTransition",
@@ -47438,8 +47826,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ScaleTransition",
@@ -47584,8 +47973,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:SelectionShapeStyle",
@@ -47624,8 +48014,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:SeparatorShapeStyle",
@@ -47708,8 +48099,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:SlideTransition",
@@ -47756,8 +48148,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:Spring",
@@ -47843,8 +48236,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:SymbolEffectTransition",
@@ -47910,8 +48304,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:TintShapeStyle",
@@ -47951,8 +48346,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:UnitCurve",
@@ -48011,8 +48407,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:WindowBackgroundShapeStyle",
@@ -48328,8 +48725,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:AnyShape",
@@ -48681,8 +49079,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:BasicChartSymbolShape",
@@ -49152,9 +49551,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Draws nothing yet: draw with a custom `Shape` instead.",
+      "notes" : "The renderer runs on the main thread each time the view updates; in a `TimelineView(.animation)` that's every frame. `withCGContext` isn't there.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Canvas",
@@ -49218,10 +49618,10 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Bar, line, point, area, sector and rule marks, by value or by series; the axes and the legend can be hidden.",
+      "notes" : "Its content is marks, plots, `ForEach` and `if`; give each axis one kind of value (text, numbers or dates).",
       "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Chart",
@@ -49642,8 +50042,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "Follows its container's corners, as SwiftUI's does.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ConcentricRectangle",
@@ -51984,8 +52386,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GlassEffectContainer",
@@ -52582,8 +52985,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:KeyframeAnimator",
@@ -54479,8 +54883,10 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "`points:` as `[x, y]` pairs or `.init(x, y)`, and `colors:`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:MeshGradient",
@@ -56136,8 +56542,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:PhaseAnimator",
@@ -60982,10 +61389,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "`.periodic(from:by:)` and `.everyMinute`; the closure gets `context.date`.",
+      "notes" : "`.animation`, `.periodic(from:by:)`, `.everyMinute` and `.explicit(dates)`; the closure gets `context.date`.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:TimelineView",
@@ -61626,8 +62033,10 @@
     },
     {
       "family" : "Accessibility",
+      "notes" : "A `Bool` or an optional `Hashable`, as `@FocusState`, for VoiceOver's focus.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:AccessibilityFocusState",
@@ -62191,10 +62600,10 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Holds a value; it doesn't move the keyboard focus yet.",
+      "notes" : "A `Bool` or an optional `Hashable` (an enum of fields); it moves the keyboard focus.",
       "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:FocusState",
@@ -62226,8 +62635,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:FocusedBinding",
@@ -62250,8 +62660,9 @@
     },
     {
       "family" : "Focus & Keyboard",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:FocusedObject",
@@ -62274,9 +62685,10 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Reads its `@Entry` default; focused views don't set it yet.",
+      "notes" : "`\\.key` from `@Entry` in `extension FocusedValues`, or an `@Observable` type.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:FocusedValue",
@@ -62308,8 +62720,10 @@
     },
     {
       "family" : "Gestures",
+      "notes" : "Set in a gesture's `updating`; back to its initial value when the gesture ends.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:GestureState",
@@ -62399,8 +62813,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "For `matchedGeometryEffect`, `glassEffectID` and the zoom transition; pass it down as `Namespace.ID`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Namespace",
@@ -62916,6 +63332,10 @@
     }
   ],
   "extras" : [
+    "content:AxisGridLine",
+    "content:AxisTick",
+    "content:AxisValueLabel",
+    "content:KeyframeTrack",
     "member:Angle.degrees",
     "member:Angle.radians",
     "member:Angle.zero",
@@ -62960,12 +63380,33 @@
     "member:AttributedString.font",
     "member:AttributedString.foregroundColor",
     "member:AttributedString.link",
+    "member:BasicChartSymbolShape.asterisk",
+    "member:BasicChartSymbolShape.circle",
+    "member:BasicChartSymbolShape.cross",
+    "member:BasicChartSymbolShape.diamond",
+    "member:BasicChartSymbolShape.pentagon",
+    "member:BasicChartSymbolShape.plus",
+    "member:BasicChartSymbolShape.square",
+    "member:BasicChartSymbolShape.triangle",
     "member:Binding.animation",
     "member:Binding.constant",
     "member:Bool.description",
     "member:Bool.random",
     "member:Bool.toggle",
     "member:Bool.toggled",
+    "member:CGAffineTransform.a",
+    "member:CGAffineTransform.b",
+    "member:CGAffineTransform.c",
+    "member:CGAffineTransform.concatenating",
+    "member:CGAffineTransform.d",
+    "member:CGAffineTransform.identity",
+    "member:CGAffineTransform.inverted",
+    "member:CGAffineTransform.isIdentity",
+    "member:CGAffineTransform.rotated",
+    "member:CGAffineTransform.scaledBy",
+    "member:CGAffineTransform.translatedBy",
+    "member:CGAffineTransform.tx",
+    "member:CGAffineTransform.ty",
     "member:CGPoint.x",
     "member:CGPoint.y",
     "member:CGPoint.zero",
@@ -62996,6 +63437,12 @@
     "member:Calendar.isDateInWeekend",
     "member:Calendar.isDateInYesterday",
     "member:Calendar.startOfDay",
+    "member:ChartProxy.plotAreaSize",
+    "member:ChartProxy.plotSize",
+    "member:ChartProxy.position",
+    "member:ChartProxy.selectXValue",
+    "member:ChartProxy.selectYValue",
+    "member:ChartProxy.value",
     "member:CheckedContinuation.resume",
     "member:Color.description",
     "member:Color.gradient",
@@ -63095,6 +63542,20 @@
     "member:Double.pi",
     "member:Double.random",
     "member:Double.zero",
+    "member:DynamicTypeSize.accessibility1",
+    "member:DynamicTypeSize.accessibility2",
+    "member:DynamicTypeSize.accessibility3",
+    "member:DynamicTypeSize.accessibility4",
+    "member:DynamicTypeSize.accessibility5",
+    "member:DynamicTypeSize.allCases",
+    "member:DynamicTypeSize.isAccessibilitySize",
+    "member:DynamicTypeSize.large",
+    "member:DynamicTypeSize.medium",
+    "member:DynamicTypeSize.small",
+    "member:DynamicTypeSize.xLarge",
+    "member:DynamicTypeSize.xSmall",
+    "member:DynamicTypeSize.xxLarge",
+    "member:DynamicTypeSize.xxxLarge",
     "member:Encoder.codingPath",
     "member:Encoder.container",
     "member:Encoder.singleValueContainer",
@@ -63166,10 +63627,35 @@
     "member:GeometryProxy.frame",
     "member:GeometryProxy.safeAreaInsets",
     "member:GeometryProxy.size",
+    "member:GeometryProxy.subscript",
+    "member:Glass.interactive",
+    "member:Glass.tint",
+    "member:GraphicsContext.addFilter",
+    "member:GraphicsContext.blendMode",
+    "member:GraphicsContext.clip",
+    "member:GraphicsContext.clipBoundingRect",
+    "member:GraphicsContext.clipToLayer",
+    "member:GraphicsContext.concatenate",
+    "member:GraphicsContext.draw",
+    "member:GraphicsContext.drawLayer",
+    "member:GraphicsContext.fill",
+    "member:GraphicsContext.opacity",
+    "member:GraphicsContext.resolve",
+    "member:GraphicsContext.resolveSymbol",
+    "member:GraphicsContext.rotate",
+    "member:GraphicsContext.scaleBy",
+    "member:GraphicsContext.stroke",
+    "member:GraphicsContext.transform",
+    "member:GraphicsContext.translateBy",
     "member:HTTPURLResponse.statusCode",
     "member:HTTPURLResponse.url",
     "member:Hasher.combine",
     "member:Hasher.finalize",
+    "member:HierarchicalShapeStyle.primary",
+    "member:HierarchicalShapeStyle.quaternary",
+    "member:HierarchicalShapeStyle.quinary",
+    "member:HierarchicalShapeStyle.secondary",
+    "member:HierarchicalShapeStyle.tertiary",
     "member:IndexSet.contains",
     "member:IndexSet.count",
     "member:IndexSet.first",
@@ -63210,6 +63696,8 @@
     "member:KeyedEncodingContainer.nestedContainer",
     "member:KeyedEncodingContainer.nestedUnkeyedContainer",
     "member:KeyedEncodingContainer.superEncoder",
+    "member:KeyframeTimeline.duration",
+    "member:KeyframeTimeline.value",
     "member:LayoutSubview.dimensions",
     "member:LayoutSubview.place",
     "member:LayoutSubview.priority",
@@ -63219,6 +63707,12 @@
     "member:Locale.current",
     "member:Locale.identifier",
     "member:MainActor.run",
+    "member:Material.bar",
+    "member:Material.regular",
+    "member:Material.thick",
+    "member:Material.thin",
+    "member:Material.ultraThick",
+    "member:Material.ultraThin",
     "member:NavigationPath.append",
     "member:NavigationPath.count",
     "member:NavigationPath.isEmpty",
@@ -63229,6 +63723,7 @@
     "member:NumberFormatter.minimumFractionDigits",
     "member:NumberFormatter.numberStyle",
     "member:NumberFormatter.string",
+    "member:OpenURLAction.callAsFunction",
     "member:Path.addArc",
     "member:Path.addCurve",
     "member:Path.addEllipse",
@@ -63240,6 +63735,7 @@
     "member:Path.addRoundedRect",
     "member:Path.closeSubpath",
     "member:Path.move",
+    "member:PlottableValue.value",
     "member:ProposedViewSize.height",
     "member:ProposedViewSize.infinity",
     "member:ProposedViewSize.replacingUnspecifiedDimensions",
@@ -63254,6 +63750,7 @@
     "member:Range.last",
     "member:Range.lowerBound",
     "member:Range.upperBound",
+    "member:RefreshAction.callAsFunction",
     "member:Regex.Match.output",
     "member:Regex.Match.range",
     "member:Regex.firstMatch",
@@ -63261,6 +63758,7 @@
     "member:Regex.prefixMatch",
     "member:Regex.wholeMatch",
     "member:RelativeDateTimeFormatter.localizedString",
+    "member:RenameAction.callAsFunction",
     "member:ScrollPosition.edge",
     "member:ScrollPosition.isPositionedByUser",
     "member:ScrollPosition.point",
@@ -63325,6 +63823,19 @@
     "member:SingleValueDecodingContainer.decodeNil",
     "member:SingleValueEncodingContainer.encode",
     "member:SingleValueEncodingContainer.encodeNil",
+    "member:Spring.bounce",
+    "member:Spring.bouncy",
+    "member:Spring.damping",
+    "member:Spring.dampingRatio",
+    "member:Spring.duration",
+    "member:Spring.mass",
+    "member:Spring.response",
+    "member:Spring.settlingDuration",
+    "member:Spring.smooth",
+    "member:Spring.snappy",
+    "member:Spring.stiffness",
+    "member:Spring.value",
+    "member:Spring.velocity",
     "member:String.append",
     "member:String.capitalized",
     "member:String.components",
@@ -63405,6 +63916,7 @@
     "member:Swift.withUnsafeThrowingContinuation",
     "member:Swift.zip",
     "member:SwiftUI.withAnimation",
+    "member:SwiftUI.withTransaction",
     "member:Task.cancel",
     "member:Task.checkCancellation",
     "member:Task.currentPriority",
@@ -63427,6 +63939,9 @@
     "member:Timer.isValid",
     "member:Timer.publish",
     "member:Timer.scheduledTimer",
+    "member:Transaction.animation",
+    "member:Transaction.disablesAnimations",
+    "member:Transaction.isContinuous",
     "member:TransferRepresentation.exportingCondition",
     "member:TransferRepresentation.suggestedFileName",
     "member:TransferRepresentation.visibility",
@@ -63523,6 +64038,24 @@
     "member:UUID.description",
     "member:UUID.hashValue",
     "member:UUID.uuidString",
+    "member:UndoManager.canRedo",
+    "member:UndoManager.canUndo",
+    "member:UndoManager.redo",
+    "member:UndoManager.registerUndo",
+    "member:UndoManager.removeAllActions",
+    "member:UndoManager.setActionName",
+    "member:UndoManager.undo",
+    "member:UnitCurve.bezier",
+    "member:UnitCurve.circularEaseIn",
+    "member:UnitCurve.circularEaseInOut",
+    "member:UnitCurve.circularEaseOut",
+    "member:UnitCurve.easeIn",
+    "member:UnitCurve.easeInOut",
+    "member:UnitCurve.easeOut",
+    "member:UnitCurve.inverse",
+    "member:UnitCurve.linear",
+    "member:UnitCurve.value",
+    "member:UnitCurve.velocity",
     "member:UnkeyedDecodingContainer.count",
     "member:UnkeyedDecodingContainer.currentIndex",
     "member:UnkeyedDecodingContainer.decode",
@@ -63600,8 +64133,10 @@
     "type:AsyncThrowingStream",
     "type:AttributedString",
     "type:Axis",
+    "type:BasicChartSymbolShape",
     "type:Binding",
     "type:Bool",
+    "type:CGAffineTransform",
     "type:CGFloat",
     "type:CGPoint",
     "type:CGRect",
@@ -63625,6 +64160,7 @@
     "type:DismissAction",
     "type:DispatchQueue",
     "type:Double",
+    "type:DynamicTypeSize",
     "type:Edge",
     "type:EmptyAnimatableData",
     "type:Encoder",
@@ -63662,12 +64198,16 @@
     "type:NSColor",
     "type:NavigationTransition",
     "type:NumberFormatter",
+    "type:OpenURLAction",
     "type:PresentationSizing",
+    "type:ProjectionTransform",
     "type:ProxyRepresentation",
     "type:Range",
+    "type:RefreshAction",
     "type:Regex",
     "type:Regex.Match",
     "type:RelativeDateTimeFormatter",
+    "type:RenameAction",
     "type:ScrollTargetBehavior",
     "type:Sequence",
     "type:Set",
@@ -63685,6 +64225,7 @@
     "type:TimeInterval",
     "type:TimeZone",
     "type:Timer",
+    "type:Transaction",
     "type:TransferRepresentation",
     "type:Transition",
     "type:TransitionPhase",
@@ -63712,6 +64253,7 @@
     "type:UTF8",
     "type:UTType",
     "type:UUID",
+    "type:UndoManager",
     "type:UnkeyedDecodingContainer",
     "type:UnkeyedEncodingContainer",
     "type:UnsafeContinuation",
@@ -63727,12 +64269,12 @@
   "families" : [
     {
       "family" : "Core",
-      "missing" : 7,
+      "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 11,
+      "supported" : 17,
       "total" : 25,
-      "wontDo" : 7
+      "wontDo" : 8
     },
     {
       "family" : "Controls",
@@ -63745,12 +64287,12 @@
     },
     {
       "family" : "Text",
-      "missing" : 30,
-      "missingNew" : 6,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 35,
+      "supported" : 62,
       "total" : 65,
-      "wontDo" : 0
+      "wontDo" : 3
     },
     {
       "family" : "Layout",
@@ -63781,66 +64323,66 @@
     },
     {
       "family" : "Gestures",
-      "missing" : 35,
-      "missingNew" : 1,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 4,
+      "supported" : 39,
       "total" : 39,
       "wontDo" : 0
     },
     {
       "family" : "Drawing",
-      "missing" : 127,
-      "missingNew" : 16,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 137,
+      "supported" : 261,
       "total" : 269,
-      "wontDo" : 5
+      "wontDo" : 8
     },
     {
       "family" : "Focus & Keyboard",
-      "missing" : 20,
+      "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 6,
+      "supported" : 26,
       "total" : 26,
       "wontDo" : 0
     },
     {
       "family" : "Environment",
-      "missing" : 56,
-      "missingNew" : 6,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 14,
+      "supported" : 70,
       "total" : 70,
       "wontDo" : 0
     },
     {
       "family" : "Accessibility",
-      "missing" : 57,
-      "missingNew" : 5,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 5,
-      "total" : 62,
-      "wontDo" : 0
+      "supported" : 59,
+      "total" : 60,
+      "wontDo" : 1
     },
     {
       "family" : "Charts",
-      "missing" : 54,
-      "missingNew" : 1,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 15,
-      "total" : 69,
+      "supported" : 68,
+      "total" : 68,
       "wontDo" : 0
     },
     {
       "family" : "Scenes",
-      "missing" : 5,
+      "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 1,
+      "supported" : 2,
       "total" : 57,
-      "wontDo" : 51
+      "wontDo" : 55
     },
     {
       "family" : "Haptics",
@@ -63889,11 +64431,11 @@
     },
     {
       "family" : "Chart3D",
-      "missing" : 17,
-      "missingNew" : 17,
+      "missing" : 18,
+      "missingNew" : 18,
       "round" : 2,
       "supported" : 0,
-      "total" : 17,
+      "total" : 18,
       "wontDo" : 0
     },
     {
@@ -64045,7 +64587,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 1528
+    "symbols" : 1991
   },
   "schemaVersion" : 1,
   "sdk" : {

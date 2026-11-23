@@ -1084,7 +1084,8 @@ extension KInterpreter {
     func memberwiseParams(_ t: KType) -> [KEVarDecl] {
         t.stored.filter { p in
             if p.isLet && p.initial != nil { return false }
-            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage", "FocusedValue"].contains(w) { return false }
+            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage", "FocusedValue",
+                                          "AccessibilityFocusState", "FocusedBinding", "FocusedObject"].contains(w) { return false }
             return true
         }
     }

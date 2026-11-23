@@ -153,7 +153,7 @@ struct KChartBuilder {
     /// A vectorized plot as one mark per element; a function plot sampled.
     func plotSpecs(_ name: String, _ a: KArgs, _ modifiers: [KModifier]) -> [KMarkSpec] {
         let markName = name.replacingOccurrences(of: "Plot", with: "Mark")
-        if case .function(let fn)? = a["function"] {
+        if case .function(let fn)? = a["function"] ?? a.lastFunction {
             let (lo, hi) = domain(a["domain"])
             let n = 200
             var out: [KMarkSpec] = []

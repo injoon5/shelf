@@ -109,6 +109,8 @@ extension DrawingBridges {
             m.form("antialiased:bool?") { _, view in view.clipped() }
         }
         r.modifier("shadow", .drawing) { m in
+            // `.red.shadow(.drop(radius: 2))`: a style's shadow, read where the style is (`styledColor`).
+            m.form("_:any", receiver: "ShapeStyle") { _, view in view }
             m.form("color:ColorOrStyle? radius:number x:number? y:number?") { c, view in
                 view.shadow(color: c.color("color") ?? Color.black.opacity(0.33), radius: c.cg("radius") ?? 4, x: c.cg("x") ?? 0, y: c.cg("y") ?? 0)
             }

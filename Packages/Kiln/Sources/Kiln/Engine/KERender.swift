@@ -124,7 +124,7 @@ struct KRenderer {
                 return moreShapeStyle(n, a)
             }
         case .view(let view)?:
-            return gradient(view).map { AnyShapeStyle($0) }
+            return gradient(view).map { AnyShapeStyle($0) } ?? styledColor(view)
         default: return nil
         }
     }

@@ -330,6 +330,37 @@ final class GesturesBridges: KBridgeFamily {
                 #endif
             }
         }
+        r.modifier("handGestureShortcut", .gestures, introduced: "18.0", notes: "Apple Watch's double tap; on an iPhone, nothing.") { m in
+            m.form("_:any isEnabled:bool?") { c, view in
+                #if os(iOS)
+                if #available(iOS 18, *) { AnyView(view.handGestureShortcut(.primaryAction, isEnabled: c.bool("isEnabled", default: true))) } else { view }
+                #else
+                view
+                #endif
+            }
+        }
+        r.modifier("onHingeChange", .gestures, introduced: "27.1", notes: "A foldable device's hinge; each context has `hinge`, nil when there's none.") { m in
+            m.form("isEnabled:bool? _:closure") { c, view in
+                #if os(iOS)
+                if #available(iOS 27.1, *), case .function(let fn)? = c.a.lastFunction {
+                    let interp = c.interp
+                    AnyView(view.onHingeChange(isEnabled: c.bool("isEnabled", default: true)) { old, new in
+                        func kv(_ ctx: DeviceHingeContext) -> KV { .tuple([ctx.hinge.map { .string(String(describing: $0)) } ?? .nilValue], ["hinge"]) }
+                        interp.perform(fn, [kv(old), kv(new)])
+                    })
+                } else {
+                    view
+                }
+                #else
+                view
+                #endif
+            }
+            m.probe { _, a, _ in
+                guard case .function(let fn)? = a.lastFunction else { return [] }
+                let none = KV.tuple([.nilValue], ["hinge"])
+                return [KProbeCall(fn: fn, args: [none, none], use: .action)]
+            }
+        }
         r.modifier("onPencilDoubleTap", .gestures, notes: "An Apple Pencil's double tap, on an iPad.") { m in
             m.form("perform:action") { c, view in
                 #if os(iOS)

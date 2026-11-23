@@ -20,6 +20,7 @@ struct KPreferences: PreferenceKey {
 
 extension EnvironmentBridges {
     static func preferences(_ r: KRegistry) {
+        anchors(r)
         r.protocolBridge("PreferenceKey", .environment, requirements: ["static defaultValue", "static reduce(value:nextValue:)"], support: .full,
                          notes: "Set with `.preference(key:value:)`; read with `.onPreferenceChange` or `.overlayPreferenceValue`.")
         r.protocolBridge("EnvironmentKey", .environment, requirements: ["static defaultValue"], support: .full,
@@ -35,6 +36,11 @@ extension EnvironmentBridges {
             }
         }
         r.modifier("transformPreference", .environment) { m in
+            m.probe { _, a, interp in
+                guard case .function(let fn)? = a.lastFunction else { return [] }
+                var v = KPreferenceFold.fold(a.first, [], interp)
+                return [KProbeCall(fn: fn, args: [.binding(.inOut(get: { v }, set: { v = $0 }))], use: .action)]
+            }
             m.form("_:any _:closure") { c, view in
                 if let key = KPreferenceFold.key(c[0]), case .function(let fn)? = c[1] {
                     let interp = c.interp, type = c[0]
@@ -85,6 +91,70 @@ extension EnvironmentBridges {
                     return [KProbeCall(fn: fn, args: [KPreferenceFold.fold(a.first, [], interp)])]
                 }
             }
+        }
+    }
+
+    // MARK: Anchors
+
+    static func anchors(_ r: KRegistry) {
+        r.modifier("anchorPreference", .environment, notes: "Read in `overlayPreferenceValue` with a `GeometryReader`'s `proxy[anchor]`.") { m in
+            m.form("key:any value:any transform:closure") { c, view in
+                anchored(c, view, replace: true)
+            }
+        }
+        r.modifier("transformAnchorPreference", .environment) { m in
+            m.form("key:any value:any transform:closure") { c, view in
+                anchored(c, view, replace: false)
+            }
+        }
+        for name in ["anchorPreference", "transformAnchorPreference"] {
+            r.modifier(name)?.probe = { _, a, interp in
+                guard case .function(let fn)? = a["transform"] else { return [] }
+                let anchor = KV.native(.boxed(KBoxed("Anchor", KAnchorValue())))
+                if name == "anchorPreference" { return [KProbeCall(fn: fn, args: [anchor], use: .action)] }
+                var v = KPreferenceFold.fold(a["key"], [], interp)
+                return [KProbeCall(fn: fn, args: [.binding(.inOut(get: { v }, set: { v = $0 })), anchor], use: .action)]
+            }
+        }
+        r.extend("GeometryProxy") { t in
+            t.method("subscript", "_:any") { c in
+                guard case .native(.object(_, let ref)) = c.receiver, let g = ref.value as? KGeometry,
+                      let anchor = c[0]?.boxed(KAnchorValue.self) else { return .nilValue }
+                return g.resolve?(anchor) ?? .native(.rect(0, 0, 0, 0))
+            }
+        }
+    }
+
+    @MainActor static func anchored(_ c: KCall, _ view: AnyView, replace: Bool) -> AnyView {
+        guard let key = KPreferenceFold.key(c["key"]), case .function(let fn)? = c["transform"] else { return view }
+        let interp = c.interp, type = c["key"]
+        func apply(_ prefs: inout [String: [KV]], _ anchor: KAnchorValue) {
+            let a = KV.native(.boxed(KBoxed("Anchor", anchor)))
+            if replace {
+                prefs[key] = [(try? interp.entry { try interp.call(fn, [a], [nil]) }) ?? .nilValue]
+            } else {
+                var value = KPreferenceFold.fold(type, prefs[key] ?? [], interp)
+                _ = try? interp.entry { try interp.call(fn, [.binding(.inOut(get: { value }, set: { value = $0 })), a], [nil, nil]) }
+                prefs[key] = [value]
+            }
+        }
+        switch c["value"] {
+        case .native(.implicit("bounds", _))?:
+            return AnyView(view.transformAnchorPreference(key: KPreferences.self, value: .bounds) { prefs, anchor in
+                MainActor.assumeIsolated { apply(&prefs, KAnchorValue(rect: anchor)) }
+            })
+        case .native(.implicit("rect", let args))?:
+            let rect = KCanvas.rect(args.first) ?? .zero
+            return AnyView(view.transformAnchorPreference(key: KPreferences.self, value: .rect(rect)) { prefs, anchor in
+                MainActor.assumeIsolated { apply(&prefs, KAnchorValue(rect: anchor)) }
+            })
+        case let source?:
+            let point = KCurves.unitPoint(source, c.r)
+            return AnyView(view.transformAnchorPreference(key: KPreferences.self, value: .unitPoint(point)) { prefs, anchor in
+                MainActor.assumeIsolated { apply(&prefs, KAnchorValue(point: anchor)) }
+            })
+        default:
+            return view
         }
     }
 
@@ -160,6 +230,22 @@ extension EnvironmentBridges {
         r.modifier("interactionActivityTrackingTag", .environment) { m in
             m.form("_:string") { c, view in view.interactionActivityTrackingTag(c.string(0) ?? "") }
         }
+    }
+}
+
+/// An anchor a view gave a preference, as SwiftUI's own.
+struct KAnchorValue: Hashable {
+    var rect: Anchor<CGRect>?
+    var point: Anchor<CGPoint>?
+
+    static func == (a: KAnchorValue, b: KAnchorValue) -> Bool { a.rect == b.rect && a.point == b.point }
+    func hash(into h: inout Hasher) { h.combine(rect == nil) }
+
+    /// Where it is in a `GeometryReader`'s space.
+    @MainActor func resolved(_ proxy: GeometryProxy) -> KV {
+        if let rect { let r = proxy[rect]; return .native(.rect(r.minX, r.minY, r.width, r.height)) }
+        if let point { let p = proxy[point]; return .native(.point(p.x, p.y)) }
+        return .native(.rect(0, 0, 0, 0))
     }
 }
 

@@ -233,7 +233,8 @@ final class KProbe {
     static let visible: Set<String> = ["Text", "Image", "Label", "Button", "Toggle", "Slider", "Stepper", "TextField",
         "SecureField", "TextEditor", "Picker", "DatePicker", "ProgressView", "Circle", "Rectangle", "RoundedRectangle",
         "Capsule", "Ellipse", "Color", "LinearGradient", "RadialGradient", "AngularGradient", "Chart", "Gauge", "Link",
-        "ContentUnavailableView", "AsyncImage", "ColorPicker", "Menu", "LabeledContent"]
+        "ContentUnavailableView", "AsyncImage", "ColorPicker", "Menu", "LabeledContent", "Canvas", "MeshGradient", "ConcentricRectangle",
+        "AnyShape", "PhaseAnimator", "KeyframeAnimator"]
 
     static let actionLabels: Set<String> = ["action", "perform", "onIncrement", "onDecrement", "onCommit", "onDismiss"]
     static let actionModifiers: Set<String> = ["onTapGesture", "onAppear", "task", "onChange", "onReceive", "onSubmit",
