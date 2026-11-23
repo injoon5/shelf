@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1 to §0.4, §0.7, items 1–4 of §0.8, §1.1 to §1.3 (§1.3 as its fallback, below), the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below), the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -385,6 +385,24 @@ The rest is mechanical:
 - **Observation:** native `@Observable` objects (`WebPage`, `LanguageModelSession`, `CLServiceSession`…) are read inside the real SwiftUI `body` call, so SwiftUI's own observation tracking sees those reads. A test pins this down.
 - **Porting:** every component, modifier and built-in in the three switch files is moved into the registry, and the switches are deleted.
 
+Built.
+
+- **The registry** is `Packages/Kiln/Sources/Kiln/Registry/`. The bridges are in `Bridges/<Family>/`: 20 families have something so far.
+  - §1.4's, where there's something to bridge: Controls, Text, Layout, Lists, Navigation, Gestures, Drawing, Charts, Haptics, Sharing, Units.
+  - The coverage report's other SwiftUI families: Core, Focus & Keyboard, Environment, Accessibility, Scenes.
+  - For what isn't SwiftUI: Language (the standard library), Foundation, Concurrency, Networking.
+- **Families find themselves.** Each folder has one class named `KilnBridges_<Family>`, so no shared file grows, and a symbol two families both register stops Kiln at launch.
+- **Overloads** are signature strings with argument kinds: `"_:title isOn:binding"`, `"alignment:HorizontalAlignment? spacing:number? content:content"`.
+  - A call picks one by labels and by how each argument is written, with Swift's forward scan for trailing closures, then by the running OS.
+  - Each argument is evaluated against its kind, so the bridge gets values.
+- **The switches are deleted**: the three files, and the ones in `KEAsync.swift` and `KENetwork.swift`.
+- **Unknown names are errors** with their line. A modifier, a view, or labels no overload takes all stop the code. Accepted no-ops are declared as stubs. Of the 50 differential inputs, only Apple Intelligence's `expense.md` changed: it writes `.stepValue(0.1)`, which isn't SwiftUI.
+- **The manifest.** The registry exports `kiln-manifest.json` (`Tools/manifest.sh`; a test fails when it's stale). The coverage report reads it, and the interim manifest is gone.
+- **Host bridges** use `Kiln.registerType` and `Kiln.registerFunction`.
+- **Observation.** A native `@Observable` object that `body` reads is tracked by SwiftUI; `RegistryTests` pins this down.
+- **The guide** for adding a bridge is [Packages/Kiln/Docs/bridges.md](Packages/Kiln/Docs/bridges.md).
+- **Speed** is in [Benchmarks](Packages/Kiln/Benchmarks/README.md#after-14-registryjson).
+
 ### 1.5 Native code calling the app's code
 
 Closures already cross from native code into the app (completion handlers, `Button` actions). The rewrite adds **protocol proxies**: a native class per bridged protocol that forwards each requirement to the matching method on the app's interpreted value. These are needed for:
@@ -438,7 +456,10 @@ Built, ahead of the registry. Run it with `Packages/Kiln/Tools/coverage.sh`, aft
 - **What it reads.** SwiftUI, SwiftUICore (where `View`, `padding` and `glassEffect` now live), Charts, all 29 `_*_SwiftUI` overlays, and the `_Vision_FoundationModels` and `_CoreSpotlight_FoundationModels` overlays. It's a package of its own with no dependencies: a small tokenizer and line parser, not SwiftSyntax, which would have been a large build on a full disk. It drops anything unavailable on iOS and anything starting with `_`, and ignores 65 compiler-made types (`TupleView`, `ModifiedContent`).
 - **What it lists.** 1,487 symbols on iOS 27.1: views, modifiers (one per name and receiver, with every overload), style members, toolbar/tab/chart/table content, gestures, static members (`.spring`, `.ultraThinMaterial`, `.zoom`), environment values, property wrappers, protocols an app adopts, key types and macros. Each has its iOS version and every overload's signature in `coverage.json`.
 - **Rules.** `Tools/coverage/families.json` files each symbol under §1.4's families, plus Core, Focus & Keyboard, Environment, Accessibility, Scenes and Chart3D, and the families outside the plan (Maps, Store, Wallet…). A symbol no rule matches is listed as Unsorted. `Tools/coverage/wont-do.json` holds the won't-do list. It's seeded from the table below, and also *proposes* StoreKit, Apple Pay and Wallet, RealityKit/SceneKit/SpriteKit, MusicKit, Sign in with Apple, system services (Siri tips, Screen Time, PermissionKit…) and Xcode previews. Each of those is marked "Proposed by §1.9" until it's agreed and added here.
-- **"Supported"** comes from `kiln-manifest.json`, whose schema is in [Packages/Kiln/Docs/manifest.md](Packages/Kiln/Docs/manifest.md). §1.4's registry exports it. Until then the tool reads the 0.2.1 switch files (without editing them) and writes an **interim** manifest, `Tools/coverage/kiln-manifest.interim.json`. Every `case` it finds counts as `partial`, and a case that only returns the view counts as a stub. So these numbers overstate support.
+- **"Supported"** comes from `kiln-manifest.json`, whose schema is in [Packages/Kiln/Docs/manifest.md](Packages/Kiln/Docs/manifest.md). §1.4's registry exports it.
+  - Before the registry, the tool read the 0.2.1 switch files and wrote an **interim** manifest, in which every `case` counted as `partial`. The baseline below is from that interim manifest.
+  - Since §1.4, the registry's export is used, and the interim manifest and its scanner are deleted. On it, Round 1 is 380 of 1,158 supported (34%) and Round 2 is 1 of 52.
+  - The registry declares stubs honestly (`Canvas`, `ShareLink`, `.blendMode`, the haptic generators), and stubs count as missing.
 
 **Round 1 baseline** (interim manifest, iOS 27.1 SDK). "Covered" is supported ÷ (symbols − won't do):
 

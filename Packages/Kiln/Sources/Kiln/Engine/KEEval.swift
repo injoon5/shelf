@@ -40,7 +40,7 @@ extension KInterpreter {
             }
             if case .ident(let bn, _) = base, isBuiltinTypeName(bn, env) {
                 if let ext = builtinExtensions[bn], ext.staticDecls[name] != nil { return try builtinStatic(bn, name) }
-                return try KBuiltins.staticMember(bn, name, self, line)
+                return try nativeStatic(bn, name, line)
             }
             let b = try eval(base, env)
             return try member(b, name, line: line)
@@ -174,9 +174,9 @@ extension KInterpreter {
                 guard let first = args.first else { continue }
                 let v = try eval(first.value, env)
                 if let spec = args.first(where: { $0.label == "specifier" }) {
-                    s += KBuiltins.format(try eval(spec.value, env).asString ?? "%@", [v], self)
+                    s += KFormatting.format(try eval(spec.value, env).asString ?? "%@", [v], self)
                 } else if let fmt = args.first(where: { $0.label == "format" }) {
-                    s += KBuiltins.formatted(v, try eval(fmt.value, env), self)
+                    s += KFormatting.formatted(v, try eval(fmt.value, env), self)
                 } else if args.contains(where: { $0.label == "style" }), case .native(.date(let d)) = v {
                     s += d.formatted(date: .abbreviated, time: .shortened)
                 } else if localized, case .int(let i) = v {
@@ -232,14 +232,14 @@ extension KInterpreter {
             if let m = ctx.type.staticMethods[name]?.first { return .function(KFunction(.user(m, globalEnv, ctx))) }
             if ctx.type.enumCase(name) != nil, ctx.isStatic { return try staticValue(ctx.type, name) }
             // A view struct's `@Environment(\.dismiss)` read before storage exists.
-            if let w = ctx.type.wrapper(of: name), w == "Environment" { return KBuiltins.environmentDefault(ctx.type.storedDecl(name)!, self) }
+            if let w = ctx.type.wrapper(of: name), w == "Environment" { return environmentDefault(ctx.type.storedDecl(name)!) }
         }
         if let box = globalEnv.vars[name] { return box.value }
         if let fs = functions[name], let f = fs.first { return .function(KFunction(.user(f, globalEnv, nil))) }
         if let t = types[name] { return .type(.user(t)) }
         if let op = KBuiltins.operatorFunction(name, self) { return op }
         if name.first?.isUppercase == true { return .type(.builtin(name)) }
-        if let v = KBuiltins.globalConstant(name) { return v }
+        if let v = nativeConstant(name) { return v }
         throw fail("Cannot find '\(name)' in scope", line)
     }
 
@@ -362,7 +362,7 @@ extension KInterpreter {
             return try staticMember(t, name, line)
         case .type(.builtin(let n)):
             if let ext = builtinExtensions[n], ext.staticDecls[name] != nil { return try builtinStatic(n, name) }
-            return try KBuiltins.staticMember(n, name, self, line)
+            return try nativeStatic(n, name, line)
         case .binding(let b):
             if name == "wrappedValue" { return b.get() }
             if name == "projectedValue" { return base }
@@ -387,7 +387,7 @@ extension KInterpreter {
                 let ctx = KSelfContext(type: KType(name: base.typeName, kind: .structType), location: .box(KBox(base)))
                 return try runAccessor(p.getter ?? [], env: KEnv(parent: globalEnv, selfContext: ctx), returns: p.type)
             }
-            return try KBuiltins.member(base, name, self, line)
+            return try nativeMember(base, name, line)
         }
     }
 
@@ -593,7 +593,7 @@ extension KInterpreter {
                     t.enumCase(name) != nil || t.staticDecls[name] != nil || t.staticMethods[name] != nil
                 }.map { ObjectIdentifier($0) })
                 if owners.count == 1, let t = types.values.first(where: { owners.contains(ObjectIdentifier($0)) }),
-                   KBuiltins.implicit(name, args ?? [], expectedType: nil) == nil || t.enumCase(name) != nil,
+                   resolveImplicit(name, args ?? [], expectedType: nil) == nil || t.enumCase(name) != nil,
                    let v = try implicitOn(t, name, args, labels: labels) {
                     return v
                 }
@@ -608,7 +608,7 @@ extension KInterpreter {
                 _ = ext
                 return try builtinStatic(tn, name)
             }
-            if let v = KBuiltins.implicit(name, args ?? [], expectedType: builtinName, labels: labels) { return v }
+            if let v = resolveImplicit(name, args ?? [], expectedType: builtinName, labels: labels) { return v }
         }
         return .native(.implicit(name, args ?? []))
     }
@@ -678,7 +678,7 @@ extension KInterpreter {
                 let args = try evalArgs(argExprs, env, params: i.params)
                 return try runBuiltinExtensionInit(name, i, args, labels)
             }
-            return try KBuiltins.callGlobal(name, argExprs, env, self, line, expected)
+            return try callNamed(name, argExprs, env, line, expected)
 
         case .member(let baseExpr, let name, _):
             if let t = typeExpr(baseExpr, env) {
@@ -702,7 +702,7 @@ extension KInterpreter {
                     let args = try evalArgs(argExprs, env, params: m.params)
                     return try invoke(m, args: args, labels: labels, selfContext: nil, parent: globalEnv)
                 }
-                return try KBuiltins.callStatic(bn, name, argExprs, env, self, line, expected)
+                return try nativeStaticCall(bn, name, argExprs, env, line, expected)
             }
             return try callMethod(baseExpr, name, argExprs, env, line, expected)
 
@@ -723,13 +723,13 @@ extension KInterpreter {
 
         case .typeExpr(let t):
             if let ut = userType(t) { return try construct(ut, argExprs, env, line) }
-            return try KBuiltins.constructType(t, try evalArgs(argExprs, env), labels, self, line)
+            return try constructType(t, try evalArgs(argExprs, env), labels, line)
 
         case .array(let elems) where elems.count == 1:
             if case .ident(let n, _) = elems[0], n.first?.isUppercase == true, env.lookup(n) == nil {
-                return try KBuiltins.constructType(.array(.named(n, [])), try evalArgs(argExprs, env), labels, self, line)
+                return try constructType(.array(.named(n, [])), try evalArgs(argExprs, env), labels, line)
             }
-            if case .array = elems[0] { return try KBuiltins.constructType(.array(.named("Array", [])), try evalArgs(argExprs, env), labels, self, line) }
+            if case .array = elems[0] { return try constructType(.array(.named("Array", [])), try evalArgs(argExprs, env), labels, line) }
             return try callValue(try eval(callee, env), argExprs, env, line)
 
         case .dictionary(let pairs) where pairs.count == 1:
@@ -766,9 +766,9 @@ extension KInterpreter {
         case .type(.user(let t)):
             return try construct(t, argExprs, env, line)
         case .type(.builtin(let n)):
-            return try KBuiltins.callGlobal(n, argExprs, env, self, line, nil)
+            return try callNamed(n, argExprs, env, line, nil)
         case .native(let n):
-            return try KBuiltins.callNative(n, try evalArgs(argExprs, env), labels, self, line)
+            return try callNativeValue(n, argExprs, env, line)
         case .binding(let b):
             return try callValue(b.get(), argExprs, env, line)
         case .nilValue:
@@ -836,14 +836,10 @@ extension KInterpreter {
             let ctx = KSelfContext(type: KType(name: key, kind: .structType), location: loc ?? .box(KBox(base)))
             return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
         }
-        if KBuiltins.isViewLike(base), KBuiltins.modifierNames.contains(name) || !KBuiltins.hasValueMethod(base, name) {
+        if KBuiltins.isViewLike(base), isModifierName(name) || !KBuiltins.hasValueMethod(base, name) {
             if let v = KBuiltins.asViews(base, self).first { return try viewMethod(v, name, argExprs, env, line) }
         }
-        let args = try argExprs.map { a -> KV in
-            // Closure-typed arguments of standard methods see `$0` as the element.
-            try eval(a.value, env, nil)
-        }
-        let (result, mutated) = try KBuiltins.callMethod(base, name, args, labels, self, line)
+        let (result, mutated) = try nativeMethod(base, name, argExprs, env, line)
         if let mutated {
             guard let loc else { throw fail("Cannot use mutating member '\(name)' on an immutable value", line) }
             try write(loc, mutated)
@@ -880,13 +876,7 @@ extension KInterpreter {
             let args = try evalArgs(argExprs, env, params: m.params)
             return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: s.type, location: .box(KBox(.structV(s)))), parent: globalEnv)
         }
-        let args = try argExprs.enumerated().map { i, a -> KV in
-            if i == 0, a.label == nil, KBuiltins.localizedTitleModifiers.contains(name), case .string(let segs) = a.value {
-                return .string(try stringLiteral(segs, env, localized: true))
-            }
-            return try eval(a.value, env, KBuiltins.modifierArgType(name, a.label))
-        }
-        return .view(.modified(v, KModifier(name: name, args: args, labels: labels, line: line)))
+        return try applyModifier(v, name, argExprs, env, line)
     }
 
     // MARK: - Initializers
@@ -931,7 +921,7 @@ extension KInterpreter {
                 fields[p.name] = v
                 env.declare(p.name, v)
             } else if p.wrapper == "Environment" {
-                fields[p.name] = KBuiltins.environmentDefault(p, self)
+                fields[p.name] = environmentDefault(p)
             } else if p.type?.isOptional == true {
                 fields[p.name] = .nilValue
             }

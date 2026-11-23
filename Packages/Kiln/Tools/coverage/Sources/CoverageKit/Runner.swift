@@ -7,7 +7,7 @@ public struct Options: Sendable {
     /// `Packages/Kiln`.
     public var kilnRoot: URL
     public var sdkPath: String?
-    /// Use this manifest instead of looking for the registry's or building the interim one.
+    /// Use this manifest instead of the registry's.
     public var manifestPath: String?
     /// Don't write files; print the summary only.
     public var dryRun = false
@@ -17,7 +17,6 @@ public struct Options: Sendable {
     var toolDir: URL { kilnRoot.appendingPathComponent("Tools/coverage") }
     /// Where §1.4's registry writes its export.
     public var registryManifest: URL { kilnRoot.appendingPathComponent("kiln-manifest.json") }
-    public var interimManifest: URL { toolDir.appendingPathComponent("kiln-manifest.interim.json") }
 }
 
 public enum Runner {
@@ -96,11 +95,7 @@ public enum Runner {
             manifestURL = o.registryManifest
             manifest = try Manifest.load(manifestURL)
         } else {
-            let facts = try InterimManifest.scan(engineDirectory: o.kilnRoot.appendingPathComponent("Sources/Kiln/Engine"))
-            manifest = InterimManifest.build(facts: facts, catalog: catalog, families: families)
-            manifestURL = o.interimManifest
-            if !o.dryRun { try manifest.encoded().write(to: manifestURL) }
-            log("No kiln-manifest.json yet; built the interim manifest from the engine's switches (\(manifest.symbols.count) symbols).")
+            throw CoverageError("No kiln-manifest.json: run Packages/Kiln/Tools/manifest.sh to export it from the bridge registry.")
         }
         let manifestPath = relativePath(manifestURL, to: o.kilnRoot)
 

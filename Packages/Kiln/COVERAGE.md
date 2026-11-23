@@ -4,11 +4,9 @@ What Kiln runs, against every public view, modifier and style in the iOS SDK's S
 
 - **SDK:** iOS 27.1, Xcode 27.1, Build version 27A9269
 - **Interfaces read:** `Charts`, `SwiftUI`, `SwiftUICore`, `_AVKit_SwiftUI`, `_AppIntents_SwiftUI`, `_AuthenticationServices_SwiftUI`, `_CoreLocationUI_SwiftUI`, `_CoreLocation_SwiftUI`, `_CoreMotion_SwiftUI`, `_CoreSpotlight_FoundationModels`, `_DataDetection_SwiftUI`, `_DeviceActivity_SwiftUI`, `_DeviceDiscoveryUI_SwiftUI`, `_FoundationModels_SwiftUI`, `_GameController_SwiftUI`, `_HomeKit_SwiftUI`, `_ManagedAppDistribution_SwiftUI`, `_MapKit_SwiftUI`, `_MusicKit_SwiftUI`, `_PassKit_SwiftUI`, `_PermissionKit_SwiftUI`, `_PhotosUI_SwiftUI`, `_QuickLook_SwiftUI`, `_RealityKit_SwiftUI`, `_SceneKit_SwiftUI`, `_ScreenCaptureKit_SwiftUI`, `_SecureElementCredential_SwiftUI`, `_SpriteKit_SwiftUI`, `_StoreKit_SwiftUI`, `_SwiftData_SwiftUI`, `_Translation_SwiftUI`, `_Vision_FoundationModels`, `_WebKit_SwiftUI`, `_WorkoutKit_SwiftUI`
-- **Manifest:** `Tools/coverage/kiln-manifest.interim.json` (coverage/interim-switch-scan, 478 symbols)
+- **Manifest:** `kiln-manifest.json` (kiln-registry, 969 symbols)
 - **Rules:** `Tools/coverage/families.json`, `Tools/coverage/wont-do.json`
 - **Machine-readable:** [`coverage.json`](coverage.json)
-
-> **Interim manifest.** §1.4's registry doesn't exist yet, so "supported" means "Kiln 0.2.1's engine has a `case` for it" (read from `KERenderer.swift`, `KEModifiers.swift` and `KEBuiltins.swift`). That says nothing about which overloads work, so this overstates support. These numbers are the **Round 1 baseline**. The registry's `kiln-manifest.json` replaces them (see `Docs/manifest.md`).
 
 ## Summary
 
@@ -16,49 +14,49 @@ A symbol is a view, a modifier (all overloads of one name, on one receiver), a s
 
 | Round | Families | Symbols | Supported | Won't do / later | Missing | Covered |
 |---|---|---:|---:|---:|---:|---:|
-| Round 1 | 13 | 1158 | 364 | 63 | 731 | 33% |
-| Round 2 | 5 | 52 | 2 | 0 | 50 | 3% |
+| Round 1 | 13 | 1158 | 380 | 63 | 715 | 34% |
+| Round 2 | 5 | 52 | 1 | 0 | 51 | 1% |
 | Round 3 | 4 | 48 | 0 | 3 | 45 | 0% |
 | Round 4 | 1 | 6 | 0 | 0 | 6 | 0% |
 | Round 5 | 1 | 2 | 0 | 0 | 2 | 0% |
 | Outside the plan | 9 | 153 | 0 | 153 | 0 | 100% |
-| **All** | 33 | 1419 | 366 | 219 | 834 | 30% |
+| **All** | 33 | 1419 | 381 | 219 | 819 | 31% |
 
 ### By kind
 
 | Kind | Symbols | Supported | Won't do / later | Missing |
 |---|---:|---:|---:|---:|
-| Views | 136 | 68 | 40 | 28 |
-| Modifiers | 685 | 143 | 121 | 421 |
-| Styles | 95 | 28 | 16 | 51 |
+| Views | 136 | 66 | 40 | 30 |
+| Modifiers | 685 | 138 | 121 | 426 |
+| Styles | 95 | 36 | 16 | 43 |
 | Toolbar, tab, chart, table and scene content | 54 | 11 | 12 | 31 |
 | Gestures | 13 | 0 | 0 | 13 |
-| Static members (colors, fonts, animations, transitions, shape styles) | 165 | 93 | 0 | 72 |
+| Static members (colors, fonts, animations, transitions, shape styles) | 165 | 97 | 0 | 68 |
 | Environment values | 139 | 7 | 18 | 114 |
-| Property wrappers | 20 | 9 | 3 | 8 |
-| Protocols an app adopts | 47 | 0 | 4 | 43 |
-| Other types | 58 | 7 | 2 | 49 |
+| Property wrappers | 20 | 10 | 3 | 7 |
+| Protocols an app adopts | 47 | 5 | 4 | 38 |
+| Other types | 58 | 11 | 2 | 45 |
 | Macros | 7 | 0 | 3 | 4 |
 
 ## Families
 
 | Family | Round | Symbols | Supported | Won't do / later | Missing | Missing, new in iOS 26+ | Covered |
 |---|---|---:|---:|---:|---:|---:|---:|
-| [Core](#core) | 1 | 25 | 8 | 7 | 10 | 0 | 44% |
-| [Controls](#controls) | 1 | 143 | 58 | 0 | 85 | 17 | 40% |
+| [Core](#core) | 1 | 25 | 11 | 7 | 7 | 0 | 61% |
+| [Controls](#controls) | 1 | 143 | 65 | 0 | 78 | 17 | 45% |
 | [Text](#text) | 1 | 65 | 35 | 0 | 30 | 6 | 53% |
-| [Layout](#layout) | 1 | 92 | 35 | 0 | 57 | 11 | 38% |
-| [Lists](#lists) | 1 | 62 | 16 | 0 | 46 | 6 | 25% |
-| [Navigation](#navigation) | 1 | 179 | 37 | 0 | 142 | 33 | 20% |
-| [Gestures](#gestures) | 1 | 39 | 5 | 0 | 34 | 1 | 12% |
-| [Drawing](#drawing) | 1 | 269 | 134 | 5 | 130 | 16 | 50% |
+| [Layout](#layout) | 1 | 92 | 37 | 0 | 55 | 11 | 40% |
+| [Lists](#lists) | 1 | 62 | 17 | 0 | 45 | 6 | 27% |
+| [Navigation](#navigation) | 1 | 179 | 39 | 0 | 140 | 33 | 21% |
+| [Gestures](#gestures) | 1 | 39 | 4 | 0 | 35 | 1 | 10% |
+| [Drawing](#drawing) | 1 | 269 | 133 | 5 | 131 | 16 | 50% |
 | [Focus & Keyboard](#focus--keyboard) | 1 | 26 | 6 | 0 | 20 | 0 | 23% |
-| [Environment](#environment) | 1 | 70 | 12 | 0 | 58 | 6 | 17% |
+| [Environment](#environment) | 1 | 70 | 14 | 0 | 56 | 6 | 20% |
 | [Accessibility](#accessibility) | 1 | 62 | 3 | 0 | 59 | 5 | 4% |
-| [Charts](#charts) | 1 | 69 | 14 | 0 | 55 | 1 | 20% |
+| [Charts](#charts) | 1 | 69 | 15 | 0 | 54 | 1 | 21% |
 | [Scenes](#scenes) | 1 | 57 | 1 | 51 | 5 | 0 | 16% |
 | [Haptics](#haptics) | 2 | 16 | 0 | 0 | 16 | 2 | 0% |
-| [Sharing](#sharing) | 2 | 8 | 2 | 0 | 6 | 3 | 25% |
+| [Sharing](#sharing) | 2 | 8 | 1 | 0 | 7 | 3 | 12% |
 | [Audio](#audio) | 2 | 1 | 0 | 0 | 1 | 0 | 0% |
 | [Web](#web) | 2 | 10 | 0 | 0 | 10 | 10 | 0% |
 | [Chart3D](#chart3d) | 2 | 17 | 0 | 0 | 17 | 17 | 0% |
@@ -88,16 +86,16 @@ Versions are shown from iOS 18 on. **(stub)** means Kiln accepts the name but do
 
 Round 1. The app and view protocols, lifecycle (`onAppear`, `task`, `onChange`), `ViewModifier`, and the macros (`@Entry`, `#Preview`).
 
-8 of 18 supported; 10 missing; 7 won't do or later.
+11 of 18 supported; 7 missing; 7 won't do or later.
 
 - **Modifiers** (1): `.onOpenURL`
-- **Protocols an app adopts** (4): `App`, `DynamicProperty`, `View`, `ViewModifier`
+- **Protocols an app adopts** (1): `DynamicProperty`
 - **Other types** (1): `LocalizedStringKey`
 - **Macros** (4): `@Animatable`, `@AnimatableIgnored`, `@Entry`, `@State`
 
-<details><summary>Supported (8)</summary>
+<details><summary>Supported (11)</summary>
 
-`.id`, `.modifier`, `.onAppear`, `.onChange`, `.onDisappear`, `.onReceive`, `.tag`, `.task`
+`.id`, `.modifier`, `.onAppear`, `.onChange`, `.onDisappear`, `.onReceive`, `.tag`, `.task`, `App`, `View`, `ViewModifier`
 
 </details>
 
@@ -105,18 +103,18 @@ Round 1. The app and view protocols, lifecycle (`onAppear`, `task`, `onChange`),
 
 Round 1. Buttons, toggles, pickers (every `DatePicker` style, `MultiDatePicker`), sliders, steppers, text fields, menus, and their styles.
 
-58 of 143 supported; 85 missing; 0 won't do or later.
+65 of 143 supported; 78 missing; 0 won't do or later.
 
 - **Views** (4): `ButtonBorderShape`, `MultiDatePicker`, `RenameButton`, `TextInputBorderShape` (27)
 - **Modifiers** (24): `.arrangementViewStyle` (27.1), `.backgroundStyle`, `.buttonRepeatBehavior`, `.buttonSizing` (26), `.controlGroupStyle`, `.disclosureGroupStyle`, `.formStyle`, `.groupBoxStyle`, `.help` (stub), `.indexViewStyle`, `.labeledContentStyle`, `.labelIconToTitleSpacing` (26), `.labelReservedIconWidth` (26), `.labelsHidden`, `.labelsVisibility` (18), `.menuIndicator`, `.menuOrder`, `.menuStyle`, `.paletteSelectionEffect`, `.scrollEdgeEffectStyle` (26), `.sliderThumbVisibility` (26), `.textEditorStyle`, `.textInputBorderShape` (27), `.textInputFormattingControlVisibility` (26)
-- **Styles** (32): `ButtonStyle.automatic`, `ButtonStyle.glass` (26), `ButtonStyle.glassProminent` (26), `ControlGroupStyle.automatic`, `ControlGroupStyle.compactMenu`, `ControlGroupStyle.menu`, `ControlGroupStyle.navigation`, `ControlGroupStyle.palette`, `DatePickerStyle.automatic`, `DisclosureGroupStyle.automatic`, `FormStyle.automatic`, `FormStyle.columns`, `FormStyle.grouped`, `GaugeStyle.accessoryCircularCapacity`, `GaugeStyle.accessoryLinear`, `GaugeStyle.accessoryLinearCapacity`, `GaugeStyle.automatic`, `GaugeStyle.linearCapacity`, `GroupBoxStyle.automatic`, `LabeledContentStyle.automatic`, `LabelStyle.automatic`, `MenuStyle.automatic`, `MenuStyle.borderlessButton`, `MenuStyle.button`, `PickerStyle.automatic`, `PickerStyle.tabs` (27), `ProgressViewStyle.automatic`, `TextEditorStyle.automatic`, `TextEditorStyle.plain`, `TextFieldStyle.automatic`, `TextFieldStyle.bordered` (27), `ToggleStyle.automatic`
+- **Styles** (25): `ButtonStyle.glass` (26), `ButtonStyle.glassProminent` (26), `ControlGroupStyle.automatic`, `ControlGroupStyle.compactMenu`, `ControlGroupStyle.menu`, `ControlGroupStyle.navigation`, `ControlGroupStyle.palette`, `DisclosureGroupStyle.automatic`, `FormStyle.automatic`, `FormStyle.columns`, `FormStyle.grouped`, `GaugeStyle.accessoryCircularCapacity`, `GaugeStyle.accessoryLinear`, `GaugeStyle.accessoryLinearCapacity`, `GaugeStyle.automatic`, `GaugeStyle.linearCapacity`, `GroupBoxStyle.automatic`, `LabeledContentStyle.automatic`, `MenuStyle.automatic`, `MenuStyle.borderlessButton`, `MenuStyle.button`, `PickerStyle.tabs` (27), `TextEditorStyle.automatic`, `TextEditorStyle.plain`, `TextFieldStyle.bordered` (27)
 - **Toolbar, tab, chart, table and scene content** (2): `SliderTick` (26), `SliderTickContentForEach` (26)
 - **Environment values** (7): `\.buttonRepeatBehavior`, `\.controlSize`, `\.isEnabled`, `\.labelIconToTitleSpacing` (26), `\.labelReservedIconWidth` (26), `\.labelsVisibility` (18), `\.menuIndicatorVisibility`
 - **Protocols an app adopts** (16): `ButtonStyle`, `ControlGroupStyle`, `DatePickerStyle`, `DisclosureGroupStyle`, `FormStyle`, `GaugeStyle`, `GroupBoxStyle`, `LabeledContentStyle`, `LabelStyle`, `MenuStyle`, `PickerStyle`, `PrimitiveButtonStyle`, `ProgressViewStyle`, `TextEditorStyle`, `TextFieldStyle`, `ToggleStyle`
 
-<details><summary>Supported (58)</summary>
+<details><summary>Supported (65)</summary>
 
-`.buttonBorderShape`, `.buttonStyle`, `.contextMenu`, `.controlSize`, `.datePickerStyle`, `.disabled`, `.foregroundStyle`, `.gaugeStyle`, `.labelStyle`, `.pickerStyle`, `.progressViewStyle`, `.textFieldStyle`, `.tint`, `.toggleStyle`, `Button`, `ButtonStyle.bordered`, `ButtonStyle.borderedProminent`, `ButtonStyle.borderless`, `ButtonStyle.plain`, `ColorPicker`, `ControlGroup`, `DatePicker`, `DatePickerStyle.compact`, `DatePickerStyle.graphical`, `DatePickerStyle.wheel`, `DisclosureGroup`, `EditButton`, `Form`, `Gauge`, `GaugeStyle.accessoryCircular`, `GroupBox`, `Label`, `LabeledContent`, `LabelStyle.iconOnly`, `LabelStyle.titleAndIcon`, `LabelStyle.titleOnly`, `Link`, `Menu`, `Picker`, `PickerStyle.inline`, `PickerStyle.menu`, `PickerStyle.navigationLink`, `PickerStyle.palette`, `PickerStyle.segmented`, `PickerStyle.wheel`, `ProgressView`, `ProgressViewStyle.circular`, `ProgressViewStyle.linear`, `SecureField`, `Slider`, `Stepper`, `TextEditor`, `TextField`, `TextFieldStyle.plain`, `TextFieldStyle.roundedBorder`, `Toggle`, `ToggleStyle.button`, `ToggleStyle.switch`
+`.buttonBorderShape`, `.buttonStyle`, `.contextMenu`, `.controlSize`, `.datePickerStyle`, `.disabled`, `.foregroundStyle`, `.gaugeStyle`, `.labelStyle`, `.pickerStyle`, `.progressViewStyle`, `.textFieldStyle`, `.tint`, `.toggleStyle`, `Button`, `ButtonStyle.automatic`, `ButtonStyle.bordered`, `ButtonStyle.borderedProminent`, `ButtonStyle.borderless`, `ButtonStyle.plain`, `ColorPicker`, `ControlGroup`, `DatePicker`, `DatePickerStyle.automatic`, `DatePickerStyle.compact`, `DatePickerStyle.graphical`, `DatePickerStyle.wheel`, `DisclosureGroup`, `EditButton`, `Form`, `Gauge`, `GaugeStyle.accessoryCircular`, `GroupBox`, `Label`, `LabeledContent`, `LabelStyle.automatic`, `LabelStyle.iconOnly`, `LabelStyle.titleAndIcon`, `LabelStyle.titleOnly`, `Link`, `Menu`, `Picker`, `PickerStyle.automatic`, `PickerStyle.inline`, `PickerStyle.menu`, `PickerStyle.navigationLink`, `PickerStyle.palette`, `PickerStyle.segmented`, `PickerStyle.wheel`, `ProgressView`, `ProgressViewStyle.automatic`, `ProgressViewStyle.circular`, `ProgressViewStyle.linear`, `SecureField`, `Slider`, `Stepper`, `TextEditor`, `TextField`, `TextFieldStyle.automatic`, `TextFieldStyle.plain`, `TextFieldStyle.roundedBorder`, `Toggle`, `ToggleStyle.automatic`, `ToggleStyle.button`, `ToggleStyle.switch`
 
 </details>
 
@@ -140,7 +138,7 @@ Round 1. `Text`, fonts and typography modifiers, `AttributedString`, data detect
 
 Round 1. Stacks, grids, `Layout`, frames, padding, safe areas, scroll views and scroll behaviour.
 
-35 of 92 supported; 57 missing; 0 won't do or later.
+37 of 92 supported; 55 missing; 0 won't do or later.
 
 - **Views** (7): `ArrangementView` (27.1), `EquatableView`, `GroupElementsOfContent` (18), `GroupSectionsOfContent` (18), `Subview` (18), `SubviewsCollection` (18), `SubviewsCollectionSlice` (18)
 - **Modifiers** (36): `.alignmentGuide`, `.containerCornerOffset` (26), `.containerRelativeFrame`, `.containerShape`, `.containerValue` (18), `.contentMargins`, `.coordinateSpace`, `.defaultScrollAnchor` (stub), `.geometryGroup`, `.gridCellAnchor`, `.gridCellColumns`, `.gridCellUnsizedAxes`, `.gridColumnAlignment`, `.layoutDirectionBehavior`, `.layoutValue`, `.onGeometryChange`, `.onScrollGeometryChange` (18), `.onScrollPhaseChange` (18), `.onScrollTargetVisibilityChange` (18), `.onScrollVisibilityChange` (18), `.overlayArrangementEdge` (27.1), `.safeAreaPadding`, `.scrollBounceBehavior`, `.scrollClipDisabled`, `.scrollDisabled`, `.scrollEdgeEffectHidden` (26), `.scrollIndicatorsFlash`, `.scrollInputBehavior` (18), `.scrollPosition`, `.scrollTargetBehavior` (stub), `.scrollTargetLayout` (stub), `.scrollTransition`, `.size`, `.splitArrangementFixedLayoutSize` (27.1), `.splitArrangementLayoutRatio` (27.1), `.splitArrangementLayoutSize` (27.1)
@@ -148,11 +146,11 @@ Round 1. Stacks, grids, `Layout`, frames, padding, safe areas, scroll views and 
 - **Static members (colors, fonts, animations, transitions, shape styles)** (2): `ScrollTargetBehavior.paging`, `ScrollTargetBehavior.viewAligned`
 - **Property wrappers** (1): `@ScaledMetric`
 - **Protocols an app adopts** (3): `ArrangementViewStyle` (27.1), `ContainerValueKey` (18), `Layout`
-- **Other types** (5): `EdgeInsets`, `GeometryProxy`, `ProposedViewSize`, `ScrollPosition` (18), `ScrollViewProxy`
+- **Other types** (3): `GeometryProxy`, `ProposedViewSize`, `ScrollPosition` (18)
 
-<details><summary>Supported (35)</summary>
+<details><summary>Supported (37)</summary>
 
-`.aspectRatio`, `.edgesIgnoringSafeArea`, `.fixedSize`, `.frame`, `.ignoresSafeArea`, `.layoutPriority`, `.offset`, `.padding`, `.position`, `.safeAreaInset`, `.scaledToFill`, `.scaledToFit`, `.scrollContentBackground`, `.scrollIndicators`, `.zIndex`, `AnyView`, `Divider`, `EmptyView`, `ForEach`, `GeometryReader`, `Grid`, `GridItem`, `GridRow`, `Group`, `HStack`, `LazyHGrid`, `LazyHStack`, `LazyVGrid`, `LazyVStack`, `ScrollView`, `ScrollViewReader`, `Spacer`, `ViewThatFits`, `VStack`, `ZStack`
+`.aspectRatio`, `.edgesIgnoringSafeArea`, `.fixedSize`, `.frame`, `.ignoresSafeArea`, `.layoutPriority`, `.offset`, `.padding`, `.position`, `.safeAreaInset`, `.scaledToFill`, `.scaledToFit`, `.scrollContentBackground`, `.scrollIndicators`, `.zIndex`, `AnyView`, `Divider`, `EdgeInsets`, `EmptyView`, `ForEach`, `GeometryReader`, `Grid`, `GridItem`, `GridRow`, `Group`, `HStack`, `LazyHGrid`, `LazyHStack`, `LazyVGrid`, `LazyVStack`, `ScrollView`, `ScrollViewProxy`, `ScrollViewReader`, `Spacer`, `ViewThatFits`, `VStack`, `ZStack`
 
 </details>
 
@@ -160,18 +158,18 @@ Round 1. Stacks, grids, `Layout`, frames, padding, safe areas, scroll views and 
 
 Round 1. `List`, `Section`, `ForEach`, `Table`, row modifiers, swipe actions and reordering (iOS 27 outside `List`).
 
-16 of 62 supported; 46 missing; 0 won't do or later.
+17 of 62 supported; 45 missing; 0 won't do or later.
 
 - **Views** (4): `EditableCollectionContent`, `OutlineGroup`, `OutlineSubgroupChildren`, `Table`
 - **Modifiers** (29): `.badgeProminence`, `.deleteDisabled`, `.findDisabled`, `.findNavigator`, `.headerProminence` (stub), `.listItemTint`, `.listRowSeparatorTint`, `.listRowSpacing`, `.listSectionIndexVisibility` (26), `.listSectionMargins` (26), `.listSectionSeparator` (stub), `.listSectionSeparatorTint`, `.listSectionSpacing`, `.moveDisabled`, `.onInsert`, `.reorderable` (27), `.reorderContainer` (27), `.replaceDisabled`, `.sectionIndexLabel` (26), `.selectionDisabled`, `.swipeActionsContainer` (27), `.tableColumnHeaders`, `.tableStyle`, `TableColumnContent.alignment`, `TableColumnContent.customizationID`, `TableColumnContent.defaultVisibility`, `TableColumnContent.disabledCustomizationBehavior`, `TableRowContent.contextMenu`, `TableRowContent.selectionDisabled`
-- **Styles** (3): `ListStyle.automatic`, `TableStyle.automatic`, `TableStyle.inset`
+- **Styles** (2): `TableStyle.automatic`, `TableStyle.inset`
 - **Toolbar, tab, chart, table and scene content** (4): `DisclosureTableRow`, `TableColumn`, `TableColumnForEach`, `TableRow`
 - **Environment values** (4): `\.defaultMinListHeaderHeight`, `\.defaultMinListRowHeight`, `\.headerProminence`, `\.isScrollEnabled`
 - **Protocols an app adopts** (2): `ListStyle`, `TableStyle`
 
-<details><summary>Supported (16)</summary>
+<details><summary>Supported (17)</summary>
 
-`.badge`, `.listRowBackground`, `.listRowInsets`, `.listRowSeparator`, `.listStyle`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions`, `List`, `ListStyle.grouped`, `ListStyle.inset`, `ListStyle.insetGrouped`, `ListStyle.plain`, `ListStyle.sidebar`, `Section`
+`.badge`, `.listRowBackground`, `.listRowInsets`, `.listRowSeparator`, `.listStyle`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions`, `List`, `ListStyle.automatic`, `ListStyle.grouped`, `ListStyle.inset`, `ListStyle.insetGrouped`, `ListStyle.plain`, `ListStyle.sidebar`, `Section`
 
 </details>
 
@@ -179,19 +177,19 @@ Round 1. `List`, `Section`, `ForEach`, `Table`, row modifiers, swipe actions and
 
 Round 1. Stacks, split views, tabs, toolbars, search, sheets, popovers, alerts and other presentations.
 
-37 of 179 supported; 142 missing; 0 won't do or later.
+39 of 179 supported; 140 missing; 0 won't do or later.
 
 - **Modifiers** (86): `.actionSheet`, `.contentToolbar` (18.4), `.defaultAdaptableTabBarPlacement` (18), `.defaultTabBarPlacement` (27), `.dialogIcon`, `.dialogSuppressionToggle`, `.dismissalConfirmationDialog` (27), `.inspector`, `.inspectorColumnWidth`, `.interactiveDismissDisabled` (stub), `.matchedTransitionSource` (18), `.menuActionDismissBehavior`, `.navigationBarItems`, `.navigationBarTitle`, `.navigationLinkIndicatorVisibility`, `.navigationSplitViewColumnWidth`, `.navigationSplitViewStyle`, `.navigationSubtitle` (26), `.navigationTransition` (18), `.navigationViewStyle`, `.popoverCore` (18.1), `.presentationBackground`, `.presentationBackgroundInteraction`, `.presentationCompactAdaptation`, `.presentationContentInteraction`, `.presentationCornerRadius` (stub), `.presentationPlacement` (27), `.presentationSizing` (18), `.renameAction`, `.safeAreaBar` (26), `.searchCompletion`, `.searchDictationBehavior`, `.searchPresentationToolbarBehavior`, `.searchScopes`, `.searchSelection` (26), `.searchSuggestions`, `.searchToolbarBehavior` (26), `.sectionActions` (18), `.statusBar`, `.statusBarHidden`, `.tabBarMinimizeBehavior` (26), `.tabViewBottomAccessory` (26), `.tabViewCustomization` (18), `.tabViewSearchActivation` (26), `.tabViewSidebarBottomBar` (18), `.tabViewSidebarFooter` (18), `.tabViewSidebarHeader` (18), `.tabViewStyle`, `.toolbarBackground` (stub), `.toolbarBackgroundVisibility` (18), `.toolbarColorScheme` (stub), `.toolbarMinimizationBehavior` (27), `.toolbarMinimizationRestoration` (27), `.toolbarMinimizationSafeAreaAdjustment` (27), `.toolbarOverflowMenu` (27), `.toolbarRole`, `.toolbarTitleDisplayMode`, `.toolbarTitleMenu`, `.toolbarVerticalBehavior` (27.1), `.toolbarVerticalCompressionBehavior` (27.1), `.toolbarVisibility` (18), `TabContent.accessibilityHint` (18), `TabContent.accessibilityIdentifier` (18), `TabContent.accessibilityInputLabels` (18), `TabContent.accessibilityLabel` (18), `TabContent.accessibilityValue` (18), `TabContent.badge` (18), `TabContent.contextMenu` (18), `TabContent.customizationBehavior` (18), `TabContent.customizationID` (18), `TabContent.defaultSectionExpansion` (27), `TabContent.defaultVisibility` (18), `TabContent.disabled` (18.4), `TabContent.help` (27), `TabContent.hidden` (18), `TabContent.popover` (18), `TabContent.sectionActions` (18), `TabContent.swipeActions` (18), `TabContent.tabPlacement` (18), `ToolbarContent.axisBehavior` (27.1), `ToolbarContent.contentMarginsRemoved` (27), `ToolbarContent.customizationBehavior`, `ToolbarContent.defaultCustomization`, `ToolbarContent.matchedTransitionSource` (26), `ToolbarContent.sharedBackgroundVisibility` (26), `ToolbarContent.visibilityPriority` (27)
 - **Styles** (11): `IndexViewStyle.page`, `NavigationSplitViewStyle.automatic`, `NavigationSplitViewStyle.balanced`, `NavigationSplitViewStyle.prominentDetail`, `NavigationViewStyle.automatic`, `NavigationViewStyle.columns`, `NavigationViewStyle.stack`, `TabViewStyle.automatic`, `TabViewStyle.page`, `TabViewStyle.sidebarAdaptable` (18), `TabViewStyle.tabBarOnly` (18)
 - **Toolbar, tab, chart, table and scene content** (6): `AnyTabContent` (18), `DefaultToolbarItem` (26), `TabSection` (18), `ToolbarOverflowMenu` (27), `ToolbarSpacer` (26), `ToolbarTitleMenu`
-- **Static members (colors, fonts, animations, transitions, shape styles)** (21): `NavigationTransition.automatic` (18), `NavigationTransition.crossFade` (27), `NavigationTransition.zoom` (18), `PresentationDetent.custom`, `PresentationDetent.fraction`, `PresentationDetent.height`, `PresentationDetent.large`, `PresentationDetent.medium`, `PresentationSizing.automatic` (18), `PresentationSizing.fitted` (18), `PresentationSizing.form` (18), `PresentationSizing.page` (18), `ToolbarItemPlacement.automatic`, `ToolbarItemPlacement.largeSubtitle` (26), `ToolbarItemPlacement.largeTitle` (26), `ToolbarItemPlacement.navigation`, `ToolbarItemPlacement.secondaryAction`, `ToolbarItemPlacement.status`, `ToolbarItemPlacement.subtitle` (26), `ToolbarItemPlacement.title`, `ToolbarItemPlacement.topBarPinnedTrailing` (27)
+- **Static members (colors, fonts, animations, transitions, shape styles)** (20): `NavigationTransition.automatic` (18), `NavigationTransition.crossFade` (27), `NavigationTransition.zoom` (18), `PresentationDetent.custom`, `PresentationDetent.fraction`, `PresentationDetent.height`, `PresentationDetent.large`, `PresentationDetent.medium`, `PresentationSizing.automatic` (18), `PresentationSizing.fitted` (18), `PresentationSizing.form` (18), `PresentationSizing.page` (18), `ToolbarItemPlacement.largeSubtitle` (26), `ToolbarItemPlacement.largeTitle` (26), `ToolbarItemPlacement.navigation`, `ToolbarItemPlacement.secondaryAction`, `ToolbarItemPlacement.status`, `ToolbarItemPlacement.subtitle` (26), `ToolbarItemPlacement.title`, `ToolbarItemPlacement.topBarPinnedTrailing` (27)
 - **Environment values** (10): `\.dismissSearch`, `\.editMode`, `\.isPresented`, `\.isSearching`, `\.isTabBarShowingSections` (18), `\.navigationLinkIndicatorVisibility`, `\.searchSuggestionsPlacement`, `\.tabViewBottomAccessoryPlacement` (26), `\.toolbarLabelStyle` (18), `\.toolbarVerticalEdge` (27.1)
 - **Protocols an app adopts** (4): `IndexViewStyle`, `NavigationSplitViewStyle`, `NavigationViewStyle`, `TabViewStyle`
-- **Other types** (4): `NavigationPath`, `PresentationDetent`, `SearchFieldPlacement`, `ToolbarItemPlacement`
+- **Other types** (3): `NavigationPath`, `PresentationDetent`, `SearchFieldPlacement`
 
-<details><summary>Supported (37)</summary>
+<details><summary>Supported (39)</summary>
 
-`.alert`, `.confirmationDialog`, `.fullScreenCover`, `.navigationBarBackButtonHidden`, `.navigationBarHidden`, `.navigationBarTitleDisplayMode`, `.navigationDestination`, `.navigationTitle`, `.popover`, `.presentationDetents`, `.presentationDragIndicator`, `.searchable`, `.sheet`, `.tabItem`, `.toolbar`, `\.dismiss`, `\.presentationMode`, `ContentUnavailableView`, `NavigationLink`, `NavigationSplitView`, `NavigationStack`, `NavigationView`, `Tab` (18), `TabView`, `ToolbarItem`, `ToolbarItemGroup`, `ToolbarItemPlacement.bottomBar`, `ToolbarItemPlacement.cancellationAction`, `ToolbarItemPlacement.confirmationAction`, `ToolbarItemPlacement.destructiveAction`, `ToolbarItemPlacement.keyboard`, `ToolbarItemPlacement.navigationBarLeading`, `ToolbarItemPlacement.navigationBarTrailing`, `ToolbarItemPlacement.primaryAction`, `ToolbarItemPlacement.principal`, `ToolbarItemPlacement.topBarLeading`, `ToolbarItemPlacement.topBarTrailing`
+`.alert`, `.confirmationDialog`, `.fullScreenCover`, `.navigationBarBackButtonHidden`, `.navigationBarHidden`, `.navigationBarTitleDisplayMode`, `.navigationDestination`, `.navigationTitle`, `.popover`, `.presentationDetents`, `.presentationDragIndicator`, `.searchable`, `.sheet`, `.tabItem`, `.toolbar`, `\.dismiss`, `\.presentationMode`, `ContentUnavailableView`, `NavigationLink`, `NavigationSplitView`, `NavigationStack`, `NavigationView`, `Tab` (18), `TabView`, `ToolbarItem`, `ToolbarItemGroup`, `ToolbarItemPlacement`, `ToolbarItemPlacement.automatic`, `ToolbarItemPlacement.bottomBar`, `ToolbarItemPlacement.cancellationAction`, `ToolbarItemPlacement.confirmationAction`, `ToolbarItemPlacement.destructiveAction`, `ToolbarItemPlacement.keyboard`, `ToolbarItemPlacement.navigationBarLeading`, `ToolbarItemPlacement.navigationBarTrailing`, `ToolbarItemPlacement.primaryAction`, `ToolbarItemPlacement.principal`, `ToolbarItemPlacement.topBarLeading`, `ToolbarItemPlacement.topBarTrailing`
 
 </details>
 
@@ -199,15 +197,16 @@ Round 1. Stacks, split views, tabs, toolbars, search, sheets, popovers, alerts a
 
 Round 1. Gesture types, gesture modifiers, `@GestureState`, hit testing and hover.
 
-5 of 39 supported; 34 missing; 0 won't do or later.
+4 of 39 supported; 35 missing; 0 won't do or later.
 
 - **Modifiers** (20): `.defaultHoverEffect`, `.defersSystemGestures`, `.gesture` (stub), `.handGestureShortcut` (18), `.highPriorityGesture` (stub), `.hoverEffect`, `.hoverEffectDisabled`, `.onContinuousHover`, `.onHingeChange` (27.1), `.onHover` (stub), `.onPencilDoubleTap`, `.onPencilSqueeze`, `.simultaneousGesture` (stub), `Gesture.exclusively`, `Gesture.map`, `Gesture.onChanged`, `Gesture.onEnded`, `Gesture.sequenced`, `Gesture.simultaneously`, `Gesture.updating`
 - **Gestures** (13): `AnyGesture`, `DragGesture`, `ExclusiveGesture`, `LongPressGesture`, `MagnificationGesture`, `MagnifyGesture`, `RotateGesture`, `RotationGesture`, `SequenceGesture`, `SimultaneousGesture`, `SpatialEventGesture` (18), `SpatialTapGesture`, `TapGesture`
+- **Property wrappers** (1): `@GestureState` (stub)
 - **Protocols an app adopts** (1): `Gesture`
 
-<details><summary>Supported (5)</summary>
+<details><summary>Supported (4)</summary>
 
-`.allowsHitTesting`, `.contentShape`, `.onLongPressGesture`, `.onTapGesture`, `@GestureState`
+`.allowsHitTesting`, `.contentShape`, `.onLongPressGesture`, `.onTapGesture`
 
 </details>
 
@@ -215,19 +214,19 @@ Round 1. Gesture types, gesture modifiers, `@GestureState`, hit testing and hove
 
 Round 1. Shapes, colours, gradients, `Canvas`, images and symbols, visual effects, glass, animation and transitions.
 
-134 of 264 supported; 130 missing; 5 won't do or later.
+133 of 264 supported; 131 missing; 5 won't do or later.
 
-- **Views** (6): `AnyShape`, `ConcentricRectangle` (26), `GlassEffectContainer` (26), `KeyframeAnimator`, `MeshGradient` (18), `PhaseAnimator`
-- **Modifiers** (28): `.allowedDynamicRange`, `.asyncImageURLSession` (27), `.backgroundExtensionEffect` (26), `.glassEffect` (26), `.glassEffectID` (26), `.glassEffectTransition` (26), `.glassEffectUnion` (26), `.intersection`, `.keyframeAnimator`, `.lineIntersection`, `.lineSubtraction`, `.luminanceToAlpha` (stub), `.matchedGeometryEffect`, `.materialActiveAppearance` (18), `.phaseAnimator`, `.projectionEffect`, `.subtracting`, `.symbolColorRenderingMode` (26), `.symbolEffect` (stub), `.symbolEffectsRemoved`, `.symbolVariableValueMode` (26), `.symbolVariant`, `.symmetricDifference`, `.transaction`, `.transform`, `.transformEffect`, `.union`, `.visualEffect`
+- **Views** (7): `AnyShape`, `Canvas` (stub), `ConcentricRectangle` (26), `GlassEffectContainer` (26), `KeyframeAnimator`, `MeshGradient` (18), `PhaseAnimator`
+- **Modifiers** (34): `.allowedDynamicRange`, `.antialiased` (stub), `.asyncImageURLSession` (27), `.backgroundExtensionEffect` (26), `.blendMode` (stub), `.glassEffect` (26), `.glassEffectID` (26), `.glassEffectTransition` (26), `.glassEffectUnion` (26), `.inset` (stub), `.interpolation` (stub), `.intersection`, `.keyframeAnimator`, `.lineIntersection`, `.lineSubtraction`, `.luminanceToAlpha` (stub), `.matchedGeometryEffect`, `.materialActiveAppearance` (18), `.phaseAnimator`, `.projectionEffect`, `.rotation` (stub), `.scale` (stub), `.subtracting`, `.symbolColorRenderingMode` (26), `.symbolEffect` (stub), `.symbolEffectsRemoved`, `.symbolVariableValueMode` (26), `.symbolVariant`, `.symmetricDifference`, `.transaction`, `.transform`, `.transformEffect`, `.union`, `.visualEffect`
 - **Toolbar, tab, chart, table and scene content** (4): `CubicKeyframe`, `LinearKeyframe`, `MoveKeyframe`, `SpringKeyframe`
-- **Static members (colors, fonts, animations, transitions, shape styles)** (34): `Animation.easeInOut`, `Animation.timingCurve`, `AnyTransition.asymmetric`, `AnyTransition.modifier`, `AnyTransition.offset`, `AnyTransition.opacity`, `ContentTransition.identity`, `ContentTransition.interpolate`, `ContentTransition.numericText`, `ContentTransition.opacity`, `ContentTransition.symbolEffect`, `Glass.clear` (26), `Glass.identity` (26), `Glass.regular` (26), `ShapeStyle.angularGradient`, `ShapeStyle.blendMode`, `ShapeStyle.conicGradient`, `ShapeStyle.ellipticalGradient`, `ShapeStyle.fill`, `ShapeStyle.image`, `ShapeStyle.linearGradient`, `ShapeStyle.link`, `ShapeStyle.opacity`, `ShapeStyle.placeholder`, `ShapeStyle.quinary`, `ShapeStyle.radialGradient`, `ShapeStyle.selection`, `ShapeStyle.shadow`, `ShapeStyle.windowBackground`, `Transition.blurReplace`, `Transition.offset`, `Transition.opacity`, `Transition.properties`, `Transition.symbolEffect`
+- **Static members (colors, fonts, animations, transitions, shape styles)** (31): `Animation.timingCurve`, `AnyTransition.asymmetric`, `AnyTransition.modifier`, `AnyTransition.offset`, `ContentTransition.identity`, `ContentTransition.interpolate`, `ContentTransition.numericText`, `ContentTransition.opacity`, `ContentTransition.symbolEffect`, `Glass.clear` (26), `Glass.identity` (26), `Glass.regular` (26), `ShapeStyle.angularGradient`, `ShapeStyle.blendMode`, `ShapeStyle.conicGradient`, `ShapeStyle.ellipticalGradient`, `ShapeStyle.fill`, `ShapeStyle.image`, `ShapeStyle.linearGradient`, `ShapeStyle.link`, `ShapeStyle.opacity`, `ShapeStyle.placeholder`, `ShapeStyle.quinary`, `ShapeStyle.radialGradient`, `ShapeStyle.selection`, `ShapeStyle.shadow`, `ShapeStyle.windowBackground`, `Transition.blurReplace` (stub), `Transition.offset`, `Transition.properties`, `Transition.symbolEffect` (stub)
 - **Environment values** (17): `\.appearsActive` (18), `\.backgroundMaterial`, `\.backgroundProminence`, `\.backgroundStyle`, `\.colorSchemeContrast`, `\.contentTransition`, `\.contentTransitionAddsDrawingGroup`, `\.displayScale`, `\.imageScale`, `\.isLuminanceReduced`, `\.materialActiveAppearance` (18), `\.pixelLength`, `\.redactionReasons`, `\.symbolColorRenderingMode` (26), `\.symbolRenderingMode`, `\.symbolVariableValueMode` (26), `\.symbolVariants`
-- **Protocols an app adopts** (9): `Animatable`, `AnimatableModifier`, `CustomAnimation`, `InsettableShape`, `Shape`, `TextRenderer`, `Transition`, `VectorArithmetic`, `VisualEffect`
-- **Other types** (32): `AnyGradient`, `AnyShapeStyle`, `AsymmetricTransition`, `BackgroundStyle`, `BlurReplaceTransition`, `ContentTransition`, `FillShapeStyle`, `FillStyle`, `ForegroundStyle`, `Glass` (26), `Gradient`, `GraphicsContext`, `HierarchicalShapeStyle`, `IdentityTransition`, `ImagePaint`, `KeyframeTimeline`, `LinkShapeStyle`, `Material`, `MoveTransition`, `OffsetTransition`, `OpacityTransition`, `PlaceholderTextShapeStyle`, `PushTransition`, `ScaleTransition`, `SelectionShapeStyle`, `SeparatorShapeStyle`, `SlideTransition`, `Spring`, `SymbolEffectTransition`, `TintShapeStyle`, `UnitCurve`, `WindowBackgroundShapeStyle`
+- **Protocols an app adopts** (7): `Animatable`, `AnimatableModifier`, `CustomAnimation`, `TextRenderer`, `Transition`, `VectorArithmetic`, `VisualEffect`
+- **Other types** (31): `AnyGradient`, `AnyShapeStyle`, `AsymmetricTransition`, `BackgroundStyle`, `BlurReplaceTransition`, `ContentTransition`, `FillShapeStyle`, `FillStyle`, `ForegroundStyle`, `Glass` (26), `GraphicsContext`, `HierarchicalShapeStyle`, `IdentityTransition`, `ImagePaint`, `KeyframeTimeline`, `LinkShapeStyle`, `Material`, `MoveTransition`, `OffsetTransition`, `OpacityTransition`, `PlaceholderTextShapeStyle`, `PushTransition`, `ScaleTransition`, `SelectionShapeStyle`, `SeparatorShapeStyle`, `SlideTransition`, `Spring`, `SymbolEffectTransition`, `TintShapeStyle`, `UnitCurve`, `WindowBackgroundShapeStyle`
 
-<details><summary>Supported (134)</summary>
+<details><summary>Supported (133)</summary>
 
-`.accentColor`, `.animation`, `.antialiased`, `.background`, `.blendMode`, `.blur`, `.border`, `.brightness`, `.clipped`, `.clipShape`, `.colorInvert`, `.colorMultiply`, `.compositingGroup`, `.contentTransition`, `.contrast`, `.cornerRadius`, `.drawingGroup`, `.fill`, `.foregroundColor`, `.grayscale`, `.hidden`, `.hueRotation`, `.imageScale`, `.inset`, `.interpolation`, `.mask`, `.opacity`, `.overlay`, `.renderingMode`, `.resizable`, `.rotation`, `.rotation3DEffect`, `.rotationEffect`, `.saturation`, `.scale`, `.scaleEffect`, `.shadow`, `.stroke`, `.strokeBorder`, `.symbolRenderingMode`, `.transition`, `.trim`, `\.colorScheme`, `Angle`, `AngularGradient`, `Animation`, `Animation.bouncy`, `Animation.default`, `Animation.easeIn`, `Animation.easeOut`, `Animation.interactiveSpring`, `Animation.interpolatingSpring`, `Animation.linear`, `Animation.smooth`, `Animation.snappy`, `Animation.spring`, `AnyTransition`, `AnyTransition.identity`, `AnyTransition.move`, `AnyTransition.push`, `AnyTransition.scale`, `AnyTransition.slide`, `AsyncImage`, `Canvas`, `Capsule`, `Circle`, `Color`, `Color.accentColor`, `Color.black`, `Color.blue`, `Color.brown`, `Color.clear`, `Color.cyan`, `Color.gray`, `Color.green`, `Color.indigo`, `Color.mint`, `Color.orange`, `Color.pink`, `Color.primary`, `Color.purple`, `Color.red`, `Color.secondary`, `Color.teal`, `Color.white`, `Color.yellow`, `ContainerRelativeShape`, `Ellipse`, `EllipticalGradient`, `Image`, `LinearGradient`, `Path`, `RadialGradient`, `Rectangle`, `RoundedRectangle`, `ShapeStyle.background`, `ShapeStyle.bar`, `ShapeStyle.black`, `ShapeStyle.blue`, `ShapeStyle.brown`, `ShapeStyle.clear`, `ShapeStyle.cyan`, `ShapeStyle.foreground`, `ShapeStyle.gray`, `ShapeStyle.green`, `ShapeStyle.indigo`, `ShapeStyle.mint`, `ShapeStyle.orange`, `ShapeStyle.pink`, `ShapeStyle.primary`, `ShapeStyle.purple`, `ShapeStyle.quaternary`, `ShapeStyle.red`, `ShapeStyle.regularMaterial`, `ShapeStyle.secondary`, `ShapeStyle.separator`, `ShapeStyle.teal`, `ShapeStyle.tertiary`, `ShapeStyle.thickMaterial`, `ShapeStyle.thinMaterial`, `ShapeStyle.tint`, `ShapeStyle.ultraThickMaterial`, `ShapeStyle.ultraThinMaterial`, `ShapeStyle.white`, `ShapeStyle.yellow`, `StrokeStyle`, `TimelineView`, `Transition.identity`, `Transition.move`, `Transition.push`, `Transition.scale`, `Transition.slide`, `UnevenRoundedRectangle`, `UnitPoint`
+`.accentColor`, `.animation`, `.background`, `.blur`, `.border`, `.brightness`, `.clipped`, `.clipShape`, `.colorInvert`, `.colorMultiply`, `.compositingGroup`, `.contentTransition`, `.contrast`, `.cornerRadius`, `.drawingGroup`, `.fill`, `.foregroundColor`, `.grayscale`, `.hidden`, `.hueRotation`, `.imageScale`, `.mask`, `.opacity`, `.overlay`, `.renderingMode`, `.resizable`, `.rotation3DEffect`, `.rotationEffect`, `.saturation`, `.scaleEffect`, `.shadow`, `.stroke`, `.strokeBorder`, `.symbolRenderingMode`, `.transition`, `.trim`, `\.colorScheme`, `Angle`, `AngularGradient`, `Animation`, `Animation.bouncy`, `Animation.default`, `Animation.easeIn`, `Animation.easeInOut`, `Animation.easeOut`, `Animation.interactiveSpring`, `Animation.interpolatingSpring`, `Animation.linear`, `Animation.smooth`, `Animation.snappy`, `Animation.spring`, `AnyTransition`, `AnyTransition.identity`, `AnyTransition.move`, `AnyTransition.opacity`, `AnyTransition.push`, `AnyTransition.scale`, `AnyTransition.slide`, `AsyncImage`, `Capsule`, `Circle`, `Color`, `Color.accentColor`, `Color.black`, `Color.blue`, `Color.brown`, `Color.clear`, `Color.cyan`, `Color.gray`, `Color.green`, `Color.indigo`, `Color.mint`, `Color.orange`, `Color.pink`, `Color.primary`, `Color.purple`, `Color.red`, `Color.secondary`, `Color.teal`, `Color.white`, `Color.yellow`, `ContainerRelativeShape`, `Ellipse`, `EllipticalGradient`, `Gradient`, `Image`, `InsettableShape`, `LinearGradient`, `Path`, `RadialGradient`, `Rectangle`, `RoundedRectangle`, `Shape`, `ShapeStyle.background`, `ShapeStyle.bar`, `ShapeStyle.black`, `ShapeStyle.blue`, `ShapeStyle.brown`, `ShapeStyle.clear`, `ShapeStyle.cyan`, `ShapeStyle.foreground`, `ShapeStyle.gray`, `ShapeStyle.green`, `ShapeStyle.indigo`, `ShapeStyle.mint`, `ShapeStyle.orange`, `ShapeStyle.pink`, `ShapeStyle.primary`, `ShapeStyle.purple`, `ShapeStyle.quaternary`, `ShapeStyle.red`, `ShapeStyle.regularMaterial`, `ShapeStyle.secondary`, `ShapeStyle.separator`, `ShapeStyle.teal`, `ShapeStyle.tertiary`, `ShapeStyle.thickMaterial`, `ShapeStyle.thinMaterial`, `ShapeStyle.tint`, `ShapeStyle.ultraThickMaterial`, `ShapeStyle.ultraThinMaterial`, `ShapeStyle.white`, `ShapeStyle.yellow`, `StrokeStyle`, `TimelineView`, `Transition.identity`, `Transition.move`, `Transition.opacity`, `Transition.push`, `Transition.scale`, `Transition.slide`, `UnevenRoundedRectangle`, `UnitPoint`
 
 </details>
 
@@ -252,16 +251,16 @@ Round 1. `@FocusState`, `.focused`, submit, keyboard types and text input traits
 
 Round 1. `@State` and the other property wrappers, environment values, `environment`, preferences, redaction.
 
-12 of 70 supported; 58 missing; 0 won't do or later.
+14 of 70 supported; 56 missing; 0 won't do or later.
 
 - **Modifiers** (13): `.anchorPreference`, `.backgroundPreferenceValue`, `.colorScheme` (stub), `.interactionActivityTrackingTag`, `.onPreferenceChange`, `.overlayPreferenceValue`, `.preference`, `.privacySensitive` (stub), `.redacted` (stub), `.transformAnchorPreference`, `.transformEnvironment`, `.transformPreference`, `.unredacted`
 - **Environment values** (40): `\.accentColor`, `\.allowedDynamicRange`, `\.autocorrectionDisabled`, `\.badgeProminence`, `\.buttonSizing` (26), `\.defaultAppStorageDefaults`, `\.description`, `\.disableAutocorrection`, `\.findContext` (26), `\.foregroundColor`, `\.horizontalScrollBounceBehavior`, `\.horizontalScrollIndicatorVisibility`, `\.isFocusEffectEnabled`, `\.isHoverEffectEnabled`, `\.isSceneCaptured`, `\.isTabViewSidebarAvailable` (27), `\.isUserAuthenticationEnabled` (18), `\.keyboardShortcut`, `\.listRowSpacing`, `\.listSectionSpacing`, `\.menuOrder`, `\.overlayArrangementZIndex` (27.1), `\.preferredPencilDoubleTapAction`, `\.preferredPencilSqueezeAction`, `\.realHorizontalSizeClass`, `\.realVerticalSizeClass`, `\.refresh`, `\.rename`, `\.scenePhase`, `\.scrollDismissesKeyboardMode`, `\.sidebarRowSize`, `\.splitArrangementAxis` (27.1), `\.systemPrefersReducedResourceUsage` (27), `\.tabBarPlacement` (18), `\.textContentType`, `\.tint`, `\.tintColor`, `\.undoManager`, `\.verticalScrollBounceBehavior`, `\.verticalScrollIndicatorVisibility`
-- **Property wrappers** (3): `@Binding`, `@Environment`, `@EnvironmentObject`
+- **Property wrappers** (1): `@Namespace` (stub)
 - **Protocols an app adopts** (2): `EnvironmentKey`, `PreferenceKey`
 
-<details><summary>Supported (12)</summary>
+<details><summary>Supported (14)</summary>
 
-`.environment`, `.environmentObject`, `.preferredColorScheme`, `@AppStorage`, `@Bindable`, `@Namespace`, `@ObservedObject`, `@SceneStorage`, `@State`, `@StateObject`, `\.horizontalSizeClass`, `\.verticalSizeClass`
+`.environment`, `.environmentObject`, `.preferredColorScheme`, `@AppStorage`, `@Bindable`, `@Binding`, `@Environment`, `@EnvironmentObject`, `@ObservedObject`, `@SceneStorage`, `@State`, `@StateObject`, `\.horizontalSizeClass`, `\.verticalSizeClass`
 
 </details>
 
@@ -286,17 +285,17 @@ Round 1. `accessibility*` modifiers, rotors, speech.
 
 Round 1. Swift Charts: `Chart`, marks, plots, axes, scales, selection and scrolling.
 
-14 of 69 supported; 55 missing; 0 won't do or later.
+15 of 69 supported; 54 missing; 0 won't do or later.
 
 - **Views** (1): `BasicChartSymbolShape`
-- **Modifiers** (40): `.chartAngleSelection`, `.chartBackground` (stub), `.chartForegroundStyleScale` (stub), `.chartGesture`, `.chartLineStyleScale`, `.chartOverlay` (stub), `.chartPlotStyle` (stub), `.chartScrollableAxes`, `.chartScrollPosition`, `.chartScrollTargetBehavior`, `.chartSymbolScale`, `.chartSymbolSizeScale`, `.chartXAxisLabel`, `.chartXAxisStyle`, `.chartXScale` (stub), `.chartXSelection`, `.chartXVisibleDomain`, `.chartYAxisLabel`, `.chartYAxisStyle`, `.chartYSelection`, `.chartYVisibleDomain`, `ChartContent.accessibilityHidden`, `ChartContent.accessibilityIdentifier`, `ChartContent.accessibilityLabel`, `ChartContent.accessibilityValue`, `ChartContent.alignsMarkStylesWithPlotArea`, `ChartContent.annotation` (stub), `ChartContent.blur`, `ChartContent.clipShape`, `ChartContent.compositingLayer`, `ChartContent.interpolationMethod` (stub), `ChartContent.lineStyle` (stub), `ChartContent.mask`, `ChartContent.offset`, `ChartContent.opacity`, `ChartContent.position`, `ChartContent.shadow`, `ChartContent.symbol`, `ChartContent.symbolSize`, `ChartContent.zIndex`
+- **Modifiers** (39): `.chartAngleSelection`, `.chartBackground` (stub), `.chartForegroundStyleScale` (stub), `.chartGesture`, `.chartLineStyleScale`, `.chartOverlay` (stub), `.chartPlotStyle` (stub), `.chartScrollableAxes`, `.chartScrollPosition`, `.chartScrollTargetBehavior`, `.chartSymbolScale`, `.chartSymbolSizeScale`, `.chartXAxisLabel`, `.chartXAxisStyle`, `.chartXScale` (stub), `.chartXSelection`, `.chartXVisibleDomain`, `.chartYAxisLabel`, `.chartYAxisStyle`, `.chartYSelection`, `.chartYVisibleDomain`, `ChartContent.accessibilityHidden`, `ChartContent.accessibilityIdentifier`, `ChartContent.accessibilityLabel`, `ChartContent.accessibilityValue`, `ChartContent.alignsMarkStylesWithPlotArea`, `ChartContent.annotation` (stub), `ChartContent.blur`, `ChartContent.clipShape`, `ChartContent.compositingLayer`, `ChartContent.interpolationMethod` (stub), `ChartContent.lineStyle` (stub), `ChartContent.mask`, `ChartContent.offset`, `ChartContent.opacity`, `ChartContent.shadow`, `ChartContent.symbol` (stub), `ChartContent.symbolSize` (stub), `ChartContent.zIndex`
 - **Toolbar, tab, chart, table and scene content** (11): `AnyAxisContent`, `AnyChartContent`, `AreaPlot` (18), `AxisMarks`, `BarPlot` (18), `LinePlot` (18), `Plot`, `PointPlot` (18), `RectanglePlot` (18), `RulePlot` (18), `SectorPlot` (18)
 - **Protocols an app adopts** (1): `Chart3DSurfaceStyle` (26)
 - **Other types** (2): `ChartProxy`, `PlottableValue`
 
-<details><summary>Supported (14)</summary>
+<details><summary>Supported (15)</summary>
 
-`.chartLegend`, `.chartXAxis`, `.chartYAxis`, `.chartYScale`, `AreaMark`, `BarMark`, `Chart`, `ChartContent.cornerRadius`, `ChartContent.foregroundStyle`, `LineMark`, `PointMark`, `RectangleMark`, `RuleMark`, `SectorMark`
+`.chartLegend`, `.chartXAxis`, `.chartYAxis`, `.chartYScale`, `AreaMark`, `BarMark`, `Chart`, `ChartContent.cornerRadius`, `ChartContent.foregroundStyle`, `ChartContent.position`, `LineMark`, `PointMark`, `RectangleMark`, `RuleMark`, `SectorMark`
 
 </details>
 
@@ -328,15 +327,15 @@ Round 2. `.sensoryFeedback` (§3.1).
 
 Round 2. `ShareLink`, `PasteButton`, copy and paste, text selection (§3.2).
 
-2 of 8 supported; 6 missing; 0 won't do or later.
+1 of 8 supported; 7 missing; 0 won't do or later.
 
-- **Views** (1): `PasteButton`
+- **Views** (2): `PasteButton`, `ShareLink` (stub)
 - **Modifiers** (4): `.copyable` (27), `.cuttable` (27), `.pasteDestination` (27), `.textSelectionAffinity` (18)
 - **Other types** (1): `TextSelection` (18)
 
-<details><summary>Supported (2)</summary>
+<details><summary>Supported (1)</summary>
 
-`.textSelection`, `ShareLink`
+`.textSelection`
 
 </details>
 
@@ -364,7 +363,7 @@ Round 2. `Chart3D`, `SurfacePlot`, 3D marks, pose and projection (§3.7).
 0 of 17 supported; 17 missing; 0 won't do or later.
 
 - **Views** (1): `Chart3D` (26)
-- **Modifiers** (13): `.chart3DCameraProjection` (26), `.chart3DPose` (26), `.chartZAxis` (26), `.chartZAxisLabel` (26), `.chartZScale` (26), `.chartZSelection` (26), `Chart3DContent.foregroundStyle` (26), `Chart3DContent.metalness` (26), `Chart3DContent.modifier` (26), `Chart3DContent.roughness` (26), `Chart3DContent.symbol` (26) (stub), `Chart3DContent.symbolRotation` (26), `Chart3DContent.symbolSize` (26)
+- **Modifiers** (13): `.chart3DCameraProjection` (26), `.chart3DPose` (26), `.chartZAxis` (26), `.chartZAxisLabel` (26), `.chartZScale` (26), `.chartZSelection` (26), `Chart3DContent.foregroundStyle` (26), `Chart3DContent.metalness` (26), `Chart3DContent.modifier` (26), `Chart3DContent.roughness` (26), `Chart3DContent.symbol` (26), `Chart3DContent.symbolRotation` (26), `Chart3DContent.symbolSize` (26)
 - **Styles** (2): `Chart3DSurfaceStyle.heightBased` (26), `Chart3DSurfaceStyle.normalBased` (26)
 - **Toolbar, tab, chart, table and scene content** (1): `SurfacePlot` (26)
 
@@ -636,13 +635,13 @@ Every symbol has a family.
 
 Kiln accepts these so the code runs, but they have no effect. They count as missing.
 
-`.accessibilityAddTraits` (stub), `.accessibilityElement` (stub), `.accessibilityHidden` (stub), `.accessibilityValue` (stub), `.chartBackground` (stub), `.chartForegroundStyleScale` (stub), `.chartOverlay` (stub), `.chartPlotStyle` (stub), `.chartXScale` (stub), `.colorScheme` (stub), `.defaultScrollAnchor` (stub), `.dynamicTypeSize` (stub), `.focused` (stub), `.gesture` (stub), `.headerProminence` (stub), `.help` (stub), `.highPriorityGesture` (stub), `.interactiveDismissDisabled` (stub), `.listSectionSeparator` (stub), `.luminanceToAlpha` (stub), `.onHover` (stub), `.presentationCornerRadius` (stub), `.privacySensitive` (stub), `.redacted` (stub), `.scrollDismissesKeyboard` (stub), `.scrollTargetBehavior` (stub), `.scrollTargetLayout` (stub), `.sensoryFeedback` (stub), `.simultaneousGesture` (stub), `.symbolEffect` (stub), `.textContentType` (stub), `.toolbarBackground` (stub), `.toolbarColorScheme` (stub), `Chart3DContent.symbol` (26) (stub), `ChartContent.annotation` (stub), `ChartContent.interpolationMethod` (stub), `ChartContent.lineStyle` (stub)
+`.accessibilityAddTraits` (stub), `.accessibilityElement` (stub), `.accessibilityHidden` (stub), `.accessibilityValue` (stub), `.antialiased` (stub), `.blendMode` (stub), `.chartBackground` (stub), `.chartForegroundStyleScale` (stub), `.chartOverlay` (stub), `.chartPlotStyle` (stub), `.chartXScale` (stub), `.colorScheme` (stub), `.defaultScrollAnchor` (stub), `.dynamicTypeSize` (stub), `.focused` (stub), `.gesture` (stub), `.headerProminence` (stub), `.help` (stub), `.highPriorityGesture` (stub), `.inset` (stub), `.interactiveDismissDisabled` (stub), `.interpolation` (stub), `.listSectionSeparator` (stub), `.luminanceToAlpha` (stub), `.onHover` (stub), `.presentationCornerRadius` (stub), `.privacySensitive` (stub), `.redacted` (stub), `.rotation` (stub), `.scale` (stub), `.scrollDismissesKeyboard` (stub), `.scrollTargetBehavior` (stub), `.scrollTargetLayout` (stub), `.sensoryFeedback` (stub), `.simultaneousGesture` (stub), `.symbolEffect` (stub), `.textContentType` (stub), `.toolbarBackground` (stub), `.toolbarColorScheme` (stub), `@GestureState` (stub), `@Namespace` (stub), `Canvas` (stub), `ChartContent.annotation` (stub), `ChartContent.interpolationMethod` (stub), `ChartContent.lineStyle` (stub), `ChartContent.symbol` (stub), `ChartContent.symbolSize` (stub), `ShareLink` (stub), `Transition.blurReplace` (stub), `Transition.symbolEffect` (stub)
 
 ## In the manifest, not in the SDK
 
 Kiln-only names (`UserShape`), Swift and Foundation types the engine constructs (`Date`, `URL`), and names that don't match an SDK symbol's id. These don't count anywhere.
 
-`member:Color.grey`, `member:ShapeStyle.accentColor`, `member:ShapeStyle.grey`, `member:ShapeStyle.material`, `modifier:dragToMove`, `type:Alert`, `type:Alignment`, `type:Array`, `type:ArraySlice`, `type:Axis`, `type:Binding`, `type:Bool`, `type:CGFloat`, `type:CGPoint`, `type:CGRect`, `type:CGSize`, `type:Calendar`, `type:Character`, `type:ClosedRange`, `type:ColorScheme`, `type:ContentMode`, `type:ContiguousArray`, `type:Data`, `type:Date`, `type:DateComponents`, `type:DateFormatter`, `type:Dictionary`, `type:DispatchQueue`, `type:Double`, `type:Edge`, `type:Float`, `type:Float64`, `type:HorizontalAlignment`, `type:Image.Scale`, `type:IndexSet`, `type:Int`, `type:Int16`, `type:Int32`, `type:Int64`, `type:Int8`, `type:JSONDecoder`, `type:JSONEncoder`, `type:Locale`, `type:Measurement`, `type:NSColor`, `type:NumberFormatter`, `type:Range`, `type:RelativeDateTimeFormatter`, `type:Set`, `type:String`, `type:Substring`, `type:SymbolRenderingMode`, `type:Task`, `type:TextAlignment`, `type:TimeInterval`, `type:TimeZone`, `type:Timer`, `type:UIApplication`, `type:UIColor`, `type:UIImpactFeedbackGenerator`, `type:UINotificationFeedbackGenerator`, `type:UIScreen`, `type:UISelectionFeedbackGenerator`, `type:UInt`, `type:URL`, `type:URLComponents`, `type:URLQueryItem`, `type:URLRequest`, `type:URLSession`, `type:UUID`, `type:UserDefaults`, `type:VerticalAlignment`, `type:Visibility`, `view:PathShape`, `view:UserShape`
+`member:Angle.degrees`, `member:Angle.radians`, `member:Angle.zero`, `member:Animation.delay`, `member:Animation.repeatCount`, `member:Animation.repeatForever`, `member:Animation.speed`, `member:Array.append`, `member:Array.count`, `member:Array.description`, `member:Array.endIndex`, `member:Array.first`, `member:Array.indices`, `member:Array.insert`, `member:Array.isEmpty`, `member:Array.last`, `member:Array.lazy`, `member:Array.move`, `member:Array.popLast`, `member:Array.remove`, `member:Array.removeAll`, `member:Array.removeFirst`, `member:Array.removeLast`, `member:Array.removeSubrange`, `member:Array.reverse`, `member:Array.shuffle`, `member:Array.sort`, `member:Array.startIndex`, `member:Array.swapAt`, `member:AsyncStream.Continuation.finish`, `member:AsyncStream.Continuation.onTermination`, `member:AsyncStream.Continuation.yield`, `member:AsyncStream.makeAsyncIterator`, `member:AsyncStream.makeStream`, `member:AsyncThrowingStream.makeStream`, `member:Binding.constant`, `member:Bool.description`, `member:Bool.random`, `member:Bool.toggle`, `member:Bool.toggled`, `member:CGPoint.x`, `member:CGPoint.y`, `member:CGPoint.zero`, `member:CGRect.height`, `member:CGRect.insetBy`, `member:CGRect.maxX`, `member:CGRect.maxY`, `member:CGRect.midX`, `member:CGRect.midY`, `member:CGRect.minX`, `member:CGRect.minY`, `member:CGRect.offsetBy`, `member:CGRect.origin`, `member:CGRect.size`, `member:CGRect.width`, `member:CGRect.zero`, `member:CGSize.height`, `member:CGSize.width`, `member:CGSize.zero`, `member:Calendar.autoupdatingCurrent`, `member:Calendar.component`, `member:Calendar.current`, `member:Calendar.date`, `member:Calendar.dateComponents`, `member:Calendar.isDate`, `member:Calendar.isDateInToday`, `member:Calendar.isDateInTomorrow`, `member:Calendar.isDateInWeekend`, `member:Calendar.isDateInYesterday`, `member:Calendar.startOfDay`, `member:CheckedContinuation.resume`, `member:Color.description`, `member:Color.gradient`, `member:Color.grey`, `member:Color.label`, `member:Color.mix`, `member:Color.opacity`, `member:Color.secondaryLabel`, `member:Color.secondarySystemBackground`, `member:Color.secondarySystemFill`, `member:Color.secondarySystemGroupedBackground`, `member:Color.separator`, `member:Color.systemBackground`, `member:Color.systemBlue`, `member:Color.systemBrown`, `member:Color.systemCyan`, `member:Color.systemFill`, `member:Color.systemGray`, `member:Color.systemGray2`, `member:Color.systemGray3`, `member:Color.systemGray4`, `member:Color.systemGray5`, `member:Color.systemGray6`, `member:Color.systemGreen`, `member:Color.systemGroupedBackground`, `member:Color.systemIndigo`, `member:Color.systemMint`, `member:Color.systemOrange`, `member:Color.systemPink`, `member:Color.systemPurple`, `member:Color.systemRed`, `member:Color.systemTeal`, `member:Color.systemYellow`, `member:Color.tertiaryLabel`, `member:Color.tertiarySystemBackground`, `member:Color.tertiarySystemFill`, `member:Data.count`, `member:Data.isEmpty`, `member:Date.addingTimeInterval`, `member:Date.compare`, `member:Date.description`, `member:Date.distance`, `member:Date.distantFuture`, `member:Date.distantPast`, `member:Date.formatted`, `member:Date.now`, `member:Date.timeIntervalSince`, `member:Date.timeIntervalSince1970`, `member:Date.timeIntervalSinceNow`, `member:Date.timeIntervalSinceReferenceDate`, `member:DateFormatter.date`, `member:DateFormatter.dateFormat`, `member:DateFormatter.dateStyle`, `member:DateFormatter.localizedString`, `member:DateFormatter.string`, `member:DateFormatter.timeStyle`, `member:Dictionary.compactMapValues`, `member:Dictionary.count`, `member:Dictionary.filter`, `member:Dictionary.first`, `member:Dictionary.isEmpty`, `member:Dictionary.keys`, `member:Dictionary.mapValues`, `member:Dictionary.merge`, `member:Dictionary.removeAll`, `member:Dictionary.removeValue`, `member:Dictionary.updateValue`, `member:Dictionary.values`, `member:DismissAction.callAsFunction`, `member:DispatchQueue.async`, `member:DispatchQueue.asyncAfter`, `member:DispatchQueue.global`, `member:DispatchQueue.main`, `member:DispatchQueue.sync`, `member:Double.description`, `member:Double.greatestFiniteMagnitude`, `member:Double.infinity`, `member:Double.isFinite`, `member:Double.isInfinite`, `member:Double.isNaN`, `member:Double.isZero`, `member:Double.leastNormalMagnitude`, `member:Double.magnitude`, `member:Double.nan`, `member:Double.pi`, `member:Double.random`, `member:Double.zero`, `member:Error.description`, `member:Error.localizedDescription`, `member:FloatingPoint.clamped`, `member:FloatingPoint.description`, `member:FloatingPoint.formatted`, `member:FloatingPoint.isMultiple`, `member:FloatingPoint.remainder`, `member:FloatingPoint.rounded`, `member:FloatingPoint.squareRoot`, `member:FloatingPoint.truncatingRemainder`, `member:Font.bold`, `member:Font.italic`, `member:Font.leading`, `member:Font.monospaced`, `member:Font.monospacedDigit`, `member:Font.smallCaps`, `member:Font.weight`, `member:Font.width`, `member:FormatStyle.grouping`, `member:FormatStyle.precision`, `member:Foundation.NSLog`, `member:Foundation.acos`, `member:Foundation.asin`, `member:Foundation.atan`, `member:Foundation.atan2`, `member:Foundation.cbrt`, `member:Foundation.ceil`, `member:Foundation.cos`, `member:Foundation.exp`, `member:Foundation.floor`, `member:Foundation.fmod`, `member:Foundation.hypot`, `member:Foundation.log`, `member:Foundation.log10`, `member:Foundation.log2`, `member:Foundation.pow`, `member:Foundation.round`, `member:Foundation.sin`, `member:Foundation.sqrt`, `member:Foundation.tan`, `member:Foundation.trunc`, `member:HTTPURLResponse.statusCode`, `member:HTTPURLResponse.url`, `member:IndexSet.contains`, `member:IndexSet.count`, `member:IndexSet.first`, `member:IndexSet.map`, `member:Int.advanced`, `member:Int.clamped`, `member:Int.description`, `member:Int.distance`, `member:Int.formatted`, `member:Int.isMultiple`, `member:Int.isZero`, `member:Int.magnitude`, `member:Int.max`, `member:Int.min`, `member:Int.quotientAndRemainder`, `member:Int.random`, `member:Int.signum`, `member:Int.zero`, `member:JSONDecoder.dateDecodingStrategy`, `member:JSONDecoder.decode`, `member:JSONDecoder.keyDecodingStrategy`, `member:JSONEncoder.dateEncodingStrategy`, `member:JSONEncoder.encode`, `member:JSONEncoder.keyEncodingStrategy`, `member:JSONEncoder.outputFormatting`, `member:Locale.current`, `member:Locale.identifier`, `member:MainActor.run`, `member:NumberFormatter.currencyCode`, `member:NumberFormatter.localizedString`, `member:NumberFormatter.maximumFractionDigits`, `member:NumberFormatter.minimumFractionDigits`, `member:NumberFormatter.numberStyle`, `member:NumberFormatter.string`, `member:Path.addArc`, `member:Path.addCurve`, `member:Path.addEllipse`, `member:Path.addLine`, `member:Path.addLines`, `member:Path.addPath`, `member:Path.addQuadCurve`, `member:Path.addRect`, `member:Path.addRoundedRect`, `member:Path.closeSubpath`, `member:Path.move`, `member:Range.clamped`, `member:Range.contains`, `member:Range.count`, `member:Range.first`, `member:Range.isEmpty`, `member:Range.last`, `member:Range.lowerBound`, `member:Range.upperBound`, `member:RelativeDateTimeFormatter.localizedString`, `member:ScrollViewProxy.scrollTo`, `member:Sequence.allSatisfy`, `member:Sequence.chunked`, `member:Sequence.compactMap`, `member:Sequence.contains`, `member:Sequence.count`, `member:Sequence.dropFirst`, `member:Sequence.dropLast`, `member:Sequence.elementsEqual`, `member:Sequence.enumerated`, `member:Sequence.filter`, `member:Sequence.first`, `member:Sequence.firstIndex`, `member:Sequence.flatMap`, `member:Sequence.forEach`, `member:Sequence.index`, `member:Sequence.isEmpty`, `member:Sequence.joined`, `member:Sequence.last`, `member:Sequence.lastIndex`, `member:Sequence.makeIterator`, `member:Sequence.map`, `member:Sequence.max`, `member:Sequence.min`, `member:Sequence.prefix`, `member:Sequence.randomElement`, `member:Sequence.reduce`, `member:Sequence.reversed`, `member:Sequence.shuffled`, `member:Sequence.sorted`, `member:Sequence.split`, `member:Sequence.starts`, `member:Sequence.suffix`, `member:Sequence.sum`, `member:Sequence.uniqued`, `member:Set.contains`, `member:Set.count`, `member:Set.first`, `member:Set.formIntersection`, `member:Set.formUnion`, `member:Set.insert`, `member:Set.intersection`, `member:Set.isDisjoint`, `member:Set.isEmpty`, `member:Set.isSubset`, `member:Set.isSuperset`, `member:Set.remove`, `member:Set.removeAll`, `member:Set.subtract`, `member:Set.subtracting`, `member:Set.symmetricDifference`, `member:Set.union`, `member:ShapeStyle.accentColor`, `member:ShapeStyle.grey`, `member:ShapeStyle.material`, `member:String.append`, `member:String.capitalized`, `member:String.components`, `member:String.contains`, `member:String.count`, `member:String.data`, `member:String.description`, `member:String.dropFirst`, `member:String.dropLast`, `member:String.endIndex`, `member:String.first`, `member:String.firstIndex`, `member:String.formatted`, `member:String.hasPrefix`, `member:String.hasSuffix`, `member:String.index`, `member:String.indices`, `member:String.insert`, `member:String.isEmpty`, `member:String.isLetter`, `member:String.isLowercase`, `member:String.isNumber`, `member:String.isPunctuation`, `member:String.isUppercase`, `member:String.isWhitespace`, `member:String.last`, `member:String.localizedCapitalized`, `member:String.localizedCaseInsensitiveContains`, `member:String.localizedStandardContains`, `member:String.lowercased`, `member:String.lowercasedContains`, `member:String.padding`, `member:String.prefix`, `member:String.range`, `member:String.removeAll`, `member:String.removeFirst`, `member:String.removeLast`, `member:String.replacingOccurrences`, `member:String.reversed`, `member:String.self`, `member:String.split`, `member:String.startIndex`, `member:String.starts`, `member:String.suffix`, `member:String.trimmingCharacters`, `member:String.unicodeScalars`, `member:String.uppercased`, `member:String.utf8`, `member:String.wholeNumberValue`, `member:Swift.abs`, `member:Swift.assert`, `member:Swift.assertionFailure`, `member:Swift.debugPrint`, `member:Swift.fatalError`, `member:Swift.max`, `member:Swift.min`, `member:Swift.precondition`, `member:Swift.preconditionFailure`, `member:Swift.print`, `member:Swift.repeatElement`, `member:Swift.stride`, `member:Swift.swap`, `member:Swift.type`, `member:Swift.withCheckedContinuation`, `member:Swift.withCheckedThrowingContinuation`, `member:Swift.withDiscardingTaskGroup`, `member:Swift.withTaskCancellationHandler`, `member:Swift.withTaskGroup`, `member:Swift.withThrowingDiscardingTaskGroup`, `member:Swift.withThrowingTaskGroup`, `member:Swift.withUnsafeContinuation`, `member:Swift.withUnsafeThrowingContinuation`, `member:Swift.zip`, `member:SwiftUI.withAnimation`, `member:Task.cancel`, `member:Task.checkCancellation`, `member:Task.currentPriority`, `member:Task.detached`, `member:Task.isCancelled`, `member:Task.result`, `member:Task.sleep`, `member:Task.value`, `member:Task.yield`, `member:TaskGroup.addTask`, `member:TaskGroup.addTaskUnlessCancelled`, `member:TaskGroup.cancelAll`, `member:TaskGroup.isCancelled`, `member:TaskGroup.isEmpty`, `member:TaskGroup.next`, `member:TaskGroup.waitForAll`, `member:TimeZone.current`, `member:Timer.fire`, `member:Timer.invalidate`, `member:Timer.isValid`, `member:Timer.publish`, `member:Timer.scheduledTimer`, `member:UIScreen.bounds`, `member:UIScreen.main`, `member:URL.absoluteString`, `member:URL.host`, `member:URL.lastPathComponent`, `member:URLComponents.path`, `member:URLComponents.queryItems`, `member:URLComponents.string`, `member:URLComponents.url`, `member:URLQueryItem.name`, `member:URLQueryItem.value`, `member:URLRequest.httpBody`, `member:URLRequest.httpMethod`, `member:URLRequest.setValue`, `member:URLRequest.url`, `member:URLSession.data`, `member:URLSession.dataTask`, `member:URLSession.shared`, `member:URLSessionDataTask.cancel`, `member:URLSessionDataTask.resume`, `member:UUID.description`, `member:UUID.hashValue`, `member:UUID.uuidString`, `member:UserDefaults.array`, `member:UserDefaults.bool`, `member:UserDefaults.data`, `member:UserDefaults.dictionary`, `member:UserDefaults.double`, `member:UserDefaults.integer`, `member:UserDefaults.object`, `member:UserDefaults.removeObject`, `member:UserDefaults.set`, `member:UserDefaults.standard`, `member:UserDefaults.string`, `member:UserDefaults.stringArray`, `protocol:CaseIterable`, `protocol:Codable`, `protocol:Comparable`, `protocol:CustomStringConvertible`, `protocol:Decodable`, `protocol:Encodable`, `protocol:Equatable`, `protocol:Error`, `protocol:Hashable`, `protocol:Identifiable`, `protocol:LocalizedError`, `protocol:ObservableObject`, `protocol:PreviewProvider`, `type:Alert`, `type:Alignment`, `type:Array`, `type:ArraySlice`, `type:AsyncStream`, `type:AsyncStream.Continuation`, `type:AsyncThrowingStream`, `type:Axis`, `type:Binding`, `type:Bool`, `type:CGFloat`, `type:CGPoint`, `type:CGRect`, `type:CGSize`, `type:Calendar`, `type:Character`, `type:CheckedContinuation`, `type:ClosedRange`, `type:ColorScheme`, `type:ContentMode`, `type:ContiguousArray`, `type:Data`, `type:Date`, `type:DateComponents`, `type:DateFormatter`, `type:Dictionary`, `type:DismissAction`, `type:DispatchQueue`, `type:Double`, `type:Edge`, `type:Error`, `type:Float`, `type:Float64`, `type:FloatingPoint`, `type:FormatStyle`, `type:HTTPURLResponse`, `type:HorizontalAlignment`, `type:Image.Scale`, `type:IndexSet`, `type:Int`, `type:Int16`, `type:Int32`, `type:Int64`, `type:Int8`, `type:JSONDecoder`, `type:JSONEncoder`, `type:Locale`, `type:MainActor`, `type:Measurement`, `type:NSColor`, `type:NumberFormatter`, `type:Range`, `type:RelativeDateTimeFormatter`, `type:Sequence`, `type:Set`, `type:ShapeStyle`, `type:String`, `type:Substring`, `type:SymbolRenderingMode`, `type:Task`, `type:TaskGroup`, `type:TextAlignment`, `type:TimeInterval`, `type:TimeZone`, `type:Timer`, `type:Transition`, `type:UIApplication`, `type:UIColor`, `type:UIImpactFeedbackGenerator`, `type:UINotificationFeedbackGenerator`, `type:UIScreen`, `type:UISelectionFeedbackGenerator`, `type:UInt`, `type:URL`, `type:URLComponents`, `type:URLQueryItem`, `type:URLRequest`, `type:URLSession`, `type:URLSessionDataTask`, `type:UUID`, `type:UnsafeContinuation`, `type:UserDefaults`, `type:VerticalAlignment`, `type:Visibility`, `wrapper:Published`
 
 ## Checks
 

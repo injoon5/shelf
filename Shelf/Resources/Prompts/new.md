@@ -64,7 +64,7 @@ If you can't run commands, reply with the code as described above.
 - `ContentUnavailableView`, `Label`, `LabeledContent`.
 - `.sheet`, `.alert`, `.confirmationDialog`, `.toolbar`, `.searchable`, `.contextMenu`, `.refreshable`.
 - `Grid` and `LazyVGrid`, `GeometryReader`, `ScrollView`.
-- Custom `Shape`s that build a `Path` in `path(in:)`, and the built-in shapes with `fill`, `stroke` and `trim`.
+- Custom `Shape`s that build a `Path` in `path(in:)`, a `Path` drawn directly (`Path { p in … }.stroke(.blue)`), and the built-in shapes with `fill`, `stroke` and `trim`.
 - Swift Charts: `Chart` with `BarMark`, `LineMark`, `PointMark`, `AreaMark`, `RuleMark`, `SectorMark` and `RectangleMark`.
 - `withAnimation`, `.animation(_:value:)`, transitions.
 
@@ -133,8 +133,9 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
 
 - UIKit, `UIViewRepresentable`, SwiftData, Core Data, and any package or framework beyond SwiftUI, Foundation and Charts. That includes MapKit, PhotosPicker, the camera, notifications, HealthKit and the file system.
 - Gestures: `DragGesture`, `MagnifyGesture`, `RotateGesture` and `TapGesture` don't exist, and code that uses them stops with an error. Use `Button`, `.onTapGesture`, `.onLongPressGesture`, `swipeActions`, `onDelete` and `onMove`.
-- `Canvas`, and `Path` used directly as a view, draw nothing. Draw with a custom `Shape` instead.
-- `matchedGeometryEffect` and `glassEffect` are skipped. `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
+- A view, modifier or initializer Kiln doesn't have stops the app with an error that names it and its line, and so do argument labels SwiftUI doesn't have (`.blur(10)` for `.blur(radius: 10)`). That includes `matchedGeometryEffect` and `glassEffect`.
+- `Canvas` draws nothing. Draw with a custom `Shape` or a `Path` instead.
+- `.focused`, `.sensoryFeedback` and `ShareLink` show up but do nothing, so `@FocusState` can't move the keyboard focus.
 - Custom property wrappers (they're ignored) and result builders.
 - Protocol conformance isn't checked, and methods from a protocol extension don't exist. Avoid designs that depend on protocol extensions or default implementations.
 - A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.

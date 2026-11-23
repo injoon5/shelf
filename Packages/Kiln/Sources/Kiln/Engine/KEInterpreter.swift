@@ -116,6 +116,8 @@ final class KInterpreter {
     var currentTask: KTask?
     /// Tasks, timers and teardown (KEAsync).
     let runtime = KRuntime()
+    /// The bridges (Registry/, Bridges/).
+    let registry = KRegistry.shared
 
     init(program: KEProgram, headless: Bool = false) throws {
         self.program = program
@@ -810,7 +812,7 @@ final class KInterpreter {
                 b.set(box.value)
             case .nilValue:
                 return   // optional chaining on nil: no-op
-            case .native(let n) where KBuiltins.setNativeMember(n, name, newValue):
+            case .native(let n) where try setNativeMember(n, name, newValue):
                 return   // a Foundation object (DateFormatter, JSONDecoder, URLComponents …) is a reference
             default:
                 throw fail("Can't set '\(name)' on \(describe(container))")
@@ -843,7 +845,7 @@ final class KInterpreter {
             if let ut = types[n] {
                 if let resolved = try? implicitOn(ut, name, args.isEmpty ? nil : args) { return resolved }
             }
-            if let resolved = KBuiltins.implicit(name, args, expectedType: n) { return resolved }
+            if let resolved = resolveImplicit(name, args, expectedType: n) { return resolved }
             return v
         case (.array(let items), .array(let elem)):
             return .array(items.map { coerce($0, to: elem) })

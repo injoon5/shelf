@@ -1,0 +1,207 @@
+//
+//  Core.swift
+//  Bridges: the app and view protocols, lifecycle, and symbolic values
+//
+//  `Group`, `EmptyView`, `AnyView`, `TimelineView`; `onAppear`, `.task`,
+//  `onChange`, `onReceive`, `.id` and `.modifier`; the protocols an app's
+//  types adopt; `Binding`; and the symbolic values (`.leading`, `.segmented`)
+//  that SwiftUI types read when they're shown.
+//
+
+import SwiftUI
+
+@objc(KilnBridges_Core)
+final class CoreBridges: KBridgeFamily {
+    override class func register(into r: KRegistry) {
+        views(r)
+        lifecycle(r)
+        protocols(r)
+        values(r)
+    }
+
+    // MARK: Views
+
+    static func views(_ r: KRegistry) {
+        r.view("Group", .core) { v in
+            v.form("content:content") { c in Group { c.content() } }
+        }
+        r.view("EmptyView", .core) { v in
+            v.form("") { _ in EmptyView() }
+        }
+        r.view("AnyView", .core) { v in
+            v.form("_:any") { c in c.r.renderList(KBuiltins.asViews(c[0] ?? .void, c.interp)) }
+        }
+        r.view("TimelineView", .core, support: .partial, notes: "`.periodic(from:by:)` and `.everyMinute`; the closure gets `context.date`.") { v in
+            v.form("_:any content:content") { c in
+                let fn = c.contentValue(nil)
+                let interval: Double = {
+                    if case .native(.implicit(_, let pa))? = c[0], let by = pa.last?.asDouble { return by }
+                    return 1
+                }()
+                TimelineView(.periodic(from: .now, by: interval)) { ctx in
+                    c.r.renderContent(fn, [.tuple([.native(.date(ctx.date))], ["date"])])
+                }
+            }
+        }
+    }
+
+    // MARK: Lifecycle
+
+    static func lifecycle(_ r: KRegistry) {
+        r.modifier("onAppear", .core) { m in
+            m.form("perform:action?") { c, view in view.onAppear(perform: c.action("perform")) }
+        }
+        r.modifier("onDisappear", .core) { m in
+            m.form("perform:action?") { c, view in view.onDisappear(perform: c.action("perform")) }
+        }
+        r.modifier("task", .core, notes: "Cancelled when the view goes away, and restarted when `id` changes.") { m in
+            m.forms(["priority:any? _:action", "id:any priority:any? _:action"]) { c, view in
+                if case .function(let fn)? = c.last {
+                    let interp = c.interp
+                    if let id = c["id"] {
+                        view.task(id: id) { await interp.runViewTask(fn) }
+                    } else {
+                        view.task { await interp.runViewTask(fn) }
+                    }
+                } else {
+                    view
+                }
+            }
+        }
+        r.modifier("onChange", .core) { m in
+            m.form("of:any initial:bool? _:action") { c, view in
+                if case .function(let fn)? = c.last {
+                    let interp = c.interp
+                    let n = c.r.closureParamCount(.function(fn))
+                    view.onChange(of: c["of"] ?? .void, initial: c.bool("initial", default: false)) { old, new in
+                        interp.perform(fn, n == 0 ? [] : (n == 1 ? [new] : [old, new]))
+                    }
+                } else {
+                    view
+                }
+            }
+            // `onChange(of:perform:)`, deprecated but common.
+            m.form("of:any perform:action") { c, view in
+                if case .function(let fn)? = c.last {
+                    let interp = c.interp
+                    let n = c.r.closureParamCount(.function(fn))
+                    view.onChange(of: c["of"] ?? .void) { old, new in
+                        interp.perform(fn, n == 0 ? [] : (n == 1 ? [new] : [old, new]))
+                    }
+                } else {
+                    view
+                }
+            }
+        }
+        r.modifier("onReceive", .core, support: .partial, notes: "Timer publishers only: `Timer.publish(every:on:in:).autoconnect()`.") { m in
+            m.form("_:any perform:action") { c, view in
+                if case .function(let fn)? = c.last, case .native(.publisher(let interval))? = c[0] {
+                    let interp = c.interp
+                    KTimerReceiver(interval: interval, action: { interp.perform(fn, [.native(.date(Date()))]) }, content: view)
+                } else {
+                    view
+                }
+            }
+        }
+        r.modifier("id", .core) { m in
+            m.form("_:any") { c, view in view.id(c[0] ?? .nilValue) }
+        }
+        r.modifier("modifier", .core, notes: "Your own `ViewModifier` structs: `body(content:)` runs with the view.") { m in
+            m.formOnBase("_:any") { c in customModifier(c) }
+        }
+    }
+
+    /// `.modifier(MyModifier())`: the struct's `body(content:)` with the view.
+    @MainActor static func customModifier(_ c: KCall) -> AnyView {
+        guard let base = c.base else { return AnyView(EmptyView()) }
+        guard case .structV(let s)? = c[0], let body = s.type.method("body") else { return c.r.render(base) }
+        do {
+            let ctx = KSelfContext(type: s.type, location: .box(KBox(.structV(s))))
+            let v = try c.interp.entry {
+                try c.interp.invoke(body, args: [.view(base)], labels: ["content"], selfContext: ctx, parent: c.interp.globalEnv)
+            }
+            return c.r.render(.group(KBuiltins.asViews(v, c.interp)))
+        } catch {
+            c.interp.report(error)
+            return c.r.render(base)
+        }
+    }
+
+    // MARK: Protocols
+
+    static func protocols(_ r: KRegistry) {
+        r.protocolBridge("View", .core, requirements: ["body"], support: .full, notes: "Each of your views is hosted by a real SwiftUI view that owns its `@State`.")
+        r.protocolBridge("App", .core, requirements: ["body"], support: .partial, notes: "Kiln shows its `WindowGroup`'s content.")
+        r.protocolBridge("ViewModifier", .core, requirements: ["body(content:)"], support: .partial, notes: "Applied with `.modifier(…)`.")
+        r.protocolBridge("PreviewProvider", .core, requirements: ["previews"])
+        r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full, notes: "`path(in:)` runs whenever SwiftUI draws it.")
+        r.protocolBridge("InsettableShape", .drawing, requirements: ["path(in:)", "inset(by:)"])
+        r.protocolBridge("Identifiable", .language, requirements: ["id"], notes: "`id` is read by `ForEach` and `List`; conformance isn't checked.")
+        r.protocolBridge("Hashable", .language, notes: "Synthesized from stored properties.")
+        r.protocolBridge("Equatable", .language, notes: "Synthesized from stored properties.")
+        r.protocolBridge("Comparable", .language, requirements: ["<"])
+        r.protocolBridge("CaseIterable", .language, requirements: ["allCases"])
+        r.protocolBridge("Codable", .foundation, notes: "Stored properties, with `CodingKeys`.")
+        r.protocolBridge("Decodable", .foundation)
+        r.protocolBridge("Encodable", .foundation)
+        r.protocolBridge("Error", .language)
+        r.protocolBridge("LocalizedError", .foundation, requirements: ["errorDescription"])
+        r.protocolBridge("CustomStringConvertible", .language, requirements: ["description"])
+        r.protocolBridge("ObservableObject", .environment, support: .full, notes: "`@Published` and plain properties both refresh the views that read them.")
+    }
+
+    // MARK: Values
+
+    static func values(_ r: KRegistry) {
+        // `.segmented`, `.leading`, `.degrees(90)` before the view reading it decides what it is.
+        r.type("ImplicitMember", .core) { t in
+            t.internal()
+            @MainActor func chainBase(_ c: KCall, _ base: String, _ args: [KV]) -> KNative? {
+                let expected = KDrawing.colorNames[base] != nil ? "Color" : (KTextBridges.fontStyles[base] != nil ? "Font" : nil)
+                if let resolved = c.interp.resolveImplicit(base, args, expectedType: expected), case .native(let r) = resolved,
+                   case .native(let n) = c.receiver, r != n { return r }
+                return nil
+            }
+            // A chain on a symbolic value: `.white.opacity`, `.title2.bold`, `.number.precision`.
+            t.anyProperty { c, name in
+                guard case .native(.implicit(let base, let args)) = c.receiver else { return nil }
+                if let r = chainBase(c, base, args) { return try c.interp.nativeMember(.native(r), name, c.line) }
+                return .native(.implicit(base + "." + name, args))
+            }
+            t.anyMethod { c, name in
+                guard case .native(.implicit(let base, let args)) = c.receiver else { return nil }
+                if let r = chainBase(c, base, args) {
+                    return try c.interp.nativeMethodValues(.native(r), name, c.args, c.labels, c.line)
+                }
+                return .native(.implicit(base + "." + name, c.args))
+            }
+            // `.degrees(…)` stored, then called.
+            t.method("callAsFunction") { c in
+                guard case .native(.implicit(let name, _)) = c.receiver else { return .nilValue }
+                return c.interp.resolveImplicit(name, c.args, expectedType: nil, labels: c.labels) ?? .native(.implicit(name, c.args))
+            }
+        }
+
+        r.type("Binding", .environment, notes: "`Binding(get:set:)` and `.constant(_:)`.") { t in
+            t.initializer { c in
+                if case .function(let g)? = c.arg("get"), case .function(let s)? = c.arg("set") {
+                    let interp = c.interp
+                    return .binding(KBinding(get: { (try? interp.call(g, [], [])) ?? .nilValue },
+                                             set: { v in _ = try? interp.call(s, [v], [nil]) }))
+                }
+                return .binding(.constant(c.first ?? .nilValue))
+            }
+            t.staticMethod("constant") { c in .binding(.constant(c.first ?? .nilValue)) }
+            t.implicit { name, args, _ in name == "constant" ? .binding(.constant(args.first ?? .void)) : nil }
+        }
+    }
+}
+
+extension KInterpreter {
+    /// A method of a native value, with evaluated arguments.
+    func nativeMethodValues(_ base: KV, _ name: String, _ args: [KV], _ labels: [String?], _ line: Int) throws -> KV {
+        try nativeMethod(base, name, args.map { KEArg(label: nil, value: .value($0)) }.enumerated().map { i, a in
+            KEArg(label: labels[i], value: a.value)
+        }, KEnv(parent: globalEnv), line).0
+    }
+}
