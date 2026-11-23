@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-§0.1, §0.2 and §0.3 are built, and the data half of §0.4. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+§0.1 to §0.4 are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -92,7 +92,7 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 - **`IconArtView`** is the one renderer. Its outline is a path, because Core Animation's continuous corner is rounder than Springboard's. Overlaid on the SwiftUI icon at 3x, the outline matched exactly and the glyphs matched for four symbols of five (`books.vertical.fill` is ⅓ pt off).
 - **Hooks for what comes next:**
   - §0.3: `ResultsLayout` and `SearchResults` are what to delete (done in §0.3). Results already draw with `IconImage`, and the menu is `HomeItem.menu(model:library:)`.
-  - §0.4: `HomeView.onDelete` is called when a minus badge is tapped (today a no-op), and Delete App goes last in `HomeItem.menu`.
+  - §0.4: `HomeView.onDelete` is called when a minus badge is tapped, and Delete App goes last in `HomeItem.menu` (done in §0.4).
   - §0.5: set `window.traitOverrides.iconTone` in `StageController.holdAppearance()`; `IconImage` reads `\.iconTone` in SwiftUI.
   - §0.6: the dock's outline is set only in `DockView.place(_:)`.
 - **Not done:** picking up more than one icon (the stretch goal), and the 120 fps check on a device. On the simulator, Time Profiler takes no samples from Shelf while a full page jiggles.
@@ -225,7 +225,7 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Failure** (other than offline or a 404): the icon comes back, and the failure follows the same rule as a failed sync or Revert.
 - **Tests:** `APITests` against the fixture, and `LibraryStoreTests` for online, offline, and failure with the icon restored. `FakeServer` gains DELETE.
 
-**Done: the data, sync and server half.** `API.deleteApp`, `LibraryStore.delete(_:) -> Deletion` (`.deleted`, `.queued`, `.restored(failure)`, `.refused`), the persisted queue (`deletions.json`, sent first by every sync), and `AppCleanup`, which both a delete and a sync-observed removal run. The launch snapshot's folder is `Caches/Snapshots/<slug>/` (`LaunchSnapshots`); files (§4.1), permission grants (§4.0) and widgets (§6) add their steps to `AppCleanup.library` when they arrive. The server now also drops the slug's unused install keys, and still purges for an app it no longer has. Left for the UIKit Home Screen (§0.2): the badges, the menu item, the alert, and the icon's exit and return.
+**Done: the data, sync and server half.** `API.deleteApp`, `LibraryStore.delete(_:) -> Deletion` (`.deleted`, `.queued`, `.restored(failure)`, `.refused`), the persisted queue (`deletions.json`, sent first by every sync), and `AppCleanup`, which both a delete and a sync-observed removal run. The launch snapshot's folder is `Caches/Snapshots/<slug>/` (`LaunchSnapshots`); files (§4.1), permission grants (§4.0) and widgets (§6) add their steps to `AppCleanup.library` when they arrive. The server now also drops the slug's unused install keys, and still purges for an app it no longer has. **Done: the Home Screen half.** Delete App goes last in the icon's menu (grid, dock and search rows), in red with Edit Home Screen; the minus badge and Delete App both ask through `HomeModel.askToDelete`, and `HomeView` shows `DeleteAlert` (a `UIAlertController` worded as Springboard's second alert). On Delete the icon shrinks away (`IconView.leave`) and the others close up 230 ms later on `Motion.iconCloseUp`, both measured from Springboard frame by frame (`design/reference/README.md`, "Deleting an app"); a refusal brings the same icon back from wherever it had got to. A search row goes with the list's own animation. Checked on the simulator (`design/audit-0.1.md`, "Deleting an app"), with `-ShelfDemoDeleteFails YES` for the refusal. Not checked: the haptic (light, as an icon drops into place), which the simulator can't play.
 
 ### 0.5 Icon appearance: Automatic, Light, Dark
 

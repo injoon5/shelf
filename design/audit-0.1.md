@@ -55,6 +55,20 @@ The demo library can't sync, so these are unit tests only.
 | Card from a result whose icon is on another page | It leaves past that side of the screen, at the icon's row. | **Bug.** Opened Scores (page 2) from search and swiped up: the card fell into the pill. SwiftUI reports no frame for icons on pages out of view. | `HomeGeometry.iconFrame(at:dockCount:page:)` computes the frame from the layout when none was reported. Re-recorded: the card now leaves past the right edge at the top row. | `anIconOnAnotherPageHasAFrameOffToThatSide`, `whereACardLands` **§0.3:** a card opened from search now closes back into its row in the list, and search closes once it has landed, so this case applies only to cards opened from the Home Screen. Re-checked on the simulator: Bills opened from its row and closed into it. |
 | Card from a result with no icon | It lands in the pill. | Every app has an icon now, so only a deleted app reaches this. | See Cards. | `whereACardLands` |
 
+## Deleting an app (§0.4)
+
+Checked on the simulator with `-ShelfDemo YES`, and `-ShelfDemoDeleteFails YES` for a server that refuses. Springboard's measurements are in [reference/README.md](reference/README.md), "Deleting an app".
+
+| Case | Expected | Observed | Covered by |
+|---|---|---|---|
+| Delete App from the grid's menu | Last, red, with Edit Home Screen; the alert; on Delete the icon shrinks away and the others close up. | Weather: Change…, Reload App, Copy Source / Edit Home Screen, Delete App. "Delete “Weather”?" with Cancel and Delete. Recorded: the shrink over about 170 ms, the close-up 230 ms after it started, Budget carried from the next row diagonally into the top row's last place on Springboard's spring. | `deleteAppIsLastInAnAppsMenu`, `theAlertIsSpringboards` |
+| Delete App from the dock's menu | The menu above the dock lists the other way, Delete App first, as `longpress-menu-dock-safari.png`. | Todos: Delete App, Edit Home Screen / Copy Source, Reload App, Change…. | `deleteAppIsLastInAnAppsMenu` |
+| The minus badge | On every icon in edit mode, the dock's too, but Settings; a tap asks. | As expected; a tap on Timer's badge opened "Delete “Timer”?". | `everyIconButSettingsHasTheBadge`, `theBadgeAsksAndTheAlertDeletes` |
+| Cancel | Nothing changes. | Nothing changed. | `theBadgeAsksAndTheAlertDeletes` |
+| The server refuses | The icon comes back where it was and the others make room; the banner says so, as a failed sync's does. | Timer (top row's last place) shrank away and Budget closed up; a second later Timer grew back in its place while Budget went back, and the banner showed. The banner says "Offline" for any refusal but a rejected token, as for a failed sync. | `aRefusedDeletionBringsTheSameIconBack`; `LibraryStoreTests` |
+| Delete App from a search row | The row goes, and the list closes up; search stays open. | Journal deleted from its row: the row and its J section went, search stayed open on the list. | Simulator |
+| Deleted while its card is out | The card lands in the pill. | Not reachable by hand: a long press can't reach an icon whose app is open. | `whereACardLands` |
+
 ## Leaving Shelf
 
 | Case | Expected | Observed | Fix |

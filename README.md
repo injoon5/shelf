@@ -14,7 +14,7 @@ Shelf needs iOS 27.
 4. **Run.** Tapping an icon runs the source through Kiln. The app opens as a card that grows out of its icon, and closes with a swipe up from the bottom edge or a drag down from the status bar.
 5. **Keep data.** Apps save through `DB`, a small key-value store Shelf provides. It works offline and syncs to your other devices through ij5.dev. `@AppStorage` is for preferences that wouldn't matter if lost.
 
-**Changing an app:** long-press its icon for **Change…** (the same flow, with the current source in the prompt), **Reload App**, **Copy Source**, and **Revert** to the version before the last change.
+**Changing an app:** long-press its icon for **Change…** (the same flow, with the current source in the prompt), **Reload App**, **Copy Source**, and **Revert** to the version before the last change. **Delete App**, there or from the minus badge in edit mode, deletes the app and its data on every device.
 
 **What an app can use:** the list is the prompt itself, in [Shelf/Resources/Prompts/new.md](Shelf/Resources/Prompts/new.md), under "What works" and "What doesn't work". Every section there has a matching app in [fixtures/apps/](fixtures/apps/) that has to run and draw, so the list stays true.
 
@@ -53,7 +53,7 @@ DEVELOPMENT_TEAM = ABCDE12345
 Scripts/run.sh <simulator-udid>     # builds, signs ad hoc, installs
 ```
 
-**Without a server:** launch with `-ShelfDemo YES` (debug builds only) for a demo library. `-ShelfSearchProgress 0.5` holds search's pull halfway, for pictures of it.
+**Without a server:** launch with `-ShelfDemo YES` (debug builds only) for a demo library. `-ShelfSearchProgress 0.5` holds search's pull halfway, for pictures of it. `-ShelfDemoDeleteFails YES` makes the demo's server refuse every Delete App a second later, so the icon comes back.
 
 ### Tests
 
@@ -64,7 +64,7 @@ xcodebuild test -project Shelf.xcodeproj -scheme Shelf \
   -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData
 ```
 
-They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the UIKit Home Screen (`HomeViewTests`: the icon outline against Springboard's, drops, page flips, the menu, the jiggle), search (`SearchTests`: sections, the index, Return, the list's rows, the warp's spring), the motion curves, and the feature apps in `fixtures/apps/`.
+They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the UIKit Home Screen (`HomeViewTests`: the icon outline against Springboard's, drops, page flips, the menu, the jiggle), search (`SearchTests`: sections, the index, Return, the list's rows, the warp's spring), Delete App (`DeleteAppUITests`: the menu, the badge, the alert, the icon leaving and coming back), the motion curves, and the feature apps in `fixtures/apps/`.
 
 ## The server
 
@@ -127,7 +127,7 @@ Decisions that aren't obvious from the code:
 - **Apps can't overwrite each other's settings.** Kiln puts `@AppStorage` in the shared `UserDefaults.standard`, so Shelf rewrites each key to `<slug>.<key>` before running an app. It's not a security boundary, so Shelf keeps nothing of its own there.
 - **`DB` is plain networking.** Kiln can already make requests, so Shelf appends a small `DB` helper to apps that use it. The helper talks to a `db://` URL scheme that Shelf answers on the phone from a local store, which syncs with ij5.dev. The key travels in a `DB-Key` header, because a key in the URL would be cut at `?` or `#`.
 - **Kiln is patched.** 0.2.1 couldn't write JSON: `JSONEncoder().encode` was missing, `[Todo].self` threw, and a decoded `UUID` came back as a `String`. `Vendor/kiln-0.2.1.patch` fixes all three. The rebuild in PLAN.md replaces it.
-- **Deleting an app deletes everything, everywhere.** Delete App sends `DELETE /api/apps/{slug}?data=delete`, which drops the app, every version Revert could reach, its data and its unused install keys (a live update key would otherwise make the app again). On the phone, `AppCleanup` is the one list of what an app leaves behind (source, `DB` store with its pending writes, `@AppStorage`, launch snapshot), and a sync that finds an app gone runs the same list, so other phones follow. The icon goes at once, but the phone's copy only once the server answers, so a refusal brings the icon back with nothing lost. Offline, the copy goes at once and the deletion waits in `deletions.json` for the next sync, which sends it before listing apps.
+- **Deleting an app deletes everything, everywhere.** Delete App sends `DELETE /api/apps/{slug}?data=delete`, which drops the app, every version Revert could reach, its data and its unused install keys (a live update key would otherwise make the app again). On the phone, `AppCleanup` is the one list of what an app leaves behind (source, `DB` store with its pending writes, `@AppStorage`, launch snapshot), and a sync that finds an app gone runs the same list, so other phones follow. The icon goes at once, but the phone's copy only once the server answers, so a refusal brings the icon back with nothing lost. On screen it is Springboard's, measured frame by frame: the system alert ("Delete “Habits”?", Cancel and Delete), then the icon shrinks to nothing about its centre in 200 ms and the others close up 230 ms later on a spring fitted to Springboard's. An icon that comes back before it has gone turns around where it is. Offline, the copy goes at once and the deletion waits in `deletions.json` for the next sync, which sends it before listing apps.
 - **The server keeps history.** `POST /api/apps/{slug}/revert` backs the Revert menu item. `rev` comes from a counter table, not `MAX(rev) + 1`, which could go backwards after a purge. A closed sheet's unused install key is reused while it has ten minutes left, since the server allows twenty live keys.
 
 ## Not done yet
