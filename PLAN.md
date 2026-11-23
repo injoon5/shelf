@@ -41,6 +41,8 @@ Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else
 
 ## 0. Shelf fixes, first
 
+**Done,** all but §0.8 item 5 (building off the main thread), which waits for the VM.
+
 Eight pieces of work on Shelf itself. None of them touches Kiln, so they come first and can run alongside the §1.3 spike. The order:
 
 1. **The audit comes first.** Its rules live in `Layout` and `HomeModel`, which don't change in the move, so its tests carry over.
@@ -229,6 +231,15 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 
 ### 0.5 Icon appearance: Automatic, Light, Dark
 
+**Built.** What came out of it:
+
+- **Clear is gone:** `IconStyle` and the Icon Style picker. `IconGlass` and the card face's Clear branch had already gone in §0.2. `ShelfSettings` drops the old `iconStyle` key, so whatever it held (Clear, Color, or the older Default, Dark, Tinted) reads as Automatic (`IconAppearanceTests.aStoredIconStyleReadsAsAutomatic`).
+- **`IconAppearance`** lives in `ShelfSettings`, and `IconAppearance.tone(system:)` is the only place it's resolved. `StageController.holdAppearance()` calls it with the chosen appearance and sets the result on the window (`IconToneTrait`); it runs from `updateProperties()`, so a change in Settings reaches every icon at once.
+- **Sheets carry the tone in SwiftUI's environment** too (`HomeModel.iconTone`, set by the stage): a sheet's SwiftUI kept the tone it was presented with when only the window's trait changed, so Settings' row of icons didn't follow its own picker.
+- **Settings** shows a row of the dock's icons (`IconImage`, the Home Screen's renderer) over a segmented Automatic / Light / Dark.
+- **Fixed on the way:** the icons and the Home Screen's held appearance were one switch behind the system (dark icons with the system light), because the screen's traits, which the stage reads, change after the scene's trait change arrives. The stage reads them again on the next turn of the run loop.
+- **Checked:** `IconAppearanceTests.everyIconResolvesThroughTheOneValue` holds every icon on screen (grid, dock with Settings, search's rows, an open card's face, an embedded `IconImage`) at Light and Dark against the system, and fails if the stage sets the system's tone instead. A 2×2 sheet per setting (system light and dark; Home Screen and Settings) was taken on the simulator, plus search's rows and a card's face held dark over a light system.
+
 - **Remove Clear:** `IconStyle.clear`, `IconGlass`, the Clear branch in `CardFace`, and the Icon Style picker. Most of that code goes in §0.2 anyway. A stored `clear` reads as Automatic.
 - **Add `IconAppearance`** (Automatic, Light, Dark) to `ShelfSettings`, shown in Settings as a segmented picker with a row of live icons.
   - Automatic follows the system.
@@ -244,6 +255,8 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Tests:** each place resolves through the one value, a stored `clear` migrates, and screenshots in both appearances with the system in each.
 
 ### 0.6 The dock's shape
+
+**Built.** Springboard's dock corner is UIKit's continuous corner at 38.75 pt, 3/8 of the dock's height: within 2 px of it on every pixel row at 3x. Not container-concentric (45 pt, 25 px rounder at the top; `.containerConcentric()` gives square corners here, with nothing above the dock to be concentric with) and not a pill (176 px at the top row against Springboard's 137). The table and the candidates are in `design/reference/README.md`, "Dock corners". `DockView.place(_:)` sets it; a carried icon is over the dock inside the same outline (`HomeGeometry.dockOutline`); nothing else animates against the dock's outline. The fill and the rim are the system glass's and match Springboard's, light and dark.
 
 Today the dock is `.rect(cornerRadius: max(displayRadius − 17, iconRadius + padding), style: .continuous)`, 368 × 103.3 pt, and it doesn't read as Springboard's.
 

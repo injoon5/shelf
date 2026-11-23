@@ -8,7 +8,7 @@ import UIKit
 /// (`LibraryStore.delete`) is `LibraryStoreTests`'.
 @MainActor
 @Suite struct DeleteAppUITests {
-    private let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, displayRadius: 55, labelHeight: 14.3)
+    private let geometry = HomeGeometry(size: CGSize(width: 402, height: 874), safeTop: 62, labelHeight: 14.3)
 
     private func demo(_ slugs: [String] = ["habits", "notes", "todos"]) -> LibraryStore {
         let apps = slugs.map { CachedApp(meta: AppMeta(slug: $0, name: $0.capitalized), cachedVersion: "1") }

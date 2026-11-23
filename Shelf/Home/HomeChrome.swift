@@ -22,8 +22,9 @@ enum HomeGlass {
 /// The dock's glass. Its icons sit above it, apart (`HomeView`), so the
 /// glass never has to know about them.
 ///
-/// Its outline is set here and nowhere else (§0.6 changes it); the drop
-/// target is the same frame (`HomeGeometry.dropSlot`).
+/// Its outline is set here and nowhere else, from `HomeGeometry`'s
+/// `dockFrame` and `dockRadius`; a carried icon is over the dock inside the
+/// same outline (`HomeGeometry.dockOutline`).
 final class DockView: UIVisualEffectView {
     init() {
         super.init(effect: nil)

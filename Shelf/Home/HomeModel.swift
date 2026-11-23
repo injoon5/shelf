@@ -40,6 +40,11 @@ final class HomeModel {
     /// on screen after this is cleared, on its way back to its icon.
     var run: Run?
     var sheet: Sheet?
+    /// The tone icons are drawn in, as the stage resolved it from Icon
+    /// Appearance and set it on the window. Sheets carry it in SwiftUI's
+    /// environment: a sheet's SwiftUI keeps the value it was presented with
+    /// when only the window's trait changes.
+    var iconTone: IconTone?
 
     private(set) var isEditing = false
     /// The icon under the finger during a drag. The stage carries it; its

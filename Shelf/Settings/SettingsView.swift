@@ -56,11 +56,10 @@ struct SettingsView: View {
                         }
                     }
                     PhotosPicker("Choose Photo", selection: $picked, matching: .images)
-                    Picker("Icon Style", selection: $settings.iconStyle) {
-                        ForEach(IconStyle.allCases) { style in
-                            Text(style.title).tag(style)
-                        }
-                    }
+                }
+
+                Section("Icons") {
+                    IconAppearancePicker(appearance: $settings.iconAppearance, faces: previewFaces)
                 }
 
                 Section {
@@ -86,7 +85,6 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .animation(Motion.quick, value: settings.iconStyle)
         }
         .presentationDetents([.medium, .large])
         .dynamicTypeSize(...ShelfMetrics.textSizeCap)
@@ -99,6 +97,43 @@ struct SettingsView: View {
                 picked = nil
             }
         }
+    }
+}
+
+extension SettingsView {
+    /// The icons the appearance picker shows: the dock's, as they are, or
+    /// the first apps when the dock is empty.
+    private var previewFaces: [IconFace] {
+        let dock = library.layout.dock.compactMap(library.item)
+        let items = dock.isEmpty ? Array(library.items.prefix(SettingsMetrics.appearanceIconCount)) : dock
+        return items.prefix(SettingsMetrics.appearanceIconCount).map(\.face)
+    }
+}
+
+/// Icon Appearance: a row of live icons over Automatic, Light and Dark.
+/// The icons are the Home Screen's own (`IconImage`) and read the same
+/// tone the window holds, so they change with the picker as every icon does.
+private struct IconAppearancePicker: View {
+    @Binding var appearance: IconAppearance
+    var faces: [IconFace]
+
+    var body: some View {
+        VStack(spacing: SettingsMetrics.appearanceSpacing) {
+            HStack(spacing: SettingsMetrics.appearanceIconGap) {
+                ForEach(Array(faces.enumerated()), id: \.offset) { _, face in
+                    IconImage(face: face, size: SettingsMetrics.appearanceIconSize)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityHidden(true)
+            Picker("Icon Appearance", selection: $appearance) {
+                ForEach(IconAppearance.allCases) { appearance in
+                    Text(appearance.title).tag(appearance)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding(.vertical, SettingsMetrics.appearancePadding)
     }
 }
 
