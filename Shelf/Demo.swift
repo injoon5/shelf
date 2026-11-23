@@ -61,6 +61,24 @@ enum Demo {
     static let deleteFails = UserDefaults.standard.bool(forKey: "ShelfDemoDeleteFails")
     static let deleteFailDelay: Double = 1
 
+    /// Asks for capabilities as an app would, once the Home Screen is up:
+    /// `-ShelfDebugAskPermission location` (or a list, `location,camera`),
+    /// as the app `-ShelfDebugAskPermissionApp workout` (by default the
+    /// library's first). For seeing the sheet, iOS's prompt after it, and
+    /// Settings › Permissions filling in. Each answer is printed.
+    static func askPermissions(_ library: LibraryStore) async {
+        let defaults = UserDefaults.standard
+        guard let list = defaults.string(forKey: "ShelfDebugAskPermission") else { return }
+        let capabilities = list.split(separator: ",").compactMap { Capability(rawValue: $0.trimmingCharacters(in: .whitespaces)) }
+        let slug = defaults.string(forKey: "ShelfDebugAskPermissionApp")
+        guard let app = (slug.flatMap(library.app) ?? library.apps.first)?.meta else { return }
+        try? await Task.sleep(for: .seconds(1))
+        for capability in capabilities {
+            let allowed = await library.permissions.request(capability, for: app)
+            print("ShelfDebugAskPermission: \(app.slug) \(capability.rawValue) → \(allowed ? "allowed" : "denied")")
+        }
+    }
+
     static func library() -> LibraryStore {
         // `-ShelfDemoEmpty YES` shows the empty library instead.
         let defaults = UserDefaults.standard

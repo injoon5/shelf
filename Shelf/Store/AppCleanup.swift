@@ -8,7 +8,6 @@ import Foundation
 /// something per app adds its step in `library(…)`, and from then on both
 /// ways of deleting clear it. Still to come:
 /// - the app's files (§4.1);
-/// - its permission grants (§4.0);
 /// - its widgets (§6).
 ///
 /// The layout isn't a step: `LibraryStore` reconciles it with the library
@@ -40,14 +39,15 @@ struct AppCleanup: Sendable {
 }
 
 extension AppCleanup {
-    /// Everything Shelf keeps per app. `data` and `snapshots` are optional
-    /// so a `SyncEngine` can be tested on its own, and for the demo, whose
-    /// apps keep no data anyone would miss.
+    /// Everything Shelf keeps per app. `data`, `snapshots` and `permissions`
+    /// are optional so a `SyncEngine` can be tested on its own, and for the
+    /// demo, whose apps keep no data anyone would miss.
     static func library(
         cache: AppCache,
         appStorage: AppStorageKeys,
         data: AppData? = nil,
-        snapshots: LaunchSnapshots? = nil
+        snapshots: LaunchSnapshots? = nil,
+        permissions: PermissionGate? = nil
     ) -> AppCleanup {
         var cleanup = AppCleanup()
             .adding("source") { cache.removeSource(for: $0) }
@@ -58,6 +58,10 @@ extension AppCleanup {
         }
         if let snapshots {
             cleanup = cleanup.adding("launch snapshot") { snapshots.remove($0) }
+        }
+        if let permissions {
+            // A sheet still up for it goes too, answering nothing.
+            cleanup = cleanup.adding("permission grants") { await permissions.forget($0) }
         }
         return cleanup
     }

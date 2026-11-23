@@ -34,6 +34,9 @@ private struct RootView: View {
             }
         }
         .task { await library.sync() }
+        #if DEBUG
+        .task { await Demo.askPermissions(library) }
+        #endif
         .onChange(of: scenePhase) { _, phase in
             switch phase {
             case .active:

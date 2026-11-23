@@ -49,6 +49,13 @@ targets:
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         ITSAppUsesNonExemptEncryption: false
+        # iOS asks once for Shelf; Shelf asks first for each app (PLAN.md §4.0,
+        # Shelf/Permissions). The photo picker needs no string.
+        NSCameraUsageDescription: So apps on your Shelf can take photos and videos. Each app asks you first.
+        NSMicrophoneUsageDescription: So apps on your Shelf can record sound. Each app asks you first.
+        NSMotionUsageDescription: So apps on your Shelf can read your steps and activity. Each app asks you first.
+        NSLocationWhenInUseUsageDescription: So apps on your Shelf can see where you are while they’re open. Each app asks you first.
+        NSPhotoLibraryAddUsageDescription: So apps on your Shelf can save photos and videos to your library. Each app asks you first.
         # Lets the site URL point at a dev server on this Mac or the LAN.
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true

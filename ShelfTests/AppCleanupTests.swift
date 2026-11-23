@@ -4,14 +4,15 @@ import Testing
 
 /// The one way an app's things leave the phone (plan §0.4).
 struct AppCleanupTests {
-    @Test func theLibrarysStepsAreEverythingKeptPerApp() {
+    @MainActor @Test func theLibrarysStepsAreEverythingKeptPerApp() {
         let folder = temporaryFolder()
         let cleanup = AppCleanup.library(
             cache: AppCache(root: folder.appending(path: "apps")),
             appStorage: AppStorageKeys(.standard),
             data: AppData(root: folder.appending(path: "data"), api: { nil }),
-            snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")))
-        #expect(cleanup.steps.map(\.name) == ["source", "@AppStorage", "DB store", "launch snapshot"])
+            snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")),
+            permissions: .inMemory())
+        #expect(cleanup.steps.map(\.name) == ["source", "@AppStorage", "DB store", "launch snapshot", "permission grants"])
 
         let bare = AppCleanup.library(cache: AppCache(root: folder), appStorage: AppStorageKeys(.standard))
         #expect(bare.steps.map(\.name) == ["source", "@AppStorage"])

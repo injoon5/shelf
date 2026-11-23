@@ -66,6 +66,9 @@ struct SettingsView: View {
                     NavigationLink("App Data") {
                         AppDataList()
                     }
+                    NavigationLink("Permissions") {
+                        PermissionsList()
+                    }
                     Button("Reset Layout") {
                         withAnimation(Motion.reorder) { library.resetLayout() }
                     }
