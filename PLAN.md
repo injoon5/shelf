@@ -468,6 +468,7 @@ Built, except `@Generable` and `@Guide`, which are Round 4's.
   - `Tools/diff.sh` is identical on every earlier input. The new inputs from `LanguageTests` differ only where something that errored or drew nothing now works (`Tools/diff-expected.txt`).
   - Shelf has three new fixtures: `swift-protocols`, `swift-builders` and `swift-codable`.
   - The prompt's "What doesn't work" no longer lists any of these.
+  - No benchmark is more than 10% slower than `after-1.7-context.json`. The worst is Chess, at 8% ([Benchmarks](Packages/Kiln/Benchmarks/README.md#after-16-languagejson)).
 
 ### 1.7 A context for each run
 
