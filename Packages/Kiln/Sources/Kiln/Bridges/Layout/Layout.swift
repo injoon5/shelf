@@ -12,6 +12,7 @@ final class LayoutBridges: KBridgeFamily {
         containers(r)
         modifiers(r)
         geometry(r)
+        customLayouts(r)
     }
 
     // MARK: Stacks and grids
