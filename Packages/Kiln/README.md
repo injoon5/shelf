@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.gif" width="864" alt="Three iPhones running apps Kiln built from chat replies in Haplo AI: a habit tracker, a dark chess board showing a queen's legal moves, and an expense form">
+  <img src="https://github.com/haplollc/Kiln/raw/0.2.1/assets/banner.gif" width="864" alt="Three iPhones running apps Kiln built from chat replies in Haplo AI: a habit tracker, a dark chess board showing a queen's legal moves, and an expense form">
 </p>
 
 <h1 align="center">Kiln</h1>
@@ -25,19 +25,28 @@
 
 ---
 
+> **This is Shelf's copy of Kiln.** It started as [haplollc/Kiln](https://github.com/haplollc/Kiln) at tag `0.2.1` (commit `70ed7d8`), MIT-licensed, by [@jc_builds](https://twitter.com/jc_builds) at [Haplo](https://haploapp.com). Thank you. Shelf runs every app through it, and is rebuilding it in place ([PLAN.md](../../PLAN.md), §1): one engine, a bytecode VM with real `async`, and a registry of bridges.
+>
+> What has changed since 0.2.1, in order. Each fix that would help upstream is its own commit, so it can be offered back:
+>
+> - `JSONEncoder().encode`, `[T].self`, and a decoded `UUID` staying a `UUID` (Shelf's former `kiln-0.2.1.patch`).
+> - `Tools/KilnBench` times Shelf's fixtures too, and [Benchmarks/](Benchmarks/) keeps the numbers each step is held to.
+>
+> The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
+
 ```swift
 let result = Kiln.run(source)   // result.view is a live SwiftUI view
 ```
 
 Kiln parses Swift source at runtime and interprets it: structs, classes, enums, closures and the rest of the language, with every `View` you write hosted by a real SwiftUI view that owns its own `@State`. Lists, forms, pickers, sheets, navigation, timers and charts are the real SwiftUI controls, so an app a model writes in a chat reply runs on the phone a moment later and behaves the way it would if you compiled it.
 
-**[Download the demo video (MP4)](assets/demo.mp4)**
+**[Download the demo video (MP4)](https://github.com/haplollc/Kiln/raw/0.2.1/assets/demo.mp4)**
 
 ## What it looks like
 
 | A chess game | A habit tracker | An expense tracker |
 |:---:|:---:|:---:|
-| <img src="assets/chess.gif" width="260" alt="Asked for a chess game, the reply's code runs in Kiln: legal moves show as dots, pieces slide, and Scholar's mate ends in a checkmate card"> | <img src="assets/habits.gif" width="260" alt="Asked for a habit tracker, the reply's code runs in Kiln: habits are checked off, the ring fills and a new habit is added"> | <img src="assets/expenses.gif" width="260" alt="Asked for an expense tracker, the reply's code runs in Kiln: a $12 lunch is added in a sheet and the total and chart update"> |
+| <img src="https://github.com/haplollc/Kiln/raw/0.2.1/assets/chess.gif" width="260" alt="Asked for a chess game, the reply's code runs in Kiln: legal moves show as dots, pieces slide, and Scholar's mate ends in a checkmate card"> | <img src="https://github.com/haplollc/Kiln/raw/0.2.1/assets/habits.gif" width="260" alt="Asked for a habit tracker, the reply's code runs in Kiln: habits are checked off, the ring fills and a new habit is added"> | <img src="https://github.com/haplollc/Kiln/raw/0.2.1/assets/expenses.gif" width="260" alt="Asked for an expense tracker, the reply's code runs in Kiln: a $12 lunch is added in a sheet and the total and chart update"> |
 | Legal moves, check and checkmate, castling and promotion; pieces slide on a spring. About 550 lines. | A `List` with sections and a progress ring that fills as habits are checked off. | Swift Charts, a sheet with a form, and a section per category. |
 
 <sub>Staged demos, recorded in the iOS Simulator inside <a href="https://haploapp.com">Haplo AI</a>. The model's replies are scripted so every take has the same code (each is one of the apps in <a href="Examples/Apps">Examples/Apps</a>); tapping Run, the sheet and the app Kiln runs from that code are real, and the taps come from a UI test.</sub>
