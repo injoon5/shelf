@@ -69,3 +69,21 @@ real `Task.sleep`, cancellation, `async let`, task groups, `for await` over
 `URLSession.data` without blocking. The step budget is per stretch between
 waits; `KilnResult.tearDown()` stops a run. `Tools/diff.sh` compares every
 input against the engine before ([Benchmarks/differential.md](Benchmarks/differential.md)).
+
+## Swift that should work (Shelf, 2026-11-24)
+
+PLAN.md §1.6. Protocols are real: requirements are checked, extensions give
+default implementations (constrained ones win, the type's own members win
+over both), conformance closes over protocol and class inheritance, and
+behaviour follows it (a custom `==` and `hash(into:)` decide equality and
+hashing everywhere; `==`, `<`, `allCases` and `ForEach` without `id:` need
+the conformance). `@resultBuilder` with Swift's whole transform, and
+`@ViewBuilder` on functions, properties, parameters and stored content.
+Custom property wrappers (`_x`, `wrappedValue`, `projectedValue`). Custom
+`init(from:)` and `encode(to:)` with keyed, unkeyed and single-value
+containers; sets round-trip. Regex literals as `Regex<AnyRegexOutput>`.
+Macros read as declarations (`Engine/KEMacros.swift`). Wrong labels and
+unknown members of the app's own types are errors worded like the
+registry's. One-sided `case` ranges, `$x.animation()`, `allCases.map`,
+`Data(text.utf8)`, `super`. The engine files are `KEProtocols`,
+`KEBuilders`, `KEWrappers`, `KEMacros` and `KEDiagnostics`.

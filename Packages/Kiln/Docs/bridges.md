@@ -239,6 +239,20 @@ Kiln.registerType("DB", notes: "Synced key-value storage: Data under a string ke
 
 Registering a host type again replaces it. Host bridges are in the manifest the running app exports, but not in the checked-in `kiln-manifest.json`, which is Kiln's own.
 
+## Result builders
+
+A bridge that takes builder content of its own (RegexBuilder's `Regex { … }`, §3.3) registers the builder, and code marked with its attribute (`@RegexComponentBuilder`, or a parameter the bridge declares with it) runs through Swift's transform (`Engine/KEBuilders.swift`):
+
+```swift
+r.resultBuilder("RegexComponentBuilder", .text) { b in
+    b.method("buildBlock") { parts, _, interp in … }               // parts: each statement's value
+    b.method("buildEither") { args, labels, _ in … }               // labels: ["first"] or ["second"]
+    b.method("buildOptional") { args, _, _ in … }                  // args[0] is .nilValue when the `if` was false
+}
+```
+
+`interp.builderClosure(closure, .custom(builder))` makes a closure argument run as the builder when it's called. `@ViewBuilder` content is the engine's own (`content` kind), not a registered builder.
+
 ## Protocols, environment values, property wrappers
 
 These are declarations, which the manifest and the checker read:
