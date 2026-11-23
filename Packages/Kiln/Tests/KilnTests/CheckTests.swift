@@ -309,6 +309,17 @@ final class CheckTests: XCTestCase {
         XCTAssertLessThan(each, 0.1, "check took \(each)s")
     }
 
+    // MARK: The manifest's language gaps
+
+    /// The probes behind "What doesn't work" tell a feature that works from one that doesn't.
+    func testGapProbesTellWorkingFromFailing() {
+        XCTAssertTrue(KLanguageGaps.works(KLanguageGap(id: "works", what: "", check: #"print("ok")"#)))
+        XCTAssertFalse(KLanguageGaps.works(KLanguageGap(id: "fails", what: "", check: #"print("no")"#)))
+        XCTAssertFalse(KLanguageGaps.works(KLanguageGap(id: "throws", what: "", check: #"let a = [1]; print(a[3] == 1 ? "ok" : "no")"#)))
+        XCTAssertFalse(KLanguageGaps.works(KLanguageGap(id: "syntax", what: "", check: #"print("ok"#)))
+        XCTAssertEqual(Set(KLanguageGaps.all.map(\.id)).count, KLanguageGaps.all.count)
+    }
+
     // MARK: Apps as models write them
 
     /// Idioms models reach for, each app run and checked: one that runs must check clean.

@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**53 inputs: 51 identical, 2 different as expected, 0 different otherwise.**
+**62 inputs: 60 identical, 2 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -28,6 +28,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/swift-language.swift | 1213 | 13 | identical |
 | fixtures/apps/time.swift | 372 | 13 | identical |
 | fixtures/apps/todos-db.swift | 296 | 14 | identical |
+| fixtures/apps/views-input.swift | 502 | 14 | identical |
 | fixtures/apps/views-layout-drawing.swift | 2560 | 13 | identical |
 | fixtures/apps/views-lists-controls.swift | 1547 | 13 | identical |
 | fixtures/apps/views-navigation.swift | 861 | 13 | identical |
@@ -39,6 +40,14 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/AppTypesRepro-2.swift | 234 | 13 | identical |
 | tests/AppTypesRepro-3.swift | 327 | 13 | identical |
 | tests/BreakoutRepro-0.swift | 8 | 2 | identical |
+| tests/CheckSamples-0.swift | 634 | 13 | identical |
+| tests/CheckSamples-1.swift | 637 | 13 | identical |
+| tests/CheckSamples-2.swift | 338 | 13 | identical |
+| tests/CheckSamples-3.swift | 139 | 14 | identical |
+| tests/CheckSamples-4.swift | 336 | 13 | identical |
+| tests/CheckSamples-5.swift | 2214 | 14 | identical |
+| tests/CheckTests-0.swift | 2 | 1 | identical |
+| tests/CheckTests-7.swift | 3 | 1 | identical |
 | tests/ContextTests-0.swift | 2 | 1 | identical |
 | tests/ContextTests-4.swift | 9 | 2 | identical |
 | tests/ContextTests-8.swift | 6 | 1 | identical |
@@ -192,7 +201,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 --- before
 +++ after
 @@ -17,195 +17,247 @@
- == appeared (List.onAppear@88)
+ == appeared (List.onAppear@89)
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -207,7 +216,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -222,7 +231,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -237,7 +246,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -252,7 +261,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -267,7 +276,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -282,7 +291,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -297,7 +306,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
