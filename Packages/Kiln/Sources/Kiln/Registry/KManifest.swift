@@ -43,6 +43,8 @@ struct KManifest: Codable, Equatable {
         /// Symbols that work (`full` or `partial`); stubs aren't counted.
         var supported: Int
         var stubs: Int
+        /// "What works" in one line, when the family writes one (`KilnFamily.promptLine`).
+        var line: String? = nil
     }
 
     /// Swift that Kiln doesn't run yet: a `KLanguageGaps` probe that fails today.
@@ -176,7 +178,7 @@ extension KRegistry {
         let families = KilnFamily.allCases.filter { $0 != .host }.map { f in
             let mine = sorted.filter { $0.family == f.rawValue }
             return KManifest.Family(name: f.rawValue, summary: f.summary, supported: mine.filter { $0.support != "stub" }.count,
-                                    stubs: mine.filter { $0.support == "stub" }.count)
+                                    stubs: mine.filter { $0.support == "stub" }.count, line: f.promptLine)
         }
         return KManifest(description: "Kiln \(Kiln.version), Shelf's copy", families: families, symbols: sorted)
     }

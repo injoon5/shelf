@@ -54,9 +54,13 @@ final class EnvironmentBridges: KBridgeFamily {
     static func modifiers(_ r: KRegistry) {
         r.modifier("environment", .environment, notes: "SwiftUI's values that can be set, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.") { m in
             m.form("_:any _:any") { c, view in
-                if case .native(.keyPath(let comps))? = c[0], let key = comps.last, let write = c.interp.registry.environment[key]?.write {
+                if case .native(.keyPath(let comps))? = c[0], let key = comps.last, let write = c.interp.registry.environment[key]?.writeEnvironment {
+                    // A SwiftUI value Values.swift bridges (`\.colorScheme`, `\.dynamicTypeSize`).
                     let value = c[1] ?? .nilValue, interp = c.interp
                     view.transformEnvironment(\.self) { env in MainActor.assumeIsolated { write(&env, value, interp) } }
+                } else if case .native(.keyPath(let comps))? = c[0], let key = comps.last, let write = c.interp.registry.environment[key]?.write {
+                    // A SwiftUI value another family bridges (`\.defaultMinListRowHeight`, `\.editMode`).
+                    write(view, c[1] ?? .nilValue, c)
                 } else if case .native(.keyPath(let comps))? = c[0], let key = comps.last, c.interp.registry.environment[key] == nil {
                     // The app's own value (`@Entry var accent`), for the `@Environment(\.accent)` below.
                     view.transformEnvironment(\.kilnObjects) { $0["\\." + key] = c.interp.coerce(c[1] ?? .nilValue, to: c.interp.userEnvironmentType(key)) }

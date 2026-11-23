@@ -25,6 +25,8 @@ final class CoreBridges: KBridgeFamily {
     static func views(_ r: KRegistry) {
         r.view("Group", .core) { v in
             v.form("content:content") { c in Group { c.content() } }
+            // `Group(subviews: content) { subviews in … }` (Layout/Subviews.swift).
+            v.forms(["subviews:any transform:content", "sections:any transform:content"]) { c in LayoutBridges.groupSubviews(c) }
         }
         r.view("EmptyView", .core) { v in
             v.form("") { _ in EmptyView() }
@@ -167,6 +169,7 @@ final class CoreBridges: KBridgeFamily {
             // A chain on a symbolic value: `.white.opacity`, `.title2.bold`, `.number.precision`.
             t.anyProperty { c, name in
                 guard case .native(.implicit(let base, let args)) = c.receiver else { return nil }
+                if let p = c.interp.registry.implicitProperties[name], let v = p(base, args) { return v }
                 if let r = chainBase(c, base, args) { return try c.interp.nativeMember(.native(r), name, c.line) }
                 return .native(.implicit(base + "." + name, args))
             }

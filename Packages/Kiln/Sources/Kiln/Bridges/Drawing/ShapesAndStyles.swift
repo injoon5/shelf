@@ -44,8 +44,7 @@ extension DrawingBridges {
             }
         }
         // `Circle().path(in: rect)`: a shape value's path, for `Canvas` and your own shapes.
-        r.type("View", .drawing) { t in
-            t.internal()
+        r.extend("View") { t in
             t.method("path", "in:CGRect") { c in
                 guard case .view(let v) = c.receiver, let chain = c.r.shapeChain(v) else { throw c.fail("is a method of shapes") }
                 let rect = KCanvas.rect(c["in"]) ?? .zero

@@ -281,7 +281,7 @@ final class KProbe {
         case .primitive(let name, let args, let labels, _):
             if Self.visible.contains(name) { renderedContent = true }
             let a = KArgs(args: args, labels: labels)
-            if name == "ForEach" || name == "List" && a.first.map({ if case .function = $0 { return false }; return true }) == true {
+            if KRenderer.eachRowNames.contains(name) || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for row in KRenderer(interp: interp).forEachRows(a) {
                     row.views.forEach { walk($0, depth: depth + 1) }
                 }
@@ -300,7 +300,10 @@ final class KProbe {
                     actions.append((f, [], false)); continue
                 }
                 var sample: [KV] = []
-                if name == "GeometryReader" { sample = [.tuple([.native(.size(393, 852))], ["size"])] }
+                if name == "GeometryReader" { sample = [KGeometry.sample.kv] }
+                if name == "Group", label == "transform" {
+                    sample = [a["sections"] != nil ? KSubviews.headlessSections(a["sections"], interp) : KSubviews.headlessCollection(a["subviews"], interp)]
+                }
                 if name == "AsyncImage" { sample = [.native(.asyncPhase("empty", KRef(nil)))] }
                 if name == "TimelineView" { sample = [.tuple([.native(.date(Date()))], ["date"])] }
                 if name == "ScrollViewReader" { continue }
@@ -337,8 +340,9 @@ final class KProbe {
                     continue
                 }
                 if m.labels[i] == "item" { continue }
+                let sample = interp.registry.modifier(m.name)?.sampleArgs?(m.labels[i], interp) ?? []
                 do {
-                    let views = try interp.entry { try interp.callBuilder(f, []) }
+                    let views = try interp.entry { try interp.callBuilder(f, sample) }
                     views.forEach { walk($0, depth: depth + 1) }
                 } catch {
                     interp.report(error)

@@ -102,7 +102,7 @@ extension KInterpreter {
             guard let w = p.wrapper else { continue }
             if Self.hostInputWrappers.contains(w) { needs = true; break }
             if w == "Environment", case .keyPath(_, let comps)? = p.wrapperAttribute?.args.first?.value,
-               let key = comps.last, registry.environment[key]?.read != nil {
+               let key = comps.last, registry.environment[key]?.live != nil {
                 needs = true
                 break
             }

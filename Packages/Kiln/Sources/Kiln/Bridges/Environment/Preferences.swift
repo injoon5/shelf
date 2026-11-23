@@ -92,7 +92,7 @@ extension EnvironmentBridges {
         r.modifier("transformEnvironment", .environment) { m in
             m.form("_:any transform:closure") { c, view in
                 if case .native(.keyPath(let comps))? = c[0], let key = comps.last, let bridge = c.interp.registry.environment[key],
-                   let read = bridge.read, let write = bridge.write, case .function(let fn)? = c["transform"] {
+                   let read = bridge.live, let write = bridge.writeEnvironment, case .function(let fn)? = c["transform"] {
                     let interp = c.interp
                     view.transformEnvironment(\.self) { env in
                         MainActor.assumeIsolated {

@@ -192,7 +192,7 @@ final class KTranscript {
                     walk(inner, depth: depth + 2, path: path + ".m\(m.name)\(i)")
                 case .function(let f):
                     if m.labels[i] == "item" { continue }
-                    content(f, [], depth: depth + 2, path: path + ".m\(m.name)\(i)")
+                    content(f, interp.registry.modifier(m.name)?.sampleArgs?(m.labels[i], interp) ?? [], depth: depth + 2, path: path + ".m\(m.name)\(i)")
                 default:
                     continue
                 }
@@ -205,7 +205,7 @@ final class KTranscript {
                 for (i, arg) in args.enumerated() { if case .view(let inner) = arg { walk(inner, depth: depth + 1, path: path + "/a\(i)") } }
                 return
             }
-            if name == "ForEach" || name == "List" && a.first.map({ if case .function = $0 { return false }; return true }) == true {
+            if KRenderer.eachRowNames.contains(name) || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for (r, row) in KRenderer(interp: interp).forEachRows(a).enumerated() {
                     emit(depth + 1, "row \(show(row.id))")
                     for (i, c) in row.views.enumerated() { walk(c, depth: depth + 2, path: path + "/r\(r).\(i)") }
@@ -227,6 +227,9 @@ final class KTranscript {
                     if name == "ScrollViewReader" { continue }
                     var sample: [KV] = []
                     if name == "GeometryReader" { sample = [.tuple([.native(.size(393, 852))], ["size"])] }
+                    if name == "Group", label == "transform" {
+                        sample = [a["sections"] != nil ? KSubviews.headlessSections(a["sections"], interp) : KSubviews.headlessCollection(a["subviews"], interp)]
+                    }
                     if name == "AsyncImage" { sample = [.native(.asyncPhase("empty", KRef(nil)))] }
                     if name == "TimelineView" { sample = [.tuple([.native(.date(Date(timeIntervalSince1970: 0)))], ["date"])] }
                     content(f, sample, depth: depth + 1, path: path + "/a\(i)")

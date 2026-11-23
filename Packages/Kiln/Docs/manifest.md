@@ -64,7 +64,7 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `interim` | bool | `true` only for the stand-in built from the 0.2.1 switch files. The registry writes `false`. |
 | `generator` | string | `kiln-registry`, or `coverage/interim-switch-scan`. |
 | `description` | string? | Free text, such as Kiln's version. |
-| `families` | array? | Every family in the prompt's order: `name`, `summary` (what it covers, for authors: `KilnFamily.summary`), `supported` (symbols that work) and `stubs`. Shelf's prompt lists a family with nothing supported as "not in Kiln yet". |
+| `families` | array? | Every family in the prompt's order: `name`, `summary` (what it covers, for authors: `KilnFamily.summary`), `supported` (symbols that work), `stubs`, and `line` (`KilnFamily.promptLine`: "What works" in one hand-written line, for a family that's nearly all of SwiftUI's; without it the prompt lists the family's names). Shelf's prompt lists a family with nothing supported as "not in Kiln yet". |
 | `gaps` | array? | Swift that doesn't work yet: `id` and `what` (the sentence for authors). Only the `KLanguageGaps` probes that fail when the manifest is written. |
 | `wontDo` | array? | `Tools/coverage/wont-do.json`'s entries: `id`, `what`, `reason`, `status` (`wontDo` or `later`). |
 | `symbols` | array | One entry per symbol, sorted by `id`. |

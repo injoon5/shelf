@@ -522,7 +522,13 @@ These are declarations, which the manifest and the checker read:
 
 - `r.protocolBridge("Identifiable", .language, requirements: ["id"])`, with no proxy: the engine implements it. With a proxy, see [a protocol proxy](#a-protocol-proxy). `Kiln.check` reports an app type that adopts the protocol and leaves out a requirement. One with a default in Swift ends in `?` (`"errorDescription?"`, `"animatableData?"`), and isn't required.
 - `r.environmentValue("dismiss", .environment) { interp in … }` gives the value `@Environment(\.dismiss)` reads before SwiftUI's arrive.
+- `r.liveEnvironment("editMode", .navigation, read: { env, interp in … }, write: { view, value, c in … })` reads the value from SwiftUI's own environment where the view is shown: a view (or `ViewModifier`, or style) with such an `@Environment` property is hosted inside a reader of `EnvironmentValues` (`KLiveEnvironment`), and the others don't depend on the whole environment. `write` is what `.environment(\.editMode, $mode)` does.
 - `r.wrapper("State", .environment)` declares a wrapper the engine implements (`KViewStorage`).
+- `r.implicitProperties["isScrolling"] = { base, args in … }` gives SwiftUI's symbolic values a property (`phase.isScrolling` on `.idle`, `mode.isEditing` on `.active`); return nil for a value that isn't yours.
+
+**An app's own control style** (`struct Pressable: ButtonStyle`) goes through a native style whose `makeBody(configuration:)` calls the app's, with the configuration as a value (`Bridges/Controls/CustomStyles.swift`): `configuration.label` is SwiftUI's own view, `configuration.isOn` a binding, and `Toggle(configuration)` shows the default. `ButtonStyle`, `PrimitiveButtonStyle`, `ToggleStyle`, `LabelStyle`, `ProgressViewStyle`, `GaugeStyle`, `GroupBoxStyle`, `LabeledContentStyle`, `DisclosureGroupStyle`, `ControlGroupStyle`, `FormStyle`, `MenuStyle`, `TextEditorStyle`, `DatePickerStyle`, `NavigationSplitViewStyle` and `ArrangementViewStyle` work this way; the styles whose requirements SwiftUI keeps private can't be adopted by any app.
+
+**Closures that aren't view content.** `Kiln.validate` calls every closure a modifier takes, as content, with no arguments. A closure that gets something (`alignmentGuide`'s `computeValue` gets dimensions, `onScrollGeometryChange`'s `of:` a geometry) says what with `m.probe { label, interp in [sample] }`, by its label (nil for a trailing closure).
 
 ## What the checker and the prompt read
 
@@ -536,6 +542,7 @@ These are declarations, which the manifest and the checker read:
 | `async: true`, `closuresCanWait` | `check` reports a missing `await`, and an `await` where nothing can wait. |
 | Protocol `requirements` | `check` reports a type that adopts the protocol without them. |
 | The family | A family with no supported symbol is listed under "Not in Kiln yet" with its `KilnFamily.summary`; its first bridge moves it to "What works", and Shelf's `everyPromptSectionHasAFixture` then wants a fixture whose `// Covers:` line names it. Keep the summary true. |
+| `KilnFamily.promptLine` | "What works" says the family in that one hand-written line instead of listing every name: for a family that's nearly all of SwiftUI's, where the list would be long. Name what an author would otherwise doubt (iOS 26 and 27 additions, the forms that differ); keep it true as bridges change. Partial symbols' notes still follow it. |
 
 Language features that don't work yet are `KLanguageGaps` probes (`Registry/KLanguageGaps.swift`): each gap has its sentence for authors and a small app that prints "ok" when the feature works. `Tools/manifest.sh` runs them and writes the failing ones into the manifest, so a fixed gap leaves the prompt by itself.
 

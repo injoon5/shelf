@@ -43,6 +43,13 @@ final class KViewStorage: ObservableObject {
                 let box = KBox(initial, type: p.type)
                 box.onChange = { [weak self] in self?.objectWillChange.send() }
                 boxes[p.name] = box
+            case "ScaledMetric":
+                // Scaled once for the text size (Bridges/Layout/Geometry.swift).
+                let style = p.wrapperAttribute?.args.first(where: { $0.label == "relativeTo" }).flatMap { a -> String? in
+                    if case .implicitMember(let n, _) = a.value { return n }
+                    return nil
+                }
+                boxes[p.name] = KBox(LayoutBridges.scaled(value.fields[p.name] ?? .double(0), relativeTo: style), type: p.type)
             case "ObservedObject", "Bindable":
                 // Owned when the view creates it itself (`= Model()`); otherwise read from the view value.
                 if p.initial != nil {
@@ -94,16 +101,14 @@ final class KViewStorage: ObservableObject {
     }
 
     /// @Environment and @EnvironmentObject values, refreshed every render.
-    func setEnvironment(_ value: KStructValue, dismiss: DismissAction, colorScheme: ColorScheme, objects: [String: KV], interp: KInterpreter,
-                        inputs: KHostInputValues? = nil) {
+    func setEnvironment(_ value: KStructValue, dismiss: DismissAction, colorScheme: ColorScheme, objects: [String: KV],
+                        live: EnvironmentValues? = nil, interp: KInterpreter, inputs: KHostInputValues? = nil) {
         if let inputs { connect(value, inputs, interp) }
+        let live = live ?? inputs?.environment
         for p in value.type.stored {
             if p.wrapper == "Environment" {
                 var v = interp.environmentDefault(p, overrides: objects)
-                if let inputs, case .keyPath(_, let comps)? = p.wrapperAttribute?.args.first?.value, let key = comps.last,
-                   let read = interp.registry.environment[key]?.read {
-                    v = read(inputs.environment, interp)
-                }
+                if let live, let read = interp.liveEnvironmentReader(p) { v = read(live, interp) }
                 if case .native(.dismiss) = v { v = .native(.dismiss(KRef({ dismiss() }))) }
                 if case .keyPath(_, let comps)? = p.wrapperAttribute?.args.first?.value, comps.last == "colorScheme" {
                     v = .native(.implicit(colorScheme == .dark ? "dark" : "light", []))
@@ -145,6 +150,9 @@ struct KHostView: View {
 
     var body: some View {
         let _ = storage.prepare(value, interp)
+        // A view that reads SwiftUI's own environment (`\.dynamicTypeSize`,
+        // `\.editMode`), or has a `@FocusState` or `@Namespace`, is hosted in
+        // a reader of them (KEHostInputs); the others don't depend on all of it.
         if interp.needsHostInputs(value.type) {
             let storage = self.storage, value = self.value, interp = self.interp, dismiss = self.dismiss, objects = self.objects
             KHostInputs(readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
@@ -162,6 +170,38 @@ struct KHostView: View {
         let tracker = KReadTracker()
         let out = interp.renderBody(of: value, storage: storage, tracker: tracker, content: content)
         storage.observe(tracker.objects)
+        return out
+    }
+}
+
+/// SwiftUI's whole environment, for the views (and styles) that read live values.
+struct KLiveEnvironment: View {
+    @SwiftUI.Environment(\.self) private var environment
+    let content: (EnvironmentValues) -> AnyView
+    var body: some View { content(environment) }
+}
+
+extension KInterpreter {
+    /// The live reader for an `@Environment(\.key)` property, if its key has one.
+    func liveEnvironmentReader(_ p: KEVarDecl) -> (@MainActor (EnvironmentValues, KInterpreter) -> KV)? {
+        guard case .keyPath(_, let comps)? = p.wrapperAttribute?.args.first?.value, let key = comps.last else { return nil }
+        return registry.environment[key]?.live
+    }
+
+    /// Whether a type has an `@Environment` property SwiftUI must supply live.
+    func readsLiveEnvironment(_ t: KType) -> Bool {
+        if let known = liveEnvironmentTypes[ObjectIdentifier(t)] { return known }
+        let reads = t.stored.contains { $0.wrapper == "Environment" && liveEnvironmentReader($0) != nil }
+        liveEnvironmentTypes[ObjectIdentifier(t)] = reads
+        return reads
+    }
+
+    /// A value (a style) with its `@Environment` properties read from `env`.
+    func withLiveEnvironment(_ s: KStructValue, _ env: EnvironmentValues) -> KStructValue {
+        var out = s
+        for p in s.type.stored where p.wrapper == "Environment" {
+            if let read = liveEnvironmentReader(p) { out.fields[p.name] = read(env, self) }
+        }
         return out
     }
 }

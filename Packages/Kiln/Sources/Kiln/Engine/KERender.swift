@@ -295,6 +295,7 @@ struct KRenderer {
     func textOf(_ a: KArgs) -> Text {
         if let lit = a["_literal"]?.asString { return Text(LocalizedStringKey(lit)) }
         if let s = a["verbatim"]?.asString { return Text(verbatim: s) }
+        if let t = attributedText(a) { return t }
         guard let first = a.first else { return Text("") }
         if let style = a["format"] { return Text(verbatim: KFormatting.formatted(first, style, interp)) }
         if case .native(.date(let d)) = first, case .native(.implicit(let s, _))? = a["style"] {
@@ -313,6 +314,10 @@ struct KRenderer {
 
     func isFunction(_ v: KV) -> Bool { if case .function = v { return true }; return false }
 
+    /// Views whose content closure runs once per element, as `ForEach`'s does
+    /// (the probe and the transcript expand their rows).
+    static let eachRowNames: Set<String> = ["ForEach", "SliderTickContentForEach", "OutlineGroup"]
+
     struct Row: Identifiable {
         let id: KV
         let views: [KView]
@@ -320,6 +325,11 @@ struct KRenderer {
 
     /// The rows of a ForEach / List(data): one per element, with SwiftUI ids.
     func forEachRows(_ a: KArgs) -> [Row] {
+        // `ForEach(subviews:)` and `ForEach(sections:)` when shown headless: the content's own views.
+        if a["subviews"] != nil || a["sections"] != nil {
+            let items = a["subviews"] != nil ? KSubviews.headlessCollection(a["subviews"], interp) : KSubviews.headlessSections(a["sections"], interp)
+            return (items.asArray ?? []).enumerated().map { i, item in Row(id: .int(i), views: content(a.lastFunction, [item])) }
+        }
         guard let data = a.first else { return [] }
         let fn = a.lastFunction
         var elements: [KV] = []

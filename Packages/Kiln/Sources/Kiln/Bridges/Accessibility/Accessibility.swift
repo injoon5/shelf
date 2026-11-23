@@ -19,7 +19,6 @@ final class AccessibilityBridges: KBridgeFamily {
         focusAndRotors(r)
         speech(r)
         r.wrapper("AccessibilityFocusState", .accessibility, notes: "A `Bool` or an optional `Hashable`, as `@FocusState`, for VoiceOver's focus.")
-        r.modifier("help", .accessibility, support: .stub) { m in m.stub(["_:title"]) }
     }
 
     @MainActor static func text(_ c: KCall, _ ref: KArgRef) -> Text {
@@ -54,6 +53,8 @@ final class AccessibilityBridges: KBridgeFamily {
                     default: view.accessibilityValue(text(c, 0))
                     }
                 }
+                // On a `Tab`, the `TabView` reads it (Bridges/Navigation/Tabs.swift).
+                m.form("_:any isEnabled:bool?", receiver: "TabContent") { _, view in view }
                 m.form("_:any isEnabled:bool") { c, view in
                     if #available(iOS 18, macOS 15, *) {
                         let on = c.bool("isEnabled", default: true)
@@ -81,6 +82,7 @@ final class AccessibilityBridges: KBridgeFamily {
         }
         r.modifier("accessibilityIdentifier", .accessibility) { m in
             m.form("_:string") { c, view in view.accessibilityIdentifier(c.string(0) ?? "") }
+            m.form("_:string isEnabled:bool?", receiver: "TabContent") { _, view in view }
             m.form("_:string isEnabled:bool") { c, view in
                 if #available(iOS 18, macOS 15, *) { AnyView(view.accessibilityIdentifier(c.string(0) ?? "", isEnabled: c.bool("isEnabled", default: true))) } else { view }
             }
@@ -103,8 +105,9 @@ final class AccessibilityBridges: KBridgeFamily {
         }
         r.modifier("accessibilityInputLabels", .accessibility) { m in
             m.form("_:any") { c, view in
-                view.accessibilityInputLabels((c[0]?.asArray ?? []).map { Text(c.r.string($0) ?? "") })
+                view.accessibilityInputLabels(((try? c.interp.sequence(c[0] ?? .array([]))) ?? []).compactMap { c.r.string($0) }.map { Text($0) })
             }
+            m.form("_:any isEnabled:bool?", receiver: "TabContent") { _, view in view }
         }
         r.modifier("accessibilityCustomContent", .accessibility) { m in
             m.form("_:any _:any importance:any?") { c, view in

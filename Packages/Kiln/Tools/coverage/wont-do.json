@@ -134,6 +134,49 @@
         { "ids": ["macro:Preview", "macro:Previewable"] },
         { "kinds": ["modifier"], "patterns": ["^preview(Context|Device|DisplayName|InterfaceOrientation|Layout)$"] }
       ]
+    },
+    {
+      "id": "private-style-protocols",
+      "what": "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle` or `IndexViewStyle`",
+      "reason": "SwiftUI keeps their requirements private (`_makeView`, `_body`), so no app can adopt them, compiled or not. The built-in styles all work.",
+      "status": "wontDo",
+      "source": "Round 1 (Controls, Lists, Navigation)",
+      "match": { "ids": ["protocol:PickerStyle", "protocol:TextFieldStyle", "protocol:ListStyle", "protocol:TabViewStyle", "protocol:NavigationViewStyle", "protocol:IndexViewStyle"] }
+    },
+    {
+      "id": "tables",
+      "what": "`Table`, its columns, rows and styles",
+      "reason": "On iPhone a `Table` collapses to its first column with no headers, so it's a `List` that's harder to write; use a `List` of rows, or a `Grid` for columns.",
+      "status": "wontDo",
+      "source": "Round 1 (Lists)",
+      "match": [
+        { "ids": ["view:Table", "content:TableColumn", "content:TableRow", "content:TableColumnForEach", "content:DisclosureTableRow", "modifier:tableStyle", "modifier:tableColumnHeaders", "protocol:TableStyle", "style:TableStyle.automatic", "style:TableStyle.inset"] },
+        { "idPatterns": ["^modifier:Table(Column|Row)Content\\."] }
+      ]
+    },
+    {
+      "id": "list-insert-drop",
+      "what": "`.onInsert(of:perform:)`: dropping items into a list",
+      "reason": "It hands the app `NSItemProvider`s from a drag, which arrive with drag and drop (§4.1).",
+      "status": "later",
+      "source": "Round 1 (Lists)",
+      "match": { "ids": ["modifier:onInsert"] }
+    },
+    {
+      "id": "custom-presentation-detent",
+      "what": "`PresentationDetent.custom(_:)` with your own `CustomPresentationDetent`",
+      "reason": "SwiftUI calls its static `height(in:)` while it lays out the sheet, off the main actor, where Kiln's code can't run; `.fraction(_:)` and `.height(_:)` cover the same sizes.",
+      "status": "wontDo",
+      "source": "Round 1 (Navigation)",
+      "match": { "ids": ["member:PresentationDetent.custom"] }
+    },
+    {
+      "id": "search-selection",
+      "what": "`.searchSelection(_:)`: the selected range in the search field",
+      "reason": "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
+      "status": "later",
+      "source": "Round 1 (Navigation)",
+      "match": { "ids": ["modifier:searchSelection"] }
     }
   ]
 }

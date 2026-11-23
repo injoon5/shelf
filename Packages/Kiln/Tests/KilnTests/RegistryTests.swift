@@ -69,7 +69,7 @@ final class RegistryTests: XCTestCase {
 
     func testNoOverloadSaysWhichThereAre() {
         let v = Kiln.validate(app(#"Toggle("x", isOn: $on, tint: .red)"#))
-        XCTAssertEqual(v.errors, ["Line 5: Kiln has no Toggle(_:isOn:tint:); it has Toggle(_:isOn:), Toggle(_:systemImage:isOn:) and Toggle(isOn:label:)"])
+        XCTAssertEqual(v.errors, ["Line 5: Kiln has no Toggle(_:isOn:tint:); it has Toggle(_:isOn:), Toggle(_:systemImage:isOn:), Toggle(isOn:label:), Toggle(_:image:isOn:) and Toggle(_:)"])
     }
 
     // MARK: Unknown names
@@ -235,12 +235,14 @@ final class RegistryTests: XCTestCase {
     func testTheManifestListsEveryViewAndModifierWithOverloads() throws {
         let symbols = KRegistry.shared.manifest(includeHost: false).symbols
         XCTAssertEqual(Set(symbols.map(\.id)).count, symbols.count)
-        for s in symbols where s.kind == "view" || s.kind == "modifier" || s.kind == "content" {
+        // What SwiftUI hands the app and it never writes as a call (`Subview`) has no initializers.
+        let handedOver = Set(KRegistry.shared.views.values.filter { !$0.constructible }.map { "view:" + $0.name })
+        for s in symbols where (s.kind == "view" || s.kind == "modifier" || s.kind == "content") && !handedOver.contains(s.id) {
             XCTAssertNotNil(s.overloads, s.id)
             XCTAssertFalse(s.overloads?.isEmpty ?? true, s.id)
         }
         XCTAssertTrue(symbols.contains { $0.id == "view:Toggle" && $0.overloads?.contains { $0.labels == ["_", "isOn"] } == true })
-        XCTAssertTrue(symbols.contains { $0.id == "modifier:ChartContent.annotation" && $0.support == "stub" })
+        XCTAssertTrue(symbols.contains { $0.id == "modifier:ChartContent.annotation" && $0.support == "full" })
         XCTAssertTrue(symbols.contains { $0.id == "style:PickerStyle.segmented" })
         XCTAssertTrue(symbols.contains { $0.id == "member:Color.red" })
     }

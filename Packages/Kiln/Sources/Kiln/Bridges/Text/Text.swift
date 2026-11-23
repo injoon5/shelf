@@ -17,6 +17,7 @@ final class KTextBridges: KBridgeFamily {
         fonts(r)
         typography(r)
         typesetting(r)
+        attributed(r)
     }
 
     // MARK: Text
@@ -27,6 +28,7 @@ final class KTextBridges: KBridgeFamily {
             v.form("verbatim:string") { c in c.r.textOf(c.a) }
             v.form("_:any format:any") { c in c.r.textOf(c.a) }
             v.form("_:any style:Text.DateStyle") { c in c.r.textOf(c.a) }
+            v.form("timerInterval:any pauseTime:any? countsDown:bool? showsHours:bool?", notes: "A live countdown or count-up over a `start...end` range of dates.") { c in c.r.textOf(c.a) }
             // A literal is marked so the renderer makes a LocalizedStringKey of it.
             v.make { c in
                 var labels = c.labels
