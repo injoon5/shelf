@@ -123,6 +123,8 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
         case .navigation:
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        case .audio:
+            return "`AVAudioPlayer(data:)` for `Data` the app makes, or `(contentsOf:)` a file in its own folder (there's no app bundle), with `volume`, `rate` (after `enableRate = true`), `numberOfLoops`, `currentTime` and `AVAudioPlayerDelegate`; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`, `AVSpeechSynthesisVoice` and its delegate. Sound mixes with other audio and stops when the app closes"
         default:
             return nil
         }

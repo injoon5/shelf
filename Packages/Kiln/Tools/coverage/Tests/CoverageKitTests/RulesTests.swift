@@ -136,6 +136,15 @@ func symbol(_ kind: SymbolKind, _ name: String, owner: String? = nil, module: St
         #expect(r.extras.map(\.id) == ["view:UserShape"])
     }
 
+    /// An entry about an API that isn't SwiftUI's reaches the prompt and is never stale.
+    @Test func entriesOutsideTheSDKAreNeverStale() throws {
+        let json = #"{"entries": [{"id": "rt", "what": "Render callbacks", "reason": "Audio thread.", "outsideSDK": true}]}"#
+        let list = try JSONDecoder().decode(WontDoList.self, from: Data(json.utf8))
+        #expect(list.entries.first?.outsideSDK == true)
+        #expect(list.entries.first?.match.isEmpty == true)
+        #expect(list.problems().isEmpty)
+    }
+
     @Test func counts() throws {
         let r = run([
             ManifestSymbol(id: "modifier:padding", kind: .modifier, name: "padding", family: "Drawing", support: .full),

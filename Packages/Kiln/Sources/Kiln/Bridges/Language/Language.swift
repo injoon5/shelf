@@ -137,7 +137,7 @@ final class LanguageBridges: KBridgeFamily {
             // The rest of a number's methods, as a Double (`rounded`, `squareRoot`).
             t.fallback("FloatingPoint") { v, _ in .double(Double(v.asInt ?? 0)) }
         }
-        for alias in ["Int64", "Int32", "UInt", "Int16", "Int8"] { r.alias(alias, to: "Int") }
+        for alias in ["Int64", "Int32", "UInt", "Int16", "Int8", "UInt64", "UInt32", "UInt16", "UInt8"] { r.alias(alias, to: "Int") }
 
         r.type("Double", .language, support: .full) { t in
             t.initializer { c in

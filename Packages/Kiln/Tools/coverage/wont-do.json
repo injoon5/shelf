@@ -177,6 +177,14 @@
       "status": "later",
       "source": "Round 1 (Navigation)",
       "match": { "ids": ["modifier:searchSelection"] }
+    },
+    {
+      "id": "realtime-audio",
+      "what": "Real-time audio render callbacks (`AVAudioSourceNode`, `AVAudioSinkNode`, taps)",
+      "reason": "They'd call the app's code on the audio thread, many times a second; `AVAudioPlayer` plays `Data` the app makes (§3.5).",
+      "status": "wontDo",
+      "source": "PLAN.md §3.5",
+      "outsideSDK": true
     }
   ]
 }

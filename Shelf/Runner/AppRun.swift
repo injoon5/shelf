@@ -59,6 +59,7 @@ enum RunContext {
         let context = KilnContext(slug: app.slug, name: app.name, defaults: host.defaults.suite(for: app.slug), files: files,
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
+        context.provide(AppAudio.session())
         return context
     }
 
@@ -73,6 +74,7 @@ enum RunContext {
         let context = KilnContext(slug: app.slug, name: app.name, defaults: UserDefaults(suiteName: suite) ?? UserDefaults(),
                                   files: KilnFiles(root: folder), capabilities: PermissionsGate(permissions))
         context.provide(session)
+        context.provide(AppAudio.session())
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: folder)
