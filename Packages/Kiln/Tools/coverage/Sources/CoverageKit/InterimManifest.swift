@@ -172,7 +172,8 @@ public enum InterimManifest {
                                          introduced: sdk?.introduced, overloads: nil, notes: notes, source: found.source)
         }
 
-        for (r, found) in raw(facts) {
+        // Sorted, so the same engine always gives the same file.
+        for (r, found) in raw(facts).sorted(by: { "\($0.key)\($0.value.source)" < "\($1.key)\($1.value.source)" }) {
             switch r {
             case .viewish(let n):
                 let kind = [SymbolKind.view, .content, .gesture].first { byID[SDKSymbol.makeID(kind: $0, name: n, owner: nil)] != nil } ?? .view
