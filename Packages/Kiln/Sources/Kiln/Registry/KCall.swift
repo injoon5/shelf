@@ -400,3 +400,17 @@ extension KInterpreter {
         return try KBuiltins.construct(name, args, labels, self, line)
     }
 }
+
+extension KCall {
+    /// The native object a method or property is called on.
+    func object<T>(_ type: T.Type) -> T? {
+        if case .native(.object(_, let ref)) = receiver { return ref.value as? T }
+        return nil
+    }
+
+    /// The date a method is called on.
+    var receiverDate: Date {
+        if case .native(.date(let d)) = receiver { return d }
+        return Date()
+    }
+}
