@@ -56,6 +56,11 @@ extension KInterpreter {
 
     func wrapperField(_ name: String) -> String { "_" + name }
 
+    /// `_volume`: where the wrapper of `volume` lives.
+    func isWrapperStorage(_ t: KType, _ field: String) -> Bool {
+        field.hasPrefix("_") && wrapped(t, String(field.dropFirst())) != nil
+    }
+
     /// A wrapped property's value: its wrapper's `wrappedValue`.
     func readWrapped(_ wrapper: KV?, _ name: String, line: Int) throws -> KV {
         guard let wrapper, !wrapper.isNil else { throw fail("'\(name)' is used before its property wrapper is set", line) }

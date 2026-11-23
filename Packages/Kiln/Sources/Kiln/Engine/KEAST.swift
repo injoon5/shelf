@@ -52,6 +52,8 @@ indirect enum KETypeRef: Equatable, CustomStringConvertible {
 struct KEArg {
     var label: String?
     var value: KEExpr
+    /// A closure literal (trailing or not), for Swift's forward scan.
+    var isClosure: Bool { if case .closure = value { return true }; return false }
 }
 
 final class KEClosure {

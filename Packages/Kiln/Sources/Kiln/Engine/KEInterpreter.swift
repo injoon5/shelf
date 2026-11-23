@@ -309,15 +309,24 @@ final class KInterpreter {
     /// Whether arguments with these labels bind to `params` as Swift binds
     /// them: in order, skipping defaulted and variadic parameters; an
     /// unlabeled argument (a trailing closure) may bind a labeled closure.
-    nonisolated static func labelsFit(_ params: [KEParam], _ labels: [String?]) -> Bool {
+    nonisolated static func labelsFit(_ params: [KEParam], _ labels: [String?], closures: [Bool]? = nil) -> Bool {
         var pi = 0
         var lastVariadic = -1
-        for l in labels {
+        for (ai, l) in labels.enumerated() {
+            let isClosure = closures.map { ai < $0.count && $0[ai] } ?? false
             var matched = false
             while pi < params.count {
                 let p = params[pi]
-                let closure: Bool = { if case .function? = p.type?.core { return true }; return false }()
-                if p.label == l || (l == nil && closure) {
+                let closureParam: Bool = { if case .function? = p.type?.core { return true }; return false }()
+                // An unlabeled closure (a trailing one) skips defaulted and variadic
+                // parameters that can't take it, as Swift's forward scan does.
+                if isClosure, l == nil, !closureParam, p.defaultValue != nil || p.isVariadic, params[(pi + 1)...].contains(where: {
+                    if case .function? = $0.type?.core { return true }; return false
+                }) {
+                    pi += 1
+                    continue
+                }
+                if p.label == l || (l == nil && closureParam) {
                     matched = true
                     if p.isVariadic { lastVariadic = pi } else { pi += 1 }
                     break
@@ -332,6 +341,11 @@ final class KInterpreter {
             }
         }
         return params[min(pi, params.count)...].allSatisfy { $0.defaultValue != nil || $0.isVariadic }
+    }
+
+    /// The first declaration that takes these labels.
+    nonisolated static func fit(_ decls: [KEFuncDecl], _ labels: [String?], closures: [Bool]? = nil) -> KEFuncDecl? {
+        decls.first { labelsFit($0.params, labels, closures: closures) }
     }
 
     nonisolated static func pick(_ decls: [KEFuncDecl], labels: [String?]?) -> KEFuncDecl? {
@@ -853,6 +867,7 @@ final class KInterpreter {
                 return
             }
             let decl = o.type.storedDecl(name)
+            if decl == nil, o.fields[name] == nil, o.type.computed[name] == nil, !isWrapperStorage(o.type, name) { throw noMember(o.type, name, line: 0) }
             let old = o.fields[name] ?? .nilValue
             let v = coerce(newValue, to: decl?.type)
             if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: .box(KBox(.object(o))), type: o.type) }
@@ -900,6 +915,7 @@ final class KInterpreter {
                     return
                 }
                 let decl = s.type.storedDecl(name)
+                if decl == nil, s.fields[name] == nil, !isWrapperStorage(s.type, name) { throw noMember(s.type, name, line: 0) }
                 let old = s.fields[name] ?? .nilValue
                 let v = coerce(newValue, to: decl?.type)
                 if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: base, type: s.type) }
@@ -1091,7 +1107,12 @@ final class KInterpreter {
         for (pi, p) in params.enumerated() {
             if p.isVariadic {
                 var rest: [KV] = []
-                while next < args.count, labels[next] == nil || labels[next] == p.label { rest.append(args[next]); used[next] = true; next += 1 }
+                // A trailing closure is for a closure parameter after the variadic one.
+                let closureLater = params[(pi + 1)...].contains { if case .function? = $0.type?.core { return true }; return false }
+                while next < args.count, labels[next] == nil || labels[next] == p.label {
+                    if closureLater, case .function = args[next], labels[next] == nil { break }
+                    rest.append(args[next]); used[next] = true; next += 1
+                }
                 env.declare(p.name, .array(rest))
                 continue
             }

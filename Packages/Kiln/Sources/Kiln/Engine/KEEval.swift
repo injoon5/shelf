@@ -308,7 +308,7 @@ extension KInterpreter {
             }))
         }
         if let n = t.nested[name] { return .type(.user(n)) }
-        throw fail("Type '\(t.name)' has no member '\(name)'", line)
+        throw noMember(t, name, line: line, isStatic: true)
     }
 
     func builtinStatic(_ typeName: String, _ name: String) throws -> KV {
@@ -355,7 +355,7 @@ extension KInterpreter {
                 return try runGetter(p, env: env)
             }
             if name == "localizedDescription" { return try errorDescription(base, s.type) }
-            throw fail("Value of type '\(s.type.name)' has no member '\(name)'", line)
+            throw noMember(s.type, name, line: line)
         case .enumV(let e):
             if name == "rawValue" { return try rawValue(e) }
             if name == "self" { return base }
@@ -370,7 +370,7 @@ extension KInterpreter {
             if let i = e.payloadLabels.firstIndex(of: name), i < e.payload.count { return e.payload[i] }
             if name == "hashValue" { return .int(base.hashValue) }
             if name == "localizedDescription" { return try errorDescription(base, e.type) }
-            throw fail("Value of type '\(e.type.name)' has no member '\(name)'", line)
+            throw noMember(e.type, name, line: line)
         case .object(let o):
             readTracker?.objects[ObjectIdentifier(o)] = o
             if let f = o.fields[name] { return unwrapField(o.type, name, f) }
@@ -385,7 +385,7 @@ extension KInterpreter {
             }
             if o.type.storedDecl(name) != nil { return .nilValue }
             if name == "localizedDescription" { return try errorDescription(base, o.type) }
-            throw fail("Value of type '\(o.type.name)' has no member '\(name)'", line)
+            throw noMember(o.type, name, line: line)
         case .type(.user(let t)):
             return try staticMember(t, name, line)
         case .type(.builtin(let n)):
@@ -705,17 +705,20 @@ extension KInterpreter {
     }
 
     private func evalCallInner(_ callee: KEExpr, _ argExprs: [KEArg], _ labels: [String?], _ env: KEnv, _ line: Int, _ expected: KETypeRef?) throws -> KV {
+        let closures = argExprs.map(\.isClosure)
         switch callee {
         case .ident(let name, _):
             if let box = env.lookup(name) {
                 return try callValue(box.value, argExprs, env, line)
             }
             if let ctx = env.nearestSelf {
-                if !ctx.isStatic, let m = ctx.type.method(name, labels: labels) {
+                let instance = ctx.isStatic ? [] : (ctx.type.methods[name] ?? [])
+                let statics = ctx.type.staticMethods[name] ?? []
+                if let m = Self.fit(instance, labels, closures: closures) {
                     let args = try evalArgs(argExprs, env, params: m.params)
                     return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
                 }
-                if let m = ctx.type.staticMethod(name, labels: labels) {
+                if let m = Self.fit(statics, labels, closures: closures) {
                     let args = try evalArgs(argExprs, env, params: m.params)
                     let sctx = KSelfContext(type: ctx.type, location: .box(KBox(.type(.user(ctx.type)))), isStatic: true)
                     return try invoke(m, args: args, labels: labels, selfContext: sctx, parent: globalEnv)
@@ -723,8 +726,15 @@ extension KInterpreter {
                 if let loc = try selfMemberLocation(ctx, name) {
                     return try callValue(try read(loc), argExprs, env, line)
                 }
+                if !(instance + statics).isEmpty, functions[name] == nil {
+                    try requireLabels(nil, among: instance + statics, labels, closures: closures, name: name, owner: ctx.type.name, line: line)
+                }
             }
-            if let fs = functions[name], let f = Self.pick(fs, labels: labels) {
+            if let fs = functions[name] {
+                guard let f = Self.fit(fs, labels, closures: closures) else {
+                    try requireLabels(nil, among: fs, labels, closures: closures, name: name, owner: nil, line: line)
+                    return .void
+                }
                 let args = try evalArgs(argExprs, env, params: f.params)
                 return try invoke(f, args: args, labels: labels, selfContext: nil, parent: globalEnv)
             }
@@ -746,18 +756,21 @@ extension KInterpreter {
             if let t = typeExpr(baseExpr, env) {
                 if let nested = t.nested[name] { return try construct(nested, argExprs, env, line) }
                 if let c = t.enumCase(name) {
+                    try requireCaseLabels(t, c, labels, line: line)
                     let types = c.associated.map(\.1)
                     let args = try evalArgs(argExprs, env, positional: types)
                     return .enumV(KEnumValue(type: t, caseName: c.name, payload: zip(args, types + Array(repeating: KETypeRef.named("Any", []), count: max(0, args.count - types.count))).map { coerce($0.0, to: $0.1) }, payloadLabels: labels))
                 }
-                if let m = t.staticMethod(name, labels: labels) {
+                if let m = Self.fit(t.staticMethods[name] ?? [], labels, closures: closures) {
                     let args = try evalArgs(argExprs, env, params: m.params)
                     let sctx = KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true)
                     return try invoke(m, args: args, labels: labels, selfContext: sctx, parent: globalEnv)
                 }
                 if name == "init" { return try construct(t, argExprs, env, line) }
                 if t.staticDecls[name] != nil { return try callValue(try staticValue(t, name), argExprs, env, line) }
-                throw fail("Type '\(t.name)' has no member '\(name)'", line)
+                if let ms = t.staticMethods[name] { try requireLabels(nil, among: ms, labels, closures: closures, name: name, owner: t.name, isStatic: true, line: line) }
+                if name == "allCases" || t.enumCase(name) != nil { return try callValue(try staticMember(t, name, line), argExprs, env, line) }
+                throw noMember(t, name, line: line, isStatic: true)
             }
             if case .ident(let bn, _) = baseExpr, isBuiltinTypeName(bn, env) {
                 if let ext = builtinExtensions[bn], let m = Self.pick(ext.staticMethods[name] ?? [], labels: labels) {
@@ -771,6 +784,7 @@ extension KInterpreter {
         case .implicitMember(let name, _):
             if let ut = userType(expected) {
                 if let c = ut.enumCase(name) {
+                    try requireCaseLabels(ut, c, labels, line: line)
                     let args = try evalArgs(argExprs, env, positional: c.associated.map(\.1))
                     return .enumV(KEnumValue(type: ut, caseName: c.name, payload: args, payloadLabels: labels))
                 }
@@ -844,6 +858,7 @@ extension KInterpreter {
     /// methods (`append`, `toggle`, a `mutating func`) write back.
     func callMethod(_ baseExpr: KEExpr, _ name: String, _ argExprs: [KEArg], _ env: KEnv, _ line: Int, _ expected: KETypeRef?) throws -> KV {
         let labels = argExprs.map(\.label)
+        let closures = argExprs.map(\.isClosure)
         if case .selfRef = baseExpr, let ctx = env.nearestSelf, !ctx.isStatic, let m = ctx.type.method(name, labels: labels) {
             let args = try evalArgs(argExprs, env, params: m.params)
             return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
@@ -854,9 +869,13 @@ extension KInterpreter {
         let base = try loc.map { try read($0) } ?? (try eval(baseExpr, env))
         if base.isNil && (isChain || name != "map") { return .nilValue }
 
+        // A method of the app's type that doesn't take these labels: what it has (KEDiagnostics).
+        if let t = base.userType, let ms = t.methods[name], Self.fit(ms, labels, closures: closures) == nil, !(t.isView || t.isShape) {
+            try requireLabels(nil, among: ms, labels, closures: closures, name: name, owner: t.name, line: line)
+        }
         switch base {
         case .structV(let s):
-            if let m = s.type.method(name, labels: labels) {
+            if let m = Self.fit(s.type.methods[name] ?? [], labels, closures: closures) {
                 let args = try evalArgs(argExprs, env, params: m.params)
                 let selfLoc = loc ?? .box(KBox(base))
                 return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: s.type, location: selfLoc), parent: globalEnv)
@@ -868,14 +887,14 @@ extension KInterpreter {
             if s.type.isView { return try viewMethod(.custom(s), name, argExprs, env, line) }
             if s.type.isShape, let v = KBuiltins.asViews(base, self).first { return try viewMethod(v, name, argExprs, env, line) }
         case .enumV(let e):
-            if let m = e.type.method(name, labels: labels) {
+            if let m = Self.fit(e.type.methods[name] ?? [], labels, closures: closures) {
                 let args = try evalArgs(argExprs, env, params: m.params)
                 return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: e.type, location: loc ?? .box(KBox(base))), parent: globalEnv)
             }
             if e.type.computed[name] != nil { return try callValue(try member(base, name, line: line), argExprs, env, line) }
         case .object(let o):
             readTracker?.objects[ObjectIdentifier(o)] = o
-            if let m = o.type.method(name, labels: labels) {
+            if let m = Self.fit(o.type.methods[name] ?? [], labels, closures: closures) {
                 let args = try evalArgs(argExprs, env, params: m.params)
                 return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: o.type, location: .box(KBox(base))), parent: globalEnv)
             }
@@ -901,6 +920,11 @@ extension KInterpreter {
         }
         if KBuiltins.isViewLike(base), isModifierName(name) || !KBuiltins.hasValueMethod(base, name) {
             if let v = KBuiltins.asViews(base, self).first { return try viewMethod(v, name, argExprs, env, line) }
+        }
+        // The app's own type has no such member (Optional's `map` aside: Kiln keeps optionals unwrapped).
+        if let t = base.userType, name != "map", name != "flatMap", !KBuiltins.isViewLike(base) {
+            _ = try evalArgs(argExprs, env)
+            throw noMember(t, name, line: line)
         }
         let (result, mutated) = try nativeMethod(base, name, argExprs, env, line)
         if let mutated {
@@ -961,7 +985,14 @@ extension KInterpreter {
 
     func construct(_ t: KType, _ argExprs: [KEArg], _ env: KEnv, _ line: Int) throws -> KV {
         let labels = argExprs.map(\.label)
-        if let i = pickInit(t, labels) {
+        let closures = argExprs.map(\.isClosure)
+        let picked = pickInit(t, labels, closures: closures)
+        if picked == nil, !t.inits.isEmpty, !(t.isEnum && labels.first == "rawValue") {
+            // Initializers the app wrote, none taking these labels (KEDiagnostics).
+            try requireLabels(nil, among: t.inits + t.extensionInits, labels, closures: closures, name: "init", owner: t.name, line: line)
+        }
+        if t.inits.isEmpty, !t.isEnum, picked == nil { try requireMemberwiseLabels(t, labels, line: line) }
+        if let i = picked {
             let args = try evalArgs(argExprs, env, params: i.params)
             return try instantiate(t, args: args, labels: labels, line: line)
         }
@@ -972,18 +1003,10 @@ extension KInterpreter {
         return try instantiate(t, args: args, labels: labels, line: line)
     }
 
-    func pickInit(_ t: KType, _ labels: [String?]) -> KEFuncDecl? {
-        // An initializer from a protocol extension keeps the memberwise one, so it's picked only by its labels.
-        if let i = t.extensionInits.first(where: { Self.labelsFit($0.params, labels) }), !(t.inits.contains { Self.labelsFit($0.params, labels) }) {
-            return i
-        }
-        guard !t.inits.isEmpty else { return nil }
-        let matching = t.inits.filter { d in
-            let required = d.params.filter { $0.defaultValue == nil }.count
-            return labels.count >= required && labels.count <= d.params.count
-        }
-        return Self.pick(matching.isEmpty ? [] : matching, labels: labels)
-            ?? (t.isClass || t.kind == .enumType ? nil : nil)
+    /// The initializer these labels call, if one the app wrote takes them.
+    /// One from a protocol extension keeps the memberwise initializer.
+    func pickInit(_ t: KType, _ labels: [String?], closures: [Bool]? = nil) -> KEFuncDecl? {
+        Self.fit(t.inits, labels, closures: closures) ?? Self.fit(t.extensionInits, labels, closures: closures)
     }
 
     /// A closure given to a memberwise initializer for `@ViewBuilder let content: Content`

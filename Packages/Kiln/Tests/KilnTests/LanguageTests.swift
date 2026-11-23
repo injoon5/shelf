@@ -678,4 +678,40 @@ final class LanguageTests: XCTestCase {
         XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("model")!, overrides: overrides), model)
         XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("greeting")!), .string("hello"))
     }
+
+    // MARK: Errors about the app's own types
+
+    func testErrorsAboutTheAppsTypes() {
+        let prelude = """
+        struct Person { var name: String; func greet(name: String) -> String { name }; static func make(x: Int) -> Person { Person(name: "") } }
+        struct Pet { var name: String; init(name: String) { self.name = name } }
+        enum Shape { case circle(radius: Double), square }
+        func total(for x: Int) -> Int { x }
+        var p = Person(name: "a")
+
+        """
+        let cases: [(String, String)] = [
+            ("p.foo()", "Line 6: Value of type 'Person' has no member 'foo'"),
+            ("print(p.nmae)", "Line 6: Value of type 'Person' has no member 'nmae' (did you mean 'name'?)"),
+            ("Person.bar", "Line 6: Type 'Person' has no member 'bar'"),
+            ("p.greet(nmae: \"x\")", "Line 6: 'Person' has no greet(nmae:); it has greet(name:)"),
+            ("p.greet()", "Line 6: 'Person' has no greet(); it has greet(name:)"),
+            ("Person(nmae: \"x\")", "Line 6: 'Person' has no init(nmae:); it has init(name:)"),
+            ("Pet(kind: \"x\")", "Line 6: 'Pet' has no init(kind:); it has init(name:)"),
+            ("total(of: 1)", "Line 6: There's no total(of:); there's total(for:)"),
+            ("Shape.circle(r: 1)", "Line 6: 'Shape' has no case circle(r:); it has circle(radius:)"),
+            ("let s: Shape = .circle(r: 1)", "Line 6: 'Shape' has no case circle(r:); it has circle(radius:)"),
+            ("Person.make(y: 1)", "Line 6: 'Person' has no static make(y:); it has make(x:)"),
+            ("p.age = 2", "Line 6: Value of type 'Person' has no member 'age'"),
+        ]
+        for (code, message) in cases {
+            XCTAssertEqual(run(prelude + code).errors, [message], code)
+        }
+        // What Swift accepts still runs: defaults, trailing closures, variadics.
+        expect("""
+        func run(times: Int = 1, _ values: Int..., then: () -> Void) { print(times, values); then() }
+        run { print("done") }
+        run(times: 2, 1, 2, 3) { print("again") }
+        """, prints: "1 []\ndone\n2 [1, 2, 3]\nagain\n")
+    }
 }
