@@ -49,6 +49,8 @@ final class KType {
     var wrappedNames: Set<String> = []
     /// The memberwise initializer's labels, once asked for (KEDiagnostics).
     var memberwiseNames: Set<String>?
+    /// Whether its host reads SwiftUI's environment, namespace or focus (KEHostInputs), once asked.
+    var hostInputs: Bool?
 
     static func standIn(_ name: String) -> KType {
         let t = KType(name: name, kind: .structType)
@@ -1219,7 +1221,9 @@ final class KInterpreter {
             for (i, p) in c.params.enumerated() where p.name != "_" {
                 var v: KV = i < args.count ? args[i] : .nilValue
                 if c.params.count > 1, args.count == 1, case .tuple(let vals, _) = args[0], i < vals.count { v = vals[i] }
-                if p.name.hasPrefix("$"), case .binding(let b) = v {
+                if case .binding(let b) = v, b.isInout {
+                    env.vars[p.name] = KBox(get: { b.get() }, set: { b.set($0) })
+                } else if p.name.hasPrefix("$"), case .binding(let b) = v {
                     // `ForEach($items) { $item in }`: `$item` is the binding, `item` its value.
                     env.declare(p.name, v)
                     env.vars[String(p.name.dropFirst())] = KBox(get: { b.get() }, set: { b.set($0) })
@@ -1228,7 +1232,10 @@ final class KInterpreter {
                 }
             }
         } else {
-            for (i, a) in args.enumerated() { env.declare("$\(i)", a) }
+            for (i, a) in args.enumerated() {
+                if case .binding(let b) = a, b.isInout { env.vars["$\(i)"] = KBox(get: { b.get() }, set: { b.set($0) }) }
+                else { env.declare("$\(i)", a) }
+            }
             if args.count == 1, case .tuple(let vals, _) = args[0] {
                 for (i, a) in vals.enumerated() where i > 0 { env.declare("$\(i)", a) }
             }

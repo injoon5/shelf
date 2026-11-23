@@ -172,7 +172,7 @@ struct KRootView: View {
     var body: some View {
         _ = refresher.version
         compiled.interp.onGlobalChange = { [weak refresher] in refresher?.bump() }
-        return rootContent
+        return rootContent.modifier(KRunEnvironment(context: compiled.interp.context))
     }
 
     @ViewBuilder
@@ -287,6 +287,11 @@ final class KProbe {
                 }
                 return
             }
+            if let hook = interp.registry.view(name)?.probe {
+                run(hook(nil, a, interp), depth: depth)
+                for arg in args { if case .view(let inner) = arg { walk(inner, depth: depth + 1) } }
+                return
+            }
             for (i, arg) in args.enumerated() {
                 guard case .function(let f) = arg else { continue }
                 let label = labels[i]
@@ -308,6 +313,11 @@ final class KProbe {
             }
         case .modified(let base, let m):
             walk(base, depth: depth + 1)
+            if let hook = interp.registry.modifier(m.name)?.probe {
+                run(hook(base, KArgs(args: m.args, labels: m.labels), interp), depth: depth)
+                for arg in m.args { if case .view(let inner) = arg { walk(inner, depth: depth + 1) } }
+                return
+            }
             if Self.actionModifiers.contains(m.name), case .function(let f)? = m.args.last {
                 switch m.name {
                 case "onReceive": for _ in 0..<max(1, ticks) { actions.append((f, [.native(.date(Date()))], false)) }
@@ -336,6 +346,22 @@ final class KProbe {
             }
         case .empty, .error:
             break
+        }
+    }
+
+    /// A bridge's own closures, with the arguments SwiftUI would pass them.
+    private func run(_ calls: [KProbeCall], depth: Int) {
+        for call in calls {
+            switch call.use {
+            case .action: actions.append((call.fn, call.args, call.canWait))
+            case .content:
+                do {
+                    let views = try interp.entry { try interp.callBuilder(call.fn, call.args) }
+                    views.forEach { walk($0, depth: depth + 1) }
+                } catch {
+                    interp.report(error)
+                }
+            }
         }
     }
 

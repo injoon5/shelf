@@ -73,6 +73,23 @@ public final class KilnContext {
     /// Whether `tearDown()` has run.
     public private(set) var isTornDown = false
 
+    /// Where the app's screen is, as the host sees it: `.active` while it's
+    /// shown, `.inactive` while it's on its way out (a card being closed),
+    /// `.background` when it's gone or the host is. `@Environment(\.scenePhase)`
+    /// reads the lower of this and the system's own phase, and SwiftUI redraws
+    /// the views that read it when it changes. A host that never sets it
+    /// leaves the app with the system's phase.
+    public var scenePhase: KilnScenePhase {
+        get { scene.phase }
+        set { scene.phase = newValue }
+    }
+    let scene = KilnSceneState()
+
+    /// What opening a URL does (`openURL(url)`, a `Link`, a link in `Text`):
+    /// the host decides, and returns whether it opened it. nil leaves it to
+    /// the system.
+    public var openURL: (@MainActor (URL) -> Bool)?
+
     private var hosted: [ObjectIdentifier: Any] = [:]
     private var stoppers: [(id: Int, stop: @MainActor () -> Void)] = []
     private var nextStopper = 0

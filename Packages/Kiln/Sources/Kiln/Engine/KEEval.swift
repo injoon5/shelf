@@ -276,7 +276,11 @@ extension KInterpreter {
         if wrapped(t, name) != nil, let v = try projectedWrapped(try read(ctx.location), name, line: 0) { return v }
         if let storage = ctx.storage, let box = storage.box(name) {
             if case .binding = box.value, t.wrapper(of: name) == "Binding" { return box.value }
-            return .binding(KBinding(get: { box.value }, set: { box.value = $0 }))
+            let b = KBinding(get: { box.value }, set: { box.value = $0 })
+            // `$field` for `.focused`: SwiftUI's own FocusState binding (KEHostInputs);
+            // `$offset` for `.updating`: the value a gesture's end resets to.
+            b.native = storage.native(name) ?? storage.initials[name].map { KGestureStateReset(initial: $0) }
+            return .binding(b)
         }
         let selfValue = try read(ctx.location)
         if case .structV(let s) = selfValue, case .binding(let b)? = s.fields[name] { return .binding(b) }
@@ -589,6 +593,15 @@ extension KInterpreter {
         case (.tuple(let x, _), .tuple(let y, _)):
             for (p, q) in zip(x, y) where !equal(p, q) { return try compare(op, p, q, line) }
             c = 0
+        case (.native(.boxed(let x)), _) where x.order != nil, (_, .native(.boxed(let x))) where x.order != nil:
+            // Ordered native values (`dynamicTypeSize >= .accessibility1`); a symbol is resolved by the value's type.
+            func order(_ v: KV) -> Int? {
+                if case .native(.boxed(let b)) = v { return b.order }
+                if case .native(.implicit(let n, _)) = v, case .native(.boxed(let b))? = registry.type(x.type)?.implicit?(n, [], []) { return b.order }
+                return nil
+            }
+            guard let oa = order(a), let ob = order(b) else { throw comparableFailure(a, b, line) }
+            c = oa < ob ? -1 : (oa > ob ? 1 : 0)
         case (.structV, _) where a.userType?.staticMethods["<"] != nil, (.object, _) where a.userType?.staticMethods["<"] != nil:
             let f = a.userType!.staticMethods["<"]!.first!
             let lt = truthy(try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv))

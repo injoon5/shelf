@@ -134,10 +134,13 @@ final class KBoxed: Hashable {
     let type: String
     let value: AnyHashable
     let caseName: String?
-    init(_ type: String, _ value: AnyHashable, caseName: String? = nil) {
+    /// Where an ordered value sorts (`DynamicTypeSize`): `<` compares these.
+    let order: Int?
+    init(_ type: String, _ value: AnyHashable, caseName: String? = nil, order: Int? = nil) {
         self.type = type
         self.value = value
         self.caseName = caseName
+        self.order = order
     }
     static func == (a: KBoxed, b: KBoxed) -> Bool { a.type == b.type && a.value == b.value }
     func hash(into h: inout Hasher) { h.combine(type); h.combine(value) }

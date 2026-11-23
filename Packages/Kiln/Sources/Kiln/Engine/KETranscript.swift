@@ -166,6 +166,11 @@ final class KTranscript {
             walk(base, depth: depth, path: path)
             emit(depth + 1, ".\(m.name)(\(arguments(m.args, m.labels)))")
             let label = "\(base.primitiveName ?? "view").\(m.name)@\(m.line)"
+            if let hook = interp.registry.modifier(m.name)?.probe {
+                probe(hook(base, KArgs(args: m.args, labels: m.labels), interp), label: label, depth: depth + 2, path: path + ".m\(m.name)")
+                for (i, arg) in m.args.enumerated() { if case .view(let inner) = arg { walk(inner, depth: depth + 2, path: path + ".m\(m.name)\(i)") } }
+                return
+            }
             if KProbe.actionModifiers.contains(m.name), case .function(let f)? = m.args.last {
                 switch m.name {
                 case "onAppear", "task":
@@ -195,6 +200,11 @@ final class KTranscript {
         case .primitive(let name, let args, let labels, let line):
             emit(depth, "\(name)(\(arguments(args, labels)))")
             let a = KArgs(args: args, labels: labels)
+            if let hook = interp.registry.view(name)?.probe {
+                probe(hook(nil, a, interp), label: "\(name)@\(line)", depth: depth + 1, path: path)
+                for (i, arg) in args.enumerated() { if case .view(let inner) = arg { walk(inner, depth: depth + 1, path: path + "/a\(i)") } }
+                return
+            }
             if name == "ForEach" || name == "List" && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for (r, row) in KRenderer(interp: interp).forEachRows(a).enumerated() {
                     emit(depth + 1, "row \(show(row.id))")
@@ -223,6 +233,16 @@ final class KTranscript {
                 default:
                     continue
                 }
+            }
+        }
+    }
+
+    /// A bridge's own closures, with the arguments SwiftUI would pass them.
+    private func probe(_ calls: [KProbeCall], label: String, depth: Int, path: String) {
+        for (i, call) in calls.enumerated() {
+            switch call.use {
+            case .action: actions.append((label, call.fn, call.args, false, call.canWait))
+            case .content: content(call.fn, call.args, depth: depth, path: path + "/p\(i)")
             }
         }
     }

@@ -471,6 +471,8 @@ final class KViewBridge: KBridge {
     /// Makes the value a call evaluates to. Default: the view description
     /// (`.primitive`), which the renderer shows with `render`.
     var make: (@MainActor (KCall) throws -> KV)?
+    /// How a check runs its closures (KProbeCall); nil: each as content, with no arguments.
+    var probe: KProbe.Hook?
 }
 
 /// A modifier: how its arguments are taken, and how it changes a view.
@@ -492,6 +494,29 @@ final class KModifierBridge: KBridge {
     /// For styles: the style protocol and its members (`ButtonStyle`: `bordered`…).
     var styles: (owner: String, names: [String])?
     var owner: String?
+    /// How a check runs its closures (KProbeCall); nil: each as content, with no arguments.
+    var probe: KProbe.Hook?
+}
+
+/// A closure a check (`Kiln.validate`) or the transcript runs, with
+/// arguments like the ones SwiftUI passes: a `Canvas` renderer gets a context
+/// and a size, a drag's `onChanged` a drag value.
+struct KProbeCall {
+    enum Use {
+        /// It makes views: they're walked.
+        case content
+        /// An event fires it: it runs once, after the walk.
+        case action
+    }
+    let fn: KFunction
+    var args: [KV] = []
+    var use: Use = .content
+    var canWait = false
+}
+
+extension KProbe {
+    /// For a modifier, `base` is the view (or gesture) it's on.
+    typealias Hook = @MainActor (_ base: KView?, _ args: KArgs, _ interp: KInterpreter) -> [KProbeCall]
 }
 
 /// A native type: initializers, static members, properties and methods.
@@ -569,10 +594,17 @@ final class KProtocolBridge: KBridge {
 /// An `@Environment` value: its default, before the view sees SwiftUI's.
 final class KEnvironmentBridge: KBridge {
     var value: @MainActor (KInterpreter) -> KV = { _ in .nilValue }
+    /// SwiftUI's own value, read where the view is shown (KEHostInputs).
+    var read: (@MainActor (EnvironmentValues, KInterpreter) -> KV)?
+    /// `.environment(\.key, v)`: sets SwiftUI's value for the views inside.
+    var write: (@MainActor (inout EnvironmentValues, KV, KInterpreter) -> Void)?
 }
 
 /// A property wrapper the engine implements (`@State`, `@AppStorage`).
 final class KWrapperBridge: KBridge {}
+
+/// A macro the engine reads as a declaration (`@Entry`, `@Animatable`; KEMacros).
+final class KMacroBridge: KBridge {}
 
 // MARK: - The registry
 
@@ -592,6 +624,7 @@ final class KRegistry {
     private(set) var protocols: [String: KProtocolBridge] = [:]
     private(set) var environment: [String: KEnvironmentBridge] = [:]
     private(set) var wrappers: [String: KWrapperBridge] = [:]
+    private(set) var macros: [String: KMacroBridge] = [:]
     /// Result builders bridges declare (`RegexComponentBuilder`), by attribute name (KEBuilders).
     private(set) var resultBuilders: [String: KNativeBuilder] = [:]
     /// `.name` with no expected type, by name (`.infinity`, `.degrees(…)`, `.red`).
@@ -666,6 +699,11 @@ final class KRegistry {
         wrappers[b.name] = b
     }
 
+    func add(_ b: KMacroBridge) {
+        claim("macro:" + b.name, b.family, b.source)
+        macros[b.name] = b
+    }
+
     func addResultBuilder(_ b: KNativeBuilder) {
         resultBuilders[b.name] = b
     }
@@ -687,7 +725,7 @@ final class KRegistry {
     /// Every bridge, for the manifest.
     var allBridges: [KBridge] {
         Array(views.values) as [KBridge] + Array(modifiers.values) + Array(types.values) + Array(functions.values)
-            + Array(protocols.values) + Array(environment.values) + Array(wrappers.values)
+            + Array(protocols.values) + Array(environment.values) + Array(wrappers.values) + Array(macros.values)
     }
 
     // MARK: Values → types
