@@ -72,7 +72,13 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 - **Search:** result order, and where a card opened from a result lands (an icon on another page leaves past that side of the screen; with no icon it lands in the pill).
 - **Leaving Shelf:** going to the background during a drag (handled), with a card open, and with a sheet up. What each looks like on return.
 - **Persistence:** when `commitLayout` writes, what a corrupt `layout.json` does, and whether the current page survives a relaunch.
-- **Settings in the dock.** Settings is fixed in the dock's last place, which Springboard has no equivalent of. Decide whether it stays fixed, or becomes an ordinary icon that can move but not be deleted.
+- **Settings becomes an ordinary icon** (decided). Today it's fixed in the dock's last place, which Springboard has no equivalent of.
+  - It moves like any icon, to any page or within the dock, and starts in the dock's last place.
+  - It can't be deleted: no minus badge, no Delete App in its menu. Its menu has only Edit Home Screen.
+  - `Layout` holds it under a reserved ID that can never be an app slug (slugs are lowercase letters, digits and hyphens, so something like `:settings`). `reconcile` always keeps it.
+  - `dockSize` becomes 4, shared with Settings.
+  - A v1 `layout.json` gains it at the end of the dock, or at the front of the first page if the dock is full.
+  - A tap opens the Settings sheet, not a card, and search finds it, as Springboard's search finds Settings.
 - **VoiceOver:** icon order, and custom actions to move and delete (Springboard has them).
 
 **Done when:** every case has a test (in `LayoutTests`, or a new `HomeModelTests`), or a recorded simulator check, and the fixes are in.
@@ -84,12 +90,16 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Where:**
   - a minus badge on every icon in edit mode (top left, ≈ 25 pt grey circle, `closeup-edit-badge-icon.png`), except Settings;
   - Delete App, in red, last in the icon's long-press menu (`longpress-menu-grid-photos.png`).
-- **Confirming:** an alert, "Delete “Habits”?", saying that the app's data goes too, on every device. Delete or Cancel.
-- **The server:** `DELETE /api/apps/{slug}?data=delete` already exists on `shelf-apps` (`fixtures/api/app-delete.json`). A 404 means it's already gone, which counts as success.
+- **Confirming:** an alert, "Delete “Habits”?", saying that everything goes with it, on every device, and can't be undone. Delete or Cancel.
+- **Deleting removes everything** (decided). There's no option to keep anything:
+  - on the server: the app, every revision Revert could reach, its `DB` data, and its unused install keys;
+  - on every phone: the source, the `DB` store with pending writes, the `@AppStorage` suite, the app's files (§4.1), its launch snapshot (§0.6), its permission grants (§4.0), and its widgets (§6).
+- **The server:** `DELETE /api/apps/{slug}?data=delete` already exists on `shelf-apps` (`fixtures/api/app-delete.json`). Check that it also purges the revisions and the slug's install keys, and add that where it doesn't. A 404 means it's already gone, which counts as success.
+- **Other devices:** they learn from their next sync that the app is gone, and run the same local cleanup. `SyncEngine` already removes the source and `@AppStorage` for apps that leave the index; that grows to everything in the list above.
 - **On the phone:**
   - `API.deleteApp`, and `LibraryStore.delete`;
   - the icon shrinks and fades as Springboard's does, and the others close up;
-  - the source cache, the app's `AppData` store (pending writes dropped) and its `@AppStorage` keys go at once.
+  - everything local in the list above goes at once.
 - **Offline:** the deletion is queued in a persisted list that the next sync sends before it lists apps. Until then, the listing hides those apps.
 - **Failure** (other than offline or a 404): the icon comes back, and the failure follows the same rule as a failed sync or Revert.
 - **Tests:** `APITests` against the fixture, and `LibraryStoreTests` for online, offline, and failure with the icon restored. `FakeServer` gains DELETE.
@@ -489,7 +499,7 @@ Using WidgetKit's own API, not a Shelf one, means models already know how to wri
 ### 6.3 In Shelf
 - **Layout v2.** A page becomes a list of items, each an icon or a widget of a size, flowed into the 4 × 6 grid by Springboard's rules:
   - widgets take aligned blocks (small 2 × 2, medium 4 × 2, large 4 × 4), and icons fill the cells around them in reading order;
-  - the dock holds icons only;
+  - the dock holds icons only (Settings included);
   - `layout.json` migrates from v1 on first launch.
   - `Layout`'s tests grow to cover the packing.
 - **Size.** Measured from `home-page1-light.png`, where Springboard's small widget is 164 × 164 pt, along with its corner and its label (if any).
