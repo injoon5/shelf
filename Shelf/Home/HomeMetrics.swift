@@ -138,6 +138,10 @@ enum HomeMetrics {
     static let badgeInset: CGFloat = 3.67
     static let badgeFill = UIColor(red: 149 / 255, green: 148 / 255, blue: 148 / 255, alpha: 1)
     static let badgeDash = CGSize(width: 11.67, height: 2)
+    /// The tap as a deleted icon starts to leave: light, as an icon dropping
+    /// into place. Not measured: the simulator plays no haptics, so this is
+    /// a choice to check on a phone against Springboard's Delete.
+    static let deleteImpact: UIImpactFeedbackGenerator.FeedbackStyle = .light
     /// How close to a screen edge a dragged icon flips the page.
     static let pageFlipEdge: CGFloat = 28
     static let bannerTopGap: CGFloat = 4

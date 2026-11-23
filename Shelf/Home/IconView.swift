@@ -176,6 +176,77 @@ final class IconView: UIView {
         }
     }
 
+    // MARK: Leaving and coming back
+
+    /// Whether it is on its way out (`leave`), and not back since.
+    private(set) var isLeaving = false
+
+    /// Its app was deleted: it shrinks to nothing about the artwork's
+    /// centre, label and badge with it, as it fades (Springboard's,
+    /// `Motion.iconLeave`). From wherever it is on screen, so a lift
+    /// settling back or a return in progress turns around where it is.
+    /// `completion` runs once it is gone, and not if it comes back first.
+    func leave(completion: @escaping () -> Void) {
+        isLeaving = true
+        let shown = layer.presentation() ?? layer
+        let fromTransform = shown.transform
+        let fromOpacity = shown.opacity
+        layer.removeAnimations(withKeyPrefix: "transform")
+        layer.removeAnimation(forKey: "opacity")
+        let gone = CATransform3DMakeScale(Self.goneScale, Self.goneScale, 1)
+        withoutActions {
+            layer.transform = gone
+            layer.opacity = 0
+        }
+        CATransaction.begin()
+        CATransaction.setCompletionBlock { [weak self] in
+            guard let self, self.isLeaving else { return }
+            completion()
+        }
+        for (keyPath, from, to) in [("transform", fromTransform as Any, gone as Any), ("opacity", fromOpacity as Any, Float(0) as Any)] {
+            let animation = CABasicAnimation(keyPath: keyPath)
+            animation.fromValue = from
+            animation.toValue = to
+            animation.duration = Motion.iconLeave * Motion.Spring.slowdown
+            animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            animation.preferredFrameRateRange = Motion.frameRate
+            layer.add(animation, forKey: keyPath)
+        }
+        CATransaction.commit()
+    }
+
+    /// Its app is back (the server refused the deletion): it grows into its
+    /// place again from however far it had shrunk.
+    func comeBack() {
+        isLeaving = false
+        let shown = layer.presentation() ?? layer
+        let scale = shown.value(forKeyPath: "transform.scale.x") as? CGFloat ?? 1
+        let opacity = shown.opacity
+        layer.removeAnimations(withKeyPrefix: "transform")
+        layer.removeAnimation(forKey: "opacity")
+        withoutActions {
+            layer.transform = CATransform3DMakeScale(scale, scale, 1)
+            layer.opacity = opacity
+        }
+        layer.spring("transform.scale", to: 1, Motion.iconReturn)
+        // A fade has nothing to overshoot to.
+        layer.spring("opacity", to: Float(1), Motion.release)
+    }
+
+    /// A new icon in a layout already on screen (an app that came back after
+    /// its icon had gone, or one a sync brought): it grows in from nothing.
+    func appear() {
+        withoutActions {
+            layer.transform = CATransform3DMakeScale(Self.goneScale, Self.goneScale, 1)
+            layer.opacity = 0
+        }
+        comeBack()
+    }
+
+    /// Small enough to be nothing on screen, and still invertible, which
+    /// UIKit's frame and hit-testing need.
+    private static let goneScale: CGFloat = 0.001
+
     // MARK: Jiggle
 
     /// Edit mode's wobble: a small rotation and a smaller vertical shift,

@@ -59,6 +59,16 @@ enum Motion {
     /// Icons flowing to new places while one is dragged, and a dropped icon
     /// settling into its place.
     static let iconReorder = Spring(duration: 0.35, bounce: 0.15)
+    /// The icons after a deleted one closing up the gap, and making room
+    /// again for one that comes back. Fitted to Springboard's (simulator,
+    /// iOS 27, 30 fps): an icon carried 718 px reaches 49% in 117 ms and 95%
+    /// in 283 ms, peaks 0.6% past its place and is still by about 680 ms;
+    /// this spring traces it to within 2 px (`design/reference/README.md`,
+    /// "Deleting an app").
+    static let iconCloseUp = Spring(duration: 0.48, bounce: 0.14)
+    /// A deleted icon that comes back (the server refused) growing into its
+    /// place again, from however small it got.
+    static let iconReturn = Spring(duration: 0.4, bounce: 0.1)
     /// An icon lifting under a long press, or settling back.
     static let iconLift = Spring(duration: 0.3, bounce: 0.15)
     /// The long-press menu opening out of its icon.
@@ -81,6 +91,18 @@ enum Motion {
     static let launch = Animation.easeOut(duration: 0.18)
     /// The pill's label and page dots trading places.
     static let pillFade: TimeInterval = 0.2
+
+    // MARK: Deleting an app
+
+    /// A deleted icon shrinking to nothing about its artwork's centre, label
+    /// and all, as it fades: Springboard's goes from full size to gone in
+    /// about 200 ms, slow at both ends (0.87, 0.64, 0.35, 0.13 of its size at
+    /// 33 ms steps), an ease in and out. It isn't a spring: nothing about it
+    /// is thrown or caught, and a spring would overshoot past nothing.
+    static let iconLeave: TimeInterval = 0.2
+    /// The others start closing up this long after the icon starts to
+    /// shrink: just after it has gone, as on Springboard (230 ms).
+    static let closeUpDelay: TimeInterval = 0.23
 
     // MARK: Shake
 

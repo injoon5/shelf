@@ -34,6 +34,17 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
     private lazy var mediumImpact = UIImpactFeedbackGenerator(style: .medium, view: self)
 
     private var icons: [String: IconView] = [:]
+    /// Icons whose app has gone, shrinking away (`IconView.leave`). One
+    /// whose app comes back before it has gone turns around where it is.
+    private var leaving: [String: IconView] = [:]
+    /// Until when the icons after a deleted one hold still: they close up
+    /// only once it has shrunk away, as on Springboard.
+    private var closeUpAt: CFTimeInterval = 0
+    /// The next reflow is the close-up after an icon left, or the room made
+    /// for one coming back, on `Motion.iconCloseUp`.
+    private var closesUp = false
+    /// The app the delete alert on screen is for.
+    private var alertFor: String?
     /// Icons out of the grid and the dock for now, in the overlay: lifted,
     /// carried, or on their way home. Layout passes leave them be.
     private var held: Set<String> = []
@@ -78,8 +89,10 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
     var cardIcons: Set<String> = [] {
         didSet { for icon in icons.values { icon.hidesArt = cardIcons.contains(icon.id) } }
     }
-    /// A tap on a minus badge. Deleting is §0.4's; for now nothing happens.
-    var onDelete: (String) -> Void = { _ in }
+    /// A tap on a minus badge: the app asks to be deleted, and the alert
+    /// (`DeleteAlert`) asks the person.
+    lazy var onDelete: (String) -> Void = { [unowned self] id in model.askToDelete(id) }
+    private lazy var deleteImpact = UIImpactFeedbackGenerator(style: HomeMetrics.deleteImpact, view: self)
 
     init(model: HomeModel, library: LibraryStore, overlay: HomeOverlay) {
         self.model = model
@@ -169,11 +182,24 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
             guard let item = library.item(id) else { continue }
             if let icon = icons[id] {
                 icon.configure(item, isDownloading: downloading.contains(id))
+            } else if let icon = leaving.removeValue(forKey: id) {
+                // Back before it had gone (a deletion the server refused):
+                // it grows back from where it is, and the others make room.
+                icons[id] = icon
+                icon.configure(item, isDownloading: downloading.contains(id))
+                icon.hidesArt = cardIcons.contains(id)
+                icon.comeBack()
+                closesUp = true
+                setNeedsLayout()
             } else if iconSize > 0 {
                 let icon = IconView(item: item, iconSize: iconSize)
                 icon.configure(item, isDownloading: downloading.contains(id))
                 icon.hidesArt = cardIcons.contains(id)
                 icons[id] = icon
+                // New to a layout already on screen (an app back after its
+                // icon had gone, or one a sync brought): the others make
+                // room on the close-up's spring, and it grows in.
+                if placedLayout != nil { closesUp = true }
                 setNeedsLayout()
             }
         }
@@ -205,6 +231,8 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
         // A drag the model ended (Done, leaving the foreground, its app
         // deleted elsewhere) ends here too.
         if let drag, model.dragging != drag.icon.id { drop(velocity: .zero) }
+
+        askToDelete(model.deleteRequest)
     }
 
     private var emptyState: EmptyLibraryView.State? {
@@ -236,11 +264,18 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
         }
 
         // A layout that changed under the same screen moves its icons on a
-        // spring; a new screen, or the first pass, puts them in place.
+        // spring; a new screen, or the first pass, puts them in place. After
+        // a deletion, the others hold still until the icon has shrunk away.
         let animated = !geometryChanged && placedLayout != nil && placedLayout != layout
-        place(layout, animated: animated)
-        placedLayout = layout
-        placedGeometry = geometry
+        let wait = closeUpAt - CACurrentMediaTime()
+        if animated, wait > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + wait) { [weak self] in self?.setNeedsLayout() }
+        } else {
+            place(layout, animated: animated, spring: closesUp ? Motion.iconCloseUp : Motion.iconReorder)
+            if animated || geometryChanged { closesUp = false }
+            placedLayout = layout
+            placedGeometry = geometry
+        }
 
         // Done on edit mode's spare page: the page goes, and the pages slide
         // back to the last one, as Springboard's do.
@@ -255,22 +290,23 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
         }
     }
 
-    private func place(_ layout: Layout, animated: Bool) {
+    private func place(_ layout: Layout, animated: Bool, spring: Motion.Spring) {
         for (index, id) in layout.dock.enumerated() {
             guard let icon = icons[id] else { continue }
-            put(icon, in: dockIcons, at: geometry.dockCenter(index, of: layout.dock.count), as: .dock, animated: animated)
+            put(icon, in: dockIcons, at: geometry.dockCenter(index, of: layout.dock.count), as: .dock, animated: animated, spring: spring)
         }
         for (page, ids) in layout.pages.enumerated() {
             for (index, id) in ids.enumerated() {
                 guard let icon = icons[id] else { continue }
                 let center = geometry.iconCenter(index)
                 put(icon, in: pages, at: CGPoint(x: CGFloat(page) * geometry.size.width + center.x, y: center.y),
-                    as: .grid, animated: animated)
+                    as: .grid, animated: animated, spring: spring)
             }
         }
     }
 
-    private func put(_ icon: IconView, in container: UIView, at point: CGPoint, as place: IconView.Place, animated: Bool) {
+    private func put(_ icon: IconView, in container: UIView, at point: CGPoint, as place: IconView.Place,
+                     animated: Bool, spring: Motion.Spring) {
         guard !held.contains(icon.id) else { return }
         if icon.bounds.isEmpty {
             icon.setCell(iconSize: geometry.iconSize, labelWidth: geometry.labelWidth,
@@ -287,29 +323,65 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
                 icon.layer.removeAnimations(withKeyPrefix: "position")
                 icon.center = onScreen
             }
-            if isNew, placedLayout != nil {
-                icon.alpha = 0
-                Motion.release.animate { icon.alpha = 1 }
-            }
+            if isNew, placedLayout != nil { icon.appear() }
         }
         guard icon.center != point else { return }
         if animated {
-            Motion.iconReorder.animate { icon.center = point }
+            spring.animate { icon.center = point }
         } else {
             UIView.performWithoutAnimation { icon.center = point }
         }
     }
 
-    /// An icon whose app has gone shrinks and fades as it leaves.
+    /// An icon whose app has gone (deleted here or elsewhere) shrinks away
+    /// where it is, still jiggling in edit mode, and once it has gone the
+    /// others close up behind it, as on Springboard.
     private func remove(_ icon: IconView) {
         held.remove(icon.id)
         if drag?.icon === icon { drag = nil }
+        // A lifted icon settles first; with no place to settle into, that
+        // comes back here, and it is already on its way out.
         if lift?.icon === icon { dismissLift() }
-        icon.setJiggling(false)
-        Motion.release.animate({
-            icon.alpha = 0
-            icon.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-        }, completion: { _ in icon.removeFromSuperview() })
+        let id = icon.id
+        if icon.isLeaving { return }
+        guard window != nil, icon.superview != nil else {
+            icon.removeFromSuperview()
+            return
+        }
+        if leaving[id] !== icon { leaving[id]?.removeFromSuperview() }
+        leaving[id] = icon
+        icon.leave { [weak self, weak icon] in
+            guard let self, let icon, self.leaving[id] === icon else { return }
+            self.leaving[id] = nil
+            icon.removeFromSuperview()
+        }
+        closeUpAt = CACurrentMediaTime() + Motion.closeUpDelay * Motion.Spring.slowdown
+        closesUp = true
+    }
+
+    // MARK: Deleting
+
+    /// Shows Delete App's alert for `id`, once per request.
+    private func askToDelete(_ id: String?) {
+        guard id != alertFor else { return }
+        alertFor = id
+        guard let id, let item = library.item(id), let presenter = window != nil ? presenter : nil else {
+            // Nothing to ask about (its app went meanwhile), or nowhere to ask.
+            if id != nil { model.cancelDelete() }
+            return
+        }
+        // Either answer clears the request, and the next pass `alertFor`.
+        let alert = DeleteAlert.make(name: item.name, onDelete: { [unowned self] in
+            // UIKit calls this once the alert has gone, so the icon starts
+            // to leave over a clear Home Screen, as Springboard's does.
+            if let icon = icons[id] {
+                deleteImpact.impactOccurred(at: convert(icon.center, from: icon.superview))
+            }
+            Task { await model.confirmDelete(in: library) }
+        }, onCancel: { [unowned self] in
+            model.cancelDelete()
+        })
+        presenter.present(alert, animated: true)
     }
 
     // MARK: Where icons are

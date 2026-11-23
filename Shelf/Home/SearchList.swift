@@ -19,8 +19,9 @@ final class SearchList: UIView, UICollectionViewDelegate, UIGestureRecognizerDel
     private let empty = UIContentUnavailableView(configuration: .empty())
     private let backgroundTap = UITapGestureRecognizer()
 
-    /// What the list shows now.
+    /// What the list shows now, and for what was typed.
     private(set) var shown = SearchSections([], query: "")
+    private var shownQuery = ""
 
     /// A tap on a row.
     var onOpen: (String) -> Void = { _ in }
@@ -114,10 +115,15 @@ final class SearchList: UIView, UICollectionViewDelegate, UIGestureRecognizerDel
 
     override func updateProperties() {
         super.updateProperties()
-        let sections = SearchSections(library.items, query: model.query)
+        let query = model.query
+        let sections = SearchSections(library.items, query: query)
         // Read here so a download starting or ending redraws its row.
         _ = library.downloading
-        apply(sections)
+        // What's typed changes the list at once, as App Library's does; an
+        // app deleted (or brought back) under the same query goes (or
+        // comes) with the list's own animation, the rows below closing up.
+        apply(sections, animated: query == shownQuery && window != nil && !isHidden)
+        shownQuery = query
         if sections.sections.isEmpty, !model.query.isEmpty {
             var configuration = UIContentUnavailableConfiguration.search()
             configuration.text = String(localized: "No Results for “\(model.query)”")
@@ -129,8 +135,9 @@ final class SearchList: UIView, UICollectionViewDelegate, UIGestureRecognizerDel
         }
     }
 
-    private func apply(_ sections: SearchSections) {
+    private func apply(_ sections: SearchSections, animated: Bool) {
         let reordered = sections != shown
+        let comeOrGone = Set(sections.ids) != Set(shown.ids)
         let headersChanged = sections.isIndexed != shown.isIndexed
         shown = sections
         if headersChanged { collectionView.collectionViewLayout.invalidateLayout() }
@@ -143,8 +150,7 @@ final class SearchList: UIView, UICollectionViewDelegate, UIGestureRecognizerDel
         // Names, icons and downloads change in place.
         snapshot.reconfigureItems(sections.ids)
         index.isHidden = !sections.isIndexed
-        // As App Library's: what's typed changes the list at once.
-        dataSource.apply(snapshot, animatingDifferences: false)
+        dataSource.apply(snapshot, animatingDifferences: animated && comeOrGone)
         if reordered {
             // Headers (and which rows are last in their section) follow.
             let kind = UICollectionView.elementKindSectionHeader

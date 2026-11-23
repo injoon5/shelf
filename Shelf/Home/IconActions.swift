@@ -11,8 +11,9 @@ struct IconAction {
 
 extension HomeItem {
     /// The icon's menu, in groups: an app's own actions, then Edit Home
-    /// Screen. Settings has only Edit Home Screen: it can't be changed,
-    /// reloaded, copied, reverted or deleted. The Home Screen's menu
+    /// Screen and Delete App (`longpress-menu-grid-photos.png`). Settings
+    /// has only Edit Home Screen: it can't be changed, reloaded, copied,
+    /// reverted or deleted. The Home Screen's menu
     /// (`IconMenuView`) and a search row's (`SearchList`) are both this list.
     @MainActor
     func menu(model: HomeModel, library: LibraryStore) -> [[IconAction]] {
@@ -36,9 +37,17 @@ extension HomeItem {
             }
             groups.append(actions)
         }
-        groups.append([IconAction(title: String(localized: "Edit Home Screen"), symbol: "apps.iphone") {
+        var last = [IconAction(title: String(localized: "Edit Home Screen"), symbol: "apps.iphone") {
             model.startEditing()
-        }])
+        }]
+        // Springboard's Remove App, in red, last, with Edit Home Screen.
+        // Shelf has no App Library to remove an app to, so it's Delete App.
+        if let app, isDeletable {
+            last.append(IconAction(title: String(localized: "Delete App"), symbol: "minus.circle", isDestructive: true) {
+                model.askToDelete(app.slug)
+            })
+        }
+        groups.append(last)
         return groups
     }
 }
