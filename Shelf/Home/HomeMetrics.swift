@@ -90,11 +90,17 @@ enum HomeMetrics {
 
     // MARK: Dock
 
-    /// From the screen's edges, sides and bottom alike, which is what makes
-    /// the dock concentric with the display.
+    /// From the screen's edges, sides and bottom alike.
     static let dockInset: CGFloat = 17
     static let dockPadding: CGFloat = 19.67
     static let dockIconGap: CGFloat = 24
+    /// The dock's corner, on UIKit's continuous curve (`cornerConfiguration`
+    /// `.fixed`): fitted to the inset of Springboard's dock edge on every
+    /// pixel row at 3x (`home-page1-light.png`), within 2 px on every row
+    /// (design/reference/README.md, "Dock corners"). It is 3/8 of the dock's
+    /// height. Not concentric with the display (62 − 17 = 45 is 24 px rounder
+    /// at the top row), and nowhere near a pill.
+    static let dockRadius: CGFloat = 38.75
     /// Used when the display's own corner radius can't be read.
     static let fallbackDisplayRadius: CGFloat = 55
 
@@ -211,8 +217,10 @@ struct HomeGeometry: Equatable {
         return CGRect(x: dockInset, y: size.height - dockInset - height,
                       width: size.width - 2 * dockInset, height: height)
     }
-    /// Concentric with the display: its radius, less the inset.
-    var dockRadius: CGFloat { max(displayRadius - dockInset, iconRadius + dockPadding) }
+    var dockRadius: CGFloat { HomeMetrics.dockRadius * scale }
+    /// The dock's outline, on screen: the glass, and where a carried icon
+    /// counts as over the dock.
+    var dockOutline: UIBezierPath { UIBezierPath(roundedRect: dockFrame, cornerRadius: dockRadius) }
     var dockIconPitch: CGFloat { iconSize + HomeMetrics.dockIconGap * scale }
 
     var pillFrame: CGRect {
@@ -281,7 +289,7 @@ extension HomeGeometry {
     /// icon there. Nil over a full dock that it isn't already in: the dock
     /// refuses a newcomer, and the icon keeps the place it had.
     func dropSlot(for id: String, at point: CGPoint, page: Int, in layout: Layout) -> Layout.Slot? {
-        if dockFrame.contains(point) {
+        if dockOutline.contains(point) {
             guard layout.dockHasRoom(for: id) else { return nil }
             let count = layout.dock.contains(id) ? layout.dock.count : layout.dock.count + 1
             return .dock(index: dockIndex(at: point.x, of: count))

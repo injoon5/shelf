@@ -575,7 +575,7 @@ final class HomeView: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate 
         let point = drag.icon.center
         let layout = library.layout
         let page = model.page
-        if !geometry.dockFrame.contains(point),
+        if !geometry.dockOutline.contains(point),
            let target = geometry.flipTarget(at: point.x, page: page, pageCount: model.pageCount(layout.pages)) {
             model.holdAtEdge(toward: target)
         } else {
