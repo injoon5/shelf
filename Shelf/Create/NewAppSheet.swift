@@ -40,6 +40,7 @@ struct NewAppSheet: View {
         .onChange(of: model.isFinished) { _, finished in
             if finished { dismiss() }
         }
+        .onDisappear { model.closed(library.permissions) }
     }
 }
 

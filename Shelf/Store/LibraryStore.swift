@@ -37,6 +37,9 @@ final class LibraryStore {
     @ObservationIgnored let data: AppData
     /// Each app's launch snapshot (plan §0.8).
     @ObservationIgnored let snapshots: LaunchSnapshots
+    /// What each app may use (plan §4.0): the ledger of its answers, and the
+    /// gate every API that prompts goes through.
+    @ObservationIgnored let permissions: PermissionGate
     @ObservationIgnored private let layoutURL: URL
     /// Apps on their way out: a sync that lands meanwhile doesn't bring them back.
     @ObservationIgnored private var deleting: Set<String> = []
@@ -53,21 +56,28 @@ final class LibraryStore {
         self.init(cache: .standard,
                   data: AppData(root: URL.applicationSupportDirectory.appending(path: "data"), api: { Account.api }),
                   layoutURL: URL.applicationSupportDirectory.appending(path: "layout.json"),
-                  server: { Account.api })
+                  server: { Account.api },
+                  permissions: PermissionGate(ledger: PermissionLedger(file: PermissionLedger.standardFile),
+                                              system: DeviceSystemPermissions(), asker: PermissionSheetAsker()))
     }
 
     /// The library kept in `cache`, `data`, `snapshots` and `layoutURL`,
     /// talking to whatever `server` returns: nil while signed out. Tests
-    /// pass their own.
+    /// pass their own. Without `permissions`, the ledger is in memory and
+    /// nothing is ever asked.
     init(cache: AppCache, data: AppData, layoutURL: URL, server: @escaping @Sendable () -> API?,
-         appStorage: AppStorageKeys = AppStorageKeys(.standard), snapshots: LaunchSnapshots = .standard) {
+         appStorage: AppStorageKeys = AppStorageKeys(.standard), snapshots: LaunchSnapshots = .standard,
+         permissions: PermissionGate? = nil) {
+        let permissions = permissions ?? .inMemory()
         self.cache = cache
         self.data = data
         self.snapshots = snapshots
+        self.permissions = permissions
         self.layoutURL = layoutURL
         self.server = server
         engine = SyncEngine(cache: cache, api: server, appStorage: appStorage,
-                            cleanup: .library(cache: cache, appStorage: appStorage, data: data, snapshots: snapshots))
+                            cleanup: .library(cache: cache, appStorage: appStorage, data: data, snapshots: snapshots,
+                                              permissions: permissions))
         isSignedIn = server() != nil
 
         // Read before the first frame, so the Home Screen never flashes empty.
@@ -272,7 +282,7 @@ final class LibraryStore {
         await sync()
     }
 
-    /// Clears the token, the cache and each app's storage.
+    /// Clears the token, the cache, each app's storage and its permissions.
     func signOut() async {
         Account.signOut()
         isSignedIn = false
@@ -287,6 +297,7 @@ final class LibraryStore {
         layout = Layout()
         try? FileManager.default.removeItem(at: layoutURL)
         snapshots.removeAll()
+        permissions.forgetAll()
     }
 
     private func abandonSync() async {
@@ -347,7 +358,7 @@ final class LibraryStore {
     ///
     /// Once the server answers, everything the phone keeps for it goes too
     /// (`AppCleanup`: source, `DB` store with its pending writes,
-    /// `@AppStorage`, launch snapshot), and the same happens on every other
+    /// `@AppStorage`, launch snapshot, permission grants), and the same happens on every other
     /// phone at its next sync. Offline, the phone's copy goes now and the
     /// deletion waits in a persisted queue that the next sync sends before
     /// it lists apps. If the server refuses, nothing on the phone has been
@@ -433,6 +444,11 @@ final class LibraryStore {
         self.cache = cache
         data = AppData(root: URL.temporaryDirectory.appending(path: "shelf-demo-data"), api: { nil })
         snapshots = LaunchSnapshots(root: URL.temporaryDirectory.appending(path: "shelf-demo-snapshots"))
+        // The demo's apps ask for real (the sheet, then iOS), but answer into
+        // a ledger of their own.
+        permissions = PermissionGate(
+            ledger: PermissionLedger(file: URL.temporaryDirectory.appending(path: "shelf-demo-permissions.json")),
+            system: DeviceSystemPermissions(), asker: PermissionSheetAsker())
         layoutURL = cache.root.appending(path: "layout.json")
         server = { nil }
         engine = SyncEngine(cache: cache, api: server)

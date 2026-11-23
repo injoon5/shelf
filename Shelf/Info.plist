@@ -29,6 +29,16 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>So apps on your Shelf can take photos and videos. Each app asks you first.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>So apps on your Shelf can see where you are while they’re open. Each app asks you first.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>So apps on your Shelf can record sound. Each app asks you first.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>So apps on your Shelf can read your steps and activity. Each app asks you first.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>So apps on your Shelf can save photos and videos to your library. Each app asks you first.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

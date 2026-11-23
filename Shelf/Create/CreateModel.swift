@@ -32,9 +32,18 @@ final class CreateModel {
     @ObservationIgnored private var copiedTask: Task<Void, Never>?
     private static let keyPoll: Duration = .seconds(3)
 
+    /// Who the preview asks for permissions as (plan §4.0). Changing an app
+    /// previews the app itself, so it asks as the app, and its answers are
+    /// the app's. A new app asks as a slug of its own that no app can have
+    /// (`PermissionLedger.previewPrefix`), so it never answers for an
+    /// installed one: Install moves its answers to the slug it's installed
+    /// as, and closing the sheet without installing forgets them.
+    let permissionSlug: String
+
     init(app: CachedApp?, source: String?) {
         self.app = app
         currentSource = source ?? ""
+        permissionSlug = app?.slug ?? PermissionLedger.previewPrefix + UUID().uuidString
     }
 
     var isChange: Bool { app != nil }
@@ -147,6 +156,29 @@ final class CreateModel {
                        tint: reply.tint)
     }
 
+    /// The preview as the permission sheet shows it: the name in the field,
+    /// or "New App" while there isn't one, with the icon it will install with.
+    var permissionIdentity: AppMeta {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        return AppMeta(slug: permissionSlug, name: trimmed.isEmpty ? (app?.meta.name ?? "New App") : trimmed,
+                       icon: previewMeta?.icon ?? app?.meta.icon, tint: reply?.tint ?? app?.meta.tint ?? .blue)
+    }
+
+    /// The preview's permissions, for its run context (§1.7): the real
+    /// capabilities, after the same sheet an installed app gets.
+    func previewPermissions(_ gate: PermissionGate) -> GatedAppPermissions {
+        GatedAppPermissions(gate: gate) { [weak self] in
+            self?.permissionIdentity ?? AppMeta(slug: PermissionLedger.previewPrefix, name: "New App")
+        }
+    }
+
+    /// The sheet has closed. A sheet still up for the preview goes, and a
+    /// new app that wasn't installed takes its answers with it.
+    func closed(_ gate: PermissionGate) {
+        gate.cancelRequests(for: permissionSlug)
+        if !isChange { gate.forget(permissionSlug) }
+    }
+
     var isSlugValid: Bool {
         slug.wholeMatch(of: /[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}/) != nil
     }
@@ -168,6 +200,10 @@ final class CreateModel {
         do throws(API.Failure) {
             try await library.install(slug: slug, name: name.trimmingCharacters(in: .whitespaces), icon: meta.icon,
                                       tint: reply.tint, source: reply.source)
+            // What the preview was allowed, the installed app is allowed.
+            if !isChange {
+                library.permissions.ledger.move(from: permissionSlug, to: slug, name: name.trimmingCharacters(in: .whitespaces))
+            }
             // The app went in with the admin token; the key in the prompt is
             // no longer needed and shouldn't stay live.
             if let key, let api = library.api {
