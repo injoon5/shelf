@@ -37,8 +37,9 @@ struct HomeStage: UIViewControllerRepresentable {
 /// - the wallpaper, and the dim search lays over it;
 /// - the Home Screen proper (`HomeView`: pages, dock, edit mode), search's
 ///   results and glass, and the overlay a lifted icon and its menu rise
-///   into, all of which scale back while an app is open;
-/// - the blur and dim an app's card is seen over;
+///   into, all of which scale back while an app is open (these first two
+///   are the backdrop, which blurs behind an app's card);
+/// - the dim an app's card is seen over;
 /// - the cards, each with its live app above it.
 ///
 /// It follows `HomeModel` in `updateProperties()`, which UIKit tracks for
@@ -50,6 +51,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     private let settings: ShelfSettings
     let layout = ResultsLayout()
 
+    /// The wallpaper and the Home Screen: what blurs behind an app's card,
+    /// as one opaque picture.
+    private let backdrop = UIView()
     private var wallpaper: WallpaperView!
     private let searchDim = UIView()
     /// Everything that scales back behind an open app.
@@ -93,14 +97,15 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLoad()
         view.backgroundColor = .black
 
+        view.addSubview(backdrop)
         wallpaper = WallpaperView(settings: settings)
-        view.addSubview(wallpaper)
+        backdrop.addSubview(wallpaper)
         searchDim.backgroundColor = .black
         searchDim.alpha = 0
         searchDim.isUserInteractionEnabled = false
-        view.addSubview(searchDim)
+        backdrop.addSubview(searchDim)
 
-        view.addSubview(home)
+        backdrop.addSubview(home)
         homeView = HomeView(model: model, library: library, overlay: overlay)
         home.addSubview(homeView)
         results = host(ResultsLayer(model: model, library: library, layout: layout), in: home)
@@ -200,7 +205,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         super.viewDidLayoutSubviews()
         let bounds = view.bounds
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
-        for layer in [wallpaper!, searchDim, home, backdropDim, backdropBlur, cardsView] as [UIView] {
+        for layer in [backdrop, wallpaper!, searchDim, home, backdropDim, backdropBlur, cardsView] as [UIView] {
             layer.bounds = bounds
             layer.center = center
         }
@@ -330,21 +335,39 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         startTicking()
     }
 
-    private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
-        // An app deleted while its card was up has no icon to land on.
-        let icon = library.app(card.slug) == nil ? nil : iconFrame(card.slug, preferResult: false)
-        let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
-                                         pill: layout.geometry.pillFrame, iconSize: iconSize)
-        card.close(to: landing.frame, fades: landing.fades, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+    private func close(_ card: AppCard, velocity: CardVelocity? = nil) {
+        let landing = landing(for: card.slug)
+        card.close(to: landing.frame, fades: landing.fades, velocity: velocity)
         startTicking()
     }
 
-    /// Where `slug`'s icon is: the search result's while searching, else
-    /// where the layout puts it on the Home Screen, exactly, an icon on
-    /// another page a whole page's width off to that side.
+    /// Where a card for `slug` lands: on its icon, past the side of the
+    /// screen its page is on, or in the pill when it has no icon (an app
+    /// deleted while its card was up).
+    func landing(for slug: String) -> (frame: CGRect, fades: Bool) {
+        let icon = library.app(slug) == nil ? nil : restingIconFrame(slug)
+        return CardMotion.landing(icon: icon, screenWidth: view.bounds.width, pill: layout.geometry.pillFrame,
+                                  iconSize: iconSize)
+    }
+
+    /// Where `slug`'s icon is now: the search result's while searching, else
+    /// where the layout puts it on the Home Screen as drawn, scaled back
+    /// behind any open app. What a card opens from.
     private func iconFrame(_ slug: String, preferResult: Bool) -> CGRect? {
         if preferResult, let result = layout.frames[slug] { return result }
         return homeView.iconFrame(for: slug).map { homeView.convert($0, to: view) }
+    }
+
+    /// Where `slug`'s icon will be when a card lands on it: in the Home
+    /// Screen at full size, which it is again by then (its scale follows the
+    /// card). Not where it is drawn now: behind a card still at 80% of the
+    /// screen the Home Screen is at 0.9, which puts an icon in the top row
+    /// 30 points lower and a dock icon 40 points higher than where it ends
+    /// up, and the card would land there and then jump.
+    private func restingIconFrame(_ slug: String) -> CGRect? {
+        // `home` lays out in the stage's own coordinates; only its transform
+        // scales it.
+        homeView.iconFrame(for: slug).map { homeView.convert($0, to: home) }
     }
 
     /// The icons a card stands in for show no artwork. A landed card and
@@ -386,8 +409,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         return card
     }
 
-    /// The card in flight under `point`, if any. Its model frame is already
-    /// its target, so this asks where it is on screen.
+    /// The card in flight under `point`, if any, by where it is on screen.
     private func movingCard(at point: CGPoint) -> AppCard? {
         cards.last { card in
             (card.phase == .opening || card.phase == .closing || card.phase == .held)
@@ -406,16 +428,30 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         tick()
     }
 
-    /// Whatever can't be a Core Animation spring of its own follows the
-    /// cards' springs here, read from their presentation each frame: the
-    /// Home Screen's scale, blur and dim, and each card's picture fading
-    /// into its icon.
+    /// The cards' flights, placed for the frame about to be shown, and
+    /// whatever follows them: the Home Screen's scale, blur and dim, and
+    /// each card's picture fading into its icon. A closing card heads for
+    /// wherever its icon is this frame, so the pages can be turned under it.
     @objc private func tick() {
+        // One transaction for the whole frame: a card's outline, its
+        // picture and its fade, and the Home Screen behind, all reach the
+        // screen together. Committed separately, the outline showed a frame
+        // behind the picture, a rim of tile around a shrinking app.
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        defer { CATransaction.commit() }
         var openness: CGFloat = 0
+        let time = displayLink?.targetTimestamp ?? CACurrentMediaTime()
         for card in cards {
+            if card.phase == .closing {
+                // Its icon may have moved: the pages turned under it.
+                let landing = landing(for: card.slug)
+                card.follow(landing: landing.frame, fades: landing.fades, at: time)
+            }
+            let arrived = card.phase != .held && card.step(at: time)
             card.tick()
             if card.phase != .landed { openness = max(openness, card.progress) }
-            if card.phase != .held, card.hasComeToRest(), card.settle() {
+            if arrived, card.settle() {
                 land(card)
             }
         }
@@ -427,11 +463,18 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
-    private func setBackdrop(_ openness: CGFloat) {
+    func setBackdrop(_ openness: CGFloat) {
         let scale = 1 - (1 - RunnerMetrics.backdropScale) * openness
         home.transform = CGAffineTransform(scaleX: scale, y: scale)
-        backdropDim.alpha = openness * RunnerMetrics.backdropDim
-        backdropBlur.alpha = openness * RunnerMetrics.backdropBlur
+        backdropDim.alpha = CardMotion.backdropDim(progress: openness)
+        let radius = CardMotion.backdropBlurRadius(progress: openness)
+        if PrivateLayerBlur.isAvailable {
+            // A real radius that shrinks as the card lands, as Springboard's,
+            // over the wallpaper and the icons as one picture.
+            withoutActions { PrivateLayerBlur.setRadius(radius, on: backdrop.layer) }
+        } else {
+            backdropBlur.alpha = radius / RunnerMetrics.backdropBlurRadius * RunnerMetrics.backdropFallbackBlur
+        }
     }
 
     // MARK: Gestures
@@ -474,7 +517,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
             if hypot(moved.x, moved.y) < RunnerMetrics.tapSlop, let card = heldCard {
                 heldCard = nil
                 _ = card.release(velocity: .zero)
-                reopen(card, centerVelocity: .zero, widthVelocity: 0)
+                reopen(card, velocity: .zero)
             } else {
                 release(velocity: recognizer.velocity(in: view))
             }
@@ -490,22 +533,22 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         heldCard = nil
         let release = card.release(velocity: velocity)
         if release.closes {
-            close(card, centerVelocity: release.centerVelocity, widthVelocity: release.widthVelocity)
+            close(card, velocity: release.velocity)
             if model.run?.id == card.slug { model.close() }
         } else {
-            reopen(card, centerVelocity: release.centerVelocity, widthVelocity: release.widthVelocity)
+            reopen(card, velocity: release.velocity)
         }
     }
 
     /// Back to full screen, unless the model says the card must land: its
     /// app is gone, or another has opened since.
-    private func reopen(_ card: AppCard, centerVelocity: CGPoint, widthVelocity: CGFloat) {
+    private func reopen(_ card: AppCard, velocity: CardVelocity) {
         guard model.reopen(card.run, in: library) else {
-            close(card, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+            close(card, velocity: velocity)
             return
         }
         openRun = model.run
-        card.reopen(centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+        card.reopen(velocity: velocity)
         setCardIcons()
         startTicking()
     }
@@ -573,9 +616,11 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 }
 
-/// The stage's root view. A card in flight is never where its model frame
-/// says (that is its target), so touches inside one are caught here, by
-/// where it is on screen, for the stage's own recognizers.
+/// The stage's root view. A card's face is artwork and takes no touches,
+/// and the live app above it is hidden while it moves, so touches inside a
+/// moving card are caught here, by where it is on screen, for the stage's
+/// own recognizers. Everywhere else, the Home Screen gets them: its pages
+/// can be turned while a card lands, and the card follows its icon.
 final class StageView: UIView {
     var catches: (CGPoint) -> Bool = { _ in false }
 
