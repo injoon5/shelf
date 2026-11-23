@@ -3052,6 +3052,38 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "member:Hasher.combine",
+      "kind" : "member",
+      "name" : "combine",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Hasher",
+      "source" : "Sources/Kiln/Hashing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "member:Hasher.finalize",
+      "kind" : "member",
+      "name" : "finalize",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "Hasher",
+      "source" : "Sources/Kiln/Hashing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:IndexSet.contains",
       "kind" : "member",
@@ -10337,6 +10369,15 @@
 
       ],
       "source" : "Sources/Kiln/Networking.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Hasher",
+      "kind" : "type",
+      "name" : "Hasher",
+      "notes" : "In your own `hash(into:)`: `hasher.combine(id)`.",
+      "source" : "Sources/Kiln/Hashing.swift",
       "support" : "partial"
     },
     {

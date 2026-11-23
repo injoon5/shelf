@@ -240,6 +240,10 @@ extension KInterpreter {
         if let op = KBuiltins.operatorFunction(name, self) { return op }
         if name.first?.isUppercase == true { return .type(.builtin(name)) }
         if let v = nativeConstant(name) { return v }
+        // Implicit `self` in an extension on a native type: `count`, `isEmpty`.
+        if let ctx = env.nearestSelf, ctx.type.standIn, !ctx.isStatic, let sv = try? read(ctx.location), let v = try? member(sv, name, line: line) {
+            return v
+        }
         throw fail("Cannot find '\(name)' in scope", line)
     }
 
@@ -324,6 +328,7 @@ extension KInterpreter {
             }
             if name == "self" { return base }
             if s.type.storedDecl(name) != nil { return .nilValue }
+            if name == "hashValue" { return .int(base.hashValue) }
             if s.type.isView, let ext = builtinExtensions["View"], let p = ext.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: s.type, location: .box(KBox(base))))
                 return try runAccessor(p.getter ?? [], env: env, returns: p.type)
@@ -383,8 +388,8 @@ extension KInterpreter {
         case .nilValue:
             return .nilValue
         default:
-            if let ext = builtinExtensions[KBuiltins.extensionKey(base)], let p = ext.computed[name] {
-                let ctx = KSelfContext(type: KType(name: base.typeName, kind: .structType), location: .box(KBox(base)))
+            if let p = builtinExtensionComputed(base, name) {
+                let ctx = KSelfContext(type: KType.standIn(base.typeName), location: .box(KBox(base)))
                 return try runAccessor(p.getter ?? [], env: KEnv(parent: globalEnv, selfContext: ctx), returns: p.type)
             }
             return try nativeMember(base, name, line)
@@ -517,8 +522,8 @@ extension KInterpreter {
         case (.tuple(let x, _), .tuple(let y, _)):
             for (p, q) in zip(x, y) where !equal(p, q) { return try compare(op, p, q, line) }
             c = 0
-        case (.structV(let s), _) where s.type.staticMethods["<"] != nil:
-            let f = s.type.staticMethods["<"]!.first!
+        case (.structV, _) where a.userType?.staticMethods["<"] != nil, (.object, _) where a.userType?.staticMethods["<"] != nil:
+            let f = a.userType!.staticMethods["<"]!.first!
             let lt = truthy(try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv))
             let gt = truthy(try invoke(f, args: [b, a], labels: [nil, nil], selfContext: nil, parent: globalEnv))
             c = lt ? -1 : (gt ? 1 : 0)
@@ -573,7 +578,8 @@ extension KInterpreter {
                 }
             }
         }
-        if case .structV(let s) = a, let f = s.type.staticMethods[op]?.first {
+        // `static func + (a: Vec, b: Vec)`, on either operand's type, or a global operator function.
+        if let f = a.userType?.staticMethods[op]?.first ?? b.userType?.staticMethods[op]?.first ?? functions[op]?.first {
             return try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv)
         }
         throw fail("Binary operator '\(op)' can't be applied to \(a.typeName) and \(b.typeName)", line)
@@ -604,6 +610,7 @@ extension KInterpreter {
             if let ext = builtinName.flatMap({ builtinExtensions[$0] }), let m = ext.staticMethods[name]?.first {
                 return try invoke(m, args: args ?? [], labels: labels, selfContext: nil, parent: globalEnv)
             }
+            if let proto = builtinName, let v = try protocolImplicit(proto, name, args, labels: labels) { return v }
             if builtinName == nil, let (tn, ext) = builtinExtensions.first(where: { $0.value.staticDecls[name] != nil }) {
                 _ = ext
                 return try builtinStatic(tn, name)
@@ -678,6 +685,11 @@ extension KInterpreter {
                 let args = try evalArgs(argExprs, env, params: i.params)
                 return try runBuiltinExtensionInit(name, i, args, labels)
             }
+            // Implicit `self` in an extension on a native type: `reduce(0, +)`, `padding()`.
+            if let ctx = env.nearestSelf, ctx.type.standIn, !ctx.isStatic, registry.function(name) == nil, registry.view(name) == nil,
+               registry.type(name) == nil, let sv = try? read(ctx.location), nativeHas(sv, name) {
+                return try callMethod(.selfRef(line: line), name, argExprs, env, line, expected)
+            }
             return try callNamed(name, argExprs, env, line, expected)
 
         case .member(let baseExpr, let name, _):
@@ -749,7 +761,7 @@ extension KInterpreter {
     func runBuiltinExtensionInit(_ typeName: String, _ decl: KEFuncDecl, _ args: [KV], _ labels: [String?]) throws -> KV {
         // `extension Color { init(hex: String) { … self.init(red:green:blue:) } }`
         let box = KBox(.nilValue)
-        let ctx = KSelfContext(type: KType(name: typeName, kind: .structType), location: .box(box))
+        let ctx = KSelfContext(type: KType.standIn(typeName), location: .box(box))
         _ = try invoke(decl, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
         return box.value
     }
@@ -829,11 +841,12 @@ extension KInterpreter {
             break
         }
 
-        // Methods from `extension` on built-in types (Array, String, Double, View, …).
+        // Methods from `extension` on built-in types (Array, String, Double, View, …)
+        // and on the protocols they conform to (`extension Collection`).
         let key = KBuiltins.extensionKey(base)
-        if let ext = builtinExtensions[key], let m = Self.pick(ext.methods[name] ?? [], labels: labels) {
+        if let m = builtinExtensionMethod(base, name, labels: labels) {
             let args = try evalArgs(argExprs, env, params: m.params)
-            let ctx = KSelfContext(type: KType(name: key, kind: .structType), location: loc ?? .box(KBox(base)))
+            let ctx = KSelfContext(type: KType.standIn(key), location: loc ?? .box(KBox(base)))
             return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
         }
         if KBuiltins.isViewLike(base), isModifierName(name) || !KBuiltins.hasValueMethod(base, name) {
@@ -845,6 +858,21 @@ extension KInterpreter {
             try write(loc, mutated)
         }
         return result
+    }
+
+    /// Whether a native value has a member called `name`, as far as its bridges say.
+    func nativeHas(_ base: KV, _ name: String) -> Bool {
+        if KBuiltins.isViewLike(base), isModifierName(name) { return true }
+        if builtinExtensionMethod(base, name, labels: nil) != nil || builtinExtensionComputed(base, name) != nil { return true }
+        var tn = KRegistry.typeName(of: base)
+        var hops = 0
+        while let t = registry.type(tn), hops < 8 {
+            if t.methods[name] != nil || t.properties[name] != nil || t.anyMethod != nil || t.anyProperty != nil { return true }
+            guard let fb = t.fallback else { break }
+            tn = fb
+            hops += 1
+        }
+        return false
     }
 
     func isStorage(_ e: KEExpr, _ env: KEnv) -> Bool {
@@ -869,7 +897,7 @@ extension KInterpreter {
         let labels = argExprs.map(\.label)
         if let ext = builtinExtensions["View"], let m = Self.pick(ext.methods[name] ?? [], labels: labels) {
             let args = try evalArgs(argExprs, env, params: m.params)
-            let ctx = KSelfContext(type: KType(name: "View", kind: .structType), location: .box(KBox(.view(v))))
+            let ctx = KSelfContext(type: KType.standIn("View"), location: .box(KBox(.view(v))))
             return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
         }
         if case .custom(let s) = v.kind, let m = s.type.method(name, labels: labels) {
@@ -895,6 +923,10 @@ extension KInterpreter {
     }
 
     func pickInit(_ t: KType, _ labels: [String?]) -> KEFuncDecl? {
+        // An initializer from a protocol extension keeps the memberwise one, so it's picked only by its labels.
+        if let i = t.extensionInits.first(where: { Self.labelsFit($0.params, labels) }), !(t.inits.contains { Self.labelsFit($0.params, labels) }) {
+            return i
+        }
         guard !t.inits.isEmpty else { return nil }
         let matching = t.inits.filter { d in
             let required = d.params.filter { $0.defaultValue == nil }.count

@@ -216,6 +216,22 @@ struct KEParam {
     var defaultValue: KEExpr?
     var isInout: Bool
     var isVariadic: Bool
+    /// `@ViewBuilder content: () -> Content`, `@escaping`.
+    var attributes: [KEAttribute] = []
+}
+
+/// A generic parameter: `Content: View`, `T`.
+struct KEGenericParam {
+    var name: String
+    var constraints: [String]
+}
+
+/// A `where` requirement: `Self: Equatable`, `Element == Int`, `T.Element: Numeric`.
+struct KEConstraint {
+    enum Relation { case conforms, same }
+    var subject: String
+    var relation: Relation
+    var type: KETypeRef
 }
 
 final class KEFuncDecl {
@@ -229,6 +245,10 @@ final class KEFuncDecl {
     let line: Int
     /// Whether the body has an `await` (KEAsync's `awaits`).
     var awaitsCache: Bool?
+    var generics: [KEGenericParam] = []
+    var constraints: [KEConstraint] = []
+    /// Declared without a body, in a protocol: a requirement.
+    var isRequirement = false
     init(name: String, params: [KEParam], returnType: KETypeRef?, body: [KEStmt], isStatic: Bool,
          isMutating: Bool, attributes: [KEAttribute], line: Int) {
         self.name = name; self.params = params; self.returnType = returnType; self.body = body
@@ -264,6 +284,9 @@ final class KETypeDecl {
     var subscripts: [KEFuncDecl] = []
     var attributes: [KEAttribute]
     let line: Int
+    var generics: [KEGenericParam] = []
+    /// `extension P where Self: Q`, `struct Box<T> where T: Equatable`.
+    var constraints: [KEConstraint] = []
     init(kind: KETypeKind, name: String, inherits: [String], attributes: [KEAttribute], line: Int) {
         self.kind = kind; self.name = name; self.inherits = inherits; self.attributes = attributes; self.line = line
     }

@@ -20,6 +20,7 @@ final class LanguageBridges: KBridgeFamily {
         numbers(r)
         strings(r)
         collections(r)
+        hashing(r)
     }
 
     // MARK: Global functions

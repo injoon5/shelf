@@ -25,10 +25,38 @@ final class KType {
     var subscripts: [KEFuncDecl] = []
     var nested: [String: KType] = [:]
     var attributes: [KEAttribute] = []
+    /// What the declaration and its extensions wrote after `:`, before the
+    /// closure over protocol inheritance (KEProtocols).
+    var declaredInherits: Set<String> = []
+    var line = 0
+    var generics: [KEGenericParam] = []
+    /// Initializers from protocol extensions: unlike the type's own, they keep the memberwise one.
+    var extensionInits: [KEFuncDecl] = []
+    var superclass: KType?
+    var finalized = false
+    var inherited = false
+    /// A custom `==` (Equatable): nil when it couldn't run.
+    var customEquals: ((KV, KV) -> Bool?)?
+    /// A custom `hash(into:)`: the values it combined.
+    var customHash: ((KV) -> [KV]?)?
+    /// Stands for a native type as `self` in an extension on it (`extension Array`).
+    var standIn = false
+
+    static func standIn(_ name: String) -> KType {
+        let t = KType(name: name, kind: .structType)
+        t.standIn = true
+        return t
+    }
 
     init(name: String, kind: KETypeKind) {
         self.name = name
         self.kind = kind
+    }
+
+    /// The superclass a class declares: its first inherited name that's one of `types`' classes.
+    func declaredSuperclass(in types: [String: KType]) -> String? {
+        guard isClass else { return nil }
+        return declaredInherits.first { types[$0]?.isClass == true && types[$0] !== self }
     }
 
     var isView: Bool { conformances.contains("View") }
@@ -60,6 +88,11 @@ final class KType {
 /// Members added by `extension` to a built-in type (View, Color, Double, …).
 final class KBuiltinExtension {
     var computed: [String: KEVarDecl] = [:]
+    /// Every computed property by name, when constrained extensions declare
+    /// the same one (`extension Array where Element == A`, `… == B`).
+    var computedAll: [String: [KEVarDecl]] = [:]
+    /// A member's `where` clause.
+    var constraints: [ObjectIdentifier: [KEConstraint]] = [:]
     var staticDecls: [String: KEVarDecl] = [:]
     var staticBoxes: [String: KBox] = [:]
     var methods: [String: [KEFuncDecl]] = [:]
@@ -88,6 +121,10 @@ final class KInterpreter {
     var builtinExtensions: [String: KBuiltinExtension] = [:]
     let globalEnv = KEnv(parent: nil)
     var functions: [String: [KEFuncDecl]] = [:]
+    /// The app's protocols (KEProtocols).
+    var protocols: [String: KProtocol] = [:]
+    /// `extension Int: Describable {}`: native types and the app's protocols they adopt.
+    var builtinConformances: [String: Set<String>] = [:]
 
     /// What the code has printed.
     var console = ""
@@ -122,9 +159,11 @@ final class KInterpreter {
     init(program: KEProgram, headless: Bool = false) throws {
         self.program = program
         self.headless = headless
+        registerProtocols(program.types)
         register(program.types, parent: nil)
         for t in program.types where t.kind == .extensionType { applyExtension(t) }
         for t in program.types { applyNestedExtensions(t) }
+        finalizeTypes()
         for f in program.functions { functions[f.name, default: []].append(f) }
         fuel = budget
         for stmt in program.globals {
@@ -178,7 +217,7 @@ final class KInterpreter {
 
     private var declSource: [String: ObjectIdentifier] = [:]
 
-    private func register(_ decls: [KETypeDecl], parent: KType?) {
+    func register(_ decls: [KETypeDecl], parent: KType?) {
         for d in decls where d.kind != .extensionType && d.kind != .protocolType {
             let full = parent.map { "\($0.name).\(d.name)" } ?? d.name
             var t = types[full] ?? KType(name: full, kind: d.kind)
@@ -187,6 +226,8 @@ final class KInterpreter {
                 if types[d.name]?.name == full { types[d.name] = t }
             }
             declSource[full] = ObjectIdentifier(d)
+            t.line = d.line
+            t.generics = d.generics
             types[full] = t
             if types[d.name] == nil || parent == nil { types[d.name] = t }      // short name for nested types
             parent?.nested[d.name] = t
@@ -197,6 +238,7 @@ final class KInterpreter {
 
     private func absorb(_ d: KETypeDecl, into t: KType) {
         t.conformances.formUnion(d.inherits)
+        t.declaredInherits.formUnion(d.inherits)
         t.attributes += d.attributes
         if d.attributes.contains(where: { $0.name == "Observable" }) { t.conformances.insert("ObservableObject") }
         for p in d.properties {
@@ -214,7 +256,12 @@ final class KInterpreter {
         t.subscripts += d.subscripts
     }
 
-    private func applyExtension(_ d: KETypeDecl) {
+    func applyExtension(_ d: KETypeDecl) {
+        if let proto = protocols[d.name] {
+            // `extension P { … }`: default implementations (KEProtocols).
+            proto.extensions.append(d)
+            return
+        }
         if let t = types[d.name] {
             absorb(d, into: t)
             register(d.nested, parent: t)
@@ -224,11 +271,14 @@ final class KInterpreter {
         let key = d.name.split(separator: ".").last.map(String.init) ?? d.name
         let ext = builtinExtensions[key] ?? KBuiltinExtension()
         builtinExtensions[key] = ext
+        if !d.inherits.isEmpty { builtinConformances[key, default: []].formUnion(d.inherits) }
         for p in d.properties {
-            if p.isStatic { ext.staticDecls[p.name] = p } else { ext.computed[p.name] = p }
+            if p.isStatic { ext.staticDecls[p.name] = p } else { ext.computed[p.name] = p; ext.computedAll[p.name, default: []].append(p) }
+            if !d.constraints.isEmpty { ext.constraints[ObjectIdentifier(p)] = d.constraints }
         }
         for m in d.methods {
             if m.isStatic { ext.staticMethods[m.name, default: []].append(m) } else { ext.methods[m.name, default: []].append(m) }
+            if !d.constraints.isEmpty { ext.constraints[ObjectIdentifier(m)] = d.constraints }
         }
         ext.inits += d.inits
         register(d.nested, parent: nil)
@@ -248,6 +298,34 @@ final class KInterpreter {
     }
 
     /// Pick an overload by argument labels (falls back to the first).
+    /// Whether arguments with these labels bind to `params` as Swift binds
+    /// them: in order, skipping defaulted and variadic parameters; an
+    /// unlabeled argument (a trailing closure) may bind a labeled closure.
+    nonisolated static func labelsFit(_ params: [KEParam], _ labels: [String?]) -> Bool {
+        var pi = 0
+        var lastVariadic = -1
+        for l in labels {
+            var matched = false
+            while pi < params.count {
+                let p = params[pi]
+                let closure: Bool = { if case .function? = p.type?.core { return true }; return false }()
+                if p.label == l || (l == nil && closure) {
+                    matched = true
+                    if p.isVariadic { lastVariadic = pi } else { pi += 1 }
+                    break
+                }
+                if p.defaultValue != nil || p.isVariadic { pi += 1; continue }
+                return false
+            }
+            if !matched {
+                // More values for the variadic just passed: `f(1, 2, 3)`.
+                if lastVariadic >= 0, params[lastVariadic].label == l, pi == lastVariadic { continue }
+                return false
+            }
+        }
+        return params[min(pi, params.count)...].allSatisfy { $0.defaultValue != nil || $0.isVariadic }
+    }
+
     nonisolated static func pick(_ decls: [KEFuncDecl], labels: [String?]?) -> KEFuncDecl? {
         guard decls.count > 1, let labels else { return decls.first }
         let exact = decls.first { d in
@@ -429,8 +507,10 @@ final class KInterpreter {
             case .function(let f):
                 env.declare(f.name, .function(KFunction(.user(f, env, env.nearestSelf))))
             case .type(let t):
+                registerProtocols([t])
                 register([t], parent: nil)
                 if t.kind == .extensionType { applyExtension(t) }
+                if let kt = types[t.name] { finalize(kt) }
             default: break
             }
             return .normal
@@ -588,10 +668,11 @@ final class KInterpreter {
         switch (v, n) {
         case (.int, "Int"), (.double, "Double"), (.double, "CGFloat"), (.string, "String"), (.bool, "Bool"),
              (.array, "Array"), (.dict, "Dictionary"): return true
-        case (.int, _), (.double, _), (.string, _), (.bool, _): return false
+        case (.int, _), (.double, _), (.string, _), (.bool, _): return valueConforms(v, n)
         case (.native(.object("Error", _)), "CancellationError"): return KAsync.isCancellation(KEThrown(value: v))
         default:
-            if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) }
+            if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) || (n == "AnyObject" && ut.isClass) }
+            if protocols[n] != nil || builtinConformances.values.contains(where: { $0.contains(n) }) { return valueConforms(v, n) }
             return true
         }
     }
@@ -945,6 +1026,7 @@ final class KInterpreter {
         }
         let env = KEnv(parent: parent, selfContext: selfContext)
         try bindParameters(decl.params, args: args, labels: labels, into: env, name: decl.name)
+        bindGenerics(decl, env)
         let saved = currentReturnType
         currentReturnType = decl.returnType
         defer { currentReturnType = saved }
@@ -1164,6 +1246,12 @@ final class KInterpreter {
     // MARK: - Description
 
     func describe(_ v: KV, quoted: Bool = false) -> String {
+        // CustomStringConvertible: `print(x)` and `"\(x)"` use its `description`.
+        if let t = v.userType, let p = t.computed["description"], t.conformances.contains("CustomStringConvertible"),
+           let d = try? runAccessor(p.getter ?? [], env: KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(v)))), returns: p.type),
+           case .string(let text) = d {
+            return text
+        }
         switch v {
         case .void: return "()"
         case .nilValue: return "nil"
