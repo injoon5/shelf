@@ -194,7 +194,7 @@ extension KRenderer {
 
     func customShape(_ name: String, _ a: KArgs) -> AnyShape {
         if name == "PathShape", case .native(.path(let box))? = a.first { return AnyShape(box.value.path) }
-        if case .structV(let s)? = a.first { return AnyShape(KUserShape(value: s, interp: interp)) }
+        if let v = a.first, let shape = interp.proxy(for: v, as: "Shape") as? AnyShape { return shape }
         return AnyShape(Rectangle())
     }
 
@@ -203,24 +203,36 @@ extension KRenderer {
 
 }
 
-/// The concrete shape types, so `strokeBorder` (InsettableShape only) works.
-/// A Shape struct written in the interpreted code: its `path(in:)` runs there.
-struct KUserShape: Shape {
-    let value: KStructValue
-    let interp: KInterpreter
+/// The app's own `Shape` (PLAN.md §1.5's Shape proxy): `path(in:)` runs in
+/// the app's code whenever SwiftUI draws, and `animatableData` is the app's
+/// (`AnimatablePair`, `@Animatable`, a hand-written one), so SwiftUI
+/// interpolates it and the app's `path(in:)` draws each frame.
+struct KUserShape: Shape, @unchecked Sendable {
+    var app: KAppValue
 
     nonisolated func path(in rect: CGRect) -> Path {
         MainActor.assumeIsolated {
-            guard let m = value.type.method("path") else { return Path(rect) }
-            let ctx = KSelfContext(type: value.type, location: .box(KBox(.structV(value))))
+            var a = app
             let r = KV.native(.rect(rect.minX, rect.minY, rect.width, rect.height))
-            do {
-                let result = try interp.entry { try interp.invoke(m, args: [r], labels: ["in"], selfContext: ctx, parent: interp.globalEnv) }
-                if case .native(.path(let box)) = result { return box.value.path }
-            } catch {
-                interp.report(error)
-            }
+            if case .native(.path(let box)) = a.callReporting("path", [r], labels: ["in"], fallback: .nilValue) { return box.value.path }
             return Path()
+        }
+    }
+
+    nonisolated var animatableData: KAnimVector {
+        get { MainActor.assumeIsolated { KAnimatable.data(app) } }
+        set { MainActor.assumeIsolated { KAnimatable.setData(&app, newValue) } }
+    }
+
+    nonisolated func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
+        MainActor.assumeIsolated {
+            guard app.implements("sizeThatFits", labels: [nil]) else {
+                return proposal.replacingUnspecifiedDimensions()
+            }
+            var a = app
+            let v = a.callReporting("sizeThatFits", [LayoutBridges.proposal(proposal)], labels: [nil], fallback: .nilValue)
+            if case .native(.size(let w, let h)) = v { return CGSize(width: w, height: h) }
+            return proposal.replacingUnspecifiedDimensions()
         }
     }
 }

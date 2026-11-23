@@ -25,6 +25,45 @@ extension DrawingBridges {
                      "url:any scale:number? transaction:any? content:content"]) { c in asyncImage(c) }
         }
         r.type("AsyncImagePhase", .drawing) { t in t.internal() }
+        // What `Image(uiImage:)` shows: a picker's photo (§1.5), and Round 3's `UIImage(data:)`.
+        r.type("UIImage", .drawing, support: .partial, notes: "From a picker's `info[.originalImage]`, `UIImage(systemName:)` or `UIImage(data:)`; `size`, `pngData()`, `jpegData(compressionQuality:)`; shown with `Image(uiImage:)`.") { t in
+            t.initializer("systemName:string") { c in
+                #if canImport(UIKit)
+                return UIImage(systemName: c.string("systemName") ?? "").map(uiImage) ?? .nilValue
+                #else
+                return .nilValue
+                #endif
+            }
+            t.initializer("data:Data") { c in
+                #if canImport(UIKit)
+                guard let data = KBuiltins.dataValue(c.args[0]) else { return .nilValue }
+                return UIImage(data: data).map(uiImage) ?? .nilValue
+                #else
+                return .nilValue
+                #endif
+            }
+            t.property("size") { c in
+                #if canImport(UIKit)
+                if let img = c.object(UIImage.self) { return .native(.size(img.size.width, img.size.height)) }
+                #endif
+                return .native(.size(0, 0))
+            }
+            t.method("pngData", "") { c in
+                #if canImport(UIKit)
+                if let d = c.object(UIImage.self)?.pngData() { return KBuiltins.data(d) }
+                #endif
+                return .nilValue
+            }
+            t.method("jpegData", "compressionQuality:number") { c in
+                #if canImport(UIKit)
+                if let d = c.object(UIImage.self)?.jpegData(compressionQuality: c.double("compressionQuality") ?? 0.8) { return KBuiltins.data(d) }
+                #endif
+                return .nilValue
+            }
+        }
+        #if canImport(UIKit)
+        r.nativeClass(UIImage.self, "UIImage")
+        #endif
 
         for name in ["resizable", "renderingMode", "interpolation", "antialiased"] {
             let sig: [String: String] = ["resizable": "capInsets:any? resizingMode:any?", "renderingMode": "_:Image.TemplateRenderingMode?",
@@ -54,8 +93,21 @@ extension DrawingBridges {
         }
     }
 
+    #if canImport(UIKit)
+    static func uiImage(_ img: UIImage) -> KV { .native(.object("UIImage", KRef(img))) }
+    #endif
+
+    /// The `UIImage` an `Image(uiImage:)` was given.
+    @MainActor static func uiImageArgument(_ a: KArgs) -> Image? {
+        #if canImport(UIKit)
+        if let ui = KCall.objectValue(a["uiImage"]) as? UIImage { return Image(uiImage: ui) }
+        #endif
+        return nil
+    }
+
     @MainActor static func image(_ c: KCall) -> AnyView {
         let a = c.a
+        if let img = uiImageArgument(a) { return AnyView(img) }
         if let s = a["systemName"].flatMap({ c.r.string($0) }) { return AnyView(Image(systemName: s)) }
         if let n = a.first?.asString {
             if let host = Kiln.hostImageProvider?(n) { return AnyView(host) }
@@ -84,6 +136,7 @@ extension DrawingBridges {
         let a = KArgs(args: args, labels: labels)
         var image: Image
         if let s = a["systemName"].flatMap({ c.r.string($0) }) { image = Image(systemName: s) }
+        else if let ui = uiImageArgument(a) { image = ui }
         else if let n = a.first?.asString { image = Kiln.hostImageProvider?(n) ?? Image(n) }
         else { image = Image(systemName: "photo") }
         var applied = chain + [current]
