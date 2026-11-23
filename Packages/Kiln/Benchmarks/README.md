@@ -3,12 +3,12 @@
 How fast Kiln runs Shelf's apps, recorded at each step of the rewrite. PLAN.md §1.3: the bytecode VM must not be slower than 0.2.1 on any input. §1.10: a regression past 10% on any input blocks the merge.
 
 ```sh
-Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.6-language.json
+Benchmarks/run.sh /tmp/now.json --compare Benchmarks/after-1.5-proxies.json
 ```
 
 `run.sh` builds `Tools/KilnBench` in release and times every input; `--compare` marks each one more than 10% slower than the base as `SLOWER` and exits 1. `Tools/iterate.sh` runs exactly this.
 
-**Compare with the latest step (now `after-1.6-language.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
+**Compare with the latest step (now `after-1.5-proxies.json`), not with 0.2.1.** §1.2 made every app's `run` about five times faster without touching the interpreter (see below), so "not slower than 0.2.1" would let the VM give all of that back unnoticed. Each step's file is the bar for the next.
 
 ## What's timed
 
@@ -251,3 +251,13 @@ Validate, minimum per call, in ms:
 | Workloads/Arithmetic.swift | 303.31 | 303.99 | +0% |
 | Workloads/Collections.swift | 30.43 | 30.56 | +0% |
 | Workloads/Objects.swift | 30.56 | 31.09 | +2% |
+
+### after-1.5-proxies.json
+
+PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transition, representables, delegates, Transferable, FileDocument, async requirements). Measured on top of §1.6 and §1.7, so the base is `after-1.6-language.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.5-proxies.json --compare Benchmarks/after-1.6-language.json` (21 samples). Load average about 3 to 5. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is `swift-language`, 4.4% slower; most apps are within 2%, Chess is 3% faster, and the compute workloads are within 2%.
+- **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
+- **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.
+

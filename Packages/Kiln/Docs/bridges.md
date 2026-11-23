@@ -8,7 +8,8 @@ This page is the guide for adding one. It has one worked example per kind:
 - [a modifier](#a-modifier);
 - [a type with an `async` method](#a-type-with-an-async-method);
 - [a host bridge](#a-host-bridge);
-- [the run's context](#the-runs-context): files, settings, the capability gate, teardown and fakes, which every Round 3 bridge goes through.
+- [the run's context](#the-runs-context): files, settings, the capability gate, teardown and fakes, which every Round 3 bridge goes through;
+- [a protocol proxy](#a-protocol-proxy): native code calling the app's code, for a SwiftUI protocol, a representable, a delegate, `Transferable` and an `async` requirement.
 
 ## Where bridges live
 
@@ -344,11 +345,179 @@ r.resultBuilder("RegexComponentBuilder", .text) { b in
 
 `interp.builderClosure(closure, .custom(builder))` makes a closure argument run as the builder when it's called. `@ViewBuilder` content is the engine's own (`content` kind), not a registered builder.
 
+## A protocol proxy
+
+PLAN.md §1.5. Native code uses the app's own value as one of its protocols:
+SwiftUI draws the app's `Shape`, lays out with its `Layout`, UIKit calls its
+delegate, a share sheet asks its `Transferable` for data. The registry
+declares the protocol, its requirements and a **proxy**: a native type that
+conforms to the real protocol and forwards each requirement to the app's
+member (`Engine/KEProxies.swift`).
+
+### Declaring one
+
+```swift
+r.protocolBridge("Layout", .layout,
+                 requirements: ["sizeThatFits(proposal:subviews:cache:)", "placeSubviews(in:proposal:subviews:cache:)",
+                                "makeCache(subviews:)?", "animatableData?"],
+                 support: .full, notes: "Your own layout: …") { app in
+    KLayoutProxy(app: app)
+}
+```
+
+- **Requirements** are written as the app writes them. `?` marks one with a
+  default (or an optional one), `static ` a static member, `async ` one that
+  waits: `"static transferRepresentation"`, `"async perform()"`,
+  `"init(configuration:)"`. A type that adopts the protocol without a required
+  one is an error with the type's line (`'Wave' doesn't conform to 'Shape': it
+  has no path(in:)`), and `Kiln.check` and the manifest (`requirements`,
+  `proxy`) read the same list.
+- **The proxy** gets a `KAppValue` and returns the native value (an
+  `AnyShape`, a `Layout`, an `AnyView`, an object). `interp.proxy(for: value,
+  as: "Layout")` makes it for a bridge that took the app's value, or nil when
+  the value's type doesn't adopt the protocol.
+- A family can give a protocol another family declared its proxy:
+  `r.proxy("Shape") { app in … }`.
+
+### `KAppValue`
+
+The app's value as the proxy holds it. A struct is a copy, as Swift copies it
+into a generic; a class instance is shared.
+
+| | |
+|---|---|
+| `app.implements("makeCache", labels: ["subviews"])` | the app's type has it (its own, or from an `extension` it adopts) |
+| `var a = app; try a.call("sizeThatFits", args, labels: ["proposal", "subviews", "cache"])` | a synchronous requirement, with its own step budget; a `mutating` one changes `a` |
+| `a.callReporting(…, fallback:)` | the same where SwiftUI calls it and nothing can throw: an error is reported with its line |
+| `app.get("title")`, `a.set("title", v)`, `app.getStatic("readableContentTypes")` | properties, computed ones too |
+| `try await app.callAsync("perform", [], labels: [])` | an `async` requirement: a VM task on the main actor, awaited; cancelling the Swift task cancels it |
+| `interp.awaitValue(v)`, `interp.callAwaiting(closure, args)` | the same for a closure the app passed (a `DataRepresentation`'s `exporting:`) |
+
+Pass values as Kiln's (`KV`). An `inout` parameter (a layout's `cache`) is a
+`.binding(KBinding(get:set:))`.
+
+**Threads.** The app's code runs on the main thread, and SwiftUI calls some
+requirements elsewhere: it interpolates `animatableData` on its render thread,
+and may lay out there while it animates. So:
+
+- a proxy's `animatableData` is a kept `KAnimVector`, read once from the app
+  (`KAnimatable.data(app)`) and given to the app's value when its code runs
+  (`KAnimatable.applied(app, data)`); never the app's getter on each frame;
+- the app's code runs in a view's `body` where it can (`KShapeHost` draws the
+  app's shape in an `Animatable` view, so its `path(in:)` runs on the main
+  thread each frame);
+- a requirement that can be called off the main thread waits for it with
+  `KDelegates.onMain { … }`.
+
+### One of each kind
+
+**A SwiftUI protocol** (`Drawing/Animatable.swift`, `Layout/CustomLayout.swift`, `Core/Core.swift`):
+
+```swift
+struct KModifierProxy: ViewModifier, Animatable {
+    let app: KAppValue
+    var data: KAnimVector                     // KAnimatable.data(app), at init
+    nonisolated var animatableData: KAnimVector { get { data } set { data = newValue } }
+    func body(content: Content) -> some View {
+        // The app's body(content:) with SwiftUI's content, in a host that keeps its @State.
+        KModifierHost(value: KAnimatable.applied(app, data).structValue!, interp: app.interp, content: AnyView(content))
+    }
+}
+```
+
+SwiftUI's own content goes to the app as `KNativeContent.value(AnyView(content))`,
+a view the app modifies like any other.
+
+**A representable and its coordinator** (`Core/Representables.swift`): the
+app's `UIViewControllerRepresentable` is shown by `KControllerRepresentable`,
+which calls the app's `makeCoordinator()`, `makeUIViewController(context:)`
+and `updateUIViewController(_:context:)`. What the app returns must be on the
+**allowlist**. To allow a controller, bridge its type (the members models
+write) and declare it:
+
+```swift
+r.type("UIImagePickerController", .camera) { t in … }          // init, sourceType, delegate, dismiss
+#if os(iOS)
+r.representableController(UIImagePickerController.self, "UIImagePickerController")
+#endif
+```
+
+`r.representableView(UIVisualEffectView.self, "UIVisualEffectView")` is the
+same for `UIViewRepresentable`. Register the type's declaration on every
+platform (the manifest is written on the Mac), with the UIKit inside
+`#if os(iOS)`.
+
+**A delegate** (`Engine/KEDelegates.swift`, `Camera/Camera.swift`): an
+Objective-C delegate protocol needs only its declaration; the proxy is
+generic (`KilnForwardingProxy`, an `NSProxy` in the `KilnObjC` target that
+conforms at run time to every delegate protocol the app's class adopts):
+
+```swift
+r.delegateProtocol("CLLocationManagerDelegate", .location,
+                   requirements: ["locationManager(_:didUpdateLocations:)?", "locationManager(_:didFailWithError:)?"])
+```
+
+The bridge that takes the delegate sets the proxy and keeps it alive
+(delegates are weak):
+
+```swift
+t.property("delegate", { _ in .nilValue }, set: { c in
+    guard let manager = c.object(CLLocationManager.self), let proxy = KDelegates.proxy(for: c.args[0], c.interp) else { … }
+    manager.delegate = unsafeBitCast(proxy, to: CLLocationManagerDelegate.self)
+    KDelegates.retain(proxy, by: manager)
+})
+```
+
+- Each requirement's selector is derived from its Swift name
+  (`locationManager(_:didUpdateLocations:)` is `locationManager:didUpdateLocations:`);
+  `spec.selectors[…]` overrides one Swift renames.
+- Arguments arrive converted by `KNativeValues.kv(from:)`: strings, numbers,
+  arrays, dictionaries, URLs, dates, `Data`, errors, and objects of classes
+  registered with `r.nativeClass(CLLocation.self, "CLLocation")`.
+  `spec.arguments(requirement) { args, interp in … }` converts one itself
+  (the picker's `info` keys become `.originalImage`).
+- `respondsToSelector:` is true only for what the app implements, and after
+  teardown the proxy answers nothing.
+- A Swift-only protocol (`DataScannerViewControllerDelegate`) subclasses
+  `KAppDelegateObject`, conforms, and forwards each method with
+  `forward("dataScanner(_:didTapOn:)", args)`; declare it as the protocol's proxy.
+
+**`Transferable`** (`Sharing/Transferable.swift`): the app's
+`transferRepresentation` runs through `TransferRepresentationBuilder`, and
+`KTransferItem` is the native `Transferable`. A bridge that shares or exports
+takes `interp.proxy(for: v, as: "Transferable") as? KTransferItem`; one that
+pastes, drops or imports calls
+`KTransferables.importValue(type, data:, contentType:, interp)`.
+`FileDocument` is the same shape (`Files/Files.swift`):
+`KFileDocuments.document(for:)` for `.fileExporter`, `read(_:data:contentType:)`
+for an importer.
+
+**An `async` requirement**: inside Kiln, `try await app.callAsync(…)`. A host
+declares its protocol and awaits the app's value the same way:
+
+```swift
+Kiln.registerProtocol("Greeter", requirements: ["async greet(name:)"])
+Kiln.registerFunction("greetWith", signature: "_:any") { call in
+    guard let g = call.adopter(0, as: "Greeter") else { throw call.error("needs a Greeter") }
+    return .async { try await g.callAsync("greet(name:)", [KilnValue(string: "Ann")]) }
+}
+```
+
+An error the app's code throws reaches the caller (and the app's `catch`, if
+the call came from the app).
+
+### Testing one
+
+`ProxyTests` has the patterns: call the proxy directly (`KUserShape(app:)`'s
+`path(in:)`, `animatableData` set as SwiftUI would), mount the app in a
+hosting view for a view or layout, and a missing requirement's error. Anything
+UIKit is tested in Shelf's `FeatureFixtureTests`, on the simulator.
+
 ## Protocols, environment values, property wrappers
 
 These are declarations, which the manifest and the checker read:
 
-- `r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"])`. §1.5 adds the proxy: a native class that forwards each requirement to the app's value (`KProtocolBridge.proxy`).
+- `r.protocolBridge("Identifiable", .language, requirements: ["id"])`, with no proxy: the engine implements it. With a proxy, see [a protocol proxy](#a-protocol-proxy).
 - `r.environmentValue("dismiss", .environment) { interp in … }` gives the value `@Environment(\.dismiss)` reads before SwiftUI's arrive.
 - `r.wrapper("State", .environment)` declares a wrapper the engine implements (`KViewStorage`).
 
