@@ -17,30 +17,33 @@ import UIKit
         #expect(largest == app, "\"No Results\" grew past the app's cap")
     }
 
-    /// The results layer with a query that matches nothing, as a picture.
+    /// Search's list with a query that matches nothing, as a picture.
     private func render(at size: DynamicTypeSize) throws -> Data {
         let model = HomeModel()
         model.query = "nothing matches this"
-        let layout = ResultsLayout()
-        layout.geometry = HomeGeometry(size: CGSize(width: 393, height: 852), safeTop: 62, displayRadius: 55, labelHeight: 14)
-        layout.resultsBottom = 120
         let library = LibraryStore(demo: [], cache: AppCache(root: temporaryFolder()))
+        let screen = CGSize(width: 393, height: 852)
 
         let scene = try #require(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first)
         let window = UIWindow(windowScene: scene)
-        window.frame = CGRect(origin: .zero, size: layout.geometry.size)
-        let host = UIHostingController(rootView: ResultsLayer(model: model, library: library, layout: layout)
-            .environment(\.dynamicTypeSize, size))
+        window.frame = CGRect(origin: .zero, size: screen)
+        let host = UIViewController()
         window.rootViewController = host
+        host.traitOverrides.preferredContentSizeCategory = UIContentSizeCategory(size)
+        let list = SearchList(model: model, library: library)
+        list.frame = host.view.bounds
+        list.top = 90
+        list.fieldTop = 700
+        host.view.addSubview(list)
         window.isHidden = false
         defer { window.isHidden = true }
         for _ in 0..<5 {
-            host.view.setNeedsLayout()
-            host.view.layoutIfNeeded()
+            list.setNeedsLayout()
+            list.layoutIfNeeded()
             RunLoop.main.run(until: Date().addingTimeInterval(0.02))
         }
-        let image = UIGraphicsImageRenderer(bounds: host.view.bounds).image { _ in
-            host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+        let image = UIGraphicsImageRenderer(bounds: list.bounds).image { _ in
+            list.drawHierarchy(in: list.bounds, afterScreenUpdates: true)
         }
         return try #require(image.pngData())
     }

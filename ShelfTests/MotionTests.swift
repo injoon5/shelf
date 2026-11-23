@@ -129,42 +129,37 @@ struct SearchWarpTests {
 
     @Test func aPullMovesTheWarpInProportionAndStopsAtTheField() {
         #expect(SearchWarp.progress(pull: 0, from: 0) == 0)
-        #expect(abs(SearchWarp.progress(pull: HomeMetrics.searchPullDistance / 2, from: 0) - 0.5) < 0.0001)
-        #expect(SearchWarp.progress(pull: HomeMetrics.searchPullDistance * 3, from: 0) == 1)
+        #expect(abs(SearchWarp.progress(pull: SearchMetrics.pullDistance / 2, from: 0) - 0.5) < 0.0001)
+        #expect(SearchWarp.progress(pull: SearchMetrics.pullDistance * 3, from: 0) == 1)
         #expect(SearchWarp.progress(pull: -50, from: 0) == 0)
         // A warp caught halfway carries on from there.
         #expect(abs(SearchWarp.progress(pull: 0, from: 0.5) - 0.5) < 0.0001)
     }
 
     @Test func releasesOpenByFlickOrByDistance() {
-        #expect(SearchWarp.opens(progress: 0.05, velocity: HomeMetrics.searchOpenVelocity + 1))
-        #expect(!SearchWarp.opens(progress: 0.95, velocity: -HomeMetrics.searchOpenVelocity - 1))
-        #expect(SearchWarp.opens(progress: HomeMetrics.searchOpenProgress + 0.01, velocity: 0))
-        #expect(!SearchWarp.opens(progress: HomeMetrics.searchOpenProgress - 0.01, velocity: 0))
+        #expect(SearchWarp.opens(progress: 0.05, velocity: SearchMetrics.openVelocity + 1))
+        #expect(!SearchWarp.opens(progress: 0.95, velocity: -SearchMetrics.openVelocity - 1))
+        #expect(SearchWarp.opens(progress: SearchMetrics.openProgress + 0.01, velocity: 0))
+        #expect(!SearchWarp.opens(progress: SearchMetrics.openProgress - 0.01, velocity: 0))
     }
 
-    @Test func theFieldIsFullWidthOnThePillsLine() {
+    /// App Library's field and round ✕, on the pill's line.
+    @Test func theFieldAndItsCloseButtonSitOnThePillsLine() {
         let field = SearchWarp.field(screenWidth: 402, pill: pill)
-        #expect(field.minX == HomeMetrics.searchSideInset)
-        #expect(field.maxX == 402 - HomeMetrics.searchSideInset)
-        #expect(abs(field.midY - pill.midY) < 0.0001)
-        #expect(field.height == HomeMetrics.searchFieldHeight)
+        let close = SearchWarp.close(screenWidth: 402, field: field)
+        #expect(field.minX == SearchMetrics.sideInset)
+        #expect(abs(close.maxX - (402 - SearchMetrics.sideInset)) < 0.0001)
+        #expect(abs(close.minX - field.maxX - SearchMetrics.closeGap) < 0.0001)
+        #expect(abs(field.midY - pill.midY) < 0.0001 && abs(close.midY - pill.midY) < 0.0001)
+        #expect(field.height == SearchMetrics.fieldHeight && close.height == SearchMetrics.closeSize)
     }
 
     @Test func theKeyboardLiftsTheFieldJustAboveItself() {
         let field = SearchWarp.field(screenWidth: 402, pill: pill)
         #expect(SearchWarp.lift(field: field, keyboardTop: nil) == 0)
         let lift = SearchWarp.lift(field: field, keyboardTop: 520)
-        #expect(abs(field.maxY + lift - (520 - HomeMetrics.searchKeyboardGap)) < 0.0001)
+        #expect(abs(field.maxY + lift - (520 - SearchMetrics.keyboardGap)) < 0.0001)
         // A keyboard below the field leaves it where it is.
         #expect(SearchWarp.lift(field: field, keyboardTop: 870) == 0)
-    }
-
-    @Test func theGlassWidthGivesTheProgressBack() {
-        let field = SearchWarp.field(screenWidth: 402, pill: pill)
-        for p: CGFloat in [0, 0.25, 0.6, 1] {
-            let glass = pill.interpolated(to: field, p)
-            #expect(abs(SearchWarp.progress(width: glass.width, pill: pill, field: field) - p) < 0.0001)
-        }
     }
 }

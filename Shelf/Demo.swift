@@ -50,6 +50,12 @@ enum Demo {
     /// latency can't do at full speed.
     static let slowMotion: Double = max(UserDefaults.standard.double(forKey: "ShelfSlowMotion"), 1)
 
+    /// Search's warp held still at this progress, as a finger holding a
+    /// pull there would: `-ShelfSearchProgress 0.5`. For pictures of the
+    /// pull's frames, which a test driver can't stop mid-gesture.
+    static let searchProgress: CGFloat? = UserDefaults.standard.object(forKey: "ShelfSearchProgress") == nil
+        ? nil : CGFloat(UserDefaults.standard.double(forKey: "ShelfSearchProgress"))
+
     static func library() -> LibraryStore {
         // `-ShelfDemoEmpty YES` shows the empty library instead.
         let defaults = UserDefaults.standard
