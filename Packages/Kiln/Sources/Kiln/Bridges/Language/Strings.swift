@@ -21,6 +21,8 @@ extension LanguageBridges {
                 if let d = c.arg("describing") { return .string(c.interp.describe(d)) }
                 if c.has("contentsOf") || c.has("contentsOfFile") { return try FoundationBridges.stringContents(c) }
                 if let d = c.arg("data") { return KBuiltins.dataValue(d).flatMap { String(data: $0, encoding: .utf8) }.map { .string($0) } ?? .nilValue }
+                // `String(decoding: data, as: UTF8.self)` never fails.
+                if let d = c.arg("decoding"), let data = KBuiltins.dataValue(d) { return .string(String(decoding: data, as: UTF8.self)) }
                 if case .array(let chars)? = c.first { return .string(chars.map { c.interp.describe($0) }.joined()) }
                 return .string(c.first.map { c.interp.describe($0) } ?? "")
             }
