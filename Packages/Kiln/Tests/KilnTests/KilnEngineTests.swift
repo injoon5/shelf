@@ -111,6 +111,48 @@ final class KilnEngineTests: XCTestCase {
                        ["1\(locale)400 pages read", "double 3.500000", "neg -12\(locale)345", "verbatim 1400", "1400", "spec 3.14"])
     }
 
+    /// JSONEncoder writes what JSONDecoder reads: stored properties through
+    /// CodingKeys, nil optionals left out, raw-value enums, UUIDs and dates.
+    /// A property with an inferred type (`var id = UUID()`, `var servings = 2.0`)
+    /// comes back as the kind of value its default is.
+    func testJSONEncoderRoundTripsDeclaredTypes() throws {
+        let c = try KilnEngine.compile(#"""
+        import SwiftUI
+        enum Level: String, Codable { case easy, hard }
+        struct Step: Codable { var text: String }
+        struct Recipe: Codable, Identifiable {
+            var id = UUID()
+            var title: String
+            var cookMinutes: Int
+            var level: Level = .easy
+            var rating: Double?
+            var made: Date = Date(timeIntervalSinceReferenceDate: 86400)
+            var servings = 2.0
+            var steps: [Step] = []
+            enum CodingKeys: String, CodingKey { case id, title, cookMinutes = "cook_minutes", level, rating, made, servings, steps }
+        }
+
+        func run() -> String {
+            let recipes = [Recipe(title: "Soup \"hot\"", cookMinutes: 25, level: .hard, steps: [Step(text: "Boil")]),
+                           Recipe(title: "Toast", cookMinutes: 3, rating: 4.5)]
+            do {
+                let data = try JSONEncoder().encode(recipes)
+                let back = try JSONDecoder().decode([Recipe].self, from: data)
+                let same = back[0].id == recipes[0].id && back[1].made == recipes[1].made && back[0].servings + 0.5 == 2.5
+                return "\(back.count) \(back[0].title) \(back[0].cookMinutes) \(back[0].level.rawValue) \(back[0].rating == nil) \(back[0].steps[0].text) \(back[1].rating ?? 0) \(same)"
+            } catch {
+                return "failed: " + error.localizedDescription
+            }
+        }
+        struct ContentView: View {
+            var body: some View { Text(run()) }
+        }
+        """#)
+        let views = try KilnEngine.rootViews(c.root, c.interp)
+        guard case .custom(let s) = views.first?.kind else { return XCTFail("no ContentView") }
+        XCTAssertEqual(try texts(s, KViewStorage(), c.interp), [#"2 Soup "hot" 25 hard true Boil 4.5 true"#])
+    }
+
     /// JSONDecoder builds your own Decodable types: CodingKeys, snake_case,
     /// optionals, defaults, nested arrays and raw-value enums; a missing key
     /// throws an Error whose localizedDescription can be shown.

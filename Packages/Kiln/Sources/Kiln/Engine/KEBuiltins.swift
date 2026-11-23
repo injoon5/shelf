@@ -651,7 +651,7 @@ enum KBuiltins {
         case "JSONDecoder":
             return .native(.object(name, KRef(KDecoderBox())))
         case "JSONEncoder":
-            return .native(.object(name, KRef(NSObject())))
+            return .native(.object(name, KRef(KEncoderBox())))
         case "URLComponents":
             let c = arg("string")?.asString.flatMap { NSURLComponents(string: $0) }
                 ?? (arg("url").flatMap { if case .native(.url(let u)) = $0 { return NSURLComponents(url: u, resolvingAgainstBaseURL: false) }; return nil })
@@ -957,6 +957,8 @@ enum KBuiltins {
         default:
             break
         }
+        // `[Todo].self` and `[String: Todo].self`: the literal is already the type's description.
+        if name == "self" { return base }
         throw interp.fail("Value of type '\(base.typeName)' has no member '\(name)'", line)
     }
 

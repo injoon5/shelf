@@ -12,12 +12,22 @@
 //    from the JSON by their stored properties: CodingKeys, optionals, default
 //    values, nested types, arrays, raw-value enums, `.convertFromSnakeCase`
 //    and `.iso8601` dates.
+//  - `JSONEncoder().encode(value)` is the same mapping the other way, so what
+//    it writes is what `decode` reads: stored properties (through CodingKeys),
+//    nil optionals left out, raw-value enums, `.convertToSnakeCase` and
+//    `.iso8601` dates.
 //
 
 import Foundation
 
 /// A JSONDecoder's settings.
 final class KDecoderBox {
+    var snakeCase = false
+    var iso8601 = false
+}
+
+/// A JSONEncoder's settings.
+final class KEncoderBox {
     var snakeCase = false
     var iso8601 = false
 }
@@ -120,6 +130,13 @@ extension KBuiltins {
             }
             let box = ref.value as? KDecoderBox ?? KDecoderBox()
             return try decode(json, as: decodeTarget(args.first ?? .nilValue, interp), box, interp, line)
+        case ("JSONEncoder", "encode"):
+            let box = ref.value as? KEncoderBox ?? KEncoderBox()
+            let json = try encode(args.first ?? .nilValue, box, interp, line)
+            guard let out = try? JSONSerialization.data(withJSONObject: json, options: [.fragmentsAllowed, .sortedKeys]) else {
+                throw KEThrown(value: errorValue("The data couldn't be written because it isn't in the correct format."))
+            }
+            return data(out)
         default:
             return nil
         }
@@ -152,6 +169,14 @@ extension KBuiltins {
         case ("JSONDecoder", "dateDecodingStrategy"):
             if case .native(.implicit(let s, _)) = value { (ref.value as? KDecoderBox)?.iso8601 = s == "iso8601" }
             return true
+        case ("JSONEncoder", "keyEncodingStrategy"):
+            if case .native(.implicit(let s, _)) = value { (ref.value as? KEncoderBox)?.snakeCase = s == "convertToSnakeCase" }
+            return true
+        case ("JSONEncoder", "dateEncodingStrategy"):
+            if case .native(.implicit(let s, _)) = value { (ref.value as? KEncoderBox)?.iso8601 = s == "iso8601" }
+            return true
+        case ("JSONEncoder", "outputFormatting"):
+            return true   // keys are always sorted; the rest is whitespace
         case ("URLComponents", "queryItems"):
             if case .array(let items) = value {
                 (ref.value as? NSURLComponents)?.queryItems = items.compactMap {
@@ -172,6 +197,65 @@ extension KBuiltins {
         default:
             return false
         }
+    }
+
+    // MARK: Encoding
+
+    /// A value as JSONSerialization objects: the inverse of `decode`.
+    @MainActor static func encode(_ v: KV, _ box: KEncoderBox, _ interp: KInterpreter, _ line: Int) throws -> Any {
+        switch v {
+        case .nilValue, .void: return NSNull()
+        case .bool(let b): return b
+        case .int(let i): return i
+        case .double(let d):
+            guard d.isFinite else { throw KEThrown(value: errorValue("The data couldn't be written because \(d) isn't a JSON number.")) }
+            return d
+        case .string(let s): return s
+        case .array(let items): return try items.map { try encode($0, box, interp, line) }
+        case .set(let items): return try items.map { try encode($0, box, interp, line) }
+        case .tuple(let items, _): return try items.map { try encode($0, box, interp, line) }
+        case .dict(let d):
+            var out: [String: Any] = [:]
+            for (k, item) in d { out[k.asString ?? interp.describe(k)] = try encode(item, box, interp, line) }
+            return out
+        case .structV(let s): return try encodeFields(s.fields, s.type, box, interp, line)
+        case .object(let o): return try encodeFields(o.fields, o.type, box, interp, line)
+        case .enumV(let e):
+            guard e.payload.isEmpty else {
+                throw KEThrown(value: errorValue("The data couldn't be written because \(e.type.name).\(e.caseName) has associated values."))
+            }
+            return try encode(try interp.rawValue(e), box, interp, line)
+        case .binding(let b): return try encode(b.get(), box, interp, line)
+        case .native(.uuid(let u)): return u.uuidString
+        case .native(.url(let u)): return u.absoluteString
+        case .native(.date(let d)):
+            return box.iso8601 ? ISO8601DateFormatter().string(from: d) as Any : d.timeIntervalSinceReferenceDate
+        case .native(.object("Data", let ref)): return ((ref.value as? Data) ?? Data()).base64EncodedString()
+        default:
+            throw KEThrown(value: errorValue("The data couldn't be written because \(interp.describe(v)) isn't Encodable."))
+        }
+    }
+
+    @MainActor static func encodeFields(_ fields: [String: KV], _ t: KType, _ box: KEncoderBox, _ interp: KInterpreter, _ line: Int) throws -> Any {
+        var keys: [String: String] = [:]
+        if let ck = t.nested["CodingKeys"] {
+            for c in ck.cases {
+                let raw = try interp.rawValue(KEnumValue(type: ck, caseName: c.name, payload: []))
+                keys[c.name] = raw.asString ?? c.name
+            }
+        }
+        var out: [String: Any] = [:]
+        for p in t.stored {
+            let key: String
+            if let k = keys[p.name] { key = k }
+            else if !keys.isEmpty { continue }   // not coded
+            else { key = box.snakeCase ? snakeCase(p.name) : p.name }
+            // A nil optional is left out, as `encodeIfPresent` does; `decode` reads a missing key as nil.
+            guard let value = fields[p.name], !value.isNil else { continue }
+            if case .void = value { continue }
+            out[key] = try encode(value, box, interp, line)
+        }
+        return out
     }
 
     // MARK: Decoding
@@ -238,6 +322,22 @@ extension KBuiltins {
         }
     }
 
+    /// JSON read as the kind of value `like` is, for a property whose type is inferred.
+    @MainActor static func decode(_ json: Any, like: KV, _ box: KDecoderBox, _ interp: KInterpreter, _ line: Int) throws -> KV {
+        switch like {
+        case .double: return try decode(json, as: .named("Double", []), box, interp, line)
+        case .native(.uuid): return try decode(json, as: .named("UUID", []), box, interp, line)
+        case .native(.date): return try decode(json, as: .named("Date", []), box, interp, line)
+        case .native(.url): return try decode(json, as: .named("URL", []), box, interp, line)
+        case .structV(let s): return try decodeUser(json, s.type, box, interp, line)
+        case .enumV(let e): return try decodeUser(json, e.type, box, interp, line)
+        case .array(let items):
+            guard let first = items.first, let list = json as? [Any] else { return plain(json) }
+            return .array(try list.map { try decode($0, like: first, box, interp, line) })
+        default: return plain(json)
+        }
+    }
+
     @MainActor static func decodeUser(_ json: Any, _ t: KType, _ box: KDecoderBox, _ interp: KInterpreter, _ line: Int) throws -> KV {
         if t.isEnum {
             for c in t.cases {
@@ -265,7 +365,12 @@ extension KBuiltins {
             else if !keys.isEmpty { fields[p.name] = defaults[p.name] ?? .nilValue; continue }   // not coded
             else { key = box.snakeCase ? snakeCase(p.name) : p.name }
             if let value = object[key], !(value is NSNull) {
-                fields[p.name] = try decode(value, as: p.type, box, interp, line)
+                // `var id = UUID()` declares no type; its default value says what the JSON holds.
+                if p.type == nil, let like = defaults[p.name] {
+                    fields[p.name] = try decode(value, like: like, box, interp, line)
+                } else {
+                    fields[p.name] = try decode(value, as: p.type, box, interp, line)
+                }
             } else if let d = defaults[p.name] {
                 fields[p.name] = d
             } else if p.type?.isOptional == true || object[key] is NSNull {
