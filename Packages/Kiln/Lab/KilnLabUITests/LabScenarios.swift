@@ -283,7 +283,9 @@ final class AppScenarios: LabCase {
         tap("Monstera, 2 days")
         snap("2 pushed a plant")
         tap("Water now")
-        tap("Back")
+        // iOS 26's back button is a chevron with no label.
+        let back = app.navigationBars.buttons.element(boundBy: 0)
+        if back.waitForExistence(timeout: 3) { back.tap() } else { note("missing: back button") }
         snap("3 watered and back")
         tap("Add")
         snap("4 sheet at medium")
