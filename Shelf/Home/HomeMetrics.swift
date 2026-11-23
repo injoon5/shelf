@@ -147,7 +147,7 @@ enum HomeMetrics {
 
     // MARK: Wallpaper
 
-    /// How far the gradient's middle points stray from their places, as a
+    /// How far the gradient's middle points sit from the centre, as a
     /// fraction of the screen.
     static let wallpaperReach: Float = 0.12
 
@@ -170,7 +170,6 @@ enum HomeMetrics {
     /// How close to a screen edge a dragged icon flips the page.
     static let pageFlipEdge: CGFloat = 28
     static let bannerTopGap: CGFloat = 4
-    static let bannerPadding = EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 18)
     static let shakeDistance: CGFloat = 8
 
     // MARK: Long press

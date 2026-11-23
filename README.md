@@ -64,7 +64,7 @@ xcodebuild test -project Shelf.xcodeproj -scheme Shelf \
   -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build/DerivedData
 ```
 
-They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the motion curves, and the feature apps in `fixtures/apps/`.
+They cover the API client against recorded responses (`fixtures/api/`), sync, the local data store, reply parsing (`fixtures/replies/`, shared with ij5.dev), the prompts, the Home Screen layout and its rules ([design/audit-0.1.md](design/audit-0.1.md)), the UIKit Home Screen (`HomeViewTests`: the icon outline against Springboard's, drops, page flips, the menu, the jiggle), the motion curves, and the feature apps in `fixtures/apps/`.
 
 ## The server
 
@@ -94,7 +94,7 @@ Then connect Shelf to `http://localhost:8787` with the token whose hash is `AUTH
 
 ```
 Shelf/
-  Home/       the Home Screen: icon grid, dock, search, edit mode, wallpaper, the stage that owns it all
+  Home/       the Home Screen in UIKit: the icon renderer, pages, dock, long press and menu, drag, edit mode, search, wallpaper, the stage that owns it all
   Runner/     running an app: the card, its open and close motion, error screen, source rewriting
   Motion/     springs, and layer animation that starts from the presentation layer
   Create/     New App and Change…: prompts, reply parsing, preview, install keys
@@ -113,13 +113,16 @@ design/       Springboard reference measurements and notes
 
 Decisions that aren't obvious from the code:
 
-- **Measured from Springboard.** The Home Screen's numbers come from screenshots of the real one on an iPhone 17 ([design/reference/](design/reference/)): 64 pt icons, a dock inset 17 pt on every side, and a 26% icon corner, the rounder outline of iOS 26 and 27. The dock, the search pill and the search field share one definition of clear system glass, never a hand-made blur.
+- **Measured from Springboard.** The Home Screen's numbers come from screenshots of the real one on an iPhone 17 ([design/reference/](design/reference/)): 64 pt icons, a dock inset 17 pt on every side, a 26% icon corner (the rounder outline of iOS 26 and 27), the minus badge, and the long-press lift and menu. The dock, the search pill, the search field and the edit-mode buttons share one definition of clear system glass (`HomeGlass`), never a hand-made blur.
+- **The Home Screen is UIKit and Core Animation.** Everything the stage shows is UIKit; only the sheets, the error screen and the app inside a card are SwiftUI. The stage reads `HomeModel` and `LibraryStore` in `updateProperties()` and `layoutSubviews()`, which UIKit tracks for observation. Each icon is a sibling at an exact point, so a reorder is points changing on additive `UIView` springs, and a card opens from, and lands on, exactly where its icon is.
+- **One icon renderer.** `IconArtView` draws every icon in Core Animation: the grid, the dock, a card's face, search results, and the previews in sheets. Its outline is a path, not a layer's `cornerRadius`: Core Animation's continuous corner is up to 6 pixels rounder at 3x than Springboard's, and SwiftUI's continuous rounded rectangle matches Springboard's to the pixel. Light or dark icons come from one trait, `IconToneTrait`, set on the window.
+- **The jiggle costs the main thread nothing.** Each icon's wobble is one repeating Core Animation animation that the render server plays by itself, each starting at its own moment. The icon is rasterized while it jiggles or pages, so its rim's mask and its label's shadow aren't drawn again every frame. Animations ask for 120 Hz, which an iPhone app only gets with `CADisableMinimumFrameDurationOnPhone` in Info.plist.
 - **Apps are cards Shelf drives in UIKit.** A SwiftUI `fullScreenCover` with a zoom transition closed like a sheet. Instead, `HomeStage` owns the layers. A card follows the finger over the live Home Screen and springs into its icon with the gesture's velocity. Every animation starts from the presentation layer, so a card can be caught mid-flight. The system's edge gestures are deferred only while an app is open.
 - **Search is the pill.** The pill is one piece of glass that stretches into the search field as you pull down (or tap) and rides up with the keyboard, as on iOS 27.
 - **Settings is an icon like any other.** It sits in the layout under `:settings`, which no slug can be, so it moves to any page or within the four-place dock and search finds it. It can't be deleted, its menu has only Edit Home Screen, and a tap opens the Settings sheet.
 - **Pages don't shift under a drag.** A page that a drag empties stays until Done, as on Springboard. Done drops it, and the page in view follows its icons.
-- **A long press means one thing at a time.** On a still Home Screen it opens the icon's menu; once icons jiggle, it starts a drag. Offered together, the menu's preview swallows the drag. Edit mode starts from the menu or from a long press on the wallpaper.
-- **Icon styles are Color and Clear.** Color draws dark tiles in dark mode, as Springboard does.
+- **A long press is Springboard's.** Touch-down darkens the icon. Held still, it lifts and its menu opens beside it while everything else dims. Moving on closes the menu, starts edit mode and carries the icon. In edit mode a short hold picks an icon up, and a quicker swipe turns the page. The menu is Shelf's own glass panel: once `UIContextMenuInteraction`'s menu is up, UIKit cancels the touch for every other recognizer, the window's included, so the finger could never carry on into a drag. Edit mode also starts from a long press on the wallpaper.
+- **Icons are light or dark.** Dark icons are near-black tiles with the glyph in the app's colour, as Springboard's are. Clear isn't drawn any more; Settings still offers it until Icon Appearance replaces the setting (PLAN.md §0.5).
 - **Apps can't overwrite each other's settings.** Kiln puts `@AppStorage` in the shared `UserDefaults.standard`, so Shelf rewrites each key to `<slug>.<key>` before running an app. It's not a security boundary, so Shelf keeps nothing of its own there.
 - **`DB` is plain networking.** Kiln can already make requests, so Shelf appends a small `DB` helper to apps that use it. The helper talks to a `db://` URL scheme that Shelf answers on the phone from a local store, which syncs with ij5.dev. The key travels in a `DB-Key` header, because a key in the URL would be cut at `?` or `#`.
 - **Kiln is patched.** 0.2.1 couldn't write JSON: `JSONEncoder().encode` was missing, `[Todo].self` threw, and a decoded `UUID` came back as a `String`. `Vendor/kiln-0.2.1.patch` fixes all three. The rebuild in PLAN.md replaces it.
@@ -127,7 +130,8 @@ Decisions that aren't obvious from the code:
 
 ## Not done yet
 
-- A 120 fps check in Instruments, and a frame-by-frame comparison of a finger-driven close with Springboard's. The simulator can't perform the system's home gesture, so there's nothing to compare against.
+- A 120 fps check in Instruments on an iPhone. On the simulator, Time Profiler takes no samples from Shelf in 4 s of jiggling with a full page: nothing runs on the main thread. A frame-by-frame comparison of a finger-driven close with Springboard's is also still to do. The simulator can't perform the system's home gesture, so there's nothing to compare against.
+- Picking up more than one icon at once (tapping others mid-drag, as on Springboard).
 - With an app's own keyboard up, the swipe from the bottom edge lands on the keyboard and can't close the app. The drag down from the status bar still works.
 - A device token in place of the admin token on the phone, minted like install keys and limited to apps, data and keys.
 - Live updates to an app's data while it's open, so a change from another device shows without reopening.

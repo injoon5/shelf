@@ -114,12 +114,6 @@ final class IconView: UIView {
         return hypot(point.x - center.x, point.y - center.y) <= target / 2
     }
 
-    /// Whether `point` (in this view's coordinates) is on the artwork or
-    /// its label: what a finger has to touch to press the icon.
-    func touchArea(contains point: CGPoint) -> Bool {
-        bounds.insetBy(dx: 0, dy: 0).contains(point)
-    }
-
     // MARK: States
 
     /// While an app's card stands in for its icon, the artwork isn't drawn.

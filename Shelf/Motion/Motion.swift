@@ -13,8 +13,6 @@ enum Motion {
     static let standard = Animation.spring(duration: 0.4, bounce: 0.1)
     /// Small state changes: a press releasing, a dot appearing.
     static let quick = Animation.spring(duration: 0.25, bounce: 0)
-    /// The install pie filling.
-    static let pie = Animation.spring(duration: 0.5, bounce: 0)
 
     // MARK: UIKit springs
 
@@ -78,7 +76,6 @@ enum Motion {
 
     // MARK: Fades
 
-    static let fade = Animation.easeOut(duration: fadeDuration)
     static let fadeDuration: TimeInterval = 0.2
     /// The app replacing its launch screen.
     static let launch = Animation.easeOut(duration: 0.18)
@@ -98,7 +95,6 @@ enum Motion {
 
     /// One full swing, there and back.
     static let jigglePeriod: Double = 0.26
-    static var jiggle: Animation { .easeInOut(duration: jigglePeriod / 2).repeatForever(autoreverses: true) }
 
     // MARK: Durations
 
@@ -106,7 +102,6 @@ enum Motion {
     static let spinnerDelay: Duration = .milliseconds(300)
     /// How far the pie creeps while a download is still running, and how.
     static let pieCreepTarget: Double = 0.85
-    static let pieCreep = Animation.easeOut(duration: pieCreepDuration)
     static let pieCreepDuration: TimeInterval = 2.5
     static let bannerStay: Duration = .seconds(3)
     static let pageDotsStay: Duration = .seconds(1)
@@ -122,15 +117,4 @@ enum Motion {
     /// A dragged icon held over a new place this long makes room there, so
     /// a finger sweeping across the grid doesn't shuffle everything it passes.
     static let reorderDwell: Duration = .milliseconds(120)
-    /// A dragged icon that has left a drop target with no other target
-    /// hearing of it for this long was let go of outside any: the system
-    /// ended the drag without a drop. Crossing from one target into another
-    /// is reported at once, so this only has to outlast a frame or two.
-    static let dragLost: Duration = .milliseconds(250)
-    /// How long a landed card stays on its icon after the icon has been
-    /// shown beneath it, so there is never a frame with neither.
-    static let cardHandoff: Duration = .milliseconds(50)
-    static let wallpaperDrift: Double = 20
-    /// The gradient drifts too slowly to need more frames than this.
-    static let wallpaperFrameInterval: Double = 1 / 30
 }
