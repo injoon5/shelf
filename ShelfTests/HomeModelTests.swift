@@ -196,6 +196,18 @@ import Testing
         #expect(model.pageCount([[]]) == 1)
     }
 
+    /// The spare page doesn't count the icon being carried: carried onto
+    /// it, the icon doesn't make another one beyond it to flip to.
+    @Test func aCarriedIconMakesNoSecondSparePage() {
+        let model = HomeModel()
+        model.startEditing()
+        model.beginDrag("b")
+        #expect(model.pageCount([["a"], ["b"]]) == 2)
+        #expect(model.pageCount([["a", "b"]]) == 2)
+        model.endDrag()
+        #expect(model.pageCount([["a"], ["b"]]) == 3)
+    }
+
     /// Relaunched, Shelf starts on the first page, as Springboard does after a restart.
     @Test func aRelaunchStartsOnTheFirstPage() {
         #expect(HomeModel().page == 0)

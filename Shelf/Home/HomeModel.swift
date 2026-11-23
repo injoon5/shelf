@@ -185,9 +185,12 @@ final class HomeModel {
     }
 
     /// How many pages there are to scroll through. While editing there is
-    /// always an empty page at the end to drop onto, and a dot for it.
+    /// always an empty page at the end to drop onto, and a dot for it. The
+    /// icon being carried doesn't count: carried onto that page, it doesn't
+    /// make another, so holding it at the edge never runs on past one.
     func pageCount(_ pages: [[String]]) -> Int {
-        let spare = isEditing && pages.last?.isEmpty == false
+        let last = pages.last?.filter { $0 != dragging } ?? []
+        let spare = isEditing && !last.isEmpty
         return max(pages.count + (spare ? 1 : 0), 1)
     }
 
