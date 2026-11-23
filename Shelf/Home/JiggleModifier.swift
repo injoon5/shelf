@@ -22,9 +22,10 @@ struct Jiggle: ViewModifier {
     }
 }
 
-/// The jiggle at one moment. Glass turned as a whole view smears and
-/// shimmers, so under a Clear icon the glass is never turned: its shape is,
-/// and the pieces over it turn themselves by `jiggleTurn`.
+/// The jiggle at one moment. Glass can't be turned: turned as a view or
+/// drawn in a turned shape, it leaves a second outline and material past
+/// its edges. So a Clear icon's tile only bobs, upright, and its glyph and
+/// label turn by `jiggleTurn`.
 private struct Tilt: ViewModifier, Animatable {
     var angle: Double
     var shift: CGFloat
@@ -44,11 +45,11 @@ private struct Tilt: ViewModifier, Animatable {
 }
 
 extension EnvironmentValues {
-    /// How far a jiggling Clear icon's parts turn on their own.
+    /// How far a jiggling Clear icon's glyph and label turn on their own.
     @Entry var jiggleTurn = Angle.zero
 }
 
-/// Turns a part of a jiggling Clear icon that isn't glass.
+/// Turns a jiggling Clear icon's glyph or label.
 struct JiggleTurn: ViewModifier {
     @Environment(\.jiggleTurn) private var turn
 

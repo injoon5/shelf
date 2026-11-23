@@ -92,8 +92,8 @@ struct IconArt: View {
             .frame(width: size, height: size)
             .rotationEffect(turn)
             .background { fill(style) }
-            .modifier(IconGlass(isOn: style == .clear, scheme: scheme, shape: shape.rotation(turn)))
-            .overlay { rim.rotationEffect(turn) }
+            .modifier(IconGlass(isOn: style == .clear, scheme: scheme, shape: shape))
+            .overlay { rim }
             .compositingGroup()
     }
 
@@ -138,10 +138,10 @@ struct IconOutline: Shape {
 }
 
 /// Clear icons are the Home Screen's own glass.
-private struct IconGlass<S: Shape>: ViewModifier {
+private struct IconGlass: ViewModifier {
     var isOn: Bool
     var scheme: ColorScheme
-    var shape: S
+    var shape: RoundedRectangle
 
     func body(content: Content) -> some View {
         if isOn {
@@ -211,7 +211,6 @@ struct IconPress: ViewModifier {
             .overlay {
                 HomeMetrics.iconShape(size)
                     .fill(.black.opacity(isPressed ? HomeMetrics.pressedDim : 0))
-                    .modifier(JiggleTurn())
                     .allowsHitTesting(false)
             }
             // Down is instant; only the release eases.

@@ -132,7 +132,6 @@ private struct PendingIcon: View {
                         HomeMetrics.iconShape(size).fill(.black.opacity(HomeMetrics.pendingDim))
                         InstallPie(progress: progress, size: size * HomeMetrics.pieRatio)
                     }
-                    .modifier(JiggleTurn())
                     .transition(.opacity)
                     .allowsHitTesting(false)
                 }
