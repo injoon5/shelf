@@ -89,6 +89,39 @@ enum RunnerMetrics {
     /// over the last of its progress.
     static let landingFade: CGFloat = 0.15
 
+    // MARK: The open
+
+    // Measured from the same recording's opens (Settings at 6.2 and 7.95 s,
+    // Developer at 11.55 and 13.85 s, Weather at 16.75 s); the reference
+    // README has the tables.
+
+    /// The icon gives way to the launch surface as the card grows through
+    /// this range of its progress, easing out: a quarter of the icon is
+    /// left at 0.31 and a tenth at 0.38. Measured: Springboard's card shows
+    /// all of its icon at 0.14, about a fifth at 0.31–0.34, under a tenth at
+    /// 0.38 and none by 0.5, in all three apps. The close's crossfade
+    /// (`contentFade`) in reverse, but earlier and wider.
+    static let launchFade: ClosedRange<CGFloat> = 0.12...0.5
+    /// Growing, the Home Screen behind blurs late and darkens early: the
+    /// blur's radius is `backdropBlurRadius` × progress to this power, and
+    /// the dim is `backdropDim` × progress. Measured: blur 2–3 points and
+    /// brightness 0.9 at 0.14, 3–4 and 0.8 at 0.48, 6–10 and 0.68 at 0.66,
+    /// 16–18 and 0.57 at 0.85. Shrinking, the blur stays until the card is
+    /// small (`backdropBlurFull`): the two aren't mirror images.
+    static let openBlurCurve: CGFloat = 2
+    /// When a card turns back (caught growing, or let go short of
+    /// closing), what it shows and the Home Screen's blur and dim go from
+    /// where they were to the new direction's over this much progress, so
+    /// nothing jumps between the open's curves and the close's.
+    static let lookHandoff: CGFloat = 0.25
+
+    // MARK: Launch snapshots
+
+    /// JPEG quality of a snapshot on disk: small, and quick to decode.
+    static let snapshotQuality: CGFloat = 0.85
+    /// How many apps' snapshots stay decoded in memory.
+    static let snapshotsInMemory = 3
+
     // MARK: The card's lean
 
     /// On its way to an icon below it, Springboard's card leans back: its
@@ -101,6 +134,15 @@ enum RunnerMetrics {
     /// nothing when the finger lets go and is nothing again when it lands.
     /// Fitted to the two Developer closes (50° per unit).
     static let landingLean: CGFloat = 0.87
+    /// Growing out of its icon, the card leans the same way, away from the
+    /// icon: this many radians per unit of (how far the icon is below its
+    /// centre, in card heights) × (how far it still has to grow). Fitted to
+    /// the cold Developer open (icon about 60 points below the card): its
+    /// bottom edge narrower than its top by 4.8% at half the screen's
+    /// width, 3.7% at 0.73, 1.7% at 0.9, which is 1.3–1.6 per unit; the
+    /// Settings opens, from an icon level with the card, don't lean. Neither
+    /// leans sideways.
+    static let launchLean: CGFloat = 1.4
     static let maxLean: CGFloat = 0.14
     /// The distance of the eye from the screen for that lean, in points.
     static let leanPerspective: CGFloat = 500
