@@ -2,7 +2,7 @@
 
 Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/haplollc/Kiln), an interpreter. This plan first fixes Shelf itself, then takes Kiln in house and rebuilds it, then widens what apps can use, one round at a time, in order of difficulty:
 
-0. **Shelf fixes (§0).** Audit the Home Screen's behaviour, delete apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a new launch screen.
+0. **Shelf fixes (§0).** Audit the Home Screen's behaviour, move the Home Screen to UIKit and Core Animation, delete apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a new launch screen.
 1. **The rewrite (§1).** Kiln moves into this repo and is rebuilt on a design that can grow: one engine, real `async`, and one small bridge per component in a registry that also drives the checker, the prompt and a coverage report.
 2. **Round 1: the rest of SwiftUI (§2).** Every public view and modifier in the iOS 27 SDK is either supported or on a written won't-do list.
 3. **Round 2: APIs with no permission prompt (§3).** Haptics, share and paste, text parsing, unit conversion, audio playback, `WebView`, `Chart3D`, WebSockets.
@@ -41,12 +41,13 @@ Nothing here is built yet.
 
 ## 0. Shelf fixes, first
 
-Six fixes to Shelf itself. None of them touches Kiln, so they come first and can run alongside the §1.3 spike. The order:
+Seven pieces of work on Shelf itself. None of them touches Kiln, so they come first and can run alongside the §1.3 spike. The order:
 
-1. **The audit comes first.** Deleting apps and widgets both change edit mode and the layout, so the rules they build on should be right and under test first.
-2. **Deleting apps next.** It's the biggest missing feature.
-3. **Then the two visual fixes** (icons, dock).
-4. **Then the two runner fixes** (swipe up, launch screen). Half of the launch screen work has to wait for the rewrite.
+1. **The audit comes first.** Its rules live in `Layout` and `HomeModel`, which don't change in the move, so its tests carry over.
+2. **Then the Home Screen moves to UIKit and Core Animation,** so that deleting apps and widgets are built once, on the new layer.
+3. **Deleting apps next.** It's the biggest missing feature.
+4. **Then the two visual fixes** (icons, dock).
+5. **Then the two runner fixes** (swipe up, launch screen). Half of the launch screen work has to wait for the rewrite.
 
 ### 0.1 Audit the Home Screen's behaviour
 
@@ -83,7 +84,69 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 
 **Done when:** every case has a test (in `LayoutTests`, or a new `HomeModelTests`), or a recorded simulator check, and the fixes are in.
 
-### 0.2 Deleting apps
+### 0.2 The Home Screen in UIKit and Core Animation
+
+Decided: everything the stage shows moves to UIKit and Core Animation. Today the stage, the cards and the search pill are already UIKit; the icons, grid, dock, edit mode, long-press menu, drag and drop, search results, wallpaper and banners are SwiftUI hosted inside it. Moving them gives:
+
+- a long press that opens the menu and turns into a drag when the finger moves, as on Springboard;
+- a drag Shelf drives itself, which widgets need (§6);
+- exact icon frames for cards to open from and land on;
+- one icon renderer instead of two;
+- a jiggle that runs in the render server, off the main thread Kiln uses.
+
+**What stays SwiftUI:** the sheets (Settings, New App and Change…, the connect screen), the error screen, and the app inside a card, which Kiln renders in SwiftUI. They're forms and lists with no custom motion, so UIKit would be more code for the same result. Where a sheet shows an icon (the icon appearance picker, the New App preview), it embeds the UIKit icon view through `UIViewRepresentable`, so there's still one renderer.
+
+**What moves, and to what:**
+
+- **`IconView`:** one Core Animation icon for the grid, the dock, search results, the lifted and dragged icon, and the card's face. It replaces both `IconArt` and `CardFaceView`'s drawing.
+  - It's a gradient layer, a glyph (`UIImage(systemName:)`, hierarchical), the rim, the pressed overlay (multiply, as now) and the minus badge, all on the measured icon outline.
+  - The label is a `UILabel` with the existing text-size cap.
+- **Grid and pages:** a paging `UIScrollView` owned by the stage.
+  - Icons are siblings at exact points, as `IconGrid` lays them out now, and a reorder springs them to new points with `LayerMotion`.
+  - The scroll delegate drives the page dots, which `SearchBar` already draws.
+- **Dock:** a `UIVisualEffectView` with `UIGlassEffect`, in the shape from §0.5, holding its icons.
+- **Edit mode:**
+  - The jiggle is a `CAKeyframeAnimation` per icon (rotation and a small shift), each with its own phase through `beginTime`.
+  - Each icon gets its minus badge.
+  - New App and Done are glass `UIButton`s, and the status bar hides.
+- **Long press and menu:** `UIContextMenuInteraction` with targeted previews cut to the icon's outline. Moving the finger after the menu opens dismisses it, enters edit mode and picks the icon up.
+  - **Spike this first.** If the interaction won't hand the touch to Shelf's own drag cleanly, the fallback is Shelf's own long-press recognizer and a glass menu panel of its own.
+- **Drag:** Shelf's own pan recognizer, not the system's drag and drop.
+  - The real icon follows the finger, and the others flow aside on springs.
+  - Holding at the edge flips the page, and the dock takes drops.
+  - Tapping other icons mid-drag picks them up too, as on Springboard (a stretch goal).
+  - `EditDropDelegate` and the `.text` drag payload go away.
+- **Search results:** UIKit rows of icons and names, so a card opened from a result lands on that result's icon.
+- **Wallpaper:** a layer whose contents are the photo. The gradient choice is rendered once per appearance with `ImageRenderer`, since it doesn't move.
+- **Sync banner, empty library:** a glass capsule, and `UIContentUnavailableConfiguration`.
+- **Haptics:** `UIFeedbackGenerator`s called where things happen, in place of `HomeModel`'s counters that drive `.sensoryFeedback`.
+- **State:**
+  - `HomeModel` and `LibraryStore` stay `@Observable`.
+  - The stage reads them in `updateProperties()` and `layoutSubviews()`, which iOS 26 UIKit tracks for observation, so it updates when they change.
+  - The icon appearance (§0.4) is a custom `UITrait`, so every icon view picks it up the same way.
+- **Accessibility:**
+  - Each icon is an element with its name, and custom actions: Open, Edit Home Screen, Delete (not for Settings), and Move.
+  - The reading order follows the grid, then the dock.
+  - Edit mode is announced.
+  - Reduce Motion is honoured the way Springboard honours it (check on a device).
+
+**Steps:**
+
+1. The long-press-to-drag spike.
+2. `IconView`, with a pixel overlay against today's SwiftUI icon. They should match. Then the card's face switches to it.
+3. Grid, pages and dock, at rest.
+4. Edit mode, the jiggle and the badges.
+5. Drag and reorder.
+6. Search results, wallpaper, banner and the empty library.
+7. Delete `IconGrid`, `HomeIcon`, `AppIcon`'s `IconArt`, `Dock`, `JiggleModifier`, `EditDropDelegate`, `SearchResults`, the SwiftUI side of `Wallpaper`, and `HomeScreen`'s hosted layers, along with the frame plumbing in `StageLayout`.
+
+**Done when:**
+- the §0.1 cases still pass, with the gesture cases re-checked on the new layer;
+- a 50% overlay of the Home Screen at rest matches today's except where intended;
+- the jiggle with a full page holds 120 fps on an iPhone in Instruments (the README's open item);
+- a VoiceOver pass is done.
+
+### 0.3 Deleting apps
 
 As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 
@@ -93,7 +156,7 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Confirming:** an alert, "Delete “Habits”?", saying that everything goes with it, on every device, and can't be undone. Delete or Cancel.
 - **Deleting removes everything** (decided). There's no option to keep anything:
   - on the server: the app, every revision Revert could reach, its `DB` data, and its unused install keys;
-  - on every phone: the source, the `DB` store with pending writes, the `@AppStorage` suite, the app's files (§4.1), its launch snapshot (§0.6), its permission grants (§4.0), and its widgets (§6).
+  - on every phone: the source, the `DB` store with pending writes, the `@AppStorage` suite, the app's files (§4.1), its launch snapshot (§0.7), its permission grants (§4.0), and its widgets (§6).
 - **The server:** `DELETE /api/apps/{slug}?data=delete` already exists on `shelf-apps` (`fixtures/api/app-delete.json`). Check that it also purges the revisions and the slug's install keys, and add that where it doesn't. A 404 means it's already gone, which counts as success.
 - **Other devices:** they learn from their next sync that the app is gone, and run the same local cleanup. `SyncEngine` already removes the source and `@AppStorage` for apps that leave the index; that grows to everything in the list above.
 - **On the phone:**
@@ -104,29 +167,29 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Failure** (other than offline or a 404): the icon comes back, and the failure follows the same rule as a failed sync or Revert.
 - **Tests:** `APITests` against the fixture, and `LibraryStoreTests` for online, offline, and failure with the icon restored. `FakeServer` gains DELETE.
 
-### 0.3 Icon appearance: Automatic, Light, Dark
+### 0.4 Icon appearance: Automatic, Light, Dark
 
-- **Remove Clear:** `IconStyle.clear`, `IconGlass`, the Clear branch in `CardFace`, and the Icon Style picker. A stored `clear` reads as Automatic.
+- **Remove Clear:** `IconStyle.clear`, `IconGlass`, the Clear branch in `CardFace`, and the Icon Style picker. Most of that code goes in §0.2 anyway. A stored `clear` reads as Automatic.
 - **Add `IconAppearance`** (Automatic, Light, Dark) to `ShelfSettings`, shown in Settings as a segmented picker with a row of live icons.
   - Automatic follows the system.
   - Light and Dark hold the icons there whatever the system does, as Springboard's Customize panel does.
-- **Resolve it once,** as an environment value (say `iconScheme`) that every icon reads instead of `colorScheme`:
+- **Resolve it once,** as the custom `UITrait` from §0.2 that `IconView` reads instead of the system's light or dark (and the embedded SwiftUI previews receive):
   - the grid, the dock (Settings' icon included) and search results;
   - the long-press and drag previews;
   - the New App preview;
-  - `CardFace`, so a card opens from and closes into the icon you see;
+  - the card's face, which is the same `IconView`, so a card opens from and closes into the icon you see;
   - widgets later (§6.3).
 
   Labels, the dock's glass and the wallpaper follow the system, not this setting.
 - **Tests:** each place resolves through the one value, a stored `clear` migrates, and screenshots in both appearances with the system in each.
 
-### 0.4 The dock's shape
+### 0.5 The dock's shape
 
 Today the dock is `.rect(cornerRadius: max(displayRadius − 17, iconRadius + padding), style: .continuous)`, 368 × 103.3 pt, and it doesn't read as Springboard's.
 
 - **Measure it the way the icon corners were measured.** Take the inset of the dock's left edge on each pixel row, at 3x, in `home-page1-light.png` and `closeup-dock-left-corner.png`, and do the same on a Shelf screenshot from the same simulator. Overlay the two at 50%. Check the rim (a 1 px lighter hairline) and the fill too.
 - **Then pick the shape from the numbers:**
-  - iOS 26's `ConcentricRectangle` inside the display's container shape, which is likely what Springboard draws;
+  - UIKit's container-concentric corners (iOS 26 `cornerConfiguration`), concentric with the display, which is likely what Springboard draws;
   - a larger radius, since the reference notes say "nearly a pill";
   - or a custom outline.
 - **Apply it everywhere the dock's outline is used:** the glass, the drop target, and anything that animates against it.
@@ -134,7 +197,7 @@ Today the dock is `.rect(cornerRadius: max(displayRadius − 17, iconRadius + pa
 
 The real-device captures use non-default glass, so compare against the simulator stills only.
 
-### 0.5 Swiping up: the card stays on screen
+### 0.6 Swiping up: the card stays on screen
 
 - **Today:** `CardMotion.tracked` keeps the point under the finger fixed as the card shrinks, and moves the card 1:1 with the finger. A long swipe up carries the card's top edge off the top of the screen. Springboard's card stays on screen.
 - **The rule:**
@@ -149,7 +212,7 @@ The real-device captures use non-default glass, so compare against the simulator
   - nothing jumps when crossing it;
   - a card caught mid-flight above the limit is picked up where it is.
 
-### 0.6 The app's launch screen
+### 0.7 The app's launch screen
 
 **Today:** opening an app fills the screen with its tint and a white glyph (`AppStage.LaunchScreen`, and the card's face at full size). Kiln only starts building once the open has come to rest, because parsing on the main thread would make the motion stutter. So every open shows a saturated slab for at least the build time, then cuts to an app that's usually plain white or black. No system app opens like that.
 
@@ -505,7 +568,7 @@ Using WidgetKit's own API, not a Shelf one, means models already know how to wri
 - **Size.** Measured from `home-page1-light.png`, where Springboard's small widget is 164 × 164 pt, along with its corner and its label (if any).
 - **Adding.** In edit mode, the top-left button (New App today) becomes a menu with New App and Add Widget, as Springboard's Edit button is a menu. Add Widget opens a gallery: apps that declare widgets, each widget at each size it supports, previewed from its `placeholder` or snapshot. Drag one in, or tap to add it to the current page.
 - **Editing:**
-  - In edit mode, widgets jiggle, move, take the minus badge (§0.2) and get a resize handle, as in `edit-mode-page1-light.png`.
+  - In edit mode, widgets jiggle, move, take the minus badge (§0.3) and get a resize handle, as in `edit-mode-page1-light.png`.
   - The long-press menu has the size row the real-device captures show.
   - Deleting an app removes its widgets.
 - **Opening.** A tap opens the app's card from the widget's frame, not its icon's, and passes the `widgetURL` to the app's `.onOpenURL`. The card lands back on the widget when it closes.
@@ -517,7 +580,7 @@ Using WidgetKit's own API, not a Shelf one, means models already know how to wri
 
   Entries switch at their dates. This happens only while Shelf is in front, and only for the current page and its neighbours.
 - **Intents.** `perform()` runs in Kiln, then that app's widgets reload.
-- **Appearance.** Widgets follow the icon appearance setting (§0.3) for light and dark.
+- **Appearance.** Widgets follow the icon appearance setting (§0.4) for light and dark.
 - **Budget.** Measure memory and first-render time with a page of four widgets from 600-line apps. If a page costs too much, render widgets that are off screen to images and keep only the visible page live.
 
 ### 6.4 Done when
@@ -544,10 +607,10 @@ Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later
 
 ## 8. Order and checkpoints
 
-1. §0, the Shelf fixes, in their order: the audit, deleting apps, icon appearance, the dock, the swipe up, the launch screen. Each is its own branch. They don't touch Kiln, so the §1.3 spike can run alongside them.
+1. §0, the Shelf work, in its order: the audit, the move to UIKit and Core Animation, deleting apps, icon appearance, the dock, the swipe up, the launch screen. Each is its own branch. They don't touch Kiln, so the §1.3 spike can run alongside them.
 2. §1.1 and §1.2: in the repo, one engine. Small, and it can merge on its own.
 3. The §1.3 VM spike against the fixtures. Go, or switch to the fallback.
-4. §1.4 to §1.11: the registry, porting, proxies, language fixes, context, checker, coverage. Merge when §1.11 holds. Then the second half of §0.6 (building off the main thread).
+4. §1.4 to §1.11: the registry, porting, proxies, language fixes, context, checker, coverage. Merge when §1.11 holds. Then the second half of §0.7 (building off the main thread).
 5. Round 1. Then Round 2, Round 3 and Round 4, each on its own branch, each merged when its "done when" holds.
 6. Round 5, widgets on Shelf's Home Screen. It can move ahead of Rounds 2–4 if wanted.
 
