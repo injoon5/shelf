@@ -69,6 +69,10 @@ final class KType {
 
     var isView: Bool { conformances.contains("View") }
     var isShape: Bool { conformances.contains("Shape") || conformances.contains("InsettableShape") }
+    /// `UIViewControllerRepresentable` and `UIViewRepresentable`: a View the engine shows through a proxy (§1.5).
+    var isRepresentable: Bool { conformances.contains("UIViewControllerRepresentable") || conformances.contains("UIViewRepresentable") }
+    /// A view shown through a proxy instead of its `body`: a representable, or an `Animatable` view.
+    var isProxied: Bool { isRepresentable || conformances.contains("Animatable") }
     var isApp: Bool { conformances.contains("App") }
     var isClass: Bool { kind == .classType || kind == .actorType }
     var isEnum: Bool { kind == .enumType }
@@ -169,6 +173,8 @@ final class KInterpreter {
     let registry = KRegistry.shared
     /// The run's context: the app's defaults, folder, gate and teardown (§1.7).
     let context: KilnContext
+    /// Native delegates standing for the app's objects (KEDelegates), until teardown.
+    var delegateProxies: [ObjectIdentifier: (object: KObject, proxy: AnyObject)] = [:]
 
     init(program: KEProgram, headless: Bool = false, context: KilnContext? = nil) throws {
         self.program = program
@@ -701,6 +707,7 @@ final class KInterpreter {
         case .string: return .named("String", [])
         case .set: return .named("Set", [])   // `tags == ["a", "b"]`: the literal is a Set
         case .native(.color): return .named("Color", [])
+        case .native(.boxed(let b)): return .named(b.type, [])
         default: return nil
         }
     }
@@ -949,11 +956,31 @@ final class KInterpreter {
                 b.set(box.value)
             case .nilValue:
                 return   // optional chaining on nil: no-op
+            case .native(let n) where Self.geometryMember(n, name, newValue) != nil:
+                // `point.x += 4`, `size.width = 10`, `rect.origin = p`: value types, written back.
+                try write(base, .native(Self.geometryMember(n, name, newValue)!))
             case .native(let n) where try setNativeMember(n, name, newValue):
                 return   // a Foundation object (DateFormatter, JSONDecoder, URLComponents …) is a reference
             default:
                 throw fail("Can't set '\(name)' on \(describe(container))")
             }
+        }
+    }
+
+    /// A CGPoint, CGSize or CGRect with one member replaced; nil when it has no such member.
+    static func geometryMember(_ n: KNative, _ name: String, _ v: KV) -> KNative? {
+        switch (n, name) {
+        case (.point(_, let y), "x"): return v.asDouble.map { .point($0, y) }
+        case (.point(let x, _), "y"): return v.asDouble.map { .point(x, $0) }
+        case (.size(_, let h), "width"): return v.asDouble.map { .size($0, h) }
+        case (.size(let w, _), "height"): return v.asDouble.map { .size(w, $0) }
+        case (.rect(_, _, let w, let h), "origin"):
+            if case .native(.point(let x, let y)) = v { return .rect(x, y, w, h) }
+            return nil
+        case (.rect(let x, let y, _, _), "size"):
+            if case .native(.size(let w, let h)) = v { return .rect(x, y, w, h) }
+            return nil
+        default: return nil
         }
     }
 

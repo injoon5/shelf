@@ -80,6 +80,8 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `overloads` | array? | The overloads that are bridged. `null` or omitted means "not enumerated" (the interim manifest does this). `[]` means a property or bare member with no arguments. |
 | `notes` | string? | For **app authors**: limits, and what to use instead. One or two sentences, in Markdown. The prompt quotes it. |
 | `source` | string? | For **maintainers**: the file that implements it. |
+| `requirements` | [string]? | For a `protocol`: what an adopting type declares, as the app writes it (`path(in:)`, `body(content:)`). A trailing `?` marks one with a default or an optional one (`animatableData?`); `static ` and `async ` prefixes mark those (`static transferRepresentation`, `async perform()`). A missing required one is an error with the type's line. |
+| `proxy` | bool? | For a `protocol`: `true` when native code can use the app's value as the real protocol, through a proxy (PLAN.md §1.5): SwiftUI draws the app's `Shape`, lays out with its `Layout`, a UIKit controller calls its delegate. Omitted for declarations only. |
 
 ### An overload
 

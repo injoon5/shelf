@@ -493,13 +493,26 @@ final class KFunctionBridge: KBridge {
     var owner = "Swift"
 }
 
-/// A protocol an app's own types can adopt. §1.5 adds a proxy per protocol
-/// (a native class forwarding each requirement to the app's methods); for now
-/// these are declarations the checker and the manifest read.
+/// A protocol an app's own types can adopt (PLAN.md §1.5). With a `proxy`,
+/// native code can use the app's value as the real protocol: the proxy is a
+/// native type conforming to it that forwards each requirement to the app's
+/// member (`Engine/KEProxies.swift`, `Docs/bridges.md`, "A protocol proxy").
 final class KProtocolBridge: KBridge {
+    /// What an adopting type must declare: `body`, `path(in:)`. A trailing `?`
+    /// marks one with a default (`animatableData?`), which isn't required.
+    /// `Kiln.check` and the manifest read these.
     var requirements: [String] = []
-    /// Makes a native proxy for an app value (§1.5).
-    var proxy: (@MainActor (KV, KInterpreter) -> AnyObject?)?
+    /// The same, parsed: static, `async` and optional ones marked.
+    var members: [KRequirement] = []
+    /// Makes the native proxy for an app value whose type adopts the protocol
+    /// (an `AnyShape`, a `Layout`, an `NSObject` delegate…). nil: a
+    /// declaration only, which the engine implements itself (`Identifiable`).
+    var proxy: (@MainActor (KAppValue) -> Any)?
+    /// For a delegate protocol: the Objective-C protocols the proxy object
+    /// conforms to, and how it maps selectors (`KDelegateProxy`).
+    var delegate: KDelegateSpec?
+
+    var asyncRequirements: [String] { members.filter(\.isAsync).map(\.display) }
 }
 
 /// An `@Environment` value: its default, before the view sees SwiftUI's.
@@ -676,6 +689,7 @@ final class KRegistry {
             case .path: return "Path"
             case .rect: return "CGRect"
             case .suspension: return "Suspension"
+            case .boxed(let b): return b.type
             }
         }
     }

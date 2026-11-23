@@ -29,6 +29,11 @@ struct KManifest: Codable, Equatable {
         var overloads: [Overload]?
         var notes: String?
         var source: String?
+        /// A protocol's requirements as the app writes them (`path(in:)`;
+        /// `animatableData?` has a default; `async perform()` waits), and
+        /// whether native code can use the app's value through a proxy (§1.5).
+        var requirements: [String]?
+        var proxy: Bool?
     }
 
     var schemaVersion = 1
@@ -109,7 +114,13 @@ extension KRegistry {
         for f in functions.values {
             symbol("member", f.name, owner: f.owner, f, overloads: overloads(f.forms.map(\.overload)))
         }
-        for p in protocols.values { symbol("protocol", p.name, owner: nil, p, overloads: nil) }
+        for p in protocols.values {
+            let before = symbols.count
+            symbol("protocol", p.name, owner: nil, p, overloads: nil)
+            guard symbols.count > before else { continue }
+            if !p.members.isEmpty { symbols[before].requirements = p.members.map { ($0.isStatic ? "static " : "") + ($0.isAsync ? "async " : "") + $0.declared } }
+            if p.proxy != nil { symbols[before].proxy = true }
+        }
         for e in environment.values { symbol("environment", e.name, owner: nil, e, overloads: []) }
         for w in wrappers.values { symbol("wrapper", w.name, owner: nil, w, overloads: []) }
 

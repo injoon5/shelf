@@ -26,7 +26,10 @@ struct KRenderer {
         case .switchBranch(let i, let vs): return AnyView(renderList(vs).id(i))
         case .image(let img): return AnyView(img)
         case .textConcat: return AnyView(text(v) ?? Text(""))
-        case .custom(let s): return AnyView(KHostView(value: s, interp: interp))
+        case .custom(let s):
+            // An `Animatable` view interpolates; a representable shows its UIKit controller or view (§1.5).
+            if s.type.isProxied, let proxy = interp.viewProxy(s) { return proxy }
+            return AnyView(KHostView(value: s, interp: interp))
         case .primitive(let name, let args, let labels, let line):
             guard let b = interp.registry.view(name) else { return AnyView(KErrorView(message: "\(name) isn't supported in Kiln")) }
             return renderBridge(b, KArgs(args: args, labels: labels), line, v.bound)
