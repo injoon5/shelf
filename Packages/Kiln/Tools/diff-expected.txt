@@ -15,3 +15,12 @@ tests/ProxyTests-8.swift §1.5: `modifier(Card(…))` from a View extension now 
 tests/ProxyTests-10.swift §1.5: `Diagonal(step: 5) { … }` is the app's Layout with its content; before, the closure was an ignored argument.
 tests/ProxyTests-11.swift §1.5: `AnyLayout` over the app's Layout and `HStackLayout`; before, `AnyLayout` didn't exist.
 tests/ProxyTests-20.swift §1.5: `ShareLink(item:preview:)` with the app's Transferable and `SharePreview`; before, `SharePreview` didn't exist.
+Packages/Kiln/Examples/Apps/PlantCare.swift Round 1A's Lab example: before, the custom ToggleStyle and ButtonStyle, List(selection:) and the path weren't bridged.
+fixtures/apps/controls-styles.swift Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.
+fixtures/apps/layout-scrolling.swift Round 1A's Layout fixture: before, @Entry on ContainerValues and ForEach(subviews:) stopped the body.
+fixtures/apps/lists-selection.swift Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.
+fixtures/apps/navigation-tabs.swift Round 1A's Navigation fixture: before, Tab, ToolbarSpacer, zoom transitions and search scopes weren't bridged.
+tests/ControlsBridgeTests-7.swift Round 1A: `\.isEnabled` and `\.controlSize` are read from SwiftUI's environment; before, nil.
+tests/ListsBridgeTests-7.swift Round 1A: `\.defaultMinListRowHeight` and `\.isScrollEnabled` are read from SwiftUI's environment; before, nil.
+tests/NavigationBridgeTests-5.swift Round 1A: `\.isSearching` and `\.dismissSearch` are read from SwiftUI's environment; before, nil.
+tests/NavigationBridgeTests-8.swift Round 1A: `\.isPresented` is read from SwiftUI's environment; before, nil.
