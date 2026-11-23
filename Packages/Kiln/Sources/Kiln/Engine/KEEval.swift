@@ -199,12 +199,25 @@ extension KInterpreter {
         return true
     }
 
+    /// A type nested in `self`'s type (or an enclosing one): two types' `CodingKeys` are each their own.
+    func nestedType(_ name: String, _ env: KEnv) -> KType? {
+        guard let ctx = env.nearestSelf, !ctx.type.nested.isEmpty || ctx.type.name.contains(".") else { return nil }
+        if let t = ctx.type.nested[name] { return t }
+        // Inside `Outer.Inner`, a sibling `Outer.Other` by its short name.
+        var parts = ctx.type.name.split(separator: ".").map(String.init)
+        while !parts.isEmpty {
+            parts.removeLast()
+            if let t = types[(parts + [name]).joined(separator: ".")] { return t }
+        }
+        return nil
+    }
+
     /// The user type an expression names (`Category`, `Outer.Inner`, `Self`).
     func typeExpr(_ e: KEExpr, _ env: KEnv) -> KType? {
         switch e {
         case .ident(let n, _):
             if n == "Self" { return env.nearestSelf?.type }
-            guard env.lookup(n) == nil, let t = types[n] else { return nil }
+            guard env.lookup(n) == nil, let t = nestedType(n, env) ?? types[n] else { return nil }
             if let ctx = env.nearestSelf, !ctx.isStatic, ctx.type.storedDecl(n) != nil || ctx.type.computed[n] != nil { return nil }
             return t
         case .member(let b, let n, _):
@@ -236,7 +249,7 @@ extension KInterpreter {
         }
         if let box = globalEnv.vars[name] { return box.value }
         if let fs = functions[name], let f = fs.first { return .function(KFunction(.user(f, globalEnv, nil))) }
-        if let t = types[name] { return .type(.user(t)) }
+        if let t = nestedType(name, env) ?? types[name] { return .type(.user(t)) }
         if let op = KBuiltins.operatorFunction(name, self) { return op }
         if name.first?.isUppercase == true { return .type(.builtin(name)) }
         if let v = nativeConstant(name) { return v }
@@ -709,7 +722,7 @@ extension KInterpreter {
                 return try invoke(f, args: args, labels: labels, selfContext: nil, parent: globalEnv)
             }
             if let box = globalEnv.vars[name] { return try callValue(box.value, argExprs, env, line) }
-            if let t = types[name] { return try construct(t, argExprs, env, line) }
+            if let t = nestedType(name, env) ?? types[name] { return try construct(t, argExprs, env, line) }
             if let ext = builtinExtensions[name], !ext.inits.isEmpty, let i = Self.pick(ext.inits, labels: labels),
                !KBuiltins.prefersBuiltinInit(name, labels) {
                 let args = try evalArgs(argExprs, env, params: i.params)
