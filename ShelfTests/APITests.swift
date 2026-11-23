@@ -80,6 +80,35 @@ struct APITests {
         #expect(server.requests.first.map { "\($0.method) \($0.path)" } == "POST /api/apps/habits/revert")
     }
 
+    @Test func deletesAnAppWithEverything() async throws {
+        let server = StubServer { _ in .fixture("app-delete") }
+        try await server.api(token: Self.token).deleteApp("tip-jar")
+        let request = try #require(server.requests.first)
+        #expect("\(request.method) \(request.path)" == "DELETE /api/apps/tip-jar")
+        #expect(request.query == ["data": "delete"])
+        #expect(request.header("Authorization") == "Bearer \(Self.token)")
+    }
+
+    /// Already gone is deleted.
+    @Test func deletingAMissingAppSucceeds() async throws {
+        let server = StubServer { _ in .fixture("error-404", status: 404) }
+        try await server.api().deleteApp("gone")
+        #expect(server.requests.count == 1)
+    }
+
+    @Test func deletingCanFail() async {
+        let cases: [(StubResponse, API.Failure)] = [
+            (.offline, .offline),
+            (.fixture("error-401", status: 401), .unauthorized),
+            (StubResponse(status: 500), .rejected(status: 500, message: "The server had a problem. Try again later.")),
+            (.json(#"{"error": "No."}"#, status: 403), .rejected(status: 403, message: "No.")),
+        ]
+        for (response, expected) in cases {
+            let server = StubServer { _ in response }
+            await #expect(throws: expected) { try await server.api().deleteApp("habits") }
+        }
+    }
+
     @Test func readsDataChanges() async throws {
         let server = StubServer { _ in .fixture("data-since") }
         let changes = try await server.api().changes(for: "habits", since: 1)

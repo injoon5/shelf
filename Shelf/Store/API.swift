@@ -98,6 +98,14 @@ struct API: Sendable {
         return try decode(data, response)
     }
 
+    /// Delete App: `DELETE /api/apps/{slug}?data=delete`. The server drops
+    /// the app, every version Revert could reach, its `DB` data and its unused
+    /// install keys. An app the server no longer has is already deleted, so a
+    /// `404` returns like a success.
+    func deleteApp(_ slug: String) async throws(Failure) {
+        _ = try await send("DELETE", ["apps", slug], query: [URLQueryItem(name: "data", value: "delete")], accept: [404])
+    }
+
     // MARK: App data
 
     func changes(for slug: String, since rev: Int) async throws(Failure) -> DataChanges {
