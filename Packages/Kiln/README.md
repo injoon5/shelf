@@ -34,6 +34,7 @@
 > - One engine: the original interpreter is deleted (see [One engine](#one-engine)).
 > - A differential harness: `Kiln.transcript` and `Tools/diff.sh` compare everything a run shows against the engine before a change, on every input ([Benchmarks/differential.md](Benchmarks/differential.md)).
 > - Code that can wait: `async`/`await` really suspends and resumes, on frames that live on the heap (see [Code that can wait](#code-that-can-wait)).
+> - A coverage report: [COVERAGE.md](COVERAGE.md) compares Kiln with every view, modifier and style in the iOS SDK (see [Coverage](#coverage)).
 >
 > The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
 
@@ -142,6 +143,21 @@ let check = Kiln.validate(source)   // check.isValid, check.errors
 | Computed properties read live `@State`; a title bug | 4 of 5 | 98% | 5 of 5 |
 | Seeded runs; `Color` opacity as a style | 5 of 5 | 100% | 5 of 5 |
 | A sixth app (tabs, search, a shared store); SwiftUI's number formatting | 6 of 6 | 100% | 5 of 5 |
+
+## Coverage
+
+[COVERAGE.md](COVERAGE.md) lists every public view, modifier and style in the iOS SDK's SwiftUI, SwiftUICore, Charts and `_*_SwiftUI` overlays. For each one it says whether Kiln supports it, or won't and why. [coverage.json](coverage.json) holds the same data with every overload's signature, for tools and agents. To regenerate both:
+
+```sh
+Packages/Kiln/Tools/coverage.sh
+```
+
+Run it after each round and after each Xcode update. It reads the SDK that `xcrun --sdk iphoneos --show-sdk-path` finds, and the same inputs always give the same files, so a diff shows only what changed.
+
+- **"Supported"** comes from `kiln-manifest.json` ([Docs/manifest.md](Docs/manifest.md)), which the bridge registry will export. Until then the tool reads the engine's string switches and writes an interim manifest, `Tools/coverage/kiln-manifest.interim.json`.
+- **Families** come from `Tools/coverage/families.json`. A symbol that no rule matches is listed as Unsorted.
+- **Won't do:** each entry, with its one-line reason, is in `Tools/coverage/wont-do.json`.
+- **Tests:** `swift test --package-path Packages/Kiln/Tools/coverage`.
 
 ## One engine
 
