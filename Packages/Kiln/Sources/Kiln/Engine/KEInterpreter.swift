@@ -43,6 +43,8 @@ final class KType {
     var standIn = false
     /// For a `@resultBuilder` type: its static methods as a builder (KEBuilders).
     var userBuilder: KUserBuilder?
+    /// `@Animatable`: the stored properties it animates (KEMacros), for §1.5's proxy.
+    var animatableProperties: [String] = []
 
     static func standIn(_ name: String) -> KType {
         let t = KType(name: name, kind: .structType)
@@ -127,6 +129,8 @@ final class KInterpreter {
     var protocols: [String: KProtocol] = [:]
     /// `extension Int: Describable {}`: native types and the app's protocols they adopt.
     var builtinConformances: [String: Set<String>] = [:]
+    /// `@Entry var accent = Color.blue` in `extension EnvironmentValues` (KEMacros), by owner and name.
+    var entries: [String: [String: KEVarDecl]] = [:]
 
     /// What the code has printed.
     var console = ""
@@ -242,7 +246,6 @@ final class KInterpreter {
         t.conformances.formUnion(d.inherits)
         t.declaredInherits.formUnion(d.inherits)
         t.attributes += d.attributes
-        if d.attributes.contains(where: { $0.name == "Observable" }) { t.conformances.insert("ObservableObject") }
         for p in d.properties {
             if p.isStatic { t.staticDecls[p.name] = p }
             else if p.isComputed { t.computed[p.name] = p }
@@ -256,6 +259,8 @@ final class KInterpreter {
         t.inits += d.inits
         t.cases += d.cases
         t.subscripts += d.subscripts
+        // `@Observable`, `@Animatable`… (KEMacros).
+        KMacros.applyTypeMacros(t, d.attributes, self)
     }
 
     func applyExtension(_ d: KETypeDecl) {
@@ -275,6 +280,7 @@ final class KInterpreter {
         builtinExtensions[key] = ext
         if !d.inherits.isEmpty { builtinConformances[key, default: []].formUnion(d.inherits) }
         for p in d.properties {
+            if KMacros.applyPropertyMacros(p, owner: key, self) { continue }   // `@Entry` (KEMacros)
             if p.isStatic { ext.staticDecls[p.name] = p } else { ext.computed[p.name] = p; ext.computedAll[p.name, default: []].append(p) }
             if !d.constraints.isEmpty { ext.constraints[ObjectIdentifier(p)] = d.constraints }
         }

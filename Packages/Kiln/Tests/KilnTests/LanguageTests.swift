@@ -613,4 +613,69 @@ final class LanguageTests: XCTestCase {
         XCTAssertFalse(t.lowercased().contains("error"), t)
         XCTAssertEqual(Kiln.validate(code).errors, [])
     }
+
+    // MARK: Macros
+
+    func testEntryAnimatableAndPreviewAreDeclarations() throws {
+        let code = """
+        import SwiftUI
+        extension EnvironmentValues {
+            @Entry var accent: Color = .orange
+            @Entry var greeting: String = "hello"
+        }
+        private struct LegacyKey: EnvironmentKey { static let defaultValue = 42 }
+        extension EnvironmentValues {
+            var legacy: Int {
+                get { self[LegacyKey.self] }
+                set { self[LegacyKey.self] = newValue }
+            }
+        }
+        extension FocusedValues { @Entry var selection: String? }
+        extension Transaction { @Entry var fast = false }
+        @Animatable
+        struct Wave: Shape {
+            var phase: Double
+            var amplitude: CGFloat = 4
+            @AnimatableIgnored var label = "w"
+            func path(in rect: CGRect) -> Path { Path(rect) }
+        }
+        @Observable final class Model { var count = 3 }
+        struct Child: View {
+            @Environment(\\.greeting) private var greeting
+            @Environment(\\.legacy) private var legacy
+            @Environment(Model.self) private var model
+            @FocusedValue(\\.selection) private var selection
+            var body: some View { Text("\\(greeting) \\(legacy) \\(selection ?? "none")") }
+        }
+        struct ContentView: View {
+            @State private var model = Model()
+            var body: some View {
+                VStack {
+                    Child()
+                    Wave(phase: 1).stroke(.blue)
+                }
+                .environment(\\.greeting, "hi")
+                .environment(model)
+                .focusedValue(\\.selection, "x")
+            }
+        }
+        #Preview("Main") { ContentView() }
+        """
+        let t = Kiln.transcript(code, steps: 0)
+        XCTAssertTrue(t.contains("hello 42 none"), t)
+        XCTAssertEqual(Kiln.validate(code).errors, [])
+        let c = try KilnEngine.compile(code, headless: true)
+        let wave = try XCTUnwrap(c.interp.type(named: "Wave"))
+        XCTAssertTrue(wave.conformances.contains("Animatable"))
+        XCTAssertEqual(wave.animatableProperties, ["phase", "amplitude"])
+        XCTAssertTrue(c.interp.type(named: "Model")!.conformances.contains("ObservableObject"))
+        // What a view above sets reaches `@Environment`: an `@Entry`, an older key, an object.
+        let child = c.interp.type(named: "Child")!
+        let model = KV.object(KObject(type: c.interp.type(named: "Model")!, fields: [:]))
+        let overrides: [String: KV] = ["\\.greeting": .string("hi"), "Model": model]
+        XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("greeting")!, overrides: overrides), .string("hi"))
+        XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("legacy")!, overrides: overrides), .int(42))
+        XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("model")!, overrides: overrides), model)
+        XCTAssertEqual(c.interp.environmentDefault(child.storedDecl("greeting")!), .string("hello"))
+    }
 }

@@ -247,7 +247,7 @@ extension KInterpreter {
             if let m = ctx.type.staticMethods[name]?.first { return .function(KFunction(.user(m, globalEnv, ctx))) }
             if ctx.type.enumCase(name) != nil, ctx.isStatic { return try staticValue(ctx.type, name) }
             // A view struct's `@Environment(\.dismiss)` read before storage exists.
-            if let w = ctx.type.wrapper(of: name), w == "Environment" { return environmentDefault(ctx.type.storedDecl(name)!) }
+            if let w = ctx.type.wrapper(of: name), w == "Environment" || w == "FocusedValue" { return environmentDefault(ctx.type.storedDecl(name)!) }
         }
         if let box = globalEnv.vars[name] { return box.value }
         if let fs = functions[name], let f = fs.first { return .function(KFunction(.user(f, globalEnv, nil))) }
@@ -482,6 +482,9 @@ extension KInterpreter {
                                      }))
         case .tuple(let vals, _):
             if let i = first.asInt, i < vals.count { return vals[i] }
+        case .native(.object(_, let ref)) where ref.value is KEnvironmentValuesBox:
+            // `self[AccentKey.self]` in an EnvironmentValues extension: the key's default.
+            if case .type(.user(let k)) = first { return try staticValue(k, "defaultValue") }
         case .nilValue:
             return .nilValue
         default:
@@ -999,7 +1002,7 @@ extension KInterpreter {
     func memberwiseParams(_ t: KType) -> [KEVarDecl] {
         t.stored.filter { p in
             if p.isLet && p.initial != nil { return false }
-            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage"].contains(w) { return false }
+            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage", "FocusedValue"].contains(w) { return false }
             return true
         }
     }
@@ -1023,7 +1026,7 @@ extension KInterpreter {
                 let v = coerce(try eval(initial, env, p.type), to: p.type)
                 fields[p.name] = v
                 env.declare(p.name, v)
-            } else if p.wrapper == "Environment" {
+            } else if p.wrapper == "Environment" || p.wrapper == "FocusedValue" {
                 fields[p.name] = environmentDefault(p)
             } else if p.type?.isOptional == true {
                 fields[p.name] = .nilValue

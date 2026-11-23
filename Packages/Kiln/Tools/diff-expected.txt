@@ -3,3 +3,4 @@
 Packages/Kiln/Examples/AppleIntelligence/expense.md The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.
 tests/LanguageTests-18.swift §1.6: a closure given to `@ViewBuilder let content: Content` or a `@ViewBuilder` parameter now builds its views; before, Card and Panel showed nothing.
 tests/LanguageTests-28.swift §1.6: `$on.animation()` and a method straight on `allCases` used to stop with an error; now they work.
+tests/LanguageTests-29.swift §1.6: `@Entry`, `@Animatable`, `@FocusedValue` and `.focusedValue` are read as declarations; before, `.focusedValue` stopped the body.

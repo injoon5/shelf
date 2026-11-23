@@ -8073,13 +8073,13 @@
       "id" : "modifier:environment",
       "kind" : "modifier",
       "name" : "environment",
-      "notes" : "`\\.colorScheme` only.",
+      "notes" : "`\\.colorScheme`, your own `@Entry` values, and `@Observable` objects read with `@Environment(Model.self)`.",
       "overloads" : [
         {
           "labels" : [
             "_"
           ],
-          "notes" : "An `@Observable` object; not read by `@Environment` yet."
+          "notes" : "An `@Observable` object, read with `@Environment(Model.self)`."
         },
         {
           "labels" : [
@@ -8160,6 +8160,23 @@
           "labels" : [
             "_",
             "equals"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Focus.swift",
+      "support" : "stub"
+    },
+    {
+      "family" : "Focus & Keyboard",
+      "id" : "modifier:focusedValue",
+      "kind" : "modifier",
+      "name" : "focusedValue",
+      "notes" : "Accepted; `@FocusedValue` reads its `@Entry` default.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
           ]
         }
       ],
@@ -13703,6 +13720,18 @@
       ],
       "source" : "Sources/Kiln/Environment.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Focus & Keyboard",
+      "id" : "wrapper:FocusedValue",
+      "kind" : "wrapper",
+      "name" : "FocusedValue",
+      "notes" : "Reads its `@Entry` default; focused views don't set it yet.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Focus.swift",
+      "support" : "stub"
     },
     {
       "family" : "Gestures",
