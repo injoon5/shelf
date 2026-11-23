@@ -264,6 +264,32 @@ import Testing
         #expect(model.dragging == "todos")
     }
 
+    /// A drop a full dock refused reaches no one: the system only says the
+    /// icon left the dock. With no target hearing of it after, the drag is
+    /// over and the icon comes back. (It stayed hidden until Done.)
+    @Test func aDragLetGoOfOutsideEveryTargetEnds() async {
+        let model = HomeModel()
+        model.startEditing()
+        model.lifted("todos")
+        _ = model.dragMoved()
+        model.dragExited()
+        #expect(await eventually { await model.dragging == nil })
+        #expect(model.snaps == 1)
+    }
+
+    /// Crossing from one target into the next: the next hears of it at
+    /// once, and the drag goes on.
+    @Test func aDragCrossingIntoAnotherTargetGoesOn() async throws {
+        let model = HomeModel()
+        model.startEditing()
+        model.lifted("todos")
+        _ = model.dragMoved()
+        model.dragExited()
+        _ = model.dragMoved()
+        try await Task.sleep(for: Motion.dragLost * 2)
+        #expect(model.dragging == "todos")
+    }
+
     // MARK: Cards
 
     /// The open app was deleted elsewhere: its card closes (with no icon, it

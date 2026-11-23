@@ -58,6 +58,7 @@ final class HomeModel {
     @ObservationIgnored private var liftedSlug: String?
     @ObservationIgnored private var flip: (target: Int, task: Task<Void, Never>)?
     @ObservationIgnored private var dotsTask: Task<Void, Never>?
+    @ObservationIgnored private var dropWatch: Task<Void, Never>?
 
     // MARK: Opening
 
@@ -150,13 +151,29 @@ final class HomeModel {
 
     /// The lifted icon has moved over a drop target, so it really is a drag.
     func dragMoved() -> String? {
+        dropWatch?.cancel()
         if dragging == nil, let liftedSlug {
             dragging = liftedSlug
         }
         return dragging
     }
 
+    /// The dragged icon left a drop target. Usually it is entering another,
+    /// which says so at once. If none does, the drag ended without a drop,
+    /// which the system reports to no one (over a full dock, say), and the
+    /// icon has to come back by itself.
+    func dragExited() {
+        dropWatch?.cancel()
+        guard dragging != nil else { return }
+        dropWatch = Task { [weak self] in
+            try? await Task.sleep(for: Motion.dragLost)
+            guard !Task.isCancelled else { return }
+            self?.endDrag()
+        }
+    }
+
     func endDrag() {
+        dropWatch?.cancel()
         cancelFlip()
         if dragging != nil { snaps += 1 }
         liftedSlug = nil
