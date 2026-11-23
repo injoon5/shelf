@@ -20,6 +20,14 @@ struct KEParser {
         self.toks = Self.stripConditionalCompilation(tokens)
     }
 
+    /// A type written as text: `Set<String>`, `[String: Int]`.
+    static func typeRef(_ text: String) -> KETypeRef? {
+        var lexer = KELexer(text)
+        guard let toks = try? lexer.tokenize() else { return nil }
+        var parser = KEParser(tokens: toks)
+        return try? parser.parseType()
+    }
+
     static func parse(_ source: String) throws -> KEProgram {
         var lexer = KELexer(source)
         var parser = KEParser(tokens: try lexer.tokenize())

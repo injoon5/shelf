@@ -15,6 +15,7 @@ final class FoundationBridges: KBridgeFamily {
         values(r)
         dates(r)
         json(r)
+        coding(r)
         system(r)
         formatStyles(r)
     }
@@ -49,8 +50,18 @@ final class FoundationBridges: KBridgeFamily {
             t.property("lastPathComponent") { c in .string(u(c)?.lastPathComponent ?? "") }
         }
 
-        r.type("Data", .foundation, notes: "`Data()` is empty; `String(data:encoding:)` and `JSONDecoder` read it.") { t in
-            t.initializer { _ in .native(.object("Data", KRef(NSData()))) }
+        r.type("Data", .foundation, notes: "`Data()`, `Data(text.utf8)` and `Data([UInt8])`; `String(data:encoding:)` and `JSONDecoder` read it.") { t in
+            t.initializer { c in
+                // `Data(text.utf8)` and `Data([0x48, 0x69])`: bytes; `Data(other)`: a copy.
+                switch c.first {
+                case .array(let bytes)?: return KBuiltins.data(Data(bytes.map { UInt8(truncatingIfNeeded: $0.asInt ?? 0) }))
+                case .string(let s)?: return KBuiltins.data(Data(s.utf8))
+                case .native(.object("Data", let ref))?: return KBuiltins.data((ref.value as? Data) ?? Data())
+                default:
+                    if let n = c.arg("count")?.asInt { return KBuiltins.data(Data(count: n)) }
+                    return .native(.object("Data", KRef(NSData())))
+                }
+            }
             t.property("count") { c in .int(c.object(Data.self)?.count ?? 0) }
             t.property("isEmpty") { c in .bool(c.object(Data.self)?.isEmpty ?? true) }
         }

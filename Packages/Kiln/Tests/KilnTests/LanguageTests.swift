@@ -387,4 +387,142 @@ final class LanguageTests: XCTestCase {
         print(m.size, m.hits, m.$hits)
         """, prints: "15.0 3 300\n")
     }
+
+    // MARK: Codable
+
+    func testCustomInitFromAndEncodeTo() {
+        expect("""
+        struct Custom: Codable {
+            var name: String
+            var count: Int
+            var tags: [String]
+            enum CodingKeys: String, CodingKey { case name = "full_name", count, tags }
+            init(name: String, count: Int) { self.name = name; self.count = count; tags = [] }
+            init(from decoder: Decoder) throws {
+                let c = try decoder.container(keyedBy: CodingKeys.self)
+                name = try c.decode(String.self, forKey: .name)
+                count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 99
+                tags = c.contains(.tags) ? try c.decode([String].self, forKey: .tags) : ["none"]
+            }
+            func encode(to encoder: Encoder) throws {
+                var c = encoder.container(keyedBy: CodingKeys.self)
+                try c.encode(name.uppercased(), forKey: .name)
+                try c.encode(count * 2, forKey: .count)
+            }
+        }
+        struct Other: Codable { var name = "o"; enum CodingKeys: String, CodingKey { case name = "other_name" } }
+        let d = try! JSONDecoder().decode(Custom.self, from: Data(#"{"full_name":"ann"}"#.utf8))
+        print(d.name, d.count, d.tags)
+        let out = try! JSONEncoder().encode(Custom(name: "bo", count: 2))
+        print(String(data: out, encoding: .utf8)!)
+        print(String(data: try! JSONEncoder().encode(Other()), encoding: .utf8)!)
+        """, prints: "ann 99 [\"none\"]\n{\"count\":4,\"full_name\":\"BO\"}\n{\"other_name\":\"o\"}\n")
+    }
+
+    func testUnkeyedSingleValueAndNestedContainers() {
+        expect("""
+        struct Point: Codable {
+            var x: Int, y: Int
+            init(x: Int, y: Int) { self.x = x; self.y = y }
+            init(from decoder: Decoder) throws {
+                var c = try decoder.unkeyedContainer()
+                x = try c.decode(Int.self)
+                y = try c.decode(Int.self)
+            }
+            func encode(to encoder: Encoder) throws {
+                var c = encoder.unkeyedContainer()
+                try c.encode(x)
+                try c.encode(y)
+            }
+        }
+        struct Celsius: Codable {
+            var value: Double
+            init(_ v: Double) { value = v }
+            init(from decoder: Decoder) throws { value = try decoder.singleValueContainer().decode(Double.self) }
+            func encode(to encoder: Encoder) throws { var c = encoder.singleValueContainer(); try c.encode(value) }
+        }
+        enum Shape: Codable {
+            case circle(Double), square(Double)
+            enum CodingKeys: String, CodingKey { case kind, size }
+            init(from decoder: Decoder) throws {
+                let c = try decoder.container(keyedBy: CodingKeys.self)
+                let size = try c.decode(Double.self, forKey: .size)
+                switch try c.decode(String.self, forKey: .kind) {
+                case "circle": self = .circle(size)
+                case "square": self = .square(size)
+                default: throw DecodingError.dataCorruptedError(forKey: .kind, in: c, debugDescription: "bad kind")
+                }
+            }
+            func encode(to encoder: Encoder) throws {
+                var c = encoder.container(keyedBy: CodingKeys.self)
+                switch self {
+                case .circle(let s): try c.encode("circle", forKey: .kind); try c.encode(s, forKey: .size)
+                case .square(let s): try c.encode("square", forKey: .kind); try c.encode(s, forKey: .size)
+                }
+            }
+        }
+        struct Plot: Codable {
+            var points: [Point]
+            var temp: Celsius
+            var shapes: [Shape]
+            var meta: [String: String]
+            enum CodingKeys: String, CodingKey { case points, temp, shapes, meta }
+            enum MetaKeys: String, CodingKey { case author }
+            init(points: [Point], temp: Celsius, shapes: [Shape]) { self.points = points; self.temp = temp; self.shapes = shapes; meta = [:] }
+            init(from decoder: Decoder) throws {
+                let c = try decoder.container(keyedBy: CodingKeys.self)
+                points = try c.decode([Point].self, forKey: .points)
+                temp = try c.decode(Celsius.self, forKey: .temp)
+                shapes = try c.decode([Shape].self, forKey: .shapes)
+                let m = try c.nestedContainer(keyedBy: MetaKeys.self, forKey: .meta)
+                meta = ["author": try m.decode(String.self, forKey: .author)]
+            }
+            func encode(to encoder: Encoder) throws {
+                var c = encoder.container(keyedBy: CodingKeys.self)
+                try c.encode(points, forKey: .points)
+                try c.encode(temp, forKey: .temp)
+                try c.encode(shapes, forKey: .shapes)
+                var m = c.nestedContainer(keyedBy: MetaKeys.self, forKey: .meta)
+                try m.encode("kiln", forKey: .author)
+            }
+        }
+        let p = Plot(points: [Point(x: 1, y: 2)], temp: Celsius(21.5), shapes: [.circle(1), .square(2)])
+        let data = try! JSONEncoder().encode(p)
+        let text = String(data: data, encoding: .utf8)!
+        print(text)
+        let back = try! JSONDecoder().decode(Plot.self, from: data)
+        print(back.points[0].y, back.temp.value, back.shapes.count, back.meta["author"]!)
+        if case .square(let s) = back.shapes[1] { print("square", s) }
+        do {
+            _ = try JSONDecoder().decode(Shape.self, from: Data(#"{"kind":"blob","size":1}"#.utf8))
+        } catch {
+            print(error.localizedDescription)
+        }
+        """, prints: "{\"meta\":{\"author\":\"kiln\"},\"points\":[[1,2]],\"shapes\":[{\"kind\":\"circle\",\"size\":1},{\"kind\":\"square\",\"size\":2}],\"temp\":21.5}\n2 21.5 2 kiln\nsquare 2.0\nThe data couldn't be read because it isn't in the correct format. (bad kind)\n")
+    }
+
+    /// Kiln 0.2.1's patch: `JSONEncoder().encode`, `[T].self`, and a decoded `UUID` stays a `UUID`.
+    /// And a `Set` comes back a set; `Data(text.utf8)` has the bytes.
+    func testCodablePatchFixesSetsAndData() {
+        expect("""
+        struct Todo: Codable, Identifiable, Hashable {
+            var id = UUID()
+            var title: String
+            var tags: Set<String> = []
+        }
+        let todos = [Todo(title: "a", tags: ["x", "y"])]
+        let data = try! JSONEncoder().encode(todos)
+        let back = try! JSONDecoder().decode([Todo].self, from: data)
+        print(back[0].id == todos[0].id, back[0].id is UUID, back[0].tags == ["y", "x"], back[0].tags is Set<String>)
+        print(try! JSONDecoder().decode(Set<Int>.self, from: Data("[3,1,3]".utf8)).count)
+        print(Data("héllo".utf8).count, String(data: Data([72, 105]), encoding: .utf8)!)
+        """, prints: "true true true true\n2\n6 Hi\n")
+    }
+
+    func testCodingNeedsCodable() {
+        expect("""
+        struct Plain { var a = 1 }
+        let d = try? JSONEncoder().encode(Plain())
+        """, fails: "'Plain' isn't Encodable, so it can't be written as JSON: add `: Codable`")
+    }
 }

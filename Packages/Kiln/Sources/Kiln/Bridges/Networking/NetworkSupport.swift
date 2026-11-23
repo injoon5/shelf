@@ -94,6 +94,11 @@ extension KBuiltins {
 
     /// A value as JSONSerialization objects: the inverse of `decode`.
     @MainActor static func encode(_ v: KV, _ box: KEncoderBox, _ interp: KInterpreter, _ line: Int) throws -> Any {
+        // The app's own `encode(to:)` (Bridges/Foundation/Coding.swift); otherwise it must be Encodable.
+        if let t = v.userType {
+            if let m = customEncode(t) { return try encodeCustom(v, t, m, box, interp) }
+            try requireCoding(t, "Encodable", interp, line)
+        }
         switch v {
         case .nilValue, .void: return NSNull()
         case .bool(let b): return b
@@ -156,6 +161,9 @@ extension KBuiltins {
     /// What `T.self` names: a type, or `[T].self` (an array literal of one type).
     static func decodeTarget(_ v: KV, _ interp: KInterpreter) -> KETypeRef? {
         switch v {
+        case .type(.builtin(let n)) where n.contains("<") || n.contains("[") || n.hasSuffix("?"):
+            // `Set<String>.self`, `[String: Int].self` as written.
+            return KEParser.typeRef(n) ?? .named(n, [])
         case .type(let t): return .named(t.name, [])
         case .array(let items) where items.count == 1: return decodeTarget(items[0], interp).map { .array($0) }
         case .dict(let d) where d.count == 1:
@@ -204,6 +212,10 @@ extension KBuiltins {
                 throw mismatch("a date", line, interp)
             case "Array" where gen.count == 1:
                 return try decode(json, as: .array(gen[0]), box, interp, line)
+            case "Set":
+                // A Set round-trips as a set, written as an array.
+                guard let items = json as? [Any] else { throw mismatch("an array", line, interp) }
+                return .set(Set(try items.map { try decode($0, as: gen.first, box, interp, line) }))
             case "Optional" where gen.count == 1:
                 return try decode(json, as: .optional(gen[0]), box, interp, line)
             default:
@@ -227,11 +239,18 @@ extension KBuiltins {
         case .array(let items):
             guard let first = items.first, let list = json as? [Any] else { return plain(json) }
             return .array(try list.map { try decode($0, like: first, box, interp, line) })
+        case .set(let items):
+            guard let list = json as? [Any] else { return plain(json) }
+            if let first = items.first { return .set(Set(try list.map { try decode($0, like: first, box, interp, line) })) }
+            return .set(Set(list.map(plain)))
         default: return plain(json)
         }
     }
 
     @MainActor static func decodeUser(_ json: Any, _ t: KType, _ box: KDecoderBox, _ interp: KInterpreter, _ line: Int) throws -> KV {
+        // The app's own `init(from:)` (Bridges/Foundation/Coding.swift); otherwise it must be Decodable.
+        if customDecodeInit(t) != nil { return try decodeCustom(json, t, box, [], interp, line) }
+        try requireCoding(t, "Decodable", interp, line)
         if t.isEnum {
             for c in t.cases {
                 let raw = try interp.rawValue(KEnumValue(type: t, caseName: c.name, payload: []))

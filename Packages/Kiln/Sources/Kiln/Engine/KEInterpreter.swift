@@ -664,6 +664,7 @@ final class KInterpreter {
         case .int: return .named("Int", [])
         case .double: return .named("Double", [])
         case .string: return .named("String", [])
+        case .set: return .named("Set", [])   // `tags == ["a", "b"]`: the literal is a Set
         case .native(.color): return .named("Color", [])
         default: return nil
         }
