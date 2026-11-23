@@ -48,6 +48,9 @@ extension KInterpreter {
         "Shape": ["Animatable"],
         "InsettableShape": ["Shape", "Animatable"],
         "ObservableObject": ["AnyObject"],
+        // Shown through their proxies (§1.5), but views everywhere else.
+        "UIViewControllerRepresentable": ["View"],
+        "UIViewRepresentable": ["View"],
         "RawRepresentable": [],
         "OptionSet": ["SetAlgebra", "RawRepresentable", "Equatable"],
         "Collection": ["Sequence"],
@@ -168,6 +171,7 @@ extension KInterpreter {
             t.wrappedNames = Set(t.stored.filter { customWrapper($0) != nil }.map(\.name))
         }
         if !protocols.isEmpty { checkRequirements(t) }
+        checkNativeRequirements(t)
     }
 
     /// `class Dog: Animal`: the superclass's members and conformances.

@@ -16,7 +16,14 @@ let package = Package(
     targets: [
         .target(
             name: "Kiln",
+            dependencies: ["KilnObjC"],
             path: "Sources/Kiln"
+        ),
+        // The Objective-C runtime half of §1.5's delegate proxies: a proxy
+        // object that conforms to a native delegate protocol at run time.
+        .target(
+            name: "KilnObjC",
+            path: "Sources/KilnObjC"
         ),
         .testTarget(
             name: "KilnTests",

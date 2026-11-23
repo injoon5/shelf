@@ -16,6 +16,8 @@ final class LayoutBridges: KBridgeFamily {
         scrolling(r)
         subviews(r)
         arrangements(r)
+        customLayouts(r)
+        layoutValues(r)
     }
 
     // MARK: Stacks and grids

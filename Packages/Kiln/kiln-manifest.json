@@ -5,7 +5,7 @@
       "name" : "Core",
       "stubs" : 0,
       "summary" : "views' life cycle: appearing, tasks, changes, timelines",
-      "supported" : 15
+      "supported" : 27
     },
     {
       "name" : "Controls",
@@ -23,7 +23,7 @@
       "name" : "Layout",
       "stubs" : 0,
       "summary" : "stacks, grids, scroll views, frames and padding",
-      "supported" : 133
+      "supported" : 163
     },
     {
       "name" : "Lists",
@@ -35,7 +35,7 @@
       "name" : "Navigation",
       "stubs" : 0,
       "summary" : "navigation stacks, tabs, toolbars, sheets and alerts",
-      "supported" : 183
+      "supported" : 184
     },
     {
       "name" : "Gestures",
@@ -47,7 +47,7 @@
       "name" : "Drawing",
       "stubs" : 11,
       "summary" : "shapes, paths, colors, gradients, images, effects and animation",
-      "supported" : 194
+      "supported" : 211
     },
     {
       "name" : "Focus & Keyboard",
@@ -59,7 +59,7 @@
       "name" : "Environment",
       "stubs" : 5,
       "summary" : "state, bindings, observable models and environment values",
-      "supported" : 26
+      "supported" : 28
     },
     {
       "name" : "Accessibility",
@@ -89,7 +89,7 @@
       "name" : "Sharing",
       "stubs" : 1,
       "summary" : "the share sheet and the clipboard",
-      "supported" : 0
+      "supported" : 10
     },
     {
       "name" : "Units",
@@ -119,7 +119,7 @@
       "name" : "Files",
       "stubs" : 0,
       "summary" : "importing and exporting files",
-      "supported" : 0
+      "supported" : 42
     },
     {
       "name" : "Photos",
@@ -131,7 +131,7 @@
       "name" : "Camera",
       "stubs" : 0,
       "summary" : "taking photos with the camera",
-      "supported" : 0
+      "supported" : 12
     },
     {
       "name" : "Motion",
@@ -141,7 +141,7 @@
     },
     {
       "name" : "Location",
-      "stubs" : 0,
+      "stubs" : 1,
       "summary" : "the user's location and geocoding",
       "supported" : 0
     },
@@ -167,7 +167,7 @@
       "name" : "Language",
       "stubs" : 0,
       "summary" : "Swift's standard library",
-      "supported" : 265
+      "supported" : 267
     },
     {
       "name" : "Foundation",
@@ -1204,6 +1204,55 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "member:AnyLayout.callAsFunction",
+      "kind" : "member",
+      "name" : "callAsFunction",
+      "overloads" : [
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "owner" : "AnyLayout",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:AnyTransition.asymmetric",
+      "kind" : "member",
+      "name" : "asymmetric",
+      "overloads" : [
+        {
+          "labels" : [
+            "insertion",
+            "removal"
+          ]
+        }
+      ],
+      "owner" : "AnyTransition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:AnyTransition.combined",
+      "kind" : "member",
+      "name" : "combined",
+      "overloads" : [
+        {
+          "labels" : [
+            "with"
+          ]
+        }
+      ],
+      "owner" : "AnyTransition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "member:AnyTransition.identity",
       "kind" : "member",
@@ -1214,6 +1263,23 @@
       "owner" : "AnyTransition",
       "source" : "Sources/Kiln/Drawing.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:AnyTransition.modifier",
+      "kind" : "member",
+      "name" : "modifier",
+      "overloads" : [
+        {
+          "labels" : [
+            "active",
+            "identity"
+          ]
+        }
+      ],
+      "owner" : "AnyTransition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
     },
     {
       "family" : "Drawing",
@@ -3162,6 +3228,34 @@
       "support" : "partial"
     },
     {
+      "family" : "Environment",
+      "id" : "member:DismissAction.dismiss",
+      "kind" : "member",
+      "name" : "dismiss",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "DismissAction",
+      "source" : "Sources/Kiln/Environment.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Environment",
+      "id" : "member:DismissAction.wrappedValue",
+      "kind" : "member",
+      "name" : "wrappedValue",
+      "overloads" : [
+
+      ],
+      "owner" : "DismissAction",
+      "source" : "Sources/Kiln/Environment.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:DispatchQueue.async",
       "kind" : "member",
@@ -3456,6 +3550,54 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "member:FileDocumentReadConfiguration.contentType",
+      "kind" : "member",
+      "name" : "contentType",
+      "overloads" : [
+
+      ],
+      "owner" : "FileDocumentReadConfiguration",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileDocumentReadConfiguration.file",
+      "kind" : "member",
+      "name" : "file",
+      "overloads" : [
+
+      ],
+      "owner" : "FileDocumentReadConfiguration",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileDocumentWriteConfiguration.contentType",
+      "kind" : "member",
+      "name" : "contentType",
+      "overloads" : [
+
+      ],
+      "owner" : "FileDocumentWriteConfiguration",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileDocumentWriteConfiguration.existingFile",
+      "kind" : "member",
+      "name" : "existingFile",
+      "overloads" : [
+
+      ],
+      "owner" : "FileDocumentWriteConfiguration",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:FileManager.attributesOfItem",
       "kind" : "member",
@@ -3695,6 +3837,54 @@
       "owner" : "FileManager",
       "source" : "Sources/Kiln/FileSystem.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.filename",
+      "kind" : "member",
+      "name" : "filename",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.isRegularFile",
+      "kind" : "member",
+      "name" : "isRegularFile",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.preferredFilename",
+      "kind" : "member",
+      "name" : "preferredFilename",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.regularFileContents",
+      "kind" : "member",
+      "name" : "regularFileContents",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
     },
     {
       "family" : "Language",
@@ -4831,6 +5021,96 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.dimensions",
+      "kind" : "member",
+      "name" : "dimensions",
+      "overloads" : [
+        {
+          "labels" : [
+            "in"
+          ]
+        }
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.place",
+      "kind" : "member",
+      "name" : "place",
+      "overloads" : [
+        {
+          "labels" : [
+            "at",
+            "anchor",
+            "proposal"
+          ]
+        }
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.priority",
+      "kind" : "member",
+      "name" : "priority",
+      "overloads" : [
+
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.sizeThatFits",
+      "kind" : "member",
+      "name" : "sizeThatFits",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.spacing",
+      "kind" : "member",
+      "name" : "spacing",
+      "overloads" : [
+
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:LayoutSubview.subscript",
+      "kind" : "member",
+      "name" : "subscript",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "LayoutSubview",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:Locale.current",
       "kind" : "member",
@@ -5237,6 +5517,82 @@
       ],
       "owner" : "PresentationSizing",
       "source" : "Sources/Kiln/PresentationModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.height",
+      "kind" : "member",
+      "name" : "height",
+      "overloads" : [
+
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.infinity",
+      "kind" : "member",
+      "name" : "infinity",
+      "overloads" : [
+
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.replacingUnspecifiedDimensions",
+      "kind" : "member",
+      "name" : "replacingUnspecifiedDimensions",
+      "overloads" : [
+        {
+          "labels" : [
+            "by"
+          ]
+        }
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.unspecified",
+      "kind" : "member",
+      "name" : "unspecified",
+      "overloads" : [
+
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.width",
+      "kind" : "member",
+      "name" : "width",
+      "overloads" : [
+
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ProposedViewSize.zero",
+      "kind" : "member",
+      "name" : "zero",
+      "overloads" : [
+
+      ],
+      "owner" : "ProposedViewSize",
+      "source" : "Sources/Kiln/CustomLayout.swift",
       "support" : "full"
     },
     {
@@ -7789,6 +8145,54 @@
       "support" : "full"
     },
     {
+      "family" : "Sharing",
+      "id" : "member:TransferRepresentation.exportingCondition",
+      "kind" : "member",
+      "name" : "exportingCondition",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "TransferRepresentation",
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "member:TransferRepresentation.suggestedFileName",
+      "kind" : "member",
+      "name" : "suggestedFileName",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "TransferRepresentation",
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "member:TransferRepresentation.visibility",
+      "kind" : "member",
+      "name" : "visibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "TransferRepresentation",
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "member:Transition.blurReplace",
       "kind" : "member",
@@ -7885,6 +8289,271 @@
       "support" : "stub"
     },
     {
+      "family" : "Drawing",
+      "id" : "member:TransitionPhase.didDisappear",
+      "kind" : "member",
+      "name" : "didDisappear",
+      "overloads" : [
+
+      ],
+      "owner" : "TransitionPhase",
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:TransitionPhase.identity",
+      "kind" : "member",
+      "name" : "identity",
+      "overloads" : [
+
+      ],
+      "owner" : "TransitionPhase",
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:TransitionPhase.isIdentity",
+      "kind" : "member",
+      "name" : "isIdentity",
+      "overloads" : [
+
+      ],
+      "owner" : "TransitionPhase",
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:TransitionPhase.value",
+      "kind" : "member",
+      "name" : "value",
+      "overloads" : [
+
+      ],
+      "owner" : "TransitionPhase",
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:TransitionPhase.willAppear",
+      "kind" : "member",
+      "name" : "willAppear",
+      "overloads" : [
+
+      ],
+      "owner" : "TransitionPhase",
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIActivityIndicatorView.color",
+      "kind" : "member",
+      "name" : "color",
+      "overloads" : [
+
+      ],
+      "owner" : "UIActivityIndicatorView",
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIActivityIndicatorView.isAnimating",
+      "kind" : "member",
+      "name" : "isAnimating",
+      "overloads" : [
+
+      ],
+      "owner" : "UIActivityIndicatorView",
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIActivityIndicatorView.startAnimating",
+      "kind" : "member",
+      "name" : "startAnimating",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UIActivityIndicatorView",
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIActivityIndicatorView.stopAnimating",
+      "kind" : "member",
+      "name" : "stopAnimating",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UIActivityIndicatorView",
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:UIImage.jpegData",
+      "kind" : "member",
+      "name" : "jpegData",
+      "overloads" : [
+        {
+          "labels" : [
+            "compressionQuality"
+          ]
+        }
+      ],
+      "owner" : "UIImage",
+      "source" : "Sources/Kiln/Images.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:UIImage.pngData",
+      "kind" : "member",
+      "name" : "pngData",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "UIImage",
+      "source" : "Sources/Kiln/Images.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:UIImage.size",
+      "kind" : "member",
+      "name" : "size",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImage",
+      "source" : "Sources/Kiln/Images.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.InfoKey",
+      "kind" : "member",
+      "name" : "InfoKey",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.SourceType",
+      "kind" : "member",
+      "name" : "SourceType",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.allowsEditing",
+      "kind" : "member",
+      "name" : "allowsEditing",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.dismiss",
+      "kind" : "member",
+      "name" : "dismiss",
+      "overloads" : [
+        {
+          "labels" : [
+            "animated",
+            "completion"
+          ]
+        }
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.isSourceTypeAvailable",
+      "kind" : "member",
+      "name" : "isSourceTypeAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.mediaTypes",
+      "kind" : "member",
+      "name" : "mediaTypes",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.sourceType",
+      "kind" : "member",
+      "name" : "sourceType",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:UIScreen.bounds",
       "kind" : "member",
@@ -7906,6 +8575,30 @@
       ],
       "owner" : "UIScreen",
       "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIViewControllerRepresentableContext.coordinator",
+      "kind" : "member",
+      "name" : "coordinator",
+      "overloads" : [
+
+      ],
+      "owner" : "UIViewControllerRepresentableContext",
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "member:UIVisualEffectView.effect",
+      "kind" : "member",
+      "name" : "effect",
+      "overloads" : [
+
+      ],
+      "owner" : "UIVisualEffectView",
+      "source" : "Sources/Kiln/Representables.swift",
       "support" : "full"
     },
     {
@@ -8360,6 +9053,370 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "member:UTF8.self",
+      "kind" : "member",
+      "name" : "self",
+      "overloads" : [
+
+      ],
+      "owner" : "UTF8",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.audio",
+      "kind" : "member",
+      "name" : "audio",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.commaSeparatedText",
+      "kind" : "member",
+      "name" : "commaSeparatedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.conforms",
+      "kind" : "member",
+      "name" : "conforms",
+      "overloads" : [
+        {
+          "labels" : [
+            "to"
+          ]
+        }
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.content",
+      "kind" : "member",
+      "name" : "content",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.data",
+      "kind" : "member",
+      "name" : "data",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.fileURL",
+      "kind" : "member",
+      "name" : "fileURL",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.folder",
+      "kind" : "member",
+      "name" : "folder",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.heic",
+      "kind" : "member",
+      "name" : "heic",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.html",
+      "kind" : "member",
+      "name" : "html",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.identifier",
+      "kind" : "member",
+      "name" : "identifier",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.image",
+      "kind" : "member",
+      "name" : "image",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.item",
+      "kind" : "member",
+      "name" : "item",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.jpeg",
+      "kind" : "member",
+      "name" : "jpeg",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.json",
+      "kind" : "member",
+      "name" : "json",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.markdown",
+      "kind" : "member",
+      "name" : "markdown",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.movie",
+      "kind" : "member",
+      "name" : "movie",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.pdf",
+      "kind" : "member",
+      "name" : "pdf",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.plainText",
+      "kind" : "member",
+      "name" : "plainText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.png",
+      "kind" : "member",
+      "name" : "png",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.preferredFilenameExtension",
+      "kind" : "member",
+      "name" : "preferredFilenameExtension",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.preferredMIMEType",
+      "kind" : "member",
+      "name" : "preferredMIMEType",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.propertyList",
+      "kind" : "member",
+      "name" : "propertyList",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.rtf",
+      "kind" : "member",
+      "name" : "rtf",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.tabSeparatedText",
+      "kind" : "member",
+      "name" : "tabSeparatedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.text",
+      "kind" : "member",
+      "name" : "text",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.url",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.utf8PlainText",
+      "kind" : "member",
+      "name" : "utf8PlainText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.xml",
+      "kind" : "member",
+      "name" : "xml",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.zip",
+      "kind" : "member",
+      "name" : "zip",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:UUID.description",
       "kind" : "member",
@@ -8742,6 +9799,75 @@
       "owner" : "UserDefaults",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ViewDimensions.height",
+      "kind" : "member",
+      "name" : "height",
+      "overloads" : [
+
+      ],
+      "owner" : "ViewDimensions",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ViewDimensions.subscript",
+      "kind" : "member",
+      "name" : "subscript",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "ViewDimensions",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ViewDimensions.width",
+      "kind" : "member",
+      "name" : "width",
+      "overloads" : [
+
+      ],
+      "owner" : "ViewDimensions",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ViewSpacing.distance",
+      "kind" : "member",
+      "name" : "distance",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "along"
+          ]
+        }
+      ],
+      "owner" : "ViewSpacing",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "member:ViewSpacing.zero",
+      "kind" : "member",
+      "name" : "zero",
+      "overloads" : [
+
+      ],
+      "owner" : "ViewSpacing",
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -11712,6 +12838,23 @@
       "support" : "full"
     },
     {
+      "family" : "Layout",
+      "id" : "modifier:layoutValue",
+      "kind" : "modifier",
+      "name" : "layoutValue",
+      "notes" : "Read in your `Layout` as `subview[Key.self]`; the key's `defaultValue` when a view doesn't set it.",
+      "overloads" : [
+        {
+          "labels" : [
+            "key",
+            "value"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Text",
       "id" : "modifier:lineLimit",
       "kind" : "modifier",
@@ -12083,7 +13226,7 @@
       "id" : "modifier:modifier",
       "kind" : "modifier",
       "name" : "modifier",
-      "notes" : "Your own `ViewModifier` structs: `body(content:)` runs with the view.",
+      "notes" : "Your own `ViewModifier` structs: `body(content:)` runs with the view, with its own `@State`; an `Animatable` one animates.",
       "overloads" : [
         {
           "labels" : [
@@ -15093,11 +16236,27 @@
       "support" : "full"
     },
     {
+      "family" : "Drawing",
+      "id" : "protocol:Animatable",
+      "kind" : "protocol",
+      "name" : "Animatable",
+      "notes" : "`animatableData` (numbers, `AnimatablePair`, `CGPoint`, `Angle`) or `@Animatable` on a shape, view or modifier animates.",
+      "proxy" : true,
+      "requirements" : [
+        "animatableData?"
+      ],
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Core",
       "id" : "protocol:App",
       "kind" : "protocol",
       "name" : "App",
       "notes" : "Kiln shows its `WindowGroup`'s content.",
+      "requirements" : [
+        "body"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15107,6 +16266,9 @@
       "kind" : "protocol",
       "name" : "ArrangementViewStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `primary` and `secondary`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/Subviews.swift",
       "support" : "full"
     },
@@ -15116,8 +16278,27 @@
       "kind" : "protocol",
       "name" : "ButtonStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isPressed`, `role`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "protocol:CLLocationManagerDelegate",
+      "kind" : "protocol",
+      "name" : "CLLocationManagerDelegate",
+      "notes" : "Declared, with its proxy, but nothing calls it yet: `CLLocationManager` is Round 3's (§4.6).",
+      "proxy" : true,
+      "requirements" : [
+        "locationManager(_:didUpdateLocations:)?",
+        "locationManager(_:didFailWithError:)?",
+        "locationManagerDidChangeAuthorization(_:)?",
+        "locationManager(_:didUpdateHeading:)?"
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "stub"
     },
     {
       "family" : "Language",
@@ -15125,6 +16306,9 @@
       "kind" : "protocol",
       "name" : "CaseIterable",
       "notes" : "Synthesized for enums without payloads; `allCases` needs it.",
+      "requirements" : [
+        "allCases"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15143,6 +16327,9 @@
       "kind" : "protocol",
       "name" : "Comparable",
       "notes" : "`<`, `sorted()`, `min()` and `max()` on your types need it.",
+      "requirements" : [
+        "<"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15152,6 +16339,9 @@
       "kind" : "protocol",
       "name" : "ContainerValueKey",
       "notes" : "Prefer `@Entry` in `extension ContainerValues`; a key type's `defaultValue` isn't read.",
+      "requirements" : [
+        "defaultValue"
+      ],
       "source" : "Sources/Kiln/Subviews.swift",
       "support" : "partial"
     },
@@ -15161,6 +16351,9 @@
       "kind" : "protocol",
       "name" : "ControlGroupStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15169,6 +16362,9 @@
       "id" : "protocol:CustomStringConvertible",
       "kind" : "protocol",
       "name" : "CustomStringConvertible",
+      "requirements" : [
+        "description"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15178,6 +16374,9 @@
       "kind" : "protocol",
       "name" : "DatePickerStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `selection`, `$selection`, `minimumDate`, `maximumDate`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15195,6 +16394,9 @@
       "kind" : "protocol",
       "name" : "DisclosureGroupStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`, `isExpanded`, `$isExpanded`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15224,11 +16426,30 @@
       "support" : "partial"
     },
     {
+      "family" : "Files",
+      "id" : "protocol:FileDocument",
+      "kind" : "protocol",
+      "name" : "FileDocument",
+      "notes" : "Declared, for the file pickers to come; nothing shows it yet.",
+      "proxy" : true,
+      "requirements" : [
+        "static readableContentTypes",
+        "init(configuration:)",
+        "fileWrapper(configuration:)",
+        "static writableContentTypes?"
+      ],
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Controls",
       "id" : "protocol:FormStyle",
       "kind" : "protocol",
       "name" : "FormStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15238,6 +16459,9 @@
       "kind" : "protocol",
       "name" : "GaugeStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `value`, `label`, `currentValueLabel`, `minimumValueLabel`, `maximumValueLabel`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15247,6 +16471,9 @@
       "kind" : "protocol",
       "name" : "GroupBoxStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15265,6 +16492,9 @@
       "kind" : "protocol",
       "name" : "Identifiable",
       "notes" : "`id` is read by `ForEach` and `List`, which need it (or `id:`).",
+      "requirements" : [
+        "id"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15273,6 +16503,11 @@
       "id" : "protocol:InsettableShape",
       "kind" : "protocol",
       "name" : "InsettableShape",
+      "proxy" : true,
+      "requirements" : [
+        "path(in:)",
+        "inset(by:)"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15282,6 +16517,9 @@
       "kind" : "protocol",
       "name" : "LabelStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `title`, `icon`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15291,7 +16529,38 @@
       "kind" : "protocol",
       "name" : "LabeledContentStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `content`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "protocol:Layout",
+      "kind" : "protocol",
+      "name" : "Layout",
+      "notes" : "`sizeThatFits` and `placeSubviews` with `subview.sizeThatFits`, `place(at:anchor:proposal:)` and a cache; `MyLayout { … }` or `AnyLayout(MyLayout())`.",
+      "proxy" : true,
+      "requirements" : [
+        "sizeThatFits(proposal:subviews:cache:)",
+        "placeSubviews(in:proposal:subviews:cache:)",
+        "makeCache(subviews:)?",
+        "updateCache(_:subviews:)?",
+        "animatableData?"
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "protocol:LayoutValueKey",
+      "kind" : "protocol",
+      "name" : "LayoutValueKey",
+      "requirements" : [
+        "defaultValue"
+      ],
+      "source" : "Sources/Kiln/Geometry.swift",
       "support" : "full"
     },
     {
@@ -15299,6 +16568,9 @@
       "id" : "protocol:LocalizedError",
       "kind" : "protocol",
       "name" : "LocalizedError",
+      "requirements" : [
+        "errorDescription?"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15308,6 +16580,9 @@
       "kind" : "protocol",
       "name" : "MenuStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: show the menu with `Menu(configuration)`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15317,6 +16592,9 @@
       "kind" : "protocol",
       "name" : "NavigationSplitViewStyle",
       "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15334,6 +16612,9 @@
       "id" : "protocol:PreviewProvider",
       "kind" : "protocol",
       "name" : "PreviewProvider",
+      "requirements" : [
+        "static previews"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
     },
@@ -15343,6 +16624,9 @@
       "kind" : "protocol",
       "name" : "PrimitiveButtonStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `role`, `trigger()`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15352,6 +16636,9 @@
       "kind" : "protocol",
       "name" : "ProgressViewStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `fractionCompleted`, `label`, `currentValueLabel`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15360,7 +16647,10 @@
       "id" : "protocol:Shape",
       "kind" : "protocol",
       "name" : "Shape",
-      "notes" : "`path(in:)` runs whenever SwiftUI draws it.",
+      "proxy" : true,
+      "requirements" : [
+        "path(in:)"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "full"
     },
@@ -15370,6 +16660,9 @@
       "kind" : "protocol",
       "name" : "TextEditorStyle",
       "notes" : "SwiftUI's configuration holds nothing to show, so `makeBody(configuration:)` replaces the view.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
     },
@@ -15379,8 +16672,96 @@
       "kind" : "protocol",
       "name" : "ToggleStyle",
       "notes" : "`makeBody(configuration:)` gets SwiftUI's configuration: `label`, `isOn`, `$isOn`, `isMixed`.",
+      "requirements" : [
+        "makeBody(configuration:)"
+      ],
       "source" : "Sources/Kiln/CustomStyles.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "protocol:Transferable",
+      "kind" : "protocol",
+      "name" : "Transferable",
+      "notes" : "For `ShareLink`: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation(exporting:)`.",
+      "proxy" : true,
+      "requirements" : [
+        "static transferRepresentation"
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "protocol:Transition",
+      "introduced" : "17.0",
+      "kind" : "protocol",
+      "name" : "Transition",
+      "notes" : "`body(content:phase:)` with `phase.isIdentity`; `.transition(MyTransition())`.",
+      "proxy" : true,
+      "requirements" : [
+        "body(content:phase:)"
+      ],
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "protocol:UIImagePickerControllerDelegate",
+      "kind" : "protocol",
+      "name" : "UIImagePickerControllerDelegate",
+      "notes" : "`info[.originalImage] as? UIImage`.",
+      "proxy" : true,
+      "requirements" : [
+        "imagePickerController(_:didFinishPickingMediaWithInfo:)?",
+        "imagePickerControllerDidCancel(_:)?"
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Navigation",
+      "id" : "protocol:UINavigationControllerDelegate",
+      "kind" : "protocol",
+      "name" : "UINavigationControllerDelegate",
+      "notes" : "With `UIImagePickerControllerDelegate`.",
+      "proxy" : true,
+      "requirements" : [
+        "navigationController(_:willShow:animated:)?",
+        "navigationController(_:didShow:animated:)?"
+      ],
+      "source" : "Sources/Kiln/Delegates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Core",
+      "id" : "protocol:UIViewControllerRepresentable",
+      "kind" : "protocol",
+      "name" : "UIViewControllerRepresentable",
+      "notes" : "Only for `UIImagePickerController`, with a `Coordinator` class as its delegate.",
+      "proxy" : true,
+      "requirements" : [
+        "makeUIViewController(context:)",
+        "updateUIViewController(_:context:)",
+        "makeCoordinator()?"
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Core",
+      "id" : "protocol:UIViewRepresentable",
+      "kind" : "protocol",
+      "name" : "UIViewRepresentable",
+      "notes" : "Only for `UIVisualEffectView(effect: UIBlurEffect(style:))` and `UIActivityIndicatorView`.",
+      "proxy" : true,
+      "requirements" : [
+        "makeUIView(context:)",
+        "updateUIView(_:context:)",
+        "makeCoordinator()?"
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
     },
     {
       "family" : "Core",
@@ -15388,6 +16769,9 @@
       "kind" : "protocol",
       "name" : "View",
       "notes" : "Each of your views is hosted by a real SwiftUI view that owns its `@State`.",
+      "requirements" : [
+        "body"
+      ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "full"
     },
@@ -15396,9 +16780,13 @@
       "id" : "protocol:ViewModifier",
       "kind" : "protocol",
       "name" : "ViewModifier",
-      "notes" : "Applied with `.modifier(…)`.",
+      "notes" : "`.modifier(Card())`, or `modifier(Card())` in your `extension View`; it can have `@State`.",
+      "proxy" : true,
+      "requirements" : [
+        "body(content:)"
+      ],
       "source" : "Sources/Kiln/Core.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -16368,6 +17756,22 @@
     },
     {
       "family" : "Drawing",
+      "id" : "type:AnimatablePair",
+      "kind" : "type",
+      "name" : "AnimatablePair",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
       "id" : "type:Animation",
       "kind" : "type",
       "name" : "Animation",
@@ -16376,13 +17780,32 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "type:AnyLayout",
+      "kind" : "type",
+      "name" : "AnyLayout",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:AnyTransition",
       "kind" : "type",
       "name" : "AnyTransition",
-      "notes" : "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.identity`.",
+      "notes" : "The built-ins, `.asymmetric`, `.combined(with:)` and `.modifier(active:identity:)`.",
       "overloads" : [
-
+        {
+          "labels" : [
+            "_"
+          ]
+        }
       ],
       "source" : "Sources/Kiln/Drawing.swift",
       "support" : "partial"
@@ -16558,6 +17981,27 @@
       "support" : "partial"
     },
     {
+      "family" : "Sharing",
+      "id" : "type:CodableRepresentation",
+      "kind" : "type",
+      "name" : "CodableRepresentation",
+      "overloads" : [
+        {
+          "labels" : [
+            "contentType"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "contentType"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Layout",
       "id" : "type:ColorScheme",
       "kind" : "type",
@@ -16595,6 +18039,35 @@
       "name" : "Data",
       "notes" : "`Data()`, `Data(text.utf8)` and `Data([UInt8])`; `String(data:encoding:)` and `JSONDecoder` read it.",
       "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "type:DataRepresentation",
+      "kind" : "type",
+      "name" : "DataRepresentation",
+      "overloads" : [
+        {
+          "labels" : [
+            "contentType",
+            "exporting",
+            "importing"
+          ]
+        },
+        {
+          "labels" : [
+            "exportedContentType",
+            "exporting"
+          ]
+        },
+        {
+          "labels" : [
+            "importedContentType",
+            "importing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
       "support" : "partial"
     },
     {
@@ -16706,6 +18179,21 @@
       "support" : "partial"
     },
     {
+      "family" : "Drawing",
+      "id" : "type:EmptyAnimatableData",
+      "kind" : "type",
+      "name" : "EmptyAnimatableData",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:Encoder",
       "kind" : "type",
@@ -16741,6 +18229,28 @@
       "support" : "partial"
     },
     {
+      "family" : "Files",
+      "id" : "type:FileDocumentReadConfiguration",
+      "kind" : "type",
+      "name" : "FileDocumentReadConfiguration",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:FileDocumentWriteConfiguration",
+      "kind" : "type",
+      "name" : "FileDocumentWriteConfiguration",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:FileManager",
       "kind" : "type",
@@ -16750,6 +18260,51 @@
 
       ],
       "source" : "Sources/Kiln/FileSystem.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "type:FileRepresentation",
+      "kind" : "type",
+      "name" : "FileRepresentation",
+      "notes" : "Accepted; files are Round 3's (§4.1).",
+      "overloads" : [
+        {
+          "labels" : [
+            "contentType",
+            "exporting",
+            "importing"
+          ]
+        },
+        {
+          "labels" : [
+            "exportedContentType",
+            "exporting"
+          ]
+        },
+        {
+          "labels" : [
+            "importedContentType",
+            "importing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "stub"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:FileWrapper",
+      "kind" : "type",
+      "name" : "FileWrapper",
+      "overloads" : [
+        {
+          "labels" : [
+            "regularFileWithContents"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Files.swift",
       "support" : "partial"
     },
     {
@@ -16827,6 +18382,54 @@
       "kind" : "type",
       "name" : "GridItem",
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:GridLayout",
+      "kind" : "type",
+      "name" : "GridLayout",
+      "overloads" : [
+        {
+          "labels" : [
+            "alignment",
+            "horizontalSpacing",
+            "verticalSpacing"
+          ]
+        },
+        {
+          "labels" : [
+            "alignment",
+            "horizontalSpacing",
+            "verticalSpacing",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:HStackLayout",
+      "kind" : "type",
+      "name" : "HStackLayout",
+      "overloads" : [
+        {
+          "labels" : [
+            "alignment",
+            "spacing"
+          ]
+        },
+        {
+          "labels" : [
+            "alignment",
+            "spacing",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
       "support" : "partial"
     },
     {
@@ -16966,6 +18569,17 @@
       "support" : "partial"
     },
     {
+      "family" : "Layout",
+      "id" : "type:LayoutSubview",
+      "kind" : "type",
+      "name" : "LayoutSubview",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:Locale",
       "kind" : "type",
@@ -17066,6 +18680,48 @@
       ],
       "source" : "Sources/Kiln/PresentationModifiers.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:ProposedViewSize",
+      "kind" : "type",
+      "name" : "ProposedViewSize",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "width",
+            "height"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "type:ProxyRepresentation",
+      "kind" : "type",
+      "name" : "ProxyRepresentation",
+      "overloads" : [
+        {
+          "labels" : [
+            "exporting",
+            "importing"
+          ]
+        },
+        {
+          "labels" : [
+            "importing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
     },
     {
       "family" : "Language",
@@ -17228,6 +18884,40 @@
       "support" : "partial"
     },
     {
+      "family" : "Sharing",
+      "id" : "type:SharePreview",
+      "kind" : "type",
+      "name" : "SharePreview",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "icon"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "image",
+            "icon"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:SingleValueDecodingContainer",
       "kind" : "type",
@@ -17371,6 +19061,17 @@
       "support" : "partial"
     },
     {
+      "family" : "Sharing",
+      "id" : "type:TransferRepresentation",
+      "kind" : "type",
+      "name" : "TransferRepresentation",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:Transition",
       "kind" : "type",
@@ -17379,6 +19080,37 @@
 
       ],
       "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "type:TransitionPhase",
+      "kind" : "type",
+      "name" : "TransitionPhase",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Animatable.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Core",
+      "id" : "type:UIActivityIndicatorView",
+      "kind" : "type",
+      "name" : "UIActivityIndicatorView",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "style"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
       "support" : "partial"
     },
     {
@@ -17393,12 +19125,85 @@
       "support" : "stub"
     },
     {
+      "family" : "Core",
+      "id" : "type:UIBlurEffect",
+      "kind" : "type",
+      "name" : "UIBlurEffect",
+      "overloads" : [
+        {
+          "labels" : [
+            "style"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:UIColor",
       "kind" : "type",
       "name" : "UIColor",
       "notes" : "The same as `Color` in Kiln.",
       "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "type:UIImage",
+      "kind" : "type",
+      "name" : "UIImage",
+      "overloads" : [
+        {
+          "labels" : [
+            "data"
+          ]
+        },
+        {
+          "labels" : [
+            "systemName"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Images.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController",
+      "kind" : "type",
+      "name" : "UIImagePickerController",
+      "notes" : "`.photoLibrary` only, in a representable, `delegate = context.coordinator`.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.InfoKey",
+      "kind" : "type",
+      "name" : "UIImagePickerController.InfoKey",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.SourceType",
+      "kind" : "type",
+      "name" : "UIImagePickerController.SourceType",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
       "support" : "partial"
     },
     {
@@ -17439,6 +19244,32 @@
       "notes" : "Accepted; no feedback is played yet.",
       "source" : "Sources/Kiln/Haptics.swift",
       "support" : "stub"
+    },
+    {
+      "family" : "Core",
+      "id" : "type:UIViewControllerRepresentableContext",
+      "kind" : "type",
+      "name" : "UIViewControllerRepresentableContext",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Core",
+      "id" : "type:UIVisualEffectView",
+      "kind" : "type",
+      "name" : "UIVisualEffectView",
+      "overloads" : [
+        {
+          "labels" : [
+            "effect"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Representables.swift",
+      "support" : "partial"
     },
     {
       "family" : "Language",
@@ -17502,6 +19333,47 @@
 
       ],
       "source" : "Sources/Kiln/Networking.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:UTF8",
+      "kind" : "type",
+      "name" : "UTF8",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:UTType",
+      "kind" : "type",
+      "name" : "UTType",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "exportedAs"
+          ]
+        },
+        {
+          "labels" : [
+            "filenameExtension"
+          ]
+        },
+        {
+          "labels" : [
+            "importedAs"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Files.swift",
       "support" : "partial"
     },
     {
@@ -17570,6 +19442,29 @@
     },
     {
       "family" : "Layout",
+      "id" : "type:VStackLayout",
+      "kind" : "type",
+      "name" : "VStackLayout",
+      "overloads" : [
+        {
+          "labels" : [
+            "alignment",
+            "spacing"
+          ]
+        },
+        {
+          "labels" : [
+            "alignment",
+            "spacing",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
       "id" : "type:VerticalAlignment",
       "kind" : "type",
       "name" : "VerticalAlignment",
@@ -17581,6 +19476,28 @@
     },
     {
       "family" : "Layout",
+      "id" : "type:ViewDimensions",
+      "kind" : "type",
+      "name" : "ViewDimensions",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:ViewSpacing",
+      "kind" : "type",
+      "name" : "ViewSpacing",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
       "id" : "type:Visibility",
       "kind" : "type",
       "name" : "Visibility",
@@ -17588,6 +19505,27 @@
 
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Layout",
+      "id" : "type:ZStackLayout",
+      "kind" : "type",
+      "name" : "ZStackLayout",
+      "overloads" : [
+        {
+          "labels" : [
+            "alignment"
+          ]
+        },
+        {
+          "labels" : [
+            "alignment",
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/CustomLayout.swift",
       "support" : "partial"
     },
     {
@@ -19355,7 +21293,7 @@
       "id" : "view:ShareLink",
       "kind" : "view",
       "name" : "ShareLink",
-      "notes" : "Shows its label; sharing isn't wired up yet.",
+      "notes" : "A `String`, a `URL`, or your `Transferable` with `preview: SharePreview(\"…\")`.",
       "overloads" : [
         {
           "labels" : [
@@ -19393,7 +21331,7 @@
         }
       ],
       "source" : "Sources/Kiln/Sharing.swift",
-      "support" : "stub"
+      "support" : "partial"
     },
     {
       "family" : "Controls",

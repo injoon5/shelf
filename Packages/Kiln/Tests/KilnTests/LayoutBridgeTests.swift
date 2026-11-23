@@ -100,6 +100,24 @@ final class LayoutBridgeTests: XCTestCase {
         """, state: "@ScaledMetric private var metric: CGFloat = 40")
     }
 
+    func testLayoutValuesReachACustomLayout() {
+        let extra = """
+        struct Rank: LayoutValueKey { static let defaultValue = 0 }
+        struct Ranked: Layout {
+            func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize { CGSize(width: 200, height: 40) }
+            func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+                for s in subviews {
+                    let rank = s[Rank.self]
+                    s.place(at: CGPoint(x: bounds.minX + CGFloat(rank) * 30, y: bounds.minY), proposal: .unspecified)
+                }
+            }
+        }
+        """
+        assertClean("""
+        Ranked { Text("a").layoutValue(key: Rank.self, value: 2); Text("b") }
+        """, extra: extra)
+    }
+
     func testArrangementViewOnIOS27Point1() {
         assertClean("""
         ArrangementView { Text("Main") } secondary: { Text("Side").splitArrangementLayoutRatio(0.3).overlayArrangementEdge(.trailing) }

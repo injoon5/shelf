@@ -75,11 +75,28 @@ extension KRegistry {
         return b
     }
 
+    /// A protocol the app's types adopt. `requirements` are written as the
+    /// app writes them (`"path(in:)"`, `"animatableData?"` with a default,
+    /// `"static transferRepresentation"`, `"async perform()"`); a missing
+    /// required one is an error with the type's line. `proxy` makes the native
+    /// value that stands for the app's (`KEProxies.swift`).
+    @discardableResult
     func protocolBridge(_ name: String, _ family: KilnFamily, requirements: [String] = [], support: KilnSupport = .partial,
-                        notes: String? = nil, file: String = #fileID) {
-        let b = KProtocolBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file))
-        b.requirements = requirements
+                        introduced: String? = nil, notes: String? = nil, file: String = #fileID,
+                        proxy: (@MainActor (KAppValue) -> Any)? = nil) -> KProtocolBridge {
+        let b = KProtocolBridge(name: name, family: family, support: support, introduced: introduced, notes: notes, source: Self.source(file))
+        b.members = requirements.map(KRequirement.init(parsing:))
+        b.requirements = b.members.map(\.declared)
+        b.proxy = proxy
         add(b)
+        return b
+    }
+
+    /// Gives a protocol another family declared its proxy (`Shape` is declared
+    /// with the app's protocols in Core; Drawing has its proxy).
+    func proxy(_ name: String, _ make: @escaping @MainActor (KAppValue) -> Any) {
+        guard let b = protocols[name] else { preconditionFailure("Kiln: proxy(\(name)) before \(name) is registered") }
+        b.proxy = make
     }
 
     func environmentValue(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil,

@@ -67,6 +67,7 @@ enum KNative: Hashable {
     case path(KRef<KPathBox>)
     case rect(Double, Double, Double, Double)  // CGRect x, y, width, height
     case suspension(KSuspension)           // what `await` waits on (KEAsync)
+    case boxed(KBoxed)                     // a native value type compared by value (`ProposedViewSize`, `TransitionPhase`)
 
     var kindName: String {
         switch self {
@@ -95,12 +96,14 @@ enum KNative: Hashable {
         case .path: return "Path"
         case .rect: return "CGRect"
         case .suspension: return "Task"
+        case .boxed(let b): return b.type
         }
     }
 
     /// For `switch phase { case .success(let image): … }`.
     var caseName: String? {
         if case .asyncPhase(let n, _) = self { return n }
+        if case .boxed(let b) = self { return b.caseName }
         return nil
     }
 
@@ -122,6 +125,23 @@ enum KNative: Hashable {
         default: return kindName
         }
     }
+}
+
+/// A native value type that compares by value, with the name of the type its
+/// bridge is registered as. Enum-like ones have a case name, so `case .identity:`
+/// and `phase == .identity` work (the type's `implicit` makes `.identity`).
+final class KBoxed: Hashable {
+    let type: String
+    let value: AnyHashable
+    let caseName: String?
+    init(_ type: String, _ value: AnyHashable, caseName: String? = nil) {
+        self.type = type
+        self.value = value
+        self.caseName = caseName
+    }
+    static func == (a: KBoxed, b: KBoxed) -> Bool { a.type == b.type && a.value == b.value }
+    func hash(into h: inout Hasher) { h.combine(type); h.combine(value) }
+    func get<T>(_: T.Type) -> T? { value.base as? T }
 }
 
 /// A SwiftUI Path built by interpreted code (`var p = Path(); p.move(to:)`).

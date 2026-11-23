@@ -8,3 +8,10 @@ tests/LanguageTests-29.swift §1.6: `@Entry`, `@Animatable`, `@FocusedValue` and
 fixtures/apps/swift-protocols.swift §1.6's fixture: before, `case 500...:` didn't parse.
 fixtures/apps/swift-codable.swift §1.6's fixture: before, the regex literal didn't parse.
 fixtures/apps/swift-builders.swift §1.6's fixture: before, the Card's @ViewBuilder content and the @Entry tint were missing and the steps builder stopped the body.
+Packages/Kiln/Examples/Apps/TagCloud.swift §1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.
+fixtures/apps/views-custom-protocols.swift §1.5's fixture: before, `modifier(…)` called from a View extension wasn't found, and nothing below it showed.
+fixtures/apps/views-uikit.swift §1.5's fixture: before, the representable, its picker and `SharePreview` didn't exist.
+tests/ProxyTests-8.swift §1.5: `modifier(Card(…))` from a View extension now applies the app's ViewModifier; before, it wasn't found.
+tests/ProxyTests-10.swift §1.5: `Diagonal(step: 5) { … }` is the app's Layout with its content; before, the closure was an ignored argument.
+tests/ProxyTests-11.swift §1.5: `AnyLayout` over the app's Layout and `HStackLayout`; before, `AnyLayout` didn't exist.
+tests/ProxyTests-20.swift §1.5: `ShareLink(item:preview:)` with the app's Transferable and `SharePreview`; before, `SharePreview` didn't exist.

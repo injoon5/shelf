@@ -273,13 +273,13 @@ final class CheckTests: XCTestCase {
     func testStubViewAndTypeAreWarnings() {
         let check = Kiln.check(app(#"""
             VStack {
-                ShareLink(item: "x")
+                Canvas { context, size in }
                 Button("Tap") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
             }
             """#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         XCTAssertEqual(Set(check.warnings.map(\.kind)), [.stub])
-        XCTAssertEqual(check.warnings.map(\.message), ["`ShareLink` is accepted but has no effect yet",
+        XCTAssertEqual(check.warnings.map(\.message), ["`Canvas` is accepted but has no effect yet",
                                                        "`UIImpactFeedbackGenerator` is accepted but has no effect yet"])
     }
 

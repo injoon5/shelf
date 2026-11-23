@@ -38,6 +38,8 @@ enum PromptCatalog {
             var family: String
             var support: String
             var notes: String?
+            /// A protocol the app's own types adopt and native code calls through (§1.5).
+            var proxy: Bool?
         }
         var families: [Family]
         var gaps: [Gap]
@@ -84,6 +86,8 @@ enum PromptCatalog {
             }
             groups.append(names(types))
             groups.append(names(working.filter { $0.kind == "modifier" }))
+            // `Shape`, `Layout`, a delegate: protocols the app's own types adopt (PLAN.md §1.5).
+            groups.append(names(working.filter { $0.kind == "protocol" && $0.proxy == true }).map { "your own " + $0 })
             let line = groups.filter { !$0.isEmpty }.map { $0.joined(separator: ", ") }.joined(separator: "; ")
             guard !line.isEmpty else { continue }
             out.append("- **\(f.name):** \(line).")
@@ -111,12 +115,13 @@ enum PromptCatalog {
     static func isAlias(_ s: Manifest.Symbol) -> Bool { s.notes?.hasPrefix("The same as") == true }
 
     /// "`List`: rows, sections…", one per note of a symbol that works only in
-    /// part (what works fully needs no note in a prompt); names that share a
-    /// note share its line.
+    /// part (what works fully needs no note in a prompt), or of a protocol the
+    /// app's types adopt (its note says how); names that share a note share its line.
     static func notes(_ symbols: [Manifest.Symbol]) -> [String] {
         var order: [String] = []
         var byNote: [String: [String]] = [:]
-        for s in symbols where s.support == "partial" && s.kind != "style" && s.kind != "protocol" && !isAlias(s) {
+        for s in symbols where s.kind != "style" && !isAlias(s)
+            && (s.kind == "protocol" ? s.proxy == true : s.support == "partial") {
             guard let note = s.notes?.trimmingCharacters(in: .whitespaces), !note.isEmpty else { continue }
             if byNote[note] == nil { order.append(note) }
             let d = display(s)

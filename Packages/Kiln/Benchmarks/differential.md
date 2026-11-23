@@ -2,17 +2,20 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**68 inputs: 60 identical, 8 different as expected, 0 different otherwise.**
+**83 inputs: 68 identical, 15 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
+| Packages/Kiln/Examples/Apps/CardStyles.swift | 242 | 13 | identical |
 | Packages/Kiln/Examples/Apps/Chess.swift | 21125 | 13 | identical |
 | Packages/Kiln/Examples/Apps/ExpenseTracker.swift | 1654 | 13 | identical |
 | Packages/Kiln/Examples/Apps/FocusTimer.swift | 910 | 13 | identical |
 | Packages/Kiln/Examples/Apps/HabitTracker.swift | 1105 | 13 | identical |
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
+| Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
+| Packages/Kiln/Examples/Apps/WaveStudio.swift | 341 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/expense.md | 754 | 13 | expected (The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.) |
 | Packages/Kiln/Examples/AppleIntelligence/habit.md | 377 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/memory.md | 31 | 1 | identical |
@@ -31,10 +34,12 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/swift-protocols.swift | 2 | 1 | expected (§1.6's fixture: before, `case 500...:` didn't parse.) |
 | fixtures/apps/time.swift | 372 | 13 | identical |
 | fixtures/apps/todos-db.swift | 296 | 14 | identical |
+| fixtures/apps/views-custom-protocols.swift | 9 | 1 | expected (§1.5's fixture: before, `modifier(…)` called from a View extension wasn't found, and nothing below it showed.) |
 | fixtures/apps/views-input.swift | 502 | 14 | identical |
 | fixtures/apps/views-layout-drawing.swift | 2560 | 13 | identical |
 | fixtures/apps/views-lists-controls.swift | 1547 | 13 | identical |
 | fixtures/apps/views-navigation.swift | 861 | 13 | identical |
+| fixtures/apps/views-uikit.swift | 9 | 1 | expected (§1.5's fixture: before, the representable, its picker and `SharePreview` didn't exist.) |
 | Packages/Kiln/Benchmarks/Workloads/Arithmetic.swift | 8 | 2 | identical |
 | Packages/Kiln/Benchmarks/Workloads/Collections.swift | 112 | 2 | identical |
 | Packages/Kiln/Benchmarks/Workloads/Objects.swift | 8 | 2 | identical |
@@ -68,12 +73,148 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/LanguageTests-18.swift | 21 | 1 | expected (§1.6: a closure given to `@ViewBuilder let content: Content` or a `@ViewBuilder` parameter now builds its views; before, Card and Panel showed nothing.) |
 | tests/LanguageTests-28.swift | 5 | 1 | expected (§1.6: `$on.animation()` and a method straight on `allCases` used to stop with an error; now they work.) |
 | tests/LanguageTests-29.swift | 8 | 1 | expected (§1.6: `@Entry`, `@Animatable`, `@FocusedValue` and `.focusedValue` are read as declarations; before, `.focusedValue` stopped the body.) |
+| tests/ProxyTests-1.swift | 1 | 1 | identical |
+| tests/ProxyTests-10.swift | 3 | 1 | expected (§1.5: `Diagonal(step: 5) { … }` is the app's Layout with its content; before, the closure was an ignored argument.) |
+| tests/ProxyTests-11.swift | 4 | 1 | expected (§1.5: `AnyLayout` over the app's Layout and `HStackLayout`; before, `AnyLayout` didn't exist.) |
+| tests/ProxyTests-13.swift | 1 | 1 | identical |
+| tests/ProxyTests-14.swift | 18 | 2 | identical |
+| tests/ProxyTests-15.swift | 11 | 2 | identical |
+| tests/ProxyTests-16.swift | 1 | 1 | identical |
+| tests/ProxyTests-20.swift | 5 | 1 | expected (§1.5: `ShareLink(item:preview:)` with the app's Transferable and `SharePreview`; before, `SharePreview` didn't exist.) |
+| tests/ProxyTests-8.swift | 4 | 1 | expected (§1.5: `modifier(Card(…))` from a View extension now applies the app's ViewModifier; before, it wasn't found.) |
+| tests/ProxyTests-9.swift | 4 | 1 | identical |
 | tests/RegistryTests-0.swift | 2 | 1 | identical |
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
 | tests/WeatherRepro-0.swift | 209 | 13 | identical |
 | tests/WeatherRepro-1.swift | 183 | 14 | identical |
+
+## Packages/Kiln/Examples/Apps/TagCloud.swift
+
+```diff
+--- before
++++ after
+@@ -2,3 +2,1365 @@
+ ContentView {tags=["Swift", "SwiftUI", "Layout", "Kiln", "Shelf", "Animation", "Protocols"], flowing=true, extra=["Proxies", "Delegates", "Shapes", "Transitions", "Modifiers"]}
+-  body failed
+-error: Line 51: Cannot find 'AnyLayout' in scope
++  VStack(alignment: .leading, spacing: 20, {fn})
++    Text("Flow")
++      .font(Font)
++    LayoutView(AnyLayout, content: {fn})
++      ForEach(["Swift", "SwiftUI", "Layout", "Kiln", "Shelf", "Animation", "Protocols"], id: KeyPath, {fn})
++        row "Swift"
++          Text("Swift")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "SwiftUI"
++          Text("SwiftUI")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Layout"
++          Text("Layout")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Kiln"
++          Text("Kiln")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Shelf"
++          Text("Shelf")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Animation"
++          Text("Animation")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Protocols"
++          Text("Protocols")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++    HStack({fn})
++      Button("Add Tag", {fn})
++      Button("Switch Layout", {fn})
++      .buttonStyle(.bordered)
++    Spacer()
++    .padding()
++== after Button[Add Tag]@64
++ContentView {tags=["Swift", "SwiftUI", "Layout", "Kiln", "Shelf", "Animation", "Protocols", "Shapes"], flowing=true, extra=["Proxies", "Delegates", "Shapes", "Transitions", "Modifiers"]}
++  VStack(alignment: .leading, spacing: 20, {fn})
++    Text("Flow")
++      .font(Font)
++    LayoutView(AnyLayout, content: {fn})
++      ForEach(["Swift", "SwiftUI", "Layout", "Kiln", "Shelf", "Animation", "Protocols", "Shapes"], id: KeyPath, {fn})
++        row "Swift"
++          Text("Swift")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "SwiftUI"
++          Text("SwiftUI")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Layout"
++          Text("Layout")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
++                .fill(<view>)
++                  Color(Color)
++                    .opacity(0.2)
++        row "Kiln"
++          Text("Kiln")
++            .padding(.horizontal, 12)
++            .padding(.vertical, 6)
++            .background(<view>)
++              Capsule()
+…
+```
 
 ## Packages/Kiln/Examples/AppleIntelligence/expense.md
 
@@ -705,6 +846,258 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/views-custom-protocols.swift
+
+```diff
+--- before
++++ after
+@@ -5,5 +5,567 @@
+       VStack(spacing: 16, {fn})
+-        content failed
+-        .padding()
+-      .navigationTitle("Tide Board")
+-error: Line 89: Cannot find 'modifier' in scope
++        UserShape(Tide(level: 0.3, swell: 4.0))
++          .fill(<view>)
++            LinearGradient(colors: [Color, Color])
++          .frame(height: 140)
++          .clipShape(<view>)
++            RoundedRectangle(cornerRadius: 16)
++        LayoutView(AnyLayout, content: {fn})
++          ForEach(["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"], id: KeyPath, {fn})
++            row "Harbor"
++              Text("Harbor")
++                .modifier(Tile(tint: Color))
++            row "Point"
++              Text("Point")
++                .modifier(Tile(tint: Color))
++            row "Cove"
++              Text("Cove")
++                .modifier(Tile(tint: Color))
++            row "Reef"
++              Text("Reef")
++                .modifier(Tile(tint: Color))
++            row "Bay"
++              Text("Bay")
++                .modifier(Tile(tint: Color))
++            row "Inlet"
++              Text("Inlet")
++                .modifier(Tile(tint: Color))
++        Text(_literal: "Tap to pin")
++          .modifier(Pinned(pinned: false))
++          .modifier(Tile(tint: Color))
++        If true
++          Text(_literal: "High tide at <time>")
++            .modifier(Tile(tint: Color))
++            .transition(Rise())
++        If false
++        Button("High Tide", {fn})
++          .buttonStyle(.borderedProminent)
++        .padding()
++      .navigationTitle("Tide Board")
++== after Button[High Tide]@133
++ContentView {high=true, showTip=true, places=["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"]}
++  NavigationStack({fn})
++    ScrollView({fn})
++      VStack(spacing: 16, {fn})
++        UserShape(Tide(level: 0.8, swell: 12.0))
++          .fill(<view>)
++            LinearGradient(colors: [Color, Color])
++          .frame(height: 140)
++          .clipShape(<view>)
++            RoundedRectangle(cornerRadius: 16)
++        LayoutView(AnyLayout, content: {fn})
++          ForEach(["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"], id: KeyPath, {fn})
++            row "Harbor"
++              Text("Harbor")
++                .modifier(Tile(tint: Color))
++            row "Point"
++              Text("Point")
++                .modifier(Tile(tint: Color))
++            row "Cove"
++              Text("Cove")
++                .modifier(Tile(tint: Color))
++            row "Reef"
++              Text("Reef")
++                .modifier(Tile(tint: Color))
++            row "Bay"
++              Text("Bay")
++                .modifier(Tile(tint: Color))
++            row "Inlet"
++              Text("Inlet")
++                .modifier(Tile(tint: Color))
++        Text(_literal: "Tap to pin")
++          .modifier(Pinned(pinned: false))
++          .modifier(Tile(tint: Color))
++        If true
++          Text(_literal: "High tide at <time>")
++            .modifier(Tile(tint: Color))
++            .transition(Rise())
++        If true
++          Text(_literal: "Swell rising")
++            .transition(.modifier(Fade(amount: 1.0), Fade(amount: 0.0)))
++        Button("Low Tide", {fn})
++          .buttonStyle(.borderedProminent)
++        .padding()
++      .navigationTitle("Tide Board")
++== after Button[Low Tide]@133
++ContentView {high=false, showTip=true, places=["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"]}
++  NavigationStack({fn})
++    ScrollView({fn})
++      VStack(spacing: 16, {fn})
++        UserShape(Tide(level: 0.3, swell: 4.0))
++          .fill(<view>)
++            LinearGradient(colors: [Color, Color])
++          .frame(height: 140)
++          .clipShape(<view>)
++            RoundedRectangle(cornerRadius: 16)
++        LayoutView(AnyLayout, content: {fn})
++          ForEach(["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"], id: KeyPath, {fn})
++            row "Harbor"
++              Text("Harbor")
++                .modifier(Tile(tint: Color))
++            row "Point"
++              Text("Point")
++                .modifier(Tile(tint: Color))
++            row "Cove"
++              Text("Cove")
++                .modifier(Tile(tint: Color))
++            row "Reef"
++              Text("Reef")
++                .modifier(Tile(tint: Color))
++            row "Bay"
++              Text("Bay")
++                .modifier(Tile(tint: Color))
++            row "Inlet"
+…
+```
+
+## fixtures/apps/views-uikit.swift
+
+```diff
+--- before
++++ after
+@@ -4,3 +4,22 @@
+     VStack(spacing: 20, {fn})
+-      content failed
++      ZStack(alignment: .bottom, {fn})
++        If false
++          Image(systemName: "photo")
++            .font(Font)
++            .foregroundStyle(Color)
++        Text("A day at the sea")
++          .padding(8)
++          .frame(maxWidth: inf)
++          .background(Blur())
++        .frame(height: 260)
++        .clipShape(<view>)
++          RoundedRectangle(cornerRadius: 16)
++      TextField("Caption", text: $"A day at the sea")
++        .textFieldStyle(.roundedBorder)
++      Button("Choose Photo", {fn})
++        .buttonStyle(.borderedProminent)
++      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
+       .padding()
+@@ -8,2 +27,351 @@
+       .sheet(isPresented: $false, {fn})
+-error: Line 113: Cannot find 'SharePreview' in scope
++        ImagePicker {image=$nil, dismiss=DismissAction}
++          (no body)
++== after Button[Choose Photo]@111
++ContentView {image=nil, picking=true, caption="A day at the sea"}
++  NavigationStack({fn})
++    VStack(spacing: 20, {fn})
++      ZStack(alignment: .bottom, {fn})
++        If false
++          Image(systemName: "photo")
++            .font(Font)
++            .foregroundStyle(Color)
++        Text("A day at the sea")
++          .padding(8)
++          .frame(maxWidth: inf)
++          .background(Blur())
++        .frame(height: 260)
++        .clipShape(<view>)
++          RoundedRectangle(cornerRadius: 16)
++      TextField("Caption", text: $"A day at the sea")
++        .textFieldStyle(.roundedBorder)
++      Button("Choose Photo", {fn})
++        .buttonStyle(.borderedProminent)
++      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
++      .padding()
++      .navigationTitle("Photo Card")
++      .sheet(isPresented: $true, {fn})
++        ImagePicker {image=$nil, dismiss=DismissAction}
++          (no body)
++== after Button[Choose Photo]@111
++ContentView {image=nil, picking=true, caption="A day at the sea"}
++  NavigationStack({fn})
++    VStack(spacing: 20, {fn})
++      ZStack(alignment: .bottom, {fn})
++        If false
++          Image(systemName: "photo")
++            .font(Font)
++            .foregroundStyle(Color)
++        Text("A day at the sea")
++          .padding(8)
++          .frame(maxWidth: inf)
++          .background(Blur())
++        .frame(height: 260)
++        .clipShape(<view>)
++          RoundedRectangle(cornerRadius: 16)
++      TextField("Caption", text: $"A day at the sea")
++        .textFieldStyle(.roundedBorder)
++      Button("Choose Photo", {fn})
++        .buttonStyle(.borderedProminent)
++      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
++      .padding()
++      .navigationTitle("Photo Card")
++      .sheet(isPresented: $true, {fn})
++        ImagePicker {image=$nil, dismiss=DismissAction}
++          (no body)
++== after Button[Choose Photo]@111
++ContentView {image=nil, picking=true, caption="A day at the sea"}
++  NavigationStack({fn})
++    VStack(spacing: 20, {fn})
++      ZStack(alignment: .bottom, {fn})
++        If false
++          Image(systemName: "photo")
++            .font(Font)
++            .foregroundStyle(Color)
++        Text("A day at the sea")
++          .padding(8)
++          .frame(maxWidth: inf)
++          .background(Blur())
++        .frame(height: 260)
++        .clipShape(<view>)
++          RoundedRectangle(cornerRadius: 16)
++      TextField("Caption", text: $"A day at the sea")
++        .textFieldStyle(.roundedBorder)
++      Button("Choose Photo", {fn})
++        .buttonStyle(.borderedProminent)
++      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
++      .padding()
++      .navigationTitle("Photo Card")
++      .sheet(isPresented: $true, {fn})
++        ImagePicker {image=$nil, dismiss=DismissAction}
++          (no body)
++== after Button[Choose Photo]@111
++ContentView {image=nil, picking=true, caption="A day at the sea"}
+…
+```
+
 ## tests/LanguageTests-18.swift
 
 ```diff
@@ -759,4 +1152,61 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -7,2 +10 @@
      .focusedValue(KeyPath, "x")
 -error: Line 34: Missing argument 'selection' in call to Child
+```
+
+## tests/ProxyTests-10.swift
+
+```diff
+--- before
++++ after
+@@ -2,2 +2,6 @@
+ ContentView {}
+-warning: Ignored argument '_' in Diagonal(…)
++  LayoutView(AnyLayout, content: {fn})
++    Color(Color)
++      .frame(width: 20, height: 10)
++    Color(Color)
++      .frame(width: 30, height: 10)
+```
+
+## tests/ProxyTests-11.swift
+
+```diff
+--- before
++++ after
+@@ -2,3 +2,6 @@
+ ContentView {fancy=true}
+-  body failed
+-error: Line 23: Cannot find 'AnyLayout' in scope
++  LayoutView(AnyLayout, content: {fn})
++    Color(Color)
++      .frame(width: 20, height: 7)
++    Color(Color)
++      .frame(width: 20, height: 9)
+```
+
+## tests/ProxyTests-20.swift
+
+```diff
+--- before
++++ after
+@@ -3,3 +3,3 @@
+   VStack({fn})
+-    content failed
+-error: Line 9: Cannot find 'SharePreview' in scope
++    ShareLink(item: Link(url: URL(https://example.com)), preview: SharePreview)
++    ShareLink("Text", item: "hello")
+```
+
+## tests/ProxyTests-8.swift
+
+```diff
+--- before
++++ after
+@@ -2,3 +2,3 @@
+ ContentView {}
+-  body failed
+-error: Line 13: Cannot find 'modifier' in scope
++  Text(_literal: "Inside")
++    .modifier(Card(title: "Hello"))
 ```

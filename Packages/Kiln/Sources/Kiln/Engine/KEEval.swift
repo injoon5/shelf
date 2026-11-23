@@ -498,10 +498,9 @@ extension KInterpreter {
         case .nilValue:
             return .nilValue
         case .native:
-            // A bridged value's own subscript (`d[.top]` on `ViewDimensions`).
-            let tn = KRegistry.typeName(of: base)
-            if let ms = registry.type(tn)?.methods["subscript"] {
-                return try runBridge(ms, "subscript", owner: tn, values: idx, labels: labels, line: line, receiver: base).0
+            // A native type's subscript (`dimensions[.leading]`).
+            if let ms = registry.type(KRegistry.typeName(of: base))?.methods["subscript"] {
+                return try runBridge(ms, "subscript", owner: KRegistry.typeName(of: base), values: idx, labels: labels, line: line, receiver: base).0
             }
         default:
             break
@@ -869,6 +868,10 @@ extension KInterpreter {
             return try call(fn, args, labels)
         case .type(.user(let t)):
             return try construct(t, argExprs, env, line)
+        case .structV(let s) where argExprs.count == 1 && s.type.conformances.contains("Layout"):
+            // `layout { … }` on a stored layout.
+            if let v = layoutCall(f, try eval(argExprs[0].value, env), line) { return v }
+            throw fail("\(describe(f)) is not a function", line)
         case .type(.builtin(let n)):
             return try callNamed(n, argExprs, env, line, nil)
         case .native(let n):
@@ -1022,6 +1025,11 @@ extension KInterpreter {
     // MARK: - Initializers
 
     func construct(_ t: KType, _ argExprs: [KEArg], _ env: KEnv, _ line: Int) throws -> KV {
+        // `MyLayout(spacing: 4) { … }`: the app's `Layout` called with its content (§1.5).
+        if let last = argExprs.last, last.isClosure, last.label == nil, t.conformances.contains("Layout") {
+            let layout = try construct(t, Array(argExprs.dropLast()), env, line)
+            if let v = layoutCall(layout, try eval(last.value, env), line) { return v }
+        }
         let labels = argExprs.map(\.label)
         let closures = Self.closureFlags(argExprs)
         let picked = pickInit(t, labels, closures: closures)

@@ -16,6 +16,7 @@ final class CoreBridges: KBridgeFamily {
         views(r)
         lifecycle(r)
         protocols(r)
+        representables(r)
         values(r)
     }
 
@@ -109,24 +110,21 @@ final class CoreBridges: KBridgeFamily {
         r.modifier("id", .core) { m in
             m.form("_:any") { c, view in view.id(c[0] ?? .nilValue) }
         }
-        r.modifier("modifier", .core, notes: "Your own `ViewModifier` structs: `body(content:)` runs with the view.") { m in
-            m.formOnBase("_:any") { c in customModifier(c) }
-        }
-    }
-
-    /// `.modifier(MyModifier())`: the struct's `body(content:)` with the view.
-    @MainActor static func customModifier(_ c: KCall) -> AnyView {
-        guard let base = c.base else { return AnyView(EmptyView()) }
-        guard case .structV(let s)? = c[0], let body = s.type.method("body") else { return c.r.render(base) }
-        do {
-            let ctx = KSelfContext(type: s.type, location: .box(KBox(.structV(s))))
-            let v = try c.interp.entry {
-                try c.interp.invoke(body, args: [.view(base)], labels: ["content"], selfContext: ctx, parent: c.interp.globalEnv)
+        r.modifier("modifier", .core, notes: "Your own `ViewModifier` structs: `body(content:)` runs with the view, with its own `@State`; an `Animatable` one animates.") { m in
+            m.form("_:any") { c, view in
+                if let proxy = c.interp.proxy(for: c[0] ?? .void, as: "ViewModifier") as? KModifierProxy {
+                    view.modifier(proxy)
+                } else {
+                    view
+                }
             }
-            return c.r.render(.group(KBuiltins.asViews(v, c.interp)))
-        } catch {
-            c.interp.report(error)
-            return c.r.render(base)
+        }
+        // SwiftUI's own content, handed to the app's `body(content:)` (KNativeContent).
+        r.view("NativeContent", .core) { v in
+            v.engineOnly()
+            v.form("_:any") { c in
+                if case .native(.object(_, let ref))? = c[0], let box = ref.value as? KAnyViewBox { box.view } else { EmptyView() }
+            }
         }
     }
 
@@ -135,9 +133,12 @@ final class CoreBridges: KBridgeFamily {
     static func protocols(_ r: KRegistry) {
         r.protocolBridge("View", .core, requirements: ["body"], support: .full, notes: "Each of your views is hosted by a real SwiftUI view that owns its `@State`.")
         r.protocolBridge("App", .core, requirements: ["body"], support: .partial, notes: "Kiln shows its `WindowGroup`'s content.")
-        r.protocolBridge("ViewModifier", .core, requirements: ["body(content:)"], support: .partial, notes: "Applied with `.modifier(…)`.")
-        r.protocolBridge("PreviewProvider", .core, requirements: ["previews"])
-        r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full, notes: "`path(in:)` runs whenever SwiftUI draws it.")
+        r.protocolBridge("ViewModifier", .core, requirements: ["body(content:)"], support: .full,
+                         notes: "`.modifier(Card())`, or `modifier(Card())` in your `extension View`; it can have `@State`.") { app in
+            KModifierProxy(app: app)
+        }
+        r.protocolBridge("PreviewProvider", .core, requirements: ["static previews"])
+        r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full)
         r.protocolBridge("InsettableShape", .drawing, requirements: ["path(in:)", "inset(by:)"])
         r.protocolBridge("Identifiable", .language, requirements: ["id"], notes: "`id` is read by `ForEach` and `List`, which need it (or `id:`).")
         r.protocolBridge("Hashable", .language, notes: "Synthesized from stored properties, or your own `hash(into:)`.")

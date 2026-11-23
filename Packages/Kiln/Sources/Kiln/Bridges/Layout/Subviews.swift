@@ -18,7 +18,7 @@ import SwiftUI
 
 /// A subview SwiftUI resolved: shown as itself, with its id and container values.
 @available(iOS 18.0, macOS 15.0, *)
-final class KSubviewBox: KNativeViewBox {
+final class KSubviewViewBox: KNativeViewBox {
     let subview: Subview
     init(_ subview: Subview) {
         self.subview = subview
@@ -71,7 +71,7 @@ enum KSubviews {
 
     @available(iOS 18.0, macOS 15.0, *)
     static func subview(_ s: Subview) -> KV {
-        .view(.primitive("KilnNativeView", [.native(.object("NativeView", KRef(KSubviewBox(s))))], [nil], line: 0))
+        .view(.primitive("KilnNativeView", [.native(.object("NativeView", KRef(KSubviewViewBox(s))))], [nil], line: 0))
     }
 
     @available(iOS 18.0, macOS 15.0, *)
@@ -146,7 +146,7 @@ extension LayoutBridges {
             t.anyProperty { c, name in
                 guard case .view(let v) = c.receiver, name == "id" || name == "containerValues" else { return nil }
                 if #available(iOS 18.0, macOS 15.0, *), case .primitive("KilnNativeView", let args, _, _) = v.kind,
-                   case .native(.object(_, let ref))? = args.first, let box = ref.value as? KSubviewBox {
+                   case .native(.object(_, let ref))? = args.first, let box = ref.value as? KSubviewViewBox {
                     return name == "id" ? .string("\(box.subview.id)")
                         : .native(.object("ContainerValues", KRef(KContainerValuesBox(native: box.subview.containerValues))))
                 }

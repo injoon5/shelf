@@ -111,29 +111,7 @@ extension LayoutBridges {
             t.method("frame", "in:any") { c in KLayout.rect(g(c)?.frame(c["in"]) ?? .zero) }
             t.method("bounds", "of:any") { c in g(c)?.bounds(c["of"]).map(KLayout.rect) ?? .nilValue }
         }
-        // `ViewDimensions` in an alignment guide: `d.width`, `d[.top]`, `d[VerticalAlignment.center]`.
-        r.type("ViewDimensions", .layout, support: .full) { t in
-            t.internal()
-            @MainActor func dims(_ c: KCall) -> ViewDimensions? {
-                if case .native(.object(_, let ref)) = c.receiver { return (ref.value as? KDimensionsBox)?.d }
-                return nil
-            }
-            t.property("width") { c in .double(Double(dims(c)?.width ?? 100)) }
-            t.property("height") { c in .double(Double(dims(c)?.height ?? 100)) }
-            t.method("subscript", "_:any") { c in
-                guard let d = dims(c), case .native(.implicit(let n, _))? = c[0] else { return .double(0) }
-                switch n {
-                case "leading": return .double(d[HorizontalAlignment.leading])
-                case "trailing": return .double(d[HorizontalAlignment.trailing])
-                case "top": return .double(d[VerticalAlignment.top])
-                case "bottom": return .double(d[VerticalAlignment.bottom])
-                case "firstTextBaseline": return .double(d[VerticalAlignment.firstTextBaseline])
-                case "lastTextBaseline": return .double(d[VerticalAlignment.lastTextBaseline])
-                default: return .double(d[HorizontalAlignment.center])
-                }
-            }
-        }
-
+        // `ViewDimensions` (`d.width`, `d[.top]`) is CustomLayout.swift's.
         r.modifier("coordinateSpace", .layout, notes: "`.coordinateSpace(.named(\"list\"))` or `name:`, read by `proxy.frame(in: .named(\"list\"))`.") { m in
             m.form("_:any") { c, view in view.coordinateSpace(KLayout.namedSpace(c[0]) ?? .named("")) }
             m.form("name:any") { c, view in view.coordinateSpace(name: c["name"].map(KLayout.spaceName) ?? "") }
@@ -141,7 +119,7 @@ extension LayoutBridges {
         r.modifier("alignmentGuide", .layout, support: .partial,
                    notes: "The closure gets the view's dimensions: `d.width`, `d.height`, `d[.top]`. A `.center` guide is set for both axes, and `d[.center]` is the horizontal center.") { m in
             m.form("_:any computeValue:closure") { c, view in alignmentGuide(c, view) }
-            m.probe { _, _ in [.native(.object("ViewDimensions", KRef(KDimensionsBox(nil))))] }
+            m.probe { _, _ in [.native(.object("ViewDimensions", KRef(NSObject())))] }
         }
         r.modifier("containerRelativeFrame", .layout) { m in
             m.form("_:Axis.Set alignment:Alignment?") { c, view in view.containerRelativeFrame(KLayout.axes(c[0]), alignment: c.alignment("alignment")) }
@@ -306,8 +284,47 @@ struct KEquatable: Equatable, @unchecked Sendable {
     init(_ value: KV) { self.value = value }
 }
 
-final class KDimensionsBox {
-    /// nil when the app is only checked: a 100-point square.
-    let d: ViewDimensions?
-    init(_ d: ViewDimensions?) { self.d = d }
+/// Values set with `.layoutValue(key:value:)`, by the key type's name.
+struct KLayoutValuesKey: LayoutValueKey {
+    static let defaultValue: [String: KV] = [:]
+}
+
+extension LayoutBridges {
+    /// `.layoutValue(key: Rank.self, value: 2)`, read in a custom `Layout` as `subview[Rank.self]`.
+    static func layoutValues(_ r: KRegistry) {
+        r.modifier("layoutValue", .layout, notes: "Read in your `Layout` as `subview[Key.self]`; the key's `defaultValue` when a view doesn't set it.") { m in
+            m.formOnBase("key:any value:any") { c in c.view.layoutValue(key: KLayoutValuesKey.self, value: layoutValueChain(c)) }
+        }
+        r.protocolBridge("LayoutValueKey", .layout, requirements: ["defaultValue"], support: .full)
+        r.extend("LayoutSubview") { t in
+            t.method("subscript", "_:any") { c in
+                guard case .native(.object(_, let ref)) = c.receiver, let box = ref.value as? KSubviewBox, case .type(let t)? = c[0] else { return .nilValue }
+                if let v = box.subview[KLayoutValuesKey.self][typeKey(t)] { return v }
+                if case .user(let ut) = t { return (try? c.interp.staticValue(ut, "defaultValue")) ?? .nilValue }
+                return .nilValue
+            }
+        }
+    }
+
+    /// Every `layoutValue` on the view, outermost winning, in one value.
+    @MainActor static func layoutValueChain(_ c: KCall) -> [String: KV] {
+        var values: [String: KV] = [:]
+        var chain: [KModifier] = [KModifier(name: "layoutValue", args: c.args, labels: c.labels, line: c.line)]
+        var node: KView? = c.base
+        while case .modified(let base, let mm)? = node?.kind {
+            if mm.name == "layoutValue" { chain.append(mm) }
+            node = base
+        }
+        for mm in chain.reversed() {
+            if case .type(let t)? = mm.arg("key") { values[typeKey(t)] = mm.arg("value") ?? .nilValue }
+        }
+        return values
+    }
+
+    static func typeKey(_ t: KTypeValue) -> String {
+        switch t {
+        case .user(let ut): return ut.name
+        case .builtin(let n): return n
+        }
+    }
 }

@@ -20,6 +20,7 @@ final class NavigationBridges: KBridgeFamily {
         search(r)
         presentations(r)
         presentationModifiers(r)
+        delegates(r)
     }
 
     // MARK: Stacks and links

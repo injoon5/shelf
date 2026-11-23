@@ -46,6 +46,12 @@ final class EnvironmentBridges: KBridgeFamily {
                 if case .native(.dismiss(let action)) = c.receiver { action.value() }
                 return .void
             }
+            // `presentationMode.wrappedValue.dismiss()`, the older form.
+            t.property("wrappedValue") { c in c.receiver }
+            t.method("dismiss", "") { c in
+                if case .native(.dismiss(let action)) = c.receiver { action.value() }
+                return .void
+            }
         }
     }
 

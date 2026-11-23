@@ -212,7 +212,9 @@ extension DrawingBridges {
             m.form("_:Animation?", notes: "Deprecated in SwiftUI: animates every change.") { c, view in view.animation(c.animation(0), value: UUID()) }
         }
         r.modifier("transition", .drawing) { m in
-            m.form("_:AnyTransition") { c, view in view.transition(transition(c[0])) }
+            m.form("_:AnyTransition") { c, view in
+                if let mine = appTransition(c[0], c.interp) { view.transition(mine) } else { view.transition(transition(c[0], c.interp)) }
+            }
         }
         r.modifier("contentTransition", .drawing, support: .partial, notes: "`.numericText()`; anything else cross-fades.") { m in
             m.form("_:ContentTransition") { c, view in
@@ -221,14 +223,43 @@ extension DrawingBridges {
         }
     }
 
-    static func transition(_ v: KV?) -> AnyTransition {
-        guard case .native(let n)? = v else { return .opacity }
+    /// The app's own `Transition` value (or a static member giving one:
+    /// `extension Transition where Self == Fade { static var fade: Self }`).
+    @MainActor static func appTransition(_ v: KV?, _ interp: KInterpreter) -> KTransitionProxy? {
+        guard let v = resolvedTransition(v, interp) else { return nil }
+        return interp.proxy(for: v, as: "Transition") as? KTransitionProxy
+    }
+
+    /// `.fade` where the app declared it in an extension on `Transition` or
+    /// `AnyTransition`: evaluated; anything else as it is.
+    @MainActor static func resolvedTransition(_ v: KV?, _ interp: KInterpreter) -> KV? {
+        if case .native(.implicit(let name, let args))? = v {
+            for owner in ["Transition", "AnyTransition"] {
+                guard let ext = interp.builtinExtensions[owner] else { continue }
+                if ext.staticDecls[name] != nil, let r = try? interp.builtinStatic(owner, name) { return r }
+                if let m = ext.staticMethods[name]?.first,
+                   let r = try? interp.invoke(m, args: args, labels: args.map { _ in nil }, selfContext: nil, parent: interp.globalEnv) { return r }
+            }
+        }
+        return v
+    }
+
+    @MainActor static func transition(_ v: KV?, _ interp: KInterpreter) -> AnyTransition {
+        guard let v = resolvedTransition(v, interp) else { return .opacity }
+        if let mine = interp.proxy(for: v, as: "Transition") as? KTransitionProxy { return AnyTransition(mine) }
+        guard case .native(let n) = v else { return .opacity }
         var name = "opacity"
         var args: [KV] = []
         if case .implicit(let nm, let a) = n { name = nm; args = a }
         if case .transition(let nm, let a) = n { name = nm; args = a }
+        // `.opacity.combined(with: .scale)`, written on a symbol or a transition.
+        if name.hasSuffix(".combined") {
+            return transition(.native(.implicit(String(name.dropLast(9)), [])), interp).combined(with: transition(args.first, interp))
+        }
         switch name.split(separator: ".").first.map(String.init) ?? name {
-        case "scale": return .scale
+        case "scale":
+            if let s = args.first?.asDouble { return .scale(scale: s) }
+            return .scale
         case "slide": return .slide
         case "move":
             if case .native(.implicit(let e, _))? = args.first {
@@ -238,6 +269,21 @@ extension DrawingBridges {
             return .move(edge: .bottom)
         case "push": return .push(from: .trailing)
         case "identity": return .identity
+        case "offset":
+            var x = 0.0, y = 0.0
+            if case .native(.size(let w, let h))? = args.first { x = w; y = h }
+            return .offset(x: x, y: y)
+        case "asymmetric" where args.count == 2:
+            return .asymmetric(insertion: transition(args[0], interp), removal: transition(args[1], interp))
+        case "combined" where args.count == 2:
+            return transition(args[0], interp).combined(with: transition(args[1], interp))
+        case "modifier" where args.count == 2:
+            // `AnyTransition.modifier(active: Dim(amount: 1), identity: Dim(amount: 0))`.
+            if let active = interp.proxy(for: args[0], as: "ViewModifier") as? KModifierProxy,
+               let identity = interp.proxy(for: args[1], as: "ViewModifier") as? KModifierProxy {
+                return .modifier(active: active, identity: identity)
+            }
+            return .opacity
         default: return .opacity
         }
     }
