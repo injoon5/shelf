@@ -27,6 +27,5 @@ final class AccessibilityBridges: KBridgeFamily {
         r.modifier("accessibilityAddTraits", .accessibility, support: .stub) { m in m.stub(["_:any"]) }
         r.modifier("accessibilityElement", .accessibility, support: .stub) { m in m.stub(["children:any?"]) }
         r.modifier("accessibilityHidden", .accessibility, support: .stub) { m in m.stub(["_:bool"]) }
-        r.modifier("help", .accessibility, support: .stub) { m in m.stub(["_:title"]) }
     }
 }

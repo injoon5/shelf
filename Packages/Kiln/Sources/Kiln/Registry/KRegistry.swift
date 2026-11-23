@@ -477,6 +477,10 @@ final class KViewBridge: KBridge {
 final class KModifierBridge: KBridge {
     /// `.name`, for messages.
     lazy var display = "." + name
+    /// What `Kiln.validate` (and the transcript) pass a closure argument
+    /// that isn't view content, by its label: `alignmentGuide`'s
+    /// `computeValue` gets a `ViewDimensions`. nil: called with nothing.
+    var probe: (@MainActor (String?, KInterpreter) -> [KV]?)?
     struct Form {
         let overload: KOverload
         /// The view with the modifier applied. `c.base` is the description of
@@ -558,6 +562,12 @@ final class KProtocolBridge: KBridge {
 /// An `@Environment` value: its default, before the view sees SwiftUI's.
 final class KEnvironmentBridge: KBridge {
     var value: @MainActor (KInterpreter) -> KV = { _ in .nilValue }
+    /// Read from SwiftUI's real environment where the view is shown
+    /// (`\.editMode`, `\.isSearching`): a view that reads one is hosted
+    /// inside a reader of `EnvironmentValues`.
+    var live: (@MainActor (EnvironmentValues, KInterpreter) -> KV)?
+    /// Written by `.environment(\.key, value)`.
+    var write: (@MainActor (AnyView, KV, KCall) -> AnyView)?
 }
 
 /// A property wrapper the engine implements (`@State`, `@AppStorage`).
@@ -567,6 +577,11 @@ final class KWrapperBridge: KBridge {}
 
 @MainActor
 final class KRegistry {
+    /// Properties of SwiftUI's symbolic values (`phase.isScrolling` on
+    /// `.idle`, `mode.isEditing` on `.active`), by property name: nil when the
+    /// value isn't one the bridge knows.
+    var implicitProperties: [String: @MainActor (String, [KV]) -> KV?] = [:]
+
     /// Kiln's own bridges plus the host's.
     static let shared: KRegistry = {
         let r = KRegistry()

@@ -497,6 +497,12 @@ extension KInterpreter {
             if case .type(.user(let k)) = first { return try staticValue(k, "defaultValue") }
         case .nilValue:
             return .nilValue
+        case .native:
+            // A bridged value's own subscript (`d[.top]` on `ViewDimensions`).
+            let tn = KRegistry.typeName(of: base)
+            if let ms = registry.type(tn)?.methods["subscript"] {
+                return try runBridge(ms, "subscript", owner: tn, values: idx, labels: labels, line: line, receiver: base).0
+            }
         default:
             break
         }

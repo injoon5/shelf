@@ -289,6 +289,10 @@ final class KChecker {
         "Identifiable", "Hashable", "Equatable", "Comparable", "CaseIterable", "Codable", "Decodable", "Encodable",
         "Error", "LocalizedError", "CustomStringConvertible", "CustomDebugStringConvertible", "ObservableObject",
         "Sendable", "AnyObject", "CodingKey",
+        // An app's own control styles (Bridges/Controls/CustomStyles.swift): only `makeBody` makes one.
+        "ButtonStyle", "PrimitiveButtonStyle", "ToggleStyle", "LabelStyle", "ProgressViewStyle", "GaugeStyle", "GroupBoxStyle",
+        "LabeledContentStyle", "DisclosureGroupStyle", "ControlGroupStyle", "FormStyle", "MenuStyle", "TextEditorStyle",
+        "NavigationSplitViewStyle", "DatePickerStyle", "ArrangementViewStyle",
         // An enum's raw value type.
         "String", "Int", "Double", "Float", "Character", "UInt", "Int8", "Int16", "Int32", "Int64", "CGFloat",
     ]

@@ -209,7 +209,7 @@ final class KEVarDecl {
     var wrapperAttribute: KEAttribute? { attributes.first(where: { Self.wrappers.contains($0.name) }) }
     static let wrappers: Set<String> = ["State", "Binding", "StateObject", "ObservedObject", "EnvironmentObject",
                                         "Environment", "Published", "AppStorage", "SceneStorage", "FocusState",
-                                        "Namespace", "GestureState", "Bindable", "FocusedValue"]
+                                        "Namespace", "GestureState", "Bindable", "FocusedValue", "ScaledMetric"]
 }
 
 struct KEParam {

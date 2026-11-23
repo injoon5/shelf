@@ -54,6 +54,9 @@ final class EnvironmentBridges: KBridgeFamily {
             m.form("_:any _:any") { c, view in
                 if case .native(.keyPath(let comps))? = c[0], comps.last == "colorScheme", let n = c.symbol(1) {
                     view.environment(\.colorScheme, n == "dark" ? .dark : .light)
+                } else if case .native(.keyPath(let comps))? = c[0], let key = comps.last, let write = c.interp.registry.environment[key]?.write {
+                    // A SwiftUI value another family bridges (`\.defaultMinListRowHeight`, `\.editMode`).
+                    write(view, c[1] ?? .nilValue, c)
                 } else if case .native(.keyPath(let comps))? = c[0], let key = comps.last, c.interp.registry.environment[key] == nil {
                     // The app's own value (`@Entry var accent`), for the `@Environment(\.accent)` below.
                     view.transformEnvironment(\.kilnObjects) { $0["\\." + key] = c.interp.coerce(c[1] ?? .nilValue, to: c.interp.userEnvironmentType(key)) }
