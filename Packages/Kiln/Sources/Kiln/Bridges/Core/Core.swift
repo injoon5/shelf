@@ -68,6 +68,7 @@ final class CoreBridges: KBridgeFamily {
                     view
                 }
             }
+            m.closuresCanWait()
         }
         r.modifier("onChange", .core) { m in
             m.form("of:any initial:bool? _:action") { c, view in
@@ -131,11 +132,11 @@ final class CoreBridges: KBridgeFamily {
         r.protocolBridge("View", .core, requirements: ["body"], support: .full, notes: "Each of your views is hosted by a real SwiftUI view that owns its `@State`.")
         r.protocolBridge("App", .core, requirements: ["body"], support: .partial, notes: "Kiln shows its `WindowGroup`'s content.")
         r.protocolBridge("ViewModifier", .core, requirements: ["body(content:)"], support: .full,
-                         notes: "Applied with `.modifier(…)`, or from your own `extension View { func card() -> some View { modifier(Card()) } }`; it can have `@State`, and `AnyTransition.modifier(active:identity:)` takes it.") { app in
+                         notes: "`.modifier(Card())`, or `modifier(Card())` in your `extension View`; it can have `@State`.") { app in
             KModifierProxy(app: app)
         }
         r.protocolBridge("PreviewProvider", .core, requirements: ["static previews"])
-        r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full, notes: "`path(in:)` runs whenever SwiftUI draws it.")
+        r.protocolBridge("Shape", .drawing, requirements: ["path(in:)"], support: .full)
         r.protocolBridge("InsettableShape", .drawing, requirements: ["path(in:)", "inset(by:)"])
         r.protocolBridge("Identifiable", .language, requirements: ["id"], notes: "`id` is read by `ForEach` and `List`, which need it (or `id:`).")
         r.protocolBridge("Hashable", .language, notes: "Synthesized from stored properties, or your own `hash(into:)`.")
@@ -146,7 +147,7 @@ final class CoreBridges: KBridgeFamily {
         r.protocolBridge("Decodable", .foundation)
         r.protocolBridge("Encodable", .foundation)
         r.protocolBridge("Error", .language)
-        r.protocolBridge("LocalizedError", .foundation, requirements: ["errorDescription"])
+        r.protocolBridge("LocalizedError", .foundation, requirements: ["errorDescription?"])
         r.protocolBridge("CustomStringConvertible", .language, requirements: ["description"])
         r.protocolBridge("ObservableObject", .environment, support: .full, notes: "`@Published` and plain properties both refresh the views that read them.")
     }

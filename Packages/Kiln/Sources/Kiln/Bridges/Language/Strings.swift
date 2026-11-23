@@ -10,6 +10,10 @@ import SwiftUI
 
 extension LanguageBridges {
     static func strings(_ r: KRegistry) {
+        // `String(decoding: data, as: UTF8.self)`.
+        r.type("UTF8", .language) { t in
+            t.staticProperty("self") { _ in .type(.builtin("UTF8")) }
+        }
         r.type("String", .language) { t in
             t.initializer { c in
                 if let f = c.arg("format")?.asString {

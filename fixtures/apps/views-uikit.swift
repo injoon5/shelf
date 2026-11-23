@@ -1,9 +1,11 @@
 // Name: Photo Card
 // Icon: photo.on.rectangle
 // Tint: purple
+// Covers: Camera, Sharing, Files
 
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 // UIKit through a representable: UIImagePickerController with a Coordinator
 // as its delegate, a blur from UIViewRepresentable, and your own Transferable
@@ -61,6 +63,24 @@ struct Caption: Codable, Transferable {
     }
 }
 
+// The caption as a document, for when files arrive (Round 3's file exporter).
+struct CaptionFile: FileDocument {
+    static var readableContentTypes: [UTType] { [.plainText] }
+    var text: String
+
+    init(text: String) {
+        self.text = text
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        text = configuration.file.regularFileContents.map { String(decoding: $0, as: UTF8.self) } ?? ""
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: Data(text.utf8))
+    }
+}
+
 struct ContentView: View {
     @State private var image: UIImage?
     @State private var picking = false
@@ -91,6 +111,9 @@ struct ContentView: View {
                 Button("Choose Photo") { picking = true }
                     .buttonStyle(.borderedProminent)
                 ShareLink(item: Caption(text: caption), preview: SharePreview("Caption"))
+                Text("Saves as .\(CaptionFile.readableContentTypes.first?.preferredFilenameExtension ?? "txt")")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
             .padding()
             .navigationTitle("Photo Card")

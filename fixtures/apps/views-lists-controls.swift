@@ -1,6 +1,7 @@
 // Name: Trip Planner
 // Icon: suitcase.fill
 // Tint: teal
+// Covers: Lists, Controls
 
 import SwiftUI
 

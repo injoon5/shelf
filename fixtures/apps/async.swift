@@ -1,6 +1,7 @@
 // Name: Daily Quote
 // Icon: quote.bubble
 // Tint: teal
+// Covers: Concurrency
 
 import SwiftUI
 

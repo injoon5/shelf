@@ -14,7 +14,7 @@ final class SharingBridges: KBridgeFamily {
     override class func register(into r: KRegistry) {
         transferable(r)
         r.view("ShareLink", .sharing, support: .partial,
-               notes: "Shares a `String`, a `URL`, or your own `Transferable` type (with `preview: SharePreview(\"Title\")`), with `subject:` and `message:`. Images, `Data` and several items are Round 2's.") { v in
+               notes: "A `String`, a `URL`, or your `Transferable` with `preview: SharePreview(\"…\")`.") { v in
             v.forms(["item:any subject:any? message:any? preview:any?", "_:title item:any subject:any? message:any? preview:any?",
                      "items:any subject:any? message:any? preview:any?", "item:any subject:any? message:any? preview:any? label:content"]) { c in
                 shareLink(c)

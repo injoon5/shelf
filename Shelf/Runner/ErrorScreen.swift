@@ -1,3 +1,4 @@
+import Kiln
 import SwiftUI
 
 /// What Kiln said when an app's source wouldn't compile, in a shape a person
@@ -8,6 +9,8 @@ struct CompileError: Equatable {
     var message: String
     /// The lines around the failing one, numbered.
     var excerpt: [(number: Int, text: String)]
+    /// Kiln's other errors, each "Line N: message", for Copy Error.
+    var others: [String] = []
 
     static func == (a: CompileError, b: CompileError) -> Bool {
         a.line == b.line && a.message == b.message
@@ -35,11 +38,20 @@ struct CompileError: Equatable {
         }
     }
 
+    /// What `Kiln.check` found: its first error, with the others for Copy Error.
+    init(issue: KilnIssue, others: [String] = [], source: String) {
+        self.init(errors: [issue.description], source: source)
+        self.others = others
+    }
+
     /// The error and its surroundings as text, for Copy Error.
     var report: String {
         var text = line.map { "Line \($0): \(message)" } ?? message
         if !excerpt.isEmpty {
             text += "\n\n" + excerpt.map { "\($0.number == line ? ">" : " ") \($0.number) | \($0.text)" }.joined(separator: "\n")
+        }
+        if !others.isEmpty {
+            text += "\n\nAlso:\n" + others.map { "- " + $0 }.joined(separator: "\n")
         }
         return text
     }
@@ -47,16 +59,19 @@ struct CompileError: Equatable {
 
 /// Shown inside the runner when an app can't start. The icon, one line, the
 /// code around the failure and Kiln's message; dragging down closes it.
+/// The New App sheet shows it too, for what `Kiln.check` finds before Install.
 struct ErrorScreen: View {
     var face: IconFace
     var name: String
     var error: CompileError
+    /// The line under the icon; by default "<name> couldn’t open".
+    var title: String?
 
     var body: some View {
         ScrollView {
             VStack(spacing: RunnerMetrics.errorSpacing) {
                 IconImage(face: face, size: RunnerMetrics.errorIconSize)
-                Text("\(name) couldn’t open")
+                Text(title ?? "\(name) couldn’t open")
                     .font(.title3.weight(.semibold))
                     .multilineTextAlignment(.center)
                 if !error.excerpt.isEmpty {

@@ -59,11 +59,11 @@ extension LayoutBridges {
                          requirements: ["sizeThatFits(proposal:subviews:cache:)", "placeSubviews(in:proposal:subviews:cache:)",
                                         "makeCache(subviews:)?", "updateCache(_:subviews:)?", "animatableData?"],
                          support: .full,
-                         notes: "Your own layout: `sizeThatFits(proposal:subviews:cache:)` and `placeSubviews(in:proposal:subviews:cache:)`, with `subview.sizeThatFits(_:)`, `dimensions(in:)`, `place(at:anchor:proposal:)` and `spacing`, a cache from `makeCache(subviews:)`, and `animatableData`. Use it as `MyLayout { … }` or through `AnyLayout`.") { app in
+                         notes: "`sizeThatFits` and `placeSubviews` with `subview.sizeThatFits`, `place(at:anchor:proposal:)` and a cache; `MyLayout { … }` or `AnyLayout(MyLayout())`.") { app in
             KLayoutProxy(app: app)
         }
 
-        r.type("ProposedViewSize", .layout, notes: "`width` and `height` (nil when unspecified), `replacingUnspecifiedDimensions(by:)`, `.unspecified`, `.zero`, `.infinity`.") { t in
+        r.type("ProposedViewSize", .layout) { t in
             t.initializer("width:any height:any") { c in proposal(c.args[0].asDouble, c.args[1].asDouble) }
             t.initializer("_:CGSize") { c in
                 if case .native(.size(let w, let h)) = c.args[0] { return proposal(w, h) }
@@ -82,7 +82,7 @@ extension LayoutBridges {
             }
         }
 
-        r.type("LayoutSubview", .layout, notes: "`sizeThatFits(_:)`, `dimensions(in:)`, `place(at:anchor:proposal:)`, `spacing` and `priority`.") { t in
+        r.type("LayoutSubview", .layout) { t in
             @MainActor func sub(_ c: KCall) throws -> LayoutSubview {
                 if case .native(.object(_, let ref)) = c.receiver, let b = ref.value as? KSubviewBox { return b.subview }
                 throw c.fail("needs a subview")
@@ -103,7 +103,7 @@ extension LayoutBridges {
             t.property("spacing") { c in .native(.object("ViewSpacing", KRef(KSpacingBox(try sub(c).spacing)))) }
         }
 
-        r.type("ViewDimensions", .layout, notes: "`width`, `height`, and `[guide]` for an alignment guide.") { t in
+        r.type("ViewDimensions", .layout) { t in
             @MainActor func dims(_ c: KCall) -> ViewDimensions? {
                 if case .native(.object(_, let ref)) = c.receiver, let b = ref.value as? KDimensionsBox { return b.dimensions }
                 return nil
@@ -126,7 +126,7 @@ extension LayoutBridges {
             }
         }
 
-        r.type("ViewSpacing", .layout, notes: "`distance(to:along:)` between two subviews' preferred spacing.") { t in
+        r.type("ViewSpacing", .layout) { t in
             t.staticProperty("zero") { _ in .native(.object("ViewSpacing", KRef(KSpacingBox(.zero)))) }
             t.method("distance", "to:any along:Axis") { c in
                 guard case .native(.object(_, let a)) = c.receiver, let mine = a.value as? KSpacingBox,
@@ -136,7 +136,7 @@ extension LayoutBridges {
         }
 
         // `AnyLayout`, and the stack layouts it switches between (animated, like SwiftUI's).
-        r.type("AnyLayout", .layout, notes: "Over your own `Layout` or `HStackLayout`, `VStackLayout`, `ZStackLayout` and `GridLayout`; called with content: `layout { … }`.") { t in
+        r.type("AnyLayout", .layout) { t in
             t.initializer("_:any") { c in
                 if case .native(.object("AnyLayout", _)) = c.args[0] { return c.args[0] }
                 if let proxy = c.interp.proxy(for: c.args[0], as: "Layout") as? KLayoutProxy { return anyLayout(AnyLayout(proxy)) }
@@ -153,7 +153,7 @@ extension LayoutBridges {
             }),
         ]
         for (name, sig, make) in stacks {
-            r.type(name, .layout, notes: "A layout value for `AnyLayout`, or called with content like its stack.") { t in
+            r.type(name, .layout) { t in
                 t.initializer(sig) { c in anyLayout(make(c)) }
                 t.initializer(sig + " content:content") { c in
                     layoutView(anyLayout(make(c)), c["content"] ?? .void, c.line)

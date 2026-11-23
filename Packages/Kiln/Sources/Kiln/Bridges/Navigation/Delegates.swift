@@ -13,6 +13,6 @@ extension NavigationBridges {
     static func delegates(_ r: KRegistry) {
         r.delegateProtocol("UINavigationControllerDelegate", .navigation,
                            requirements: ["navigationController(_:willShow:animated:)?", "navigationController(_:didShow:animated:)?"],
-                           notes: "Adopted with `UIImagePickerControllerDelegate` by a picker's coordinator.")
+                           notes: "With `UIImagePickerControllerDelegate`.")
     }
 }

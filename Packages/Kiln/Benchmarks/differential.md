@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**74 inputs: 59 identical, 15 different as expected, 0 different otherwise.**
+**83 inputs: 68 identical, 15 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -35,6 +35,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/time.swift | 372 | 13 | identical |
 | fixtures/apps/todos-db.swift | 296 | 14 | identical |
 | fixtures/apps/views-custom-protocols.swift | 9 | 1 | expected (§1.5's fixture: before, `modifier(…)` called from a View extension wasn't found, and nothing below it showed.) |
+| fixtures/apps/views-input.swift | 502 | 14 | identical |
 | fixtures/apps/views-layout-drawing.swift | 2560 | 13 | identical |
 | fixtures/apps/views-lists-controls.swift | 1547 | 13 | identical |
 | fixtures/apps/views-navigation.swift | 861 | 13 | identical |
@@ -47,6 +48,14 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/AppTypesRepro-2.swift | 234 | 13 | identical |
 | tests/AppTypesRepro-3.swift | 327 | 13 | identical |
 | tests/BreakoutRepro-0.swift | 8 | 2 | identical |
+| tests/CheckSamples-0.swift | 634 | 13 | identical |
+| tests/CheckSamples-1.swift | 637 | 13 | identical |
+| tests/CheckSamples-2.swift | 338 | 13 | identical |
+| tests/CheckSamples-3.swift | 139 | 14 | identical |
+| tests/CheckSamples-4.swift | 336 | 13 | identical |
+| tests/CheckSamples-5.swift | 2214 | 14 | identical |
+| tests/CheckTests-0.swift | 2 | 1 | identical |
+| tests/CheckTests-7.swift | 3 | 1 | identical |
 | tests/ContextTests-0.swift | 2 | 1 | identical |
 | tests/ContextTests-4.swift | 9 | 2 | identical |
 | tests/ContextTests-8.swift | 6 | 1 | identical |
@@ -339,7 +348,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 --- before
 +++ after
 @@ -17,195 +17,247 @@
- == appeared (List.onAppear@88)
+ == appeared (List.onAppear@89)
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -354,7 +363,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -369,7 +378,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -384,7 +393,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -399,7 +408,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -414,7 +423,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -429,7 +438,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.refreshable@87
+-== after List.refreshable@88
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -444,7 +453,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .onSubmit(of: .search, {fn})
 -      .refreshable({fn})
 -      .onAppear({fn})
--== after List.onSubmit@86
+-== after List.onSubmit@87
 -ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -847,7 +856,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -        content failed
 -        .padding()
 -      .navigationTitle("Tide Board")
--error: Line 88: Cannot find 'modifier' in scope
+-error: Line 89: Cannot find 'modifier' in scope
 +        UserShape(Tide(level: 0.3, swell: 4.0))
 +          .fill(<view>)
 +            LinearGradient(colors: [Color, Color])
@@ -886,7 +895,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          .buttonStyle(.borderedProminent)
 +        .padding()
 +      .navigationTitle("Tide Board")
-+== after Button[High Tide]@132
++== after Button[High Tide]@133
 +ContentView {high=true, showTip=true, places=["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"]}
 +  NavigationStack({fn})
 +    ScrollView({fn})
@@ -931,7 +940,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          .buttonStyle(.borderedProminent)
 +        .padding()
 +      .navigationTitle("Tide Board")
-+== after Button[Low Tide]@132
++== after Button[Low Tide]@133
 +ContentView {high=false, showTip=true, places=["Harbor", "Point", "Cove", "Reef", "Bay", "Inlet"]}
 +  NavigationStack({fn})
 +    ScrollView({fn})
@@ -968,7 +977,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 ```diff
 --- before
 +++ after
-@@ -4,3 +4,19 @@
+@@ -4,3 +4,22 @@
      VStack(spacing: 20, {fn})
 -      content failed
 +      ZStack(alignment: .bottom, {fn})
@@ -988,13 +997,16 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      Button("Choose Photo", {fn})
 +        .buttonStyle(.borderedProminent)
 +      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
        .padding()
-@@ -8,2 +24,315 @@
+@@ -8,2 +27,351 @@
        .sheet(isPresented: $false, {fn})
--error: Line 93: Cannot find 'SharePreview' in scope
+-error: Line 113: Cannot find 'SharePreview' in scope
 +        ImagePicker {image=$nil, dismiss=DismissAction}
 +          (no body)
-+== after Button[Choose Photo]@91
++== after Button[Choose Photo]@111
 +ContentView {image=nil, picking=true, caption="A day at the sea"}
 +  NavigationStack({fn})
 +    VStack(spacing: 20, {fn})
@@ -1015,12 +1027,15 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      Button("Choose Photo", {fn})
 +        .buttonStyle(.borderedProminent)
 +      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
 +      .padding()
 +      .navigationTitle("Photo Card")
 +      .sheet(isPresented: $true, {fn})
 +        ImagePicker {image=$nil, dismiss=DismissAction}
 +          (no body)
-+== after Button[Choose Photo]@91
++== after Button[Choose Photo]@111
 +ContentView {image=nil, picking=true, caption="A day at the sea"}
 +  NavigationStack({fn})
 +    VStack(spacing: 20, {fn})
@@ -1041,12 +1056,15 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      Button("Choose Photo", {fn})
 +        .buttonStyle(.borderedProminent)
 +      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
 +      .padding()
 +      .navigationTitle("Photo Card")
 +      .sheet(isPresented: $true, {fn})
 +        ImagePicker {image=$nil, dismiss=DismissAction}
 +          (no body)
-+== after Button[Choose Photo]@91
++== after Button[Choose Photo]@111
 +ContentView {image=nil, picking=true, caption="A day at the sea"}
 +  NavigationStack({fn})
 +    VStack(spacing: 20, {fn})
@@ -1067,25 +1085,16 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      Button("Choose Photo", {fn})
 +        .buttonStyle(.borderedProminent)
 +      ShareLink(item: Caption(text: "A day at the sea"), preview: SharePreview)
++      Text(_literal: "Saves as .txt")
++        .font(Font)
++        .foregroundStyle(Color)
 +      .padding()
 +      .navigationTitle("Photo Card")
 +      .sheet(isPresented: $true, {fn})
 +        ImagePicker {image=$nil, dismiss=DismissAction}
 +          (no body)
-+== after Button[Choose Photo]@91
++== after Button[Choose Photo]@111
 +ContentView {image=nil, picking=true, caption="A day at the sea"}
-+  NavigationStack({fn})
-+    VStack(spacing: 20, {fn})
-+      ZStack(alignment: .bottom, {fn})
-+        If false
-+          Image(systemName: "photo")
-+            .font(Font)
-+            .foregroundStyle(Color)
-+        Text("A day at the sea")
-+          .padding(8)
-+          .frame(maxWidth: inf)
-+          .background(Blur())
-+        .frame(height: 260)
 …
 ```
 

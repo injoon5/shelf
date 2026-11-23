@@ -21,8 +21,8 @@ final class LocationBridges: KBridgeFamily {
         r.delegateProtocol("CLLocationManagerDelegate", .location,
                            requirements: ["locationManager(_:didUpdateLocations:)?", "locationManager(_:didFailWithError:)?",
                                           "locationManagerDidChangeAuthorization(_:)?", "locationManager(_:didUpdateHeading:)?"],
-                           support: .partial,
-                           notes: "Declared, with its proxy; `CLLocationManager` itself is Round 3's (§4.6).")
+                           support: .stub,
+                           notes: "Declared, with its proxy, but nothing calls it yet: `CLLocationManager` is Round 3's (§4.6).")
         #if canImport(CoreLocation)
         r.nativeClass(CLLocationManager.self, "CLLocationManager")
         r.nativeClass(CLLocation.self, "CLLocation")

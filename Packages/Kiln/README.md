@@ -117,8 +117,12 @@ let source = Kiln.swiftSource(running: tappedBlock, inReply: reply)
 // A whole app screen (navigation, List, Form, TabView …) wants the full height.
 let fullHeight = Kiln.looksLikeApp(source)
 
-// Check code before showing it: evaluates every view and fires every action once, headless.
-let check = Kiln.validate(source)   // check.isValid, check.errors
+// Check code without running it: every type, member, modifier and overload against what
+// Kiln has, await and async, protocol requirements. Errors have a line, a column and a suggestion.
+let check = Kiln.check(source)       // check.passed, check.errors, check.warnings (stubs)
+
+// Then run it headless: evaluates every view and fires every action once, with a stub context.
+let validation = Kiln.validate(source)   // validation.isValid, validation.errors
 ```
 
 ## What Kiln runs
@@ -211,6 +215,9 @@ public enum Kiln {
     @MainActor static func run(_ parsed: KilnParsedSource, context: KilnContext) -> KilnResult
     /// Any thread: parse before the screen is up, run on the main actor.
     static func parse(_ code: String) -> KilnParsedSource
+    /// Static: no code runs (PLAN.md §1.8).
+    @MainActor static func check(_ code: String) -> KilnCheck
+    @MainActor static func check(_ parsed: KilnParsedSource) -> KilnCheck
     @MainActor static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000,
                                     context: KilnContext? = nil) -> KilnValidation    // KilnContext.stub()
     static func swiftSource(fromMarkdown markdown: String) -> String

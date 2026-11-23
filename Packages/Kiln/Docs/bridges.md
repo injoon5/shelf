@@ -177,8 +177,9 @@ r.type("WebPage", .web, notes: "Load a URL or HTML; read title, url and isLoadin
         page.load(URLRequest(url: url))
         return .void
     }
-    // `try await page.callJavaScript("…")`: an async method returns what `await` waits on.
-    t.method("callJavaScript", "_:string") { c in
+    // `try await page.callJavaScript("…")`: an async method returns what `await` waits on,
+    // and says so with `async: true`, so `Kiln.check` reports a call with no `await`.
+    t.method("callJavaScript", "_:string", async: true) { c in
         guard let page = c.object(WebPage.self), let js = c.string(0) else { throw c.fail("needs JavaScript") }
         return .suspension(KSuspension.async(headless: { .nilValue }) {
             let result = try await page.callJavaScript(js)
@@ -205,6 +206,8 @@ r.type("WebPage", .web, notes: "Load a URL or HTML; read title, url and isLoadin
 - An `async` method returns `.suspension(KSuspension.async(headless:) { … })` or `KSuspension.callback { ctx, resume in …; return cancel }`.
 - A native `AsyncSequence` becomes `for await`-able with `KAsyncSequence.wrapping(name, sequence) { element in kv }`.
 - `headless` is what `Kiln.validate` gets instead of waiting. nil means the check stops following that task.
+- **Say so, for the checker.** A method, static method, function or property that returns a suspension takes `async: true`: `Kiln.check` then reports a call to it with no `await` (`'Task.sleep' is async: call it with 'await'`). A bridge whose closures may `await` (it starts them as tasks, as `Task {}`, `.task {}`, `.refreshable {}` and `withTaskGroup` do) takes `closuresCanWait: true` (`m.closuresCanWait()` on a modifier). Everywhere else, `Kiln.check` calls an `await` in a closure argument an error, because the engine can't wait there either.
+- **An initializer makes its own type.** `Kiln.check` takes `T(…)` to be a `T` and checks the members called on it against `T`'s bridge. A type whose initializer makes something else (the haptic generators all make one stand-in) must have no instance members of its own.
 
 **Observation:** a native `@Observable` object read in a property getter is tracked by SwiftUI, because the app's `body` runs inside the hosting view's real `body`. `RegistryTests.testNativeObservableReadsAreTrackedBySwiftUI` pins this down.
 
@@ -517,14 +520,31 @@ UIKit is tested in Shelf's `FeatureFixtureTests`, on the simulator.
 
 These are declarations, which the manifest and the checker read:
 
-- `r.protocolBridge("Identifiable", .language, requirements: ["id"])`, with no proxy: the engine implements it. With a proxy, see [a protocol proxy](#a-protocol-proxy).
+- `r.protocolBridge("Identifiable", .language, requirements: ["id"])`, with no proxy: the engine implements it. With a proxy, see [a protocol proxy](#a-protocol-proxy). `Kiln.check` reports an app type that adopts the protocol and leaves out a requirement. One with a default in Swift ends in `?` (`"errorDescription?"`, `"animatableData?"`), and isn't required.
 - `r.environmentValue("dismiss", .environment) { interp in … }` gives the value `@Environment(\.dismiss)` reads before SwiftUI's arrive.
 - `r.wrapper("State", .environment)` declares a wrapper the engine implements (`KViewStorage`).
+
+## What the checker and the prompt read
+
+`Kiln.check` (PLAN.md §1.8) and Shelf's prompt (§7) are built from the registry, so a bridge reaches both the day it's registered. What each needs from it:
+
+| Declare | So that |
+|---|---|
+| Every form models write, as a signature | `check` accepts it, and reports labels no form takes, listing the forms there are. |
+| `support: .stub`, or `m.stub([…])` | `check` warns (`.symbolEffect is accepted but has no effect yet`, with the notes), and the prompt lists it under "Accepted, but they do nothing yet". |
+| `support: .partial` with `notes` | The prompt quotes the notes under the family. Write them for app authors: what works, what doesn't, what to use instead, in one or two sentences. A `full` symbol's notes stay out of the prompt. |
+| `async: true`, `closuresCanWait` | `check` reports a missing `await`, and an `await` where nothing can wait. |
+| Protocol `requirements` | `check` reports a type that adopts the protocol without them. |
+| The family | A family with no supported symbol is listed under "Not in Kiln yet" with its `KilnFamily.summary`; its first bridge moves it to "What works", and Shelf's `everyPromptSectionHasAFixture` then wants a fixture whose `// Covers:` line names it. Keep the summary true. |
+
+Language features that don't work yet are `KLanguageGaps` probes (`Registry/KLanguageGaps.swift`): each gap has its sentence for authors and a small app that prints "ok" when the feature works. `Tools/manifest.sh` runs them and writes the failing ones into the manifest, so a fixed gap leaves the prompt by itself.
+
+`check` is conservative: where it can't tell a value's type, it says nothing. So a bridge never needs to declare more to avoid a false error. But `CheckCorpusTests` must stay at zero errors on every app that runs, and a new example app is added to the corpus by putting it in `Examples/` or `fixtures/apps/`.
 
 ## After adding a bridge
 
 1. **Tests.** Add a test for each bridge: the arguments decode, the overloads resolve, the view builds, and a wrong call's error reads correctly. `RegistryTests` has the patterns.
-2. **The manifest.** Run `Tools/manifest.sh`, which rewrites `kiln-manifest.json` (`testManifestIsCurrent` fails until you do). Then run `Tools/coverage.sh`, which rewrites `COVERAGE.md`.
+2. **The manifest.** Run `Tools/manifest.sh`, which rewrites `kiln-manifest.json` (`testManifestIsCurrent` fails until you do), with the language gaps and the won't-do list. Then run `Tools/coverage.sh`, which rewrites `COVERAGE.md`. Shelf bundles the manifest: its prompt changes with it, and `PromptsTests` checks the result.
 3. **The differential.** `Tools/diff.sh` should still be identical on every input, or the difference goes in `Tools/diff-expected.txt` with a reason.
 4. **The bench.** `Benchmarks/run.sh` must show no input more than 10% slower.
 

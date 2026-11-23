@@ -57,6 +57,8 @@ struct PromptsTests {
         let now = Date.now
         let filled = Prompts.newApp(idea: "{{IDEA}}", install: Prompts.Install(origin: "{{ORIGIN}}", key: "{{KEY}}", expires: now))
         let expected = template.components(separatedBy: "\n").filter { !$0.hasPrefix("<!--") }.joined(separator: "\n")
+            .replacingOccurrences(of: "{{WORKS}}", with: PromptCatalog.whatWorks())
+            .replacingOccurrences(of: "{{DOESNT}}", with: PromptCatalog.whatDoesntWork())
         #expect(filled.replacingOccurrences(of: Prompts.expiresText(now), with: "{{EXPIRES}}") + "\n" == expected)
     }
 
@@ -137,6 +139,81 @@ struct PromptsTests {
         for name in ["new", "edit", "current-source", "current-outline"] {
             #expect(!Prompts.template(name).isEmpty, "\(name).md")
         }
+    }
+
+    // MARK: Built from Kiln's manifest (plan §7)
+
+    @Test func whatWorksIsBuiltFromTheManifest() throws {
+        let m = try #require(PromptCatalog.manifest)
+        let works = PromptCatalog.whatWorks()
+        // The family lines alone, without the notes under them.
+        let lines = works.split(separator: "\n").filter { $0.hasPrefix("- **") }.joined(separator: "\n")
+        let families = PromptCatalog.listedFamilies(m)
+        #expect(families.count >= 10)
+        for f in families { #expect(works.contains("- **\(f.name):** "), "\(f.name) isn't listed") }
+        // Every view and modifier that works is named; no stub is.
+        for s in m.symbols where PromptCatalog.listedFamilies(m).contains(where: { $0.name == s.family }) {
+            let name = PromptCatalog.display(s)
+            switch (s.kind, s.support) {
+            case ("view", "full"), ("view", "partial"), ("modifier", "full"), ("modifier", "partial"):
+                #expect(works.contains(name), "\(s.id) works but isn't in the prompt")
+            case (_, "stub"):
+                #expect(![",", ";", "."].contains { lines.contains(name + $0) }, "\(s.id) is a stub")
+            default: break
+            }
+        }
+        // A partial symbol's notes are quoted.
+        #expect(works.contains("`NavigationStack`: `path:` isn't kept"))
+        // What's written by hand isn't repeated here.
+        #expect(!works.contains("**Language:**"))
+        #expect(!works.contains("**Scenes:**"))
+    }
+
+    @Test func whatDoesntWorkIsRegeneratedFromWhatFails() throws {
+        let m = try #require(PromptCatalog.manifest)
+        let doesnt = PromptCatalog.whatDoesntWork()
+        // Every stub, every gap Kiln's probes found, every won't-do, every empty family.
+        for s in m.symbols where s.support == "stub" && s.kind != "member" {
+            #expect(doesnt.contains(PromptCatalog.display(s)), "\(s.id)")
+        }
+        #expect(!m.gaps.isEmpty)
+        for g in m.gaps { #expect(doesnt.contains(g.what), "\(g.id)") }
+        for w in m.wontDo { #expect(doesnt.contains(PromptCatalog.short(w.what)), "\(w.id)") }
+        for f in m.families where f.supported == 0 && !PromptCatalog.unlisted.contains(f.name) {
+            #expect(doesnt.contains("\(f.summary) (\(f.name))"), "\(f.name)")
+        }
+    }
+
+    @Test func aFamilyWithBridgesMovesToWhatWorks() throws {
+        var m = try #require(PromptCatalog.manifest)
+        let i = try #require(m.families.firstIndex { $0.name == "Location" })
+        #expect(!PromptCatalog.whatWorks(m).contains("**Location:**"))
+        #expect(PromptCatalog.whatDoesntWork(m).contains("(Location)"))
+        // Round 3 registers its first bridge.
+        m.families[i].supported = 1
+        m.symbols.append(.init(id: "type:CLLocationManager", kind: "type", name: "CLLocationManager", owner: nil,
+                               family: "Location", support: "partial", notes: "Asks once, as Shelf asks for each app."))
+        m.symbols.append(.init(id: "modifier:onLocationChange", kind: "modifier", name: "onLocationChange", owner: nil,
+                               family: "Location", support: "full", notes: nil))
+        let works = PromptCatalog.whatWorks(m)
+        #expect(works.contains("- **Location:** `CLLocationManager`; `.onLocationChange`."))
+        #expect(works.contains("  - `CLLocationManager`: Asks once, as Shelf asks for each app."))
+        #expect(!PromptCatalog.whatDoesntWork(m).contains("(Location)"))
+    }
+
+    @Test func aGapKilnClosesLeavesThePrompt() throws {
+        var m = try #require(PromptCatalog.manifest)
+        let gap = try #require(m.gaps.first)
+        #expect(PromptCatalog.whatDoesntWork(m).contains(gap.what))
+        m.gaps.removeFirst()
+        #expect(!PromptCatalog.whatDoesntWork(m).contains(gap.what))
+    }
+
+    /// Short enough to paste into a chat.
+    @Test func thePromptStaysShort() {
+        let prompt = Prompts.newApp(idea: Self.idea, install: nil)
+        print("new-app prompt: \(prompt.count) characters")
+        #expect(prompt.count < 20_000)
     }
 
     /// No placeholder or section marker is left, and no blank line is doubled.

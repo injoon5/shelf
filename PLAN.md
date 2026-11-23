@@ -12,7 +12,7 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
-All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below), §1.6 (but Round 4's two macros), the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
+All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below), §1.6 (but Round 4's two macros), §1.7, §1.8 with the prompt and New App check of §7, the §1.9 coverage report and Shelf’s half of §4.0 (permissions per app) are built. §0.1's findings, re-checked on the UIKit Home Screen, are in [design/audit-0.1.md](design/audit-0.1.md). Nothing else here is built yet.
 
 ---
 
@@ -448,10 +448,11 @@ Built ([Docs/bridges.md, "A protocol proxy"](Packages/Kiln/Docs/bridges.md#a-pro
 - **Checks:**
   - `ProxyTests` (28) and two Shelf tests that drive a UIKit delegate message into the app's coordinator and check the allowlist's error.
   - Lab examples `WaveStudio`, `TagCloud` and `CardStyles` match native; a recording shows the custom wave interpolating in Kiln.
-  - Shelf fixtures `views-custom-protocols` and `views-uikit`, and the prompt's "Your types in SwiftUI's protocols".
+  - Shelf fixtures `views-custom-protocols` and `views-uikit` (which covers Camera, Sharing and Files).
+  - The prompt lists the protocols that have proxies ("your own `Layout`"), with their notes (`PromptCatalog`).
   - The picker and the share sheet, checked by hand on the simulator.
   - `Tools/diff.sh` is clean, with the new inputs listed in `diff-expected.txt`.
-  - No benchmark is more than 10% slower than `after-1.6-language.json`; the worst is 4.4% ([Benchmarks](Packages/Kiln/Benchmarks/README.md#after-15-proxiesjson)).
+  - No benchmark is more than 10% slower than `after-1.8-check.json` ([Benchmarks](Packages/Kiln/Benchmarks/README.md#after-15-proxiesjson)).
 - **Not built here:**
   - The camera (Round 3, §4.3).
   - `CLLocationManager` (§4.6).
@@ -533,6 +534,15 @@ Built, except `@Generable` and `@Guide`, which are Round 4's.
 - `Kiln.validate(source)`: the existing headless run of every view and action, now with the context's stubs, so it's safe on the phone. Shelf runs both in the New App preview before Install. That covers the old "validate before save" item.
 - **A manifest.** The registry exports `kiln-manifest.json`: every supported symbol, its availability, and notes for authors. Shelf's prompt builds its "What works" section from it (§7), so the prompt can't promise what Kiln doesn't run.
 
+**Built.**
+
+- **`Kiln.check(source)`** (`Packages/Kiln/Sources/Kiln/Check/`) returns `KilnCheck`: issues with a line, a column when the name is on that line, a message and a suggestion ("Did you mean `.padding`?", or "It has .blur(radius:opaque:)"). One pass over the syntax tree; a 360-line app checks in a few milliseconds. Its error classes (`KilnIssue.Kind`): syntax, no view, an unknown name (type, view, function or value), an unknown member, an unknown modifier, arguments no overload takes, a form the OS doesn't have, `await` where nothing can wait (`body`, a computed property, an `init`, a function that isn't `async`, a closure the bridge doesn't run as a task), an `async` call with no `await`, a missing protocol requirement, and a value where a binding goes. A stub bridge is a warning.
+  - It asks the registry what the engine asks (`KOverload.bind` for overloads, the same member lookups and fallbacks), and reads the app's own declarations from the syntax tree generically (types merged with their extensions, the app's protocols and their extensions, extensions on native types, generic parameters), so §1.6's features need nothing of their own.
+  - Bridges declare what it can't see: `async: true` on methods that return a suspension, `closuresCanWait` where closures run as tasks, `requirements` ending in `?` when Swift has a default. `Docs/bridges.md`, "What the checker and the prompt read".
+  - **Conservative.** A value whose type it can't tell, or a type that inherits something it doesn't know, silences it. `CheckCorpusTests` checks every app Kiln has (the example apps and Lab's, the Apple Intelligence replies, Shelf's fixtures, the bench workloads, every app inline in Kiln's tests, and six apps written as models write them): zero errors on every one that runs, except `expense.md`'s `.stepValue`.
+- **`Kiln.validate`** runs with `KilnContext.stub()` (Shelf's `RunContext.check`: a stub context and an in-memory `DB` session). `NewAppCheckTests.theCheckTouchesNothing` pins that a check reaches no network and keeps no setting or data; the slowest fixture checks and validates in about 12 ms on the simulator.
+- **The manifest** also carries `families` (with a summary for authors), `gaps` (the Swift that fails today: `KLanguageGaps` probes, run when it's written) and `wontDo`.
+
 ### 1.9 The coverage report
 
 `Packages/Kiln/Tools/coverage` reads the SDK's interfaces (`SwiftUI`, `Charts`, `_WebKit_SwiftUI`, `_PhotosUI_SwiftUI`, `_Translation_SwiftUI` and the other overlays) and lists every public `View` type, every `View` and `Shape` modifier, and every style. It compares them with the registry and writes `Packages/Kiln/COVERAGE.md`, with counts per family, everything missing, and a **won't-do** section where each entry has a one-line reason. Run it after each round and after each Xcode update.
@@ -574,7 +584,7 @@ By kind, across everything: views 68 of 96 in scope, modifiers 143 of 564, style
 - The 0.2.1 switch files are gone, and every bridge is in the registry.
 - The coverage report runs, and its numbers are the baseline for Round 1.
 - Real `async` works: a fixture that sleeps, fetches with `try await`, and streams with `for await`.
-- The prompt is built from the manifest, and its "What doesn't work" section is regenerated from what actually fails.
+- The prompt is built from the manifest, and its "What doesn't work" section is regenerated from what actually fails. Done (§7).
 
 ### §1 status
 
@@ -589,7 +599,7 @@ Where the rewrite stands after §1.5, item by item.
 | 1.5 Native code calling the app's code | Done: every proxy §1.5 lists for Rounds 1 to 3, the delegate and `async` mechanisms Rounds 3 to 5 build on, and their declarations in the registry and the manifest. What uses them later (the camera, `CLLocationManager`, the file pickers, `Tool`, widgets) is those rounds'. |
 | 1.6 Swift that should work | Done, except `@Generable` and `@Guide` (Round 4). |
 | 1.7 A context for each run | Done. |
-| 1.8 Checking before running | Being built in parallel (`Kiln.check`, the manifest-built prompt). §1.5 declares requirements in the form its checker reads (`"name(labels:)"`, `?` for a default). |
+| 1.8 Checking before running | Done. §1.5's requirements are in the form its checker reads (`"name(labels:)"`, `?` for a default), and its prompt lists the protocols that have proxies, with their notes. |
 | 1.9 The coverage report | Done; rerun after each round. |
 
 **§1.10, tests:**
@@ -607,7 +617,7 @@ Where the rewrite stands after §1.5, item by item.
 - **The 0.2.1 switch files are gone, and every bridge is in the registry:** yes.
 - **The coverage report runs and is Round 1's baseline:** yes (`COVERAGE.md`, regenerated with §1.5's bridges).
 - **Real `async`:** yes, the `async` fixture sleeps, fetches and streams.
-- **The prompt is built from the manifest, and "What doesn't work" is regenerated from what fails:** **not yet**, §1.8's. Until it lands, §1.5's lines are written by hand into `new.md`, and its protocols carry author `notes` for the manifest-built prompt to quote.
+- **The prompt is built from the manifest, and "What doesn't work" is regenerated from what fails:** yes (§1.8). §1.5's protocols reach "What works" as "your own `Layout`" and so on, with their notes; the location delegate, which nothing calls until Round 3, is a stub there.
 
 ---
 
@@ -873,8 +883,8 @@ Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later
 ## 7. Shelf, along the way
 
 - **Delete:** `SourceRewriter`'s `@AppStorage` rewriting, `Prelude`, `ShelfDBProtocol` and the `DB-Key` header path (§1.7). The server's `/api/apps/{slug}/data` API is unchanged. Done.
-- **Prompts:** "What works" and "What doesn't work" are built from `kiln-manifest.json` plus a short hand-written part (format, design, saving data). New sections per round: Files, Photos and Camera, Motion, Location, Intelligence, Widgets (for Shelf's Home Screen). `PromptsTests` checks the result. ij5.dev's admin doesn't show the prompt, so the server needs no change.
-- **New App sheet:** runs `Kiln.check` and `Kiln.validate` on the pasted reply before Install, and shows the first error with its line.
+- **Prompts:** "What works" and "What doesn't work" are built from `kiln-manifest.json` plus a short hand-written part (format, design, saving data). New sections per round: Files, Photos and Camera, Motion, Location, Intelligence, Widgets (for Shelf's Home Screen). `PromptsTests` checks the result. ij5.dev's admin doesn't show the prompt, so the server needs no change. Built: `PromptCatalog` reads the manifest Shelf bundles, at run time. "What works" has one line per family with its views, wrappers, environment values, types and modifiers, and the notes of what works only in part; "What doesn't work" lists the families not in Kiln yet (by their summary), every stub, every gap Kiln's probes find, and the won't-do list. The hand-written part is the reply format, Swift, waiting, saving data and design. A family's first bridge moves it from one section to the other, and `everyPromptSectionHasAFixture` then wants a fixture whose `// Covers:` line names it.
+- **New App sheet:** runs `Kiln.check` and `Kiln.validate` on the pasted reply before Install, and shows the first error with its line. Built: the error screen takes the preview's place ("Tally can’t be installed", the lines around it, Copy Error with every error), Install waits for the check and stays off after an error, and warnings are listed under the name without blocking. An agent's install goes straight to the server, which can't run Kiln: that's the "symbol check at `PUT`" in Later.
 - **Card lifecycle:** closing a card calls the context's teardown (§1.7). Built: a card that lands tears its run down.
 - **Settings:** Permissions (§4.0), and per-app storage use (files plus `DB`). Built: App Data lists both per app, and Delete Data removes both.
 - **README:** updated at the end of each phase.

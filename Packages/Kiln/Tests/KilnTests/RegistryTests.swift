@@ -221,7 +221,8 @@ final class RegistryTests: XCTestCase {
     /// (or `Tools/manifest.sh`) rewrites it.
     func testManifestIsCurrent() throws {
         let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../kiln-manifest.json").standardized
-        let data = try KRegistry.shared.manifest(includeHost: false).encoded()
+        let wontDo = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../Tools/coverage/wont-do.json").standardized
+        let data = try KRegistry.shared.completeManifest(wontDo: wontDo).encoded()
         if ProcessInfo.processInfo.environment["KILN_WRITE_MANIFEST"] == "1" {
             try data.write(to: url)
             return

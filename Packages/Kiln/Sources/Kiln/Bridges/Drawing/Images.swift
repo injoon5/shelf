@@ -26,7 +26,7 @@ extension DrawingBridges {
         }
         r.type("AsyncImagePhase", .drawing) { t in t.internal() }
         // What `Image(uiImage:)` shows: a picker's photo (§1.5), and Round 3's `UIImage(data:)`.
-        r.type("UIImage", .drawing, support: .partial, notes: "From a picker's `info[.originalImage]`, `UIImage(systemName:)` or `UIImage(data:)`; `size`, `pngData()`, `jpegData(compressionQuality:)`; shown with `Image(uiImage:)`.") { t in
+        r.type("UIImage", .drawing, support: .partial) { t in
             t.initializer("systemName:string") { c in
                 #if canImport(UIKit)
                 return UIImage(systemName: c.string("systemName") ?? "").map(uiImage) ?? .nilValue

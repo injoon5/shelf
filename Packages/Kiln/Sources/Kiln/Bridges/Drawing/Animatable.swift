@@ -23,10 +23,10 @@ extension DrawingBridges {
         // Drawn as a view (`KShapeHost`) wherever the app's shape is shown; as a `Shape` value above.
 
         r.protocolBridge("Animatable", .drawing, requirements: ["animatableData?"], support: .full,
-                         notes: "A shape, view or `ViewModifier` with `animatableData` (a number, `AnimatablePair`, `CGPoint`, `Angle`…) or `@Animatable` is interpolated frame by frame inside `withAnimation`.") { app in
+                         notes: "`animatableData` (numbers, `AnimatablePair`, `CGPoint`, `Angle`) or `@Animatable` on a shape, view or modifier animates.") { app in
             AnyView(KAnimatableView(app: app))
         }
-        r.type("AnimatablePair", .drawing, notes: "`AnimatablePair(a, b)`, with `.first` and `.second`; pairs nest.") { t in
+        r.type("AnimatablePair", .drawing) { t in
             t.initializer("_:any _:any") { c in .tuple([c.args[0], c.args[1]], ["first", "second"]) }
         }
         r.type("EmptyAnimatableData", .drawing) { t in
@@ -35,10 +35,10 @@ extension DrawingBridges {
 
         // `Transition` the protocol (iOS 17); `Transition` the type (Drawing.swift) has its static members.
         r.protocolBridge("Transition", .drawing, requirements: ["body(content:phase:)"], support: .full, introduced: "17.0",
-                         notes: "Your own transition: `body(content:phase:)` runs with the view and its `TransitionPhase`. Use it with `.transition(MyTransition())`, or add `extension Transition where Self == MyTransition { static var mine: Self { … } }`.") { app in
+                         notes: "`body(content:phase:)` with `phase.isIdentity`; `.transition(MyTransition())`.") { app in
             KTransitionProxy(app: app)
         }
-        r.type("TransitionPhase", .drawing, notes: "`.willAppear`, `.identity`, `.didDisappear`; `isIdentity` and `value` (-1, 0, 1).") { t in
+        r.type("TransitionPhase", .drawing) { t in
             for name in ["willAppear", "identity", "didDisappear"] {
                 t.staticProperty(name) { _ in phase(name) }
             }

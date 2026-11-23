@@ -65,7 +65,7 @@ final class KRepresentableContext {
 
 extension CoreBridges {
     static func representables(_ r: KRegistry) {
-        let controllerNotes = "For the UIKit controllers Kiln allows (`UIImagePickerController`): `makeUIViewController(context:)`, `updateUIViewController(_:context:)`, and `makeCoordinator()` with your `Coordinator` class as the controller's delegate."
+        let controllerNotes = "Only for `UIImagePickerController`, with a `Coordinator` class as its delegate."
         r.protocolBridge("UIViewControllerRepresentable", .core,
                          requirements: ["makeUIViewController(context:)", "updateUIViewController(_:context:)", "makeCoordinator()?"],
                          support: .partial, notes: controllerNotes) { app in
@@ -78,20 +78,20 @@ extension CoreBridges {
         r.protocolBridge("UIViewRepresentable", .core,
                          requirements: ["makeUIView(context:)", "updateUIView(_:context:)", "makeCoordinator()?"],
                          support: .partial,
-                         notes: "For the UIKit views Kiln allows: `UIVisualEffectView` (with `UIBlurEffect(style:)`) and `UIActivityIndicatorView`.") { app in
+                         notes: "Only for `UIVisualEffectView(effect: UIBlurEffect(style:))` and `UIActivityIndicatorView`.") { app in
             #if os(iOS) || os(visionOS)
             return AnyView(KViewRepresentable(app: app))
             #else
             return AnyView(KErrorView(message: "\(app.type.name) needs UIKit"))
             #endif
         }
-        r.type("UIViewControllerRepresentableContext", .core, notes: "`context.coordinator`.") { t in
+        r.type("UIViewControllerRepresentableContext", .core) { t in
             t.property("coordinator") { c in context(c)?.coordinator ?? .nilValue }
         }
         r.alias("UIViewRepresentableContext", to: "UIViewControllerRepresentableContext", engineOnly: true)
 
         // The allowlist's UIKit views (cheap ones models write for a blur or a spinner).
-        r.type("UIBlurEffect", .core, notes: "`UIBlurEffect(style:)` for a `UIVisualEffectView`.") { t in
+        r.type("UIBlurEffect", .core) { t in
             t.initializer("style:any") { c in
                 #if canImport(UIKit) && !os(watchOS)
                 return .native(.object("UIBlurEffect", KRef(UIBlurEffect(style: blurStyle(c.symbol("style"))))))
@@ -100,7 +100,7 @@ extension CoreBridges {
                 #endif
             }
         }
-        r.type("UIVisualEffectView", .core, notes: "`UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))` in a `UIViewRepresentable`.") { t in
+        r.type("UIVisualEffectView", .core) { t in
             t.initializer("effect:any") { c in
                 #if canImport(UIKit) && !os(watchOS)
                 let effect = KCall.objectValue(c.args[0]) as? UIVisualEffect
@@ -120,7 +120,7 @@ extension CoreBridges {
                 #endif
             })
         }
-        r.type("UIActivityIndicatorView", .core, notes: "`UIActivityIndicatorView(style:)`, `startAnimating()`, `stopAnimating()`, `color`.") { t in
+        r.type("UIActivityIndicatorView", .core) { t in
             for sig in ["", "style:any"] {
                 t.initializer(sig) { c in
                     #if canImport(UIKit) && !os(watchOS)

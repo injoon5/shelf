@@ -40,7 +40,7 @@ final class KTransferRep {
 extension SharingBridges {
     static func transferable(_ r: KRegistry) {
         r.protocolBridge("Transferable", .sharing, requirements: ["static transferRepresentation"], support: .partial,
-                         notes: "Your type in `ShareLink(item:preview:)`, from `CodableRepresentation(contentType:)`, `DataRepresentation(…)` and `ProxyRepresentation(exporting:)` (a `String` or `URL` property). `FileRepresentation` is Round 3's.") { app in
+                         notes: "For `ShareLink`: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation(exporting:)`.") { app in
             KTransferItem(app)
         }
         r.resultBuilder("TransferRepresentationBuilder", .sharing) { b in
@@ -54,11 +54,11 @@ extension SharingBridges {
         }
 
         @MainActor func rep(_ k: KTransferRep.Kind) -> KV { .native(.object("TransferRepresentation", KRef(KTransferRep(k)))) }
-        r.type("CodableRepresentation", .sharing, notes: "JSON, from your type's `Codable` conformance.") { t in
+        r.type("CodableRepresentation", .sharing) { t in
             t.initializer("contentType:UTType") { c in rep(.codable(FilesBridges.utType(c.args[0]) ?? .json)) }
             t.initializer("for:any contentType:UTType") { c in rep(.codable(FilesBridges.utType(c.args[1]) ?? .json)) }
         }
-        r.type("DataRepresentation", .sharing, notes: "`exportedContentType:exporting:`, `importedContentType:importing:`, or both with `contentType:`.") { t in
+        r.type("DataRepresentation", .sharing) { t in
             t.initializer("contentType:UTType exporting:closure importing:closure") { c in
                 rep(.data(exported: FilesBridges.utType(c.args[0]), imported: FilesBridges.utType(c.args[0]), export: c.function("exporting"), importing: c.function("importing")))
             }
@@ -69,7 +69,7 @@ extension SharingBridges {
                 rep(.data(exported: nil, imported: FilesBridges.utType(c.args[0]), export: nil, importing: c.function("importing")))
             }
         }
-        r.type("ProxyRepresentation", .sharing, notes: "`exporting:` a `String` or `URL` (a key path or a closure), and `importing:`.") { t in
+        r.type("ProxyRepresentation", .sharing) { t in
             t.initializer("exporting:any importing:closure?") { c in rep(.proxy(exporting: c.args[0], importing: c.function("importing"))) }
             t.initializer("importing:closure") { c in rep(.proxy(exporting: nil, importing: c.function("importing"))) }
         }
@@ -79,13 +79,13 @@ extension SharingBridges {
                 t.initializer(sig) { c in rep(.file(exported: FilesBridges.utType(c.args[0]), imported: FilesBridges.utType(c.args[0]))) }
             }
         }
-        r.type("TransferRepresentation", .sharing, notes: "`.suggestedFileName(_:)`, `.exportingCondition { }`, `.visibility(_:)`.") { t in
+        r.type("TransferRepresentation", .sharing) { t in
             @MainActor func receiver(_ c: KCall) -> KTransferRep? { KCall.objectValue(c.receiver) as? KTransferRep }
             t.method("suggestedFileName", "_:string") { c in receiver(c)?.suggestedFileName = c.string(0); return c.receiver }
             t.method("exportingCondition", "_:closure") { c in receiver(c)?.condition = c.function(0); return c.receiver }
             t.method("visibility", "_:any") { c in c.receiver }
         }
-        r.type("SharePreview", .sharing, notes: "`SharePreview(\"Title\")`, with `image:` or `icon:`.") { t in
+        r.type("SharePreview", .sharing) { t in
             for sig in ["_:title", "_:title image:any", "_:title icon:any", "_:title image:any icon:any"] {
                 t.initializer(sig) { c in .native(.object("SharePreview", KRef(KSharePreview(title: c.title(0), image: c["image"] ?? c["icon"])))) }
             }

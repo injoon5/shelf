@@ -1,6 +1,7 @@
 // Name: Pantry
 // Icon: cart.fill
 // Tint: orange
+// Covers: Language
 
 import SwiftUI
 

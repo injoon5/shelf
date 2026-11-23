@@ -1,5 +1,203 @@
 {
   "description" : "Kiln 0.2.1, Shelf's copy",
+  "families" : [
+    {
+      "name" : "Core",
+      "stubs" : 0,
+      "summary" : "views' life cycle: appearing, tasks, changes, timelines",
+      "supported" : 27
+    },
+    {
+      "name" : "Controls",
+      "stubs" : 0,
+      "summary" : "buttons, toggles, pickers, sliders, text fields and the other controls",
+      "supported" : 61
+    },
+    {
+      "name" : "Text",
+      "stubs" : 0,
+      "summary" : "text and fonts",
+      "supported" : 42
+    },
+    {
+      "name" : "Layout",
+      "stubs" : 3,
+      "summary" : "stacks, grids, scroll views, frames and padding",
+      "supported" : 96
+    },
+    {
+      "name" : "Lists",
+      "stubs" : 2,
+      "summary" : "lists, forms and sections",
+      "supported" : 21
+    },
+    {
+      "name" : "Navigation",
+      "stubs" : 4,
+      "summary" : "navigation stacks, tabs, toolbars, sheets and alerts",
+      "supported" : 40
+    },
+    {
+      "name" : "Gestures",
+      "stubs" : 5,
+      "summary" : "taps, long presses, drags, pinches and rotations",
+      "supported" : 4
+    },
+    {
+      "name" : "Drawing",
+      "stubs" : 11,
+      "summary" : "shapes, paths, colors, gradients, images, effects and animation",
+      "supported" : 211
+    },
+    {
+      "name" : "Focus & Keyboard",
+      "stubs" : 5,
+      "summary" : "keyboard focus, submit and keyboard types",
+      "supported" : 6
+    },
+    {
+      "name" : "Environment",
+      "stubs" : 5,
+      "summary" : "state, bindings, observable models and environment values",
+      "supported" : 28
+    },
+    {
+      "name" : "Accessibility",
+      "stubs" : 5,
+      "summary" : "accessibility labels, hints and values",
+      "supported" : 3
+    },
+    {
+      "name" : "Charts",
+      "stubs" : 10,
+      "summary" : "Swift Charts",
+      "supported" : 12
+    },
+    {
+      "name" : "Scenes",
+      "stubs" : 0,
+      "summary" : "the app's scene",
+      "supported" : 1
+    },
+    {
+      "name" : "Haptics",
+      "stubs" : 4,
+      "summary" : "haptic feedback",
+      "supported" : 0
+    },
+    {
+      "name" : "Sharing",
+      "stubs" : 1,
+      "summary" : "the share sheet and the clipboard",
+      "supported" : 10
+    },
+    {
+      "name" : "Units",
+      "stubs" : 1,
+      "summary" : "measurements and unit conversion",
+      "supported" : 0
+    },
+    {
+      "name" : "Audio",
+      "stubs" : 0,
+      "summary" : "playing sounds",
+      "supported" : 0
+    },
+    {
+      "name" : "Web",
+      "stubs" : 0,
+      "summary" : "web views and web pages",
+      "supported" : 0
+    },
+    {
+      "name" : "Chart3D",
+      "stubs" : 0,
+      "summary" : "3D charts",
+      "supported" : 0
+    },
+    {
+      "name" : "Files",
+      "stubs" : 0,
+      "summary" : "importing and exporting files",
+      "supported" : 42
+    },
+    {
+      "name" : "Photos",
+      "stubs" : 0,
+      "summary" : "the photo picker",
+      "supported" : 0
+    },
+    {
+      "name" : "Camera",
+      "stubs" : 0,
+      "summary" : "taking photos with the camera",
+      "supported" : 12
+    },
+    {
+      "name" : "Motion",
+      "stubs" : 0,
+      "summary" : "Core Motion: the accelerometer, the gyroscope and the pedometer",
+      "supported" : 0
+    },
+    {
+      "name" : "Location",
+      "stubs" : 1,
+      "summary" : "the user's location and geocoding",
+      "supported" : 0
+    },
+    {
+      "name" : "Vision",
+      "stubs" : 0,
+      "summary" : "Vision: text and barcode recognition",
+      "supported" : 0
+    },
+    {
+      "name" : "Intelligence",
+      "stubs" : 0,
+      "summary" : "on-device Foundation Models",
+      "supported" : 0
+    },
+    {
+      "name" : "Widgets",
+      "stubs" : 0,
+      "summary" : "widgets on Shelf's Home Screen",
+      "supported" : 0
+    },
+    {
+      "name" : "Language",
+      "stubs" : 0,
+      "summary" : "Swift's standard library",
+      "supported" : 267
+    },
+    {
+      "name" : "Foundation",
+      "stubs" : 3,
+      "summary" : "dates, formatters, JSON, files and settings",
+      "supported" : 201
+    },
+    {
+      "name" : "Concurrency",
+      "stubs" : 0,
+      "summary" : "tasks, async/await, task groups and streams",
+      "supported" : 41
+    },
+    {
+      "name" : "Networking",
+      "stubs" : 0,
+      "summary" : "URLSession requests",
+      "supported" : 23
+    }
+  ],
+  "gaps" : [
+    {
+      "id" : "payload-enum-codable",
+      "what" : "An enum with associated values isn't `Codable` by itself: give a saved enum raw values (`enum Priority: String, Codable`), or write its `init(from:)` and `encode(to:)`."
+    },
+    {
+      "id" : "tuple-labels",
+      "what" : "A tuple doesn't take its labels from the declared type: write them in the literal (`return (min: a, max: b)`)."
+    }
+  ],
   "generator" : "kiln-registry",
   "interim" : false,
   "schemaVersion" : 1,
@@ -7821,6 +8019,18 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "member:UTF8.self",
+      "kind" : "member",
+      "name" : "self",
+      "overloads" : [
+
+      ],
+      "owner" : "UTF8",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Files",
       "id" : "member:UTType.audio",
       "kind" : "member",
@@ -11839,7 +12049,6 @@
       "id" : "modifier:transition",
       "kind" : "modifier",
       "name" : "transition",
-      "notes" : "The built-in transitions, `.asymmetric`, `.combined(with:)`, `AnyTransition.modifier(active:identity:)` with your `ViewModifier`s, and your own `Transition` types.",
       "overloads" : [
         {
           "labels" : [
@@ -11919,7 +12128,7 @@
       "id" : "protocol:Animatable",
       "kind" : "protocol",
       "name" : "Animatable",
-      "notes" : "A shape, view or `ViewModifier` with `animatableData` (a number, `AnimatablePair`, `CGPoint`, `Angle`…) or `@Animatable` is interpolated frame by frame inside `withAnimation`.",
+      "notes" : "`animatableData` (numbers, `AnimatablePair`, `CGPoint`, `Angle`) or `@Animatable` on a shape, view or modifier animates.",
       "proxy" : true,
       "requirements" : [
         "animatableData?"
@@ -11944,7 +12153,7 @@
       "id" : "protocol:CLLocationManagerDelegate",
       "kind" : "protocol",
       "name" : "CLLocationManagerDelegate",
-      "notes" : "Declared, with its proxy; `CLLocationManager` itself is Round 3's (§4.6).",
+      "notes" : "Declared, with its proxy, but nothing calls it yet: `CLLocationManager` is Round 3's (§4.6).",
       "proxy" : true,
       "requirements" : [
         "locationManager(_:didUpdateLocations:)?",
@@ -11953,7 +12162,7 @@
         "locationManager(_:didUpdateHeading:)?"
       ],
       "source" : "Sources/Kiln/Location.swift",
-      "support" : "partial"
+      "support" : "stub"
     },
     {
       "family" : "Language",
@@ -12037,7 +12246,7 @@
       "id" : "protocol:FileDocument",
       "kind" : "protocol",
       "name" : "FileDocument",
-      "notes" : "Your document type: `readableContentTypes`, `init(configuration:)` reading `configuration.file.regularFileContents`, and `fileWrapper(configuration:)` returning `FileWrapper(regularFileWithContents:)`. The file pickers that take it are Round 3's.",
+      "notes" : "Declared, for the file pickers to come; nothing shows it yet.",
       "proxy" : true,
       "requirements" : [
         "static readableContentTypes",
@@ -12087,7 +12296,7 @@
       "id" : "protocol:Layout",
       "kind" : "protocol",
       "name" : "Layout",
-      "notes" : "Your own layout: `sizeThatFits(proposal:subviews:cache:)` and `placeSubviews(in:proposal:subviews:cache:)`, with `subview.sizeThatFits(_:)`, `dimensions(in:)`, `place(at:anchor:proposal:)` and `spacing`, a cache from `makeCache(subviews:)`, and `animatableData`. Use it as `MyLayout { … }` or through `AnyLayout`.",
+      "notes" : "`sizeThatFits` and `placeSubviews` with `subview.sizeThatFits`, `place(at:anchor:proposal:)` and a cache; `MyLayout { … }` or `AnyLayout(MyLayout())`.",
       "proxy" : true,
       "requirements" : [
         "sizeThatFits(proposal:subviews:cache:)",
@@ -12105,7 +12314,7 @@
       "kind" : "protocol",
       "name" : "LocalizedError",
       "requirements" : [
-        "errorDescription"
+        "errorDescription?"
       ],
       "source" : "Sources/Kiln/Core.swift",
       "support" : "partial"
@@ -12135,7 +12344,6 @@
       "id" : "protocol:Shape",
       "kind" : "protocol",
       "name" : "Shape",
-      "notes" : "`path(in:)` runs whenever SwiftUI draws it.",
       "proxy" : true,
       "requirements" : [
         "path(in:)"
@@ -12148,7 +12356,7 @@
       "id" : "protocol:Transferable",
       "kind" : "protocol",
       "name" : "Transferable",
-      "notes" : "Your type in `ShareLink(item:preview:)`, from `CodableRepresentation(contentType:)`, `DataRepresentation(…)` and `ProxyRepresentation(exporting:)` (a `String` or `URL` property). `FileRepresentation` is Round 3's.",
+      "notes" : "For `ShareLink`: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation(exporting:)`.",
       "proxy" : true,
       "requirements" : [
         "static transferRepresentation"
@@ -12162,7 +12370,7 @@
       "introduced" : "17.0",
       "kind" : "protocol",
       "name" : "Transition",
-      "notes" : "Your own transition: `body(content:phase:)` runs with the view and its `TransitionPhase`. Use it with `.transition(MyTransition())`, or add `extension Transition where Self == MyTransition { static var mine: Self { … } }`.",
+      "notes" : "`body(content:phase:)` with `phase.isIdentity`; `.transition(MyTransition())`.",
       "proxy" : true,
       "requirements" : [
         "body(content:phase:)"
@@ -12175,7 +12383,7 @@
       "id" : "protocol:UIImagePickerControllerDelegate",
       "kind" : "protocol",
       "name" : "UIImagePickerControllerDelegate",
-      "notes" : "Your `Coordinator` class, set as `picker.delegate`: `info[.originalImage] as? UIImage` (or `.editedImage`, `.imageURL`).",
+      "notes" : "`info[.originalImage] as? UIImage`.",
       "proxy" : true,
       "requirements" : [
         "imagePickerController(_:didFinishPickingMediaWithInfo:)?",
@@ -12189,7 +12397,7 @@
       "id" : "protocol:UINavigationControllerDelegate",
       "kind" : "protocol",
       "name" : "UINavigationControllerDelegate",
-      "notes" : "Adopted with `UIImagePickerControllerDelegate` by a picker's coordinator.",
+      "notes" : "With `UIImagePickerControllerDelegate`.",
       "proxy" : true,
       "requirements" : [
         "navigationController(_:willShow:animated:)?",
@@ -12203,7 +12411,7 @@
       "id" : "protocol:UIViewControllerRepresentable",
       "kind" : "protocol",
       "name" : "UIViewControllerRepresentable",
-      "notes" : "For the UIKit controllers Kiln allows (`UIImagePickerController`): `makeUIViewController(context:)`, `updateUIViewController(_:context:)`, and `makeCoordinator()` with your `Coordinator` class as the controller's delegate.",
+      "notes" : "Only for `UIImagePickerController`, with a `Coordinator` class as its delegate.",
       "proxy" : true,
       "requirements" : [
         "makeUIViewController(context:)",
@@ -12218,7 +12426,7 @@
       "id" : "protocol:UIViewRepresentable",
       "kind" : "protocol",
       "name" : "UIViewRepresentable",
-      "notes" : "For the UIKit views Kiln allows: `UIVisualEffectView` (with `UIBlurEffect(style:)`) and `UIActivityIndicatorView`.",
+      "notes" : "Only for `UIVisualEffectView(effect: UIBlurEffect(style:))` and `UIActivityIndicatorView`.",
       "proxy" : true,
       "requirements" : [
         "makeUIView(context:)",
@@ -12245,7 +12453,7 @@
       "id" : "protocol:ViewModifier",
       "kind" : "protocol",
       "name" : "ViewModifier",
-      "notes" : "Applied with `.modifier(…)`, or from your own `extension View { func card() -> some View { modifier(Card()) } }`; it can have `@State`, and `AnyTransition.modifier(active:identity:)` takes it.",
+      "notes" : "`.modifier(Card())`, or `modifier(Card())` in your `extension View`; it can have `@State`.",
       "proxy" : true,
       "requirements" : [
         "body(content:)"
@@ -12735,7 +12943,6 @@
       "id" : "type:AnimatablePair",
       "kind" : "type",
       "name" : "AnimatablePair",
-      "notes" : "`AnimatablePair(a, b)`, with `.first` and `.second`; pairs nest.",
       "overloads" : [
         {
           "labels" : [
@@ -12761,7 +12968,6 @@
       "id" : "type:AnyLayout",
       "kind" : "type",
       "name" : "AnyLayout",
-      "notes" : "Over your own `Layout` or `HStackLayout`, `VStackLayout`, `ZStackLayout` and `GridLayout`; called with content: `layout { … }`.",
       "overloads" : [
         {
           "labels" : [
@@ -12777,7 +12983,7 @@
       "id" : "type:AnyTransition",
       "kind" : "type",
       "name" : "AnyTransition",
-      "notes" : "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.offset`, `.identity`, `.asymmetric(insertion:removal:)`, `.combined(with:)`, `.modifier(active:identity:)` with your `ViewModifier`s, and `AnyTransition(MyTransition())`.",
+      "notes" : "The built-ins, `.asymmetric`, `.combined(with:)` and `.modifier(active:identity:)`.",
       "overloads" : [
         {
           "labels" : [
@@ -12937,7 +13143,6 @@
       "id" : "type:CodableRepresentation",
       "kind" : "type",
       "name" : "CodableRepresentation",
-      "notes" : "JSON, from your type's `Codable` conformance.",
       "overloads" : [
         {
           "labels" : [
@@ -12999,7 +13204,6 @@
       "id" : "type:DataRepresentation",
       "kind" : "type",
       "name" : "DataRepresentation",
-      "notes" : "`exportedContentType:exporting:`, `importedContentType:importing:`, or both with `contentType:`.",
       "overloads" : [
         {
           "labels" : [
@@ -13187,7 +13391,6 @@
       "id" : "type:FileDocumentReadConfiguration",
       "kind" : "type",
       "name" : "FileDocumentReadConfiguration",
-      "notes" : "`file` (a `FileWrapper`) and `contentType`.",
       "overloads" : [
 
       ],
@@ -13199,7 +13402,6 @@
       "id" : "type:FileDocumentWriteConfiguration",
       "kind" : "type",
       "name" : "FileDocumentWriteConfiguration",
-      "notes" : "`contentType` and `existingFile`.",
       "overloads" : [
 
       ],
@@ -13253,7 +13455,6 @@
       "id" : "type:FileWrapper",
       "kind" : "type",
       "name" : "FileWrapper",
-      "notes" : "`FileWrapper(regularFileWithContents:)`, `regularFileContents`, `preferredFilename`.",
       "overloads" : [
         {
           "labels" : [
@@ -13334,7 +13535,6 @@
       "id" : "type:GridLayout",
       "kind" : "type",
       "name" : "GridLayout",
-      "notes" : "A layout value for `AnyLayout`, or called with content like its stack.",
       "overloads" : [
         {
           "labels" : [
@@ -13360,7 +13560,6 @@
       "id" : "type:HStackLayout",
       "kind" : "type",
       "name" : "HStackLayout",
-      "notes" : "A layout value for `AnyLayout`, or called with content like its stack.",
       "overloads" : [
         {
           "labels" : [
@@ -13520,7 +13719,6 @@
       "id" : "type:LayoutSubview",
       "kind" : "type",
       "name" : "LayoutSubview",
-      "notes" : "`sizeThatFits(_:)`, `dimensions(in:)`, `place(at:anchor:proposal:)`, `spacing` and `priority`.",
       "overloads" : [
 
       ],
@@ -13578,7 +13776,6 @@
       "id" : "type:ProposedViewSize",
       "kind" : "type",
       "name" : "ProposedViewSize",
-      "notes" : "`width` and `height` (nil when unspecified), `replacingUnspecifiedDimensions(by:)`, `.unspecified`, `.zero`, `.infinity`.",
       "overloads" : [
         {
           "labels" : [
@@ -13600,7 +13797,6 @@
       "id" : "type:ProxyRepresentation",
       "kind" : "type",
       "name" : "ProxyRepresentation",
-      "notes" : "`exporting:` a `String` or `URL` (a key path or a closure), and `importing:`.",
       "overloads" : [
         {
           "labels" : [
@@ -13707,7 +13903,6 @@
       "id" : "type:SharePreview",
       "kind" : "type",
       "name" : "SharePreview",
-      "notes" : "`SharePreview(\"Title\")`, with `image:` or `icon:`.",
       "overloads" : [
         {
           "labels" : [
@@ -13869,7 +14064,6 @@
       "id" : "type:TransferRepresentation",
       "kind" : "type",
       "name" : "TransferRepresentation",
-      "notes" : "`.suggestedFileName(_:)`, `.exportingCondition { }`, `.visibility(_:)`.",
       "overloads" : [
 
       ],
@@ -13892,7 +14086,6 @@
       "id" : "type:TransitionPhase",
       "kind" : "type",
       "name" : "TransitionPhase",
-      "notes" : "`.willAppear`, `.identity`, `.didDisappear`; `isIdentity` and `value` (-1, 0, 1).",
       "overloads" : [
 
       ],
@@ -13904,7 +14097,6 @@
       "id" : "type:UIActivityIndicatorView",
       "kind" : "type",
       "name" : "UIActivityIndicatorView",
-      "notes" : "`UIActivityIndicatorView(style:)`, `startAnimating()`, `stopAnimating()`, `color`.",
       "overloads" : [
         {
           "labels" : [
@@ -13936,7 +14128,6 @@
       "id" : "type:UIBlurEffect",
       "kind" : "type",
       "name" : "UIBlurEffect",
-      "notes" : "`UIBlurEffect(style:)` for a `UIVisualEffectView`.",
       "overloads" : [
         {
           "labels" : [
@@ -13961,7 +14152,6 @@
       "id" : "type:UIImage",
       "kind" : "type",
       "name" : "UIImage",
-      "notes" : "From a picker's `info[.originalImage]`, `UIImage(systemName:)` or `UIImage(data:)`; `size`, `pngData()`, `jpegData(compressionQuality:)`; shown with `Image(uiImage:)`.",
       "overloads" : [
         {
           "labels" : [
@@ -13982,7 +14172,7 @@
       "id" : "type:UIImagePickerController",
       "kind" : "type",
       "name" : "UIImagePickerController",
-      "notes" : "In a `UIViewControllerRepresentable`, with `sourceType = .photoLibrary`, `allowsEditing`, and `delegate = context.coordinator`. The camera is Round 3's.",
+      "notes" : "`.photoLibrary` only, in a representable, `delegate = context.coordinator`.",
       "overloads" : [
         {
           "labels" : [
@@ -14059,7 +14249,6 @@
       "id" : "type:UIViewControllerRepresentableContext",
       "kind" : "type",
       "name" : "UIViewControllerRepresentableContext",
-      "notes" : "`context.coordinator`.",
       "overloads" : [
 
       ],
@@ -14071,7 +14260,6 @@
       "id" : "type:UIVisualEffectView",
       "kind" : "type",
       "name" : "UIVisualEffectView",
-      "notes" : "`UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))` in a `UIViewRepresentable`.",
       "overloads" : [
         {
           "labels" : [
@@ -14147,11 +14335,21 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:UTF8",
+      "kind" : "type",
+      "name" : "UTF8",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Files",
       "id" : "type:UTType",
       "kind" : "type",
       "name" : "UTType",
-      "notes" : "`.json`, `.plainText`, `.utf8PlainText`, `.data`, `.png`, `.jpeg`, `.pdf`, `.commaSeparatedText` and the other common ones; `UTType(filenameExtension:)`, `identifier`, `preferredFilenameExtension`, `conforms(to:)`.",
       "overloads" : [
         {
           "labels" : [
@@ -14246,7 +14444,6 @@
       "id" : "type:VStackLayout",
       "kind" : "type",
       "name" : "VStackLayout",
-      "notes" : "A layout value for `AnyLayout`, or called with content like its stack.",
       "overloads" : [
         {
           "labels" : [
@@ -14281,7 +14478,6 @@
       "id" : "type:ViewDimensions",
       "kind" : "type",
       "name" : "ViewDimensions",
-      "notes" : "`width`, `height`, and `[guide]` for an alignment guide.",
       "overloads" : [
 
       ],
@@ -14293,7 +14489,6 @@
       "id" : "type:ViewSpacing",
       "kind" : "type",
       "name" : "ViewSpacing",
-      "notes" : "`distance(to:along:)` between two subviews' preferred spacing.",
       "overloads" : [
 
       ],
@@ -14316,7 +14511,6 @@
       "id" : "type:ZStackLayout",
       "kind" : "type",
       "name" : "ZStackLayout",
-      "notes" : "A layout value for `AnyLayout`, or called with content like its stack.",
       "overloads" : [
         {
           "labels" : [
@@ -15719,7 +15913,7 @@
       "id" : "view:ShareLink",
       "kind" : "view",
       "name" : "ShareLink",
-      "notes" : "Shares a `String`, a `URL`, or your own `Transferable` type (with `preview: SharePreview(\"Title\")`), with `subject:` and `message:`. Images, `Data` and several items are Round 2's.",
+      "notes" : "A `String`, a `URL`, or your `Transferable` with `preview: SharePreview(\"…\")`.",
       "overloads" : [
         {
           "labels" : [
@@ -16237,6 +16431,104 @@
       ],
       "source" : "Sources/Kiln/Environment.swift",
       "support" : "full"
+    }
+  ],
+  "wontDo" : [
+    {
+      "id" : "mapkit-views",
+      "reason" : "Too much for the value. Geocoding stays (§4.6).",
+      "status" : "wontDo",
+      "what" : "MapKit views (`Map`, `Marker`, Look Around)"
+    },
+    {
+      "id" : "custom-cameras",
+      "reason" : "A live preview layer and session management; `UIImagePickerController` covers taking a photo (§4.3).",
+      "status" : "wontDo",
+      "what" : "Custom cameras with `AVCaptureSession`"
+    },
+    {
+      "id" : "metal-shaders",
+      "reason" : "They need a compiled Metal library, and run off the main thread at frame rate.",
+      "status" : "wontDo",
+      "what" : "Metal shaders (`colorEffect`, `distortionEffect`, `layerEffect` with `ShaderLibrary`)"
+    },
+    {
+      "id" : "swiftdata-coredata",
+      "reason" : "`DB` is the synced store.",
+      "status" : "wontDo",
+      "what" : "SwiftData, Core Data"
+    },
+    {
+      "id" : "background-modes",
+      "reason" : "Apps run only while their card is open.",
+      "status" : "wontDo",
+      "what" : "Background modes (location, audio, refresh)"
+    },
+    {
+      "id" : "documents-windows-scenes",
+      "reason" : "A Shelf app is one screen inside a card. `WindowGroup` stays: it's the app's root.",
+      "status" : "wontDo",
+      "what" : "iOS 27's `Document` protocol, documents, multiple windows and scenes, commands"
+    },
+    {
+      "id" : "uikit-beyond-allowlist",
+      "reason" : "Each controller is bridged on purpose, and the app delegate is Shelf's.",
+      "status" : "wontDo",
+      "what" : "UIKit beyond the representable allowlist (`UIApplicationDelegateAdaptor`)"
+    },
+    {
+      "id" : "health-home-accessories",
+      "reason" : "Entitlements, or delegate-heavy APIs for little use here.",
+      "status" : "wontDo",
+      "what" : "Bluetooth, NFC, HealthKit, HomeKit (and WorkoutKit)"
+    },
+    {
+      "id" : "translation",
+      "reason" : "On PLAN.md's Later list.",
+      "status" : "later",
+      "what" : "Translation (`translationPresentation`, `translationTask`)"
+    },
+    {
+      "id" : "storekit",
+      "reason" : "Purchases need App Store products and an app record; Shelf apps aren't sold through the App Store.",
+      "status" : "wontDo",
+      "what" : "StoreKit views and purchase modifiers"
+    },
+    {
+      "id" : "wallet-apple-pay",
+      "reason" : "They need a merchant ID, pass type IDs and entitlements that Shelf can't grant per app.",
+      "status" : "wontDo",
+      "what" : "Apple Pay and Wallet buttons"
+    },
+    {
+      "id" : "3d-and-games",
+      "reason" : "Scene graphs of subclassed native nodes, run at frame rate; see subclassing native classes. `Canvas` and `TimelineView` cover 2D games.",
+      "status" : "wontDo",
+      "what" : "RealityKit, SceneKit and SpriteKit views, game controllers"
+    },
+    {
+      "id" : "musickit",
+      "reason" : "MusicKit is registered per bundle ID, so every app would share Shelf's.",
+      "status" : "wontDo",
+      "what" : "MusicKit views (`ArtworkImage`, the music picker, subscription offer)"
+    },
+    {
+      "id" : "sign-in-with-apple",
+      "reason" : "Needs an entitlement and server-side token checks per app.",
+      "status" : "wontDo",
+      "what" : "Sign in with Apple"
+    },
+    {
+      "id" : "system-services",
+      "reason" : "Entitlement-gated, or they register the app with the system, which a Shelf app can't do.",
+      "status" : "wontDo",
+      "what" : "Siri and Shortcuts views, Screen Time, managed apps, PermissionKit, device discovery, screen capture"
+    },
+    {
+      "id" : "xcode-previews",
+      "reason" : "There's no canvas in Shelf; `#Preview` blocks are skipped when read (§1.6).",
+      "status" : "wontDo",
+      "what" : "Xcode previews (`#Preview`, `@Previewable`, `preview*` modifiers)"
     }
   ]
 }

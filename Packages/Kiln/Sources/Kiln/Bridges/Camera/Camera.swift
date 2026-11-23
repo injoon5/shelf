@@ -37,7 +37,7 @@ final class CameraBridges: KBridgeFamily {
 
     static func imagePicker(_ r: KRegistry) {
         r.type("UIImagePickerController", .camera, support: .partial,
-               notes: "In a `UIViewControllerRepresentable`, with `sourceType = .photoLibrary`, `allowsEditing`, and `delegate = context.coordinator`. The camera is Round 3's.") { t in
+               notes: "`.photoLibrary` only, in a representable, `delegate = context.coordinator`.") { t in
             t.initializer("") { c in
                 #if os(iOS)
                 return .native(.object("UIImagePickerController", KRef(UIImagePickerController())))
@@ -128,7 +128,7 @@ final class CameraBridges: KBridgeFamily {
 
         r.delegateProtocol("UIImagePickerControllerDelegate", .camera,
                            requirements: ["imagePickerController(_:didFinishPickingMediaWithInfo:)?", "imagePickerControllerDidCancel(_:)?"],
-                           notes: "Your `Coordinator` class, set as `picker.delegate`: `info[.originalImage] as? UIImage` (or `.editedImage`, `.imageURL`).") { spec in
+                           notes: "`info[.originalImage] as? UIImage`.") { spec in
             spec.arguments("imagePickerController(_:didFinishPickingMediaWithInfo:)") { args, _ in
                 [KNativeValues.kv(from: args.first), infoDictionary(args.count > 1 ? args[1] : nil)]
             }

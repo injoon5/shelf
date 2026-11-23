@@ -247,7 +247,7 @@ final class DrawingBridges: KBridgeFamily {
             }
             t.anyStatic { _, name in .native(.implicit(name, [])) }
         }
-        r.type("AnyTransition", .drawing, notes: "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.offset`, `.identity`, `.asymmetric(insertion:removal:)`, `.combined(with:)`, `.modifier(active:identity:)` with your `ViewModifier`s, and `AnyTransition(MyTransition())`.") { t in
+        r.type("AnyTransition", .drawing, notes: "The built-ins, `.asymmetric`, `.combined(with:)` and `.modifier(active:identity:)`.") { t in
             t.membersInManifest = true
             for name in ["opacity", "scale", "slide", "move", "push", "identity"] { t.staticProperty(name) { _ in .native(.transition(name, [])) } }
             t.initializer("_:any") { c in c.args[0] }

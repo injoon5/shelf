@@ -211,7 +211,7 @@ extension DrawingBridges {
             m.form("_:Animation? value:any") { c, view in view.animation(c.animation(0), value: c["value"] ?? .nilValue) }
             m.form("_:Animation?", notes: "Deprecated in SwiftUI: animates every change.") { c, view in view.animation(c.animation(0), value: UUID()) }
         }
-        r.modifier("transition", .drawing, notes: "The built-in transitions, `.asymmetric`, `.combined(with:)`, `AnyTransition.modifier(active:identity:)` with your `ViewModifier`s, and your own `Transition` types.") { m in
+        r.modifier("transition", .drawing) { m in
             m.form("_:AnyTransition") { c, view in
                 if let mine = appTransition(c[0], c.interp) { view.transition(mine) } else { view.transition(transition(c[0], c.interp)) }
             }

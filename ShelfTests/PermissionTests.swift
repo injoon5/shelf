@@ -517,7 +517,8 @@ let habits = AppMeta(slug: "habits", name: "Habits", icon: "checkmark.circle.fil
         defer { h.cleanUp() }
         await h.store.sync()
         let model = CreateModel(app: nil, source: nil)
-        model.paste("```swift\n// Name: Run Tracker\nstruct ContentView: View {}\n```", library: h.store)
+        model.paste("```swift\n// Name: Run Tracker\nstruct ContentView: View { var body: some View { Text(\"Run\") } }\n```", library: h.store)
+        await model.checked()
         h.store.permissions.ledger.set(.allowed, .location, for: model.permissionSlug, name: "Run Tracker")
 
         await model.installReply(library: h.store)

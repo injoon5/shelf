@@ -41,7 +41,7 @@ final class FilesBridges: KBridgeFamily {
     }
 
     static func types(_ r: KRegistry) {
-        r.type("UTType", .files, support: .partial, notes: "`.json`, `.plainText`, `.utf8PlainText`, `.data`, `.png`, `.jpeg`, `.pdf`, `.commaSeparatedText` and the other common ones; `UTType(filenameExtension:)`, `identifier`, `preferredFilenameExtension`, `conforms(to:)`.") { t in
+        r.type("UTType", .files, support: .partial) { t in
             for (name, type) in knownTypes { t.staticProperty(name) { _ in utType(type) } }
             t.implicit { name, _, _ in knownTypes[name].map(utType) }
             t.initializer("filenameExtension:string") { c in UTType(filenameExtension: c.string("filenameExtension") ?? "").map(utType) ?? .nilValue }
@@ -56,7 +56,7 @@ final class FilesBridges: KBridgeFamily {
                 return .bool(a.conforms(to: b))
             }
         }
-        r.type("FileWrapper", .files, support: .partial, notes: "`FileWrapper(regularFileWithContents:)`, `regularFileContents`, `preferredFilename`.") { t in
+        r.type("FileWrapper", .files, support: .partial) { t in
             t.initializer("regularFileWithContents:Data") { c in
                 .native(.object("FileWrapper", KRef(FileWrapper(regularFileWithContents: KBuiltins.dataValue(c.args[0]) ?? Data()))))
             }
@@ -73,15 +73,15 @@ final class FilesBridges: KBridgeFamily {
         r.protocolBridge("FileDocument", .files,
                          requirements: ["static readableContentTypes", "init(configuration:)", "fileWrapper(configuration:)", "static writableContentTypes?"],
                          support: .partial,
-                         notes: "Your document type: `readableContentTypes`, `init(configuration:)` reading `configuration.file.regularFileContents`, and `fileWrapper(configuration:)` returning `FileWrapper(regularFileWithContents:)`. The file pickers that take it are Round 3's.") { app in
+                         notes: "Declared, for the file pickers to come; nothing shows it yet.") { app in
             KFileDocument(app: app)
         }
         // `configuration` in `init(configuration:)` and `fileWrapper(configuration:)`.
-        r.type("FileDocumentReadConfiguration", .files, notes: "`file` (a `FileWrapper`) and `contentType`.") { t in
+        r.type("FileDocumentReadConfiguration", .files) { t in
             t.property("file") { c in config(c)?.file ?? .nilValue }
             t.property("contentType") { c in config(c)?.contentType ?? .nilValue }
         }
-        r.type("FileDocumentWriteConfiguration", .files, notes: "`contentType` and `existingFile`.") { t in
+        r.type("FileDocumentWriteConfiguration", .files) { t in
             t.property("existingFile") { c in config(c)?.file ?? .nilValue }
             t.property("contentType") { c in config(c)?.contentType ?? .nilValue }
         }

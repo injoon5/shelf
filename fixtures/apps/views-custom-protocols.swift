@@ -1,6 +1,7 @@
 // Name: Tide Board
 // Icon: water.waves
 // Tint: teal
+// Covers: Layout, Drawing, Core
 
 import SwiftUI
 

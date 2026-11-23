@@ -252,12 +252,20 @@ Validate, minimum per call, in ms:
 | Workloads/Collections.swift | 30.43 | 30.56 | +0% |
 | Workloads/Objects.swift | 30.56 | 31.09 | +2% |
 
+### after-1.8-check.json
+
+PLAN.md §1.8: `Kiln.check`, the static checker, measured with §1.6 merged, so the base is `after-1.6-language.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.8-check.json --compare Benchmarks/after-1.6-language.json` (21 samples). Date: 24 November 2026.
+- **No input is slower.** Every input is within 3% of §1.6. `check` isn't on the path `run` and `validate` take; what §1.8 adds to it is the parser keeping `async` on functions and two flags on each overload.
+- Against `after-1.7-context.json` one run showed `apps/images.swift` 10.3% slower (0.39 to 0.43 ms) and the next 2.6%: noise at that size.
+- **`check` itself** takes a few milliseconds on the largest app (`CheckTests.testCheckIsFast`), and Shelf's slowest fixture checks and validates in about 12 ms on the simulator (`NewAppCheckTests.checkAndValidateAreFastEnough`).
+
 ### after-1.5-proxies.json
 
-PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transition, representables, delegates, Transferable, FileDocument, async requirements). Measured on top of §1.6 and §1.7, so the base is `after-1.6-language.json`.
+PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transition, representables, delegates, Transferable, FileDocument, async requirements). Measured with §1.8 merged, so the base is `after-1.8-check.json`.
 
-- **The command.** `Benchmarks/run.sh Benchmarks/after-1.5-proxies.json --compare Benchmarks/after-1.6-language.json` (21 samples). Load average about 3 to 5. Date: 24 November 2026.
-- **No input is more than 10% slower.** The worst is `swift-language`, 4.4% slower; most apps are within 2%, Chess is 3% faster, and the compute workloads are within 2%.
+- **The command.** `Benchmarks/run.sh Benchmarks/after-1.5-proxies.json --compare Benchmarks/after-1.8-check.json` (21 samples). Load average about 3. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst are the model replies, 6 to 7% slower at about 0.3 ms each (a few hundredths of a millisecond); the example apps and fixtures are within 5%, and the compute workloads within 5%. Before the merge, against `after-1.6-language.json`, the worst was 4.4%.
 - **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
 - **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.
-
