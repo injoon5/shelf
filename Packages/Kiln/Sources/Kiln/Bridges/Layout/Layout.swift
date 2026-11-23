@@ -12,6 +12,10 @@ final class LayoutBridges: KBridgeFamily {
         containers(r)
         modifiers(r)
         geometry(r)
+        geometryBridges(r)
+        scrolling(r)
+        subviews(r)
+        arrangements(r)
     }
 
     // MARK: Stacks and grids
@@ -98,7 +102,7 @@ final class LayoutBridges: KBridgeFamily {
     static func containers(_ r: KRegistry) {
         r.view("ScrollView", .layout) { v in
             v.form("_:Axis.Set? showsIndicators:bool? content:content") { c in
-                ScrollView(scrollAxes(c[0]), showsIndicators: c.bool("showsIndicators", default: true)) { c.content() }
+                ScrollView(c[0].map { KLayout.axes($0) } ?? .vertical, showsIndicators: c.bool("showsIndicators", default: true)) { c.content() }
             }
         }
         r.view("ScrollViewReader", .layout, notes: "`proxy.scrollTo(id, anchor:)`.") { v in
@@ -116,17 +120,16 @@ final class LayoutBridges: KBridgeFamily {
                 return .void
             }
         }
-        r.view("GeometryReader", .layout, support: .partial, notes: "`proxy.size`.") { v in
+        r.view("GeometryReader", .layout, notes: "The closure gets a `GeometryProxy`: `size`, `safeAreaInsets`, `frame(in:)`, `bounds(of:)`.") { v in
             v.form("content:content") { c in
                 let fn = c.contentValue(nil)
-                GeometryReader { proxy in
-                    c.r.renderContent(fn, [.tuple([.native(.size(proxy.size.width, proxy.size.height)), .native(.object("GeometryProxy", KRef(NSObject())))],
-                                                  ["size", "proxy"])])
-                }
+                GeometryReader { proxy in c.r.renderContent(fn, [KGeometry.of(proxy).kv]) }
             }
         }
         r.view("ViewThatFits", .layout) { v in
-            v.form("in:Axis.Set? content:content") { c in ViewThatFits { c.content() } }
+            v.form("in:Axis.Set? content:content") { c in
+                if c["in"] != nil { ViewThatFits(in: KLayout.axes(c["in"])) { c.content() } } else { ViewThatFits { c.content() } }
+            }
         }
     }
 
@@ -203,21 +206,28 @@ final class LayoutBridges: KBridgeFamily {
         r.modifier("hidden", .layout) { m in m.form("") { _, view in view.hidden() } }
         r.modifier("scaledToFit", .layout) { m in m.form("") { _, view in view.scaledToFit() } }
         r.modifier("scaledToFill", .layout) { m in m.form("") { _, view in view.scaledToFill() } }
-        r.modifier("safeAreaInset", .layout, support: .partial, notes: "`.top` and `.bottom`.") { m in
-            m.form("edge:VerticalEdge alignment:any? spacing:number? content:content") { c, view in
-                let edge: VerticalEdge = c.symbol("edge") == "top" ? .top : .bottom
+        r.modifier("safeAreaInset", .layout) { m in
+            m.form("edge:any alignment:any? spacing:number? content:content") { c, view in
                 let content = c.content("content")
-                view.safeAreaInset(edge: edge) { content }
+                switch c.symbol("edge") {
+                case "top": view.safeAreaInset(edge: .top, alignment: c.horizontalAlignment("alignment"), spacing: c.cg("spacing")) { content }
+                case "leading": view.safeAreaInset(edge: .leading, alignment: c.verticalAlignment("alignment"), spacing: c.cg("spacing")) { content }
+                case "trailing": view.safeAreaInset(edge: .trailing, alignment: c.verticalAlignment("alignment"), spacing: c.cg("spacing")) { content }
+                default: view.safeAreaInset(edge: .bottom, alignment: c.horizontalAlignment("alignment"), spacing: c.cg("spacing")) { content }
+                }
             }
         }
         r.modifier("scrollIndicators", .layout) { m in
             m.form("_:ScrollIndicatorVisibility axes:Axis.Set?") { c, view in
-                if c.symbol(0) == "hidden" { view.scrollIndicators(.hidden) } else { view }
+                let axes = c["axes"].map { KLayout.axes($0) } ?? [.vertical, .horizontal]
+                switch c.symbol(0) {
+                case "hidden": view.scrollIndicators(.hidden, axes: axes)
+                case "never": view.scrollIndicators(.never, axes: axes)
+                case "visible": view.scrollIndicators(.visible, axes: axes)
+                default: view
+                }
             }
         }
-        r.modifier("scrollTargetBehavior", .layout, support: .stub) { m in m.stub(["_:any"]) }
-        r.modifier("scrollTargetLayout", .layout, support: .stub) { m in m.stub(["isEnabled:bool?"]) }
-        r.modifier("defaultScrollAnchor", .layout, support: .stub) { m in m.stub(["_:UnitPoint?"]) }
     }
 
     @MainActor static func frame(_ c: KCall, _ view: AnyView) -> AnyView {
