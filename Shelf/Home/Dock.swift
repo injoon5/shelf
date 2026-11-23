@@ -18,31 +18,20 @@ struct DockGlass: View {
     }
 }
 
-/// The dock's icons: the apps the user pinned, then Settings, which never
-/// leaves. No labels, as on Springboard.
+/// The dock's icons, Settings among them wherever it was put. No labels,
+/// as on Springboard.
 struct DockIcons: View {
     @Environment(LibraryStore.self) private var library
-    @Environment(HomeModel.self) private var model
     var geometry: HomeGeometry
     var labelSize: CGFloat
 
     var body: some View {
-        let pinned = library.layout.dock.compactMap { library.app($0) }
+        let items = library.layout.dock.compactMap { library.item($0) }
         ZStack {
-            ForEach(Array(pinned.enumerated()), id: \.element.id) { index, app in
-                HomeIcon(app: app, geometry: geometry, labelSize: labelSize, showsLabel: false)
-                    .position(geometry.pinnedCenter(index, pinned: pinned.count))
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                HomeIcon(item: item, geometry: geometry, labelSize: labelSize, showsLabel: false)
+                    .position(geometry.dockCenter(index, of: items.count))
             }
-            Button {
-                if model.isEditing { model.stopEditing() }
-                model.sheet = .settings
-            } label: {
-                IconArt(face: .settings, size: geometry.iconSize).modifier(IconPress(size: geometry.iconSize))
-            }
-            .buttonStyle(IconButtonStyle())
-            .accessibilityLabel("Settings")
-            .modifier(Jiggle(isOn: model.isEditing))
-            .position(geometry.settingsCenter(pinned: pinned.count))
         }
     }
 }

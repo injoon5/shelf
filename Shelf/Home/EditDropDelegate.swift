@@ -59,9 +59,9 @@ struct DockDropDelegate: DropDelegate {
         guard library.layout.dockHasRoom(for: slug) else { return DropProposal(operation: .forbidden) }
         let isPinned = dock.contains(slug)
 
-        let pinned = isPinned ? dock.count : dock.count + 1
+        let count = isPinned ? dock.count : dock.count + 1
         let x = info.location.x + geometry.dockFrame.minX
-        let target = Layout.Slot.dock(index: geometry.pinnedIndex(at: x, pinned: pinned))
+        let target = Layout.Slot.dock(index: geometry.dockIndex(at: x, of: count))
         if library.layout.slot(of: slug) != target {
             withAnimation(Motion.reorder) { _ = library.move(slug, to: target) }
         }

@@ -136,8 +136,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         search.onQuery = { [unowned self] in model.query = $0 }
         search.onSubmit = { [unowned self] in
             // Return opens the best match.
-            guard let best = library.apps.matching(model.query).first else { return }
-            Task { await model.open(best.slug, in: library) }
+            guard let best = library.items.matching(model.query).first else { return }
+            Task { await model.open(best.id, in: library) }
         }
         search.onFieldMoved = { [unowned self] top in placeResults(aboveFieldAt: top) }
         home.addSubview(search)
@@ -327,7 +327,9 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     private func close(_ card: AppCard, centerVelocity: CGPoint = .zero, widthVelocity: CGFloat = 0) {
-        let icon = layout.iconFrame(card.slug, preferResult: false)
+        // An app deleted while its card was up has no icon to land on, even
+        // if SwiftUI hasn't yet taken the icon's frame away.
+        let icon = library.app(card.slug) == nil ? nil : layout.iconFrame(card.slug, preferResult: false)
         let landing = CardMotion.landing(icon: icon, screenWidth: view.bounds.width,
                                          pill: layout.geometry.pillFrame, iconSize: iconSize)
         card.close(to: landing.frame, fades: landing.fades, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
@@ -481,9 +483,14 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         }
     }
 
+    /// Back to full screen, unless the model says the card must land: its
+    /// app is gone, or another has opened since.
     private func reopen(_ card: AppCard, centerVelocity: CGPoint, widthVelocity: CGFloat) {
+        guard model.reopen(card.run, in: library) else {
+            close(card, centerVelocity: centerVelocity, widthVelocity: widthVelocity)
+            return
+        }
         card.reopen(centerVelocity: centerVelocity, widthVelocity: widthVelocity)
-        if model.run?.id != card.slug { model.reopen(card.run) }
         startTicking()
     }
 

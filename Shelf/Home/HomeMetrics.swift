@@ -226,20 +226,6 @@ struct HomeGeometry: Equatable {
         return CGPoint(x: size.width / 2 - span / 2 + CGFloat(index) * dockIconPitch, y: dockFrame.midY)
     }
 
-    /// The dock holds the pinned apps, then Settings, which never leaves.
-    func pinnedCenter(_ index: Int, pinned: Int) -> CGPoint {
-        dockCenter(index, of: pinned + 1)
-    }
-
-    func settingsCenter(pinned: Int) -> CGPoint {
-        dockCenter(pinned, of: pinned + 1)
-    }
-
-    /// The place nearest `x` for one of `pinned` apps: any before Settings.
-    func pinnedIndex(at x: CGFloat, pinned: Int) -> Int {
-        min(dockIndex(at: x, of: pinned + 1), pinned - 1)
-    }
-
     /// The dock slot nearest `x`, when the dock would hold `count` icons.
     func dockIndex(at x: CGFloat, of count: Int) -> Int {
         guard count > 1 else { return 0 }

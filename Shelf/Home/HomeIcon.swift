@@ -1,18 +1,23 @@
 import SwiftUI
 
-/// One app on the Home Screen or in the dock: artwork, label, and everything
-/// a finger can do to it.
+/// One icon on the Home Screen, in the dock or among search results: an app
+/// or Settings, with its artwork, label, and everything a finger can do to it.
 struct HomeIcon: View {
     @Environment(LibraryStore.self) private var library
     @Environment(HomeModel.self) private var model
     @Environment(ShelfSettings.self) private var settings
     @Environment(\.iconPlace) private var place
-    var app: CachedApp
+    var item: HomeItem
     var geometry: HomeGeometry
     var labelSize: CGFloat
     var showsLabel = true
 
-    private var face: IconFace { IconFace(app.meta) }
+    private var face: IconFace {
+        switch item {
+        case .app(let app): IconFace(app.meta)
+        case .settings: .settings
+        }
+    }
 
     var body: some View {
         // A long press means one thing at a time: the menu on a still Home
@@ -26,8 +31,8 @@ struct HomeIcon: View {
                 button
                     .contentShape(.dragPreview, IconOutline(size: geometry.iconSize))
                     .onDrag {
-                        model.lifted(app.slug)
-                        return NSItemProvider(object: app.slug as NSString)
+                        model.lifted(item.id)
+                        return NSItemProvider(object: item.id as NSString)
                     }
             } else {
                 button
@@ -36,8 +41,8 @@ struct HomeIcon: View {
             }
         }
         .modifier(Jiggle(isOn: model.isEditing))
-        .modifier(Shake(trigger: model.refusals[app.slug] ?? 0))
-        .opacity(model.dragging == app.slug ? 0 : 1)
+        .modifier(Shake(trigger: model.refusals[item.id] ?? 0))
+        .opacity(model.dragging == item.id ? 0 : 1)
         // The label's size comes from the stage under this same cap; the
         // rest of the icon stops growing where the label does.
         .dynamicTypeSize(...HomeMetrics.textSizeCap)
@@ -45,29 +50,42 @@ struct HomeIcon: View {
 
     private var button: some View {
         Button {
-            Task { await model.open(app.slug, in: library) }
+            Task { await model.open(item.id, in: library) }
         } label: {
             VStack(spacing: HomeMetrics.labelGap) {
                 art
                 if showsLabel {
-                    IconLabel(name: app.meta.name, isNew: app.isNew, size: labelSize, width: geometry.labelWidth)
+                    IconLabel(name: item.name, isNew: item.app?.isNew == true, size: labelSize, width: geometry.labelWidth)
                 }
             }
             .contentShape(.rect)
         }
         .buttonStyle(IconButtonStyle())
-        .accessibilityLabel(app.meta.name)
+        .accessibilityLabel(item.name)
     }
 
     private var art: some View {
-        PendingIcon(face: face, size: geometry.iconSize, isRunnable: app.isRunnable,
-                    isDownloading: library.downloading.contains(app.slug))
+        PendingIcon(face: face, size: geometry.iconSize, isRunnable: item.app?.isRunnable ?? true,
+                    isDownloading: library.downloading.contains(item.id))
             .modifier(IconPress(size: geometry.iconSize))
-            .modifier(CardSource(key: IconKey(slug: app.slug, place: place)))
+            .modifier(CardSource(key: IconKey(slug: item.id, place: place)))
+    }
+
+    /// Settings' menu has only Edit Home Screen: it can't be changed,
+    /// reloaded, copied, reverted or deleted.
+    @ViewBuilder
+    private var menu: some View {
+        if let app = item.app {
+            appActions(app)
+            Divider()
+        }
+        Button("Edit Home Screen", systemImage: "apps.iphone") {
+            model.startEditing()
+        }
     }
 
     @ViewBuilder
-    private var menu: some View {
+    private func appActions(_ app: CachedApp) -> some View {
         Button("Change…", systemImage: "wand.and.sparkles") {
             model.sheet = .change(app)
         }
@@ -82,10 +100,6 @@ struct HomeIcon: View {
             Button("Revert", systemImage: "arrow.uturn.backward") {
                 Task { await library.revert(app.slug) }
             }
-        }
-        Divider()
-        Button("Edit Home Screen", systemImage: "apps.iphone") {
-            model.startEditing()
         }
     }
 }

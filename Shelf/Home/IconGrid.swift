@@ -10,16 +10,16 @@ struct IconGrid: View {
     var labelSize: CGFloat
 
     private struct Placement: Identifiable {
-        var app: CachedApp
+        var item: HomeItem
         var page: Int
         var index: Int
-        var id: String { app.slug }
+        var id: String { item.id }
     }
 
     private var placements: [Placement] {
-        library.layout.pages.enumerated().flatMap { page, slugs in
-            slugs.enumerated().compactMap { index, slug in
-                library.app(slug).map { Placement(app: $0, page: page, index: index) }
+        library.layout.pages.enumerated().flatMap { page, ids in
+            ids.enumerated().compactMap { index, id in
+                library.item(id).map { Placement(item: $0, page: page, index: index) }
             }
         }
     }
@@ -35,11 +35,11 @@ struct IconGrid: View {
                 Color.clear
                     .contentShape(.rect)
                     .onTapGesture { if model.isEditing { model.stopEditing() } }
-                    .onLongPressGesture { model.startEditing() }
+                    .onLongPressGesture { model.longPressedWallpaper() }
 
                 ForEach(placements) { placement in
                     let center = geometry.iconCenter(placement.index)
-                    HomeIcon(app: placement.app, geometry: geometry, labelSize: labelSize)
+                    HomeIcon(item: placement.item, geometry: geometry, labelSize: labelSize)
                         .frame(width: geometry.labelWidth, height: geometry.cellHeight, alignment: .top)
                         .position(x: CGFloat(placement.page) * width + center.x,
                                   y: center.y + (geometry.cellHeight - geometry.iconSize) / 2)
@@ -54,6 +54,7 @@ struct IconGrid: View {
         .scrollIndicators(.hidden)
         .scrollPosition($model.scroll)
         .scrollDisabled(model.isSearching)
+        .onChange(of: width, initial: true) { model.pageWidth = width }
         .onScrollGeometryChange(for: Int.self) { scroll in
             Int((scroll.contentOffset.x / max(width, 1)).rounded())
         } action: { _, page in

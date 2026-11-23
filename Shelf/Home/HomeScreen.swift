@@ -48,7 +48,10 @@ struct HomeScreen: View {
                 }
             }
             .onChange(of: model.isEditing) { _, isEditing in
-                if !isEditing { library.commitLayout() }
+                if !isEditing { library.finishEditing() }
+            }
+            .onChange(of: library.layout) { old, new in
+                model.layoutChanged(from: old, to: new, in: library)
             }
     }
 }

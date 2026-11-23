@@ -220,6 +220,12 @@ final class LibraryStore {
         layout.move(slug, to: slot)
     }
 
+    /// Edit mode has ended: the pages it emptied go, and the layout is saved.
+    func finishEditing() {
+        layout.removeEmptyPages()
+        commitLayout()
+    }
+
     func resetLayout() {
         layout = Layout()
         layout.reconcile(with: apps.map(\.slug))

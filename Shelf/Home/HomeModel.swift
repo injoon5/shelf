@@ -52,20 +52,42 @@ final class HomeModel {
     /// Per app: how many times it has refused to open. A change shakes its icon.
     private(set) var refusals: [String: Int] = [:]
 
+    /// The pager's width, for scrolling to a page from here.
+    @ObservationIgnored var pageWidth: CGFloat = 0
+    @ObservationIgnored private var taps = 0
     @ObservationIgnored private var liftedSlug: String?
     @ObservationIgnored private var flip: (target: Int, task: Task<Void, Never>)?
     @ObservationIgnored private var dotsTask: Task<Void, Never>?
 
     // MARK: Opening
 
-    func open(_ slug: String, in library: LibraryStore) async {
-        guard !isEditing, run == nil, let app = library.app(slug) else { return }
-        if app.isRunnable, let source = library.source(for: slug) {
+    /// A tap on an icon. An app opens as a card; one whose source isn't
+    /// here downloads first, and opens only if nothing else was tapped
+    /// meanwhile. Settings opens its sheet. Nothing opens in edit mode, or
+    /// over an app that is already open.
+    func open(_ id: String, in library: LibraryStore) async {
+        guard !isEditing, run == nil else { return }
+        taps += 1
+        let tap = taps
+        if id == Layout.settings {
+            launches += 1
+            // Opening anything from search closes search, as an app does.
+            endSearch()
+            sheet = .settings
+            return
+        }
+        guard let app = library.app(id) else { return }
+        if app.isRunnable, let source = library.source(for: id) {
             launch(app, source: source, in: library)
-        } else if await library.fetch(slug), let app = library.app(slug), let source = library.source(for: slug) {
+            return
+        }
+        let fetched = await library.fetch(id)
+        // A later tap, edit mode or another app took over while it downloaded.
+        guard tap == taps, !isEditing, run == nil else { return }
+        if fetched, let app = library.app(id), let source = library.source(for: id) {
             launch(app, source: source, in: library)
         } else {
-            refusals[slug, default: 0] += 1
+            refusals[id, default: 0] += 1
         }
     }
 
@@ -76,11 +98,15 @@ final class HomeModel {
         run = Run(app: app, source: source)
     }
 
-    /// A card on its way home was caught and sent back to full screen.
-    func reopen(_ again: Run) {
-        guard run == nil else { return }
+    /// A card on its way home was caught and let go: it goes back to full
+    /// screen. Returns false when it can't, and must land after all: its app
+    /// has been deleted since, or another app has opened meanwhile.
+    func reopen(_ again: Run, in library: LibraryStore) -> Bool {
+        if run?.id == again.id { return true }
+        guard run == nil, library.app(again.id) != nil else { return false }
         launches += 1
         run = again
+        return true
     }
 
     func close() {
@@ -89,6 +115,8 @@ final class HomeModel {
 
     // MARK: Edit mode
 
+    /// From an icon's menu. Edit mode and search never show together, so
+    /// this closes search, as the menu of a search result can be opened there.
     func startEditing() {
         guard !isEditing else { return }
         editStarts += 1
@@ -96,6 +124,13 @@ final class HomeModel {
             isEditing = true
             isSearching = false
         }
+    }
+
+    /// A long press on empty wallpaper. Search covers the wallpaper, so it
+    /// can't be one while searching.
+    func longPressedWallpaper() {
+        guard !isSearching else { return }
+        startEditing()
     }
 
     func stopEditing() {
@@ -153,6 +188,39 @@ final class HomeModel {
     func pageCount(_ pages: [[String]]) -> Int {
         let spare = isEditing && pages.last?.isEmpty == false
         return max(pages.count + (spare ? 1 : 0), 1)
+    }
+
+    /// The layout changed under the Home Screen: a sync, a drop, or the end
+    /// of edit mode. The page on screen follows its icons, a drag whose icon
+    /// has gone ends, and an app deleted while open closes (into the pill,
+    /// as it has no icon to land on).
+    func layoutChanged(from old: Layout, to new: Layout, in library: LibraryStore) {
+        if let held = dragging ?? liftedSlug, new.slot(of: held) == nil {
+            cancelFlip()
+            liftedSlug = nil
+            dragging = nil
+        }
+        if let run, library.app(run.id) == nil { close() }
+        let target = Self.page(following: page, from: old.pages, to: new.pages, count: pageCount(new.pages))
+        guard target != page else { return }
+        page = target
+        if pageWidth > 0 { scroll.scrollTo(x: CGFloat(target) * pageWidth) }
+    }
+
+    /// The page to show once the pages change from `old` to `new`: the one
+    /// the icons on the page in view went to, so pages that go away before it
+    /// don't change what is on screen. A page left with nothing that
+    /// survived, and edit mode's spare page, keep their place where they
+    /// can, or the last page.
+    static func page(following page: Int, from old: [[String]], to new: [[String]], count: Int) -> Int {
+        let last = max(count - 1, 0)
+        if page < 0 { return 0 }
+        // The spare page is the one after the last.
+        if page >= old.count { return min(new.count, last) }
+        for id in old[page] {
+            if let moved = new.firstIndex(where: { $0.contains(id) }) { return min(moved, last) }
+        }
+        return min(page, last)
     }
 
     func pagesMoved(_ moving: Bool) {
