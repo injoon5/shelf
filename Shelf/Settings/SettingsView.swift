@@ -153,27 +153,51 @@ private struct ChangeToken: View {
     }
 }
 
-/// Storage used by each app, with Delete Data per app.
+/// What one app keeps on the phone: its `DB` store (synced) and its files
+/// (this phone only).
+struct AppStorageUse: Equatable, Sendable {
+    var data = 0
+    var files = 0
+    var total: Int { data + files }
+
+    /// Every app's, for Settings › App Data.
+    @MainActor static func measure(_ library: LibraryStore) async -> [String: AppStorageUse] {
+        var use: [String: AppStorageUse] = [:]
+        for (slug, bytes) in await library.data.usage() { use[slug, default: .init()].data = bytes }
+        let files = library.files
+        let slugs = library.apps.map(\.slug)
+        let sizes = await Task.detached { slugs.map { ($0, files.usage(of: $0)) } }.value
+        for (slug, bytes) in sizes where bytes > 0 { use[slug, default: .init()].files = bytes }
+        return use
+    }
+}
+
+/// Storage used by each app, its data and its files, with Delete Data per app.
 private struct AppDataList: View {
     @Environment(LibraryStore.self) private var library
-    @State private var usage: [String: Int]?
+    @State private var usage: [String: AppStorageUse]?
     @State private var deleting: CachedApp?
 
-    private var rows: [(app: CachedApp, bytes: Int)] {
+    private var rows: [(app: CachedApp, use: AppStorageUse)] {
         guard let usage else { return [] }
         return library.apps
             .compactMap { app in usage[app.slug].map { (app, $0) } }
-            .filter { $0.bytes > 0 }
-            .sorted { $0.bytes > $1.bytes }
+            .filter { $0.use.total > 0 }
+            .sorted { $0.use.total > $1.use.total }
     }
 
     var body: some View {
         List {
             ForEach(rows, id: \.app.id) { row in
                 LabeledContent {
-                    Text(Int64(row.bytes), format: .byteCount(style: .file))
+                    Text(Int64(row.use.total), format: .byteCount(style: .file))
                 } label: {
-                    Label(row.app.meta.name, systemImage: Symbol.resolve(row.app.meta.icon))
+                    Label {
+                        Text(row.app.meta.name)
+                        Text(Self.breakdown(row.use))
+                    } icon: {
+                        Image(systemName: Symbol.resolve(row.app.meta.icon))
+                    }
                 }
                 .swipeActions {
                     Button("Delete Data", role: .destructive) { deleting = row.app }
@@ -190,16 +214,29 @@ private struct AppDataList: View {
         }
         .navigationTitle("App Data")
         .navigationBarTitleDisplayMode(.inline)
-        .task { usage = await library.data.usage() }
+        .task { usage = await AppStorageUse.measure(library) }
         .confirmationDialog(deleting.map { "Delete \($0.meta.name)’s Data" } ?? "", isPresented: Binding(
             get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
             Button("Delete Data", role: .destructive) {
                 guard let app = deleting else { return }
                 Task {
+                    // The synced data everywhere, and the files on this phone.
                     await library.data.deleteAll(for: app.slug)
-                    withAnimation(Motion.quick) { usage?[app.slug] = 0 }
+                    let files = library.files
+                    await Task.detached { files.remove(app.slug) }.value
+                    withAnimation(Motion.quick) { usage?[app.slug] = AppStorageUse() }
                 }
             }
+        } message: {
+            Text("Its synced data, on every device, and its files on this iPhone.")
         }
+    }
+
+    /// "Data 12 KB · Files 3 MB", leaving out what's empty.
+    static func breakdown(_ use: AppStorageUse) -> String {
+        var parts: [String] = []
+        if use.data > 0 { parts.append("Data " + Int64(use.data).formatted(.byteCount(style: .file))) }
+        if use.files > 0 { parts.append("Files " + Int64(use.files).formatted(.byteCount(style: .file))) }
+        return parts.joined(separator: " · ")
     }
 }

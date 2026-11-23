@@ -1,5 +1,5 @@
 /// An app's Swift source, one Unicode scalar at a time, each marked as code,
-/// comment or string literal. `SourceRewriter` and `Outline` both read
+/// comment or string literal. `Outline` reads
 /// source through this, so they agree on where code is.
 ///
 /// It is a tolerant lexer, not a parser: it knows Swift's comments (nested

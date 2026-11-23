@@ -130,7 +130,7 @@ final class StubProtocol: URLProtocol, @unchecked Sendable {
             path: url.path(percentEncoded: true),
             query: Dictionary((components?.queryItems ?? []).map { ($0.name, $0.value ?? "") }, uniquingKeysWith: { a, _ in a }),
             headers: request.allHTTPHeaderFields ?? [:],
-            body: request.httpBody ?? request.httpBodyStream.map(ShelfDBProtocol.drain) ?? Data())
+            body: request.httpBody ?? request.httpBodyStream.map(StubProtocol.drain) ?? Data())
         let response = server.begin(seen)
 
         let deliver: @Sendable () -> Void = { [self] in
@@ -191,4 +191,20 @@ final class Locked<Value: Sendable>: Sendable {
     init(_ value: Value) { mutex = Mutex(value) }
     var value: Value { mutex.withLock { $0 } }
     func withLock<T: Sendable>(_ body: (inout Value) -> T) -> T { mutex.withLock { body(&$0) } }
+}
+
+extension StubProtocol {
+    /// Reads a request's body stream to its end.
+    static func drain(_ stream: InputStream) -> Data {
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 16 * 1024)
+        while true {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            if count <= 0 { break }
+            data.append(buffer, count: count)
+        }
+        return data
+    }
 }

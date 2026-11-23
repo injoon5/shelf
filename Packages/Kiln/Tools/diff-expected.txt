@@ -1,3 +1,4 @@
 # Inputs whose transcript is meant to differ from the engine before §1.4 (b466f9c), and why.
 # One per line: the input as Tools/diff.py names it, a space, the reason.
 Packages/Kiln/Examples/AppleIntelligence/expense.md The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.
+fixtures/apps/network.swift Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.

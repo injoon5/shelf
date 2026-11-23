@@ -1,8 +1,8 @@
-// Shelf's `DB` helper, as `SourceRewriter` appends it to an app that uses
-// `DB.` (Shelf/Data/Prelude.swift). KilnBench answers its `db://` requests
-// in memory, through `Kiln.hostRequestHandler`, so they need no `await`.
-// It goes away when `DB` becomes a host bridge (PLAN.md §1.7); then
-// KilnBench registers that bridge instead.
+// Shelf's `DB` helper from before PLAN.md §1.7, which `SourceRewriter`
+// appended to an app that used `DB.`. Since §1.7 `DB` is a host bridge, and
+// KilnBench and KilnDiff register one; this is kept for Tools/diff.sh's
+// baseline engine (built with -DKILN_BASELINE), whose `db://` requests
+// KilnDiff answers in memory through `Kiln.hostRequestHandler`.
 enum DB {
     static func load(_ key: String) -> Data? {
         guard let (data, response) = try? URLSession.shared.data(for: DB.request(key, "GET")),

@@ -37,6 +37,7 @@ final class KDataTask {
     let request: URLRequest
     let completion: KFunction?
     var task: URLSessionDataTask?
+    var started = false
     init(request: URLRequest, completion: KFunction?) {
         self.request = request
         self.completion = completion
@@ -67,20 +68,13 @@ extension KBuiltins {
 
     /// `try await URLSession.shared.data(from: url)` (or `for:`): a
     /// suspension the calling task waits on, so the main thread never blocks.
-    /// A request the host answers itself (`Kiln.hostRequestHandler`, Shelf's
-    /// `db://`) comes back at once, without waiting, even where code can't wait.
-    /// A headless run (`validate`) never touches the network: the request
-    /// fails at once, as it would offline.
+    /// A check (`validate`, a stub context) never touches the network: the
+    /// request fails at once, as it would offline.
     @MainActor static func fetch(_ request: URLRequest, _ interp: KInterpreter, _ line: Int) throws -> KV {
-        if let handler = Kiln.hostRequestHandler, let reply = handler(request) {
-            let url = request.url ?? URL(string: "about:blank")!
-            let response = HTTPURLResponse(url: url, statusCode: reply.statusCode, httpVersion: "HTTP/1.1", headerFields: nil)
-            return fetched(reply.body ?? Data(), response ?? URLResponse())
-        }
+        let offline = { () throws -> KV in throw KEThrown(value: errorValue(URLError(.notConnectedToInternet).localizedDescription)) }
+        if interp.context.isStub { return .suspension(KSuspension.done(Result { try offline() })) }
         let req = KUnsafeSendable(request)
-        return .suspension(KSuspension.async(headless: {
-            throw KEThrown(value: errorValue(URLError(.notConnectedToInternet).localizedDescription))
-        }) {
+        return .suspension(KSuspension.async(headless: offline) {
             let (data, response) = try await URLSession.shared.data(for: req.value)
             return fetched(data, response)
         })

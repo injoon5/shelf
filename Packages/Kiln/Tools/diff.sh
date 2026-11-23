@@ -29,7 +29,7 @@ cp "$KILN/Sources/Kiln/Engine/KETranscript.swift" "$WORK/Kiln/Sources/Kiln/Engin
 mkdir -p "$WORK/Kiln/Tools/KilnDiff/Sources/KilnDiff"
 cp "$KILN/Tools/KilnDiff/Package.swift" "$WORK/Kiln/Tools/KilnDiff/"
 cp "$KILN/Tools/KilnDiff/Sources/KilnDiff/main.swift" "$WORK/Kiln/Tools/KilnDiff/Sources/KilnDiff/"
-(cd "$WORK/Kiln/Tools/KilnDiff" && swift build -c release 2>&1 | grep -E "error:" || true)
+(cd "$WORK/Kiln/Tools/KilnDiff" && swift build -c release -Xswiftc -DKILN_BASELINE 2>&1 | grep -E "error:" || true)
 
 echo "== this engine"
 (cd "$KILN/Tools/KilnDiff" && swift build -c release 2>&1 | grep -E "error:" || true)

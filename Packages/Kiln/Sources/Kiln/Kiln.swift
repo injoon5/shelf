@@ -45,25 +45,44 @@ public enum Kiln {
     /// returns a SwiftUI `Image` (not a UIImage) so Kiln stays platform-neutral.
     @MainActor public static var hostImageProvider: ((String) -> Image?)?
 
-    /// Requests the host answers itself, at once, on the main actor, before
-    /// `URLSession.shared.data(from:)`/`data(for:)` in the app's code go to the
-    /// network: Shelf's `db://` store. Return nil to let a request through.
-    /// Because the answer is immediate, the app gets it without waiting, even
-    /// in code that can't wait.
-    ///
-    /// Temporary: PLAN.md §1.7 replaces it with a `DB` host bridge.
-    @MainActor public static var hostRequestHandler: ((URLRequest) -> KilnHostResponse?)?
-
     /// Parse, evaluate, and render a Swift source string. Returns a
     /// `KilnResult` containing the rendered view (when the source produced
     /// one), any `print(...)` output, and any errors raised during parsing
     /// or evaluation.
     ///
+    /// Runs with a context of its own (`KilnContext.standard()`): an app
+    /// called "App" with its own defaults and folder. A host running more
+    /// than one app gives each run its context with `run(_:context:)`.
+    ///
     /// Safe to call from the main actor on any iOS 17+ / macOS 14+ device.
     /// No compilation step is involved — this is pure interpretation.
     @MainActor
     public static func run(_ code: String) -> KilnResult {
-        KilnEngine.run(code)
+        KilnEngine.run(KilnParsedSource(code), context: .standard())
+    }
+
+    /// Runs `code` as one app, with its own defaults, folder, capability
+    /// gate, teardown and error channel (PLAN.md §1.7). Tear the run down
+    /// (`KilnResult.tearDown()` or `context.tearDown()`) when its screen closes.
+    @MainActor
+    public static func run(_ code: String, context: KilnContext) -> KilnResult {
+        KilnEngine.run(KilnParsedSource(code), context: context)
+    }
+
+    /// Runs source already parsed off the main thread (`parse`). The rest
+    /// of building, declaring the app's types and running its globals, is
+    /// on the main actor.
+    @MainActor
+    public static func run(_ parsed: KilnParsedSource, context: KilnContext) -> KilnResult {
+        KilnEngine.run(parsed, context: context)
+    }
+
+    /// Parses `code` on whatever thread calls it, so a host can start before
+    /// the app's screen is up (Shelf parses when a finger lands on the icon)
+    /// and hand the result to `run(_:context:)` on the main actor. Each
+    /// parse is for one run.
+    public static func parse(_ code: String) -> KilnParsedSource {
+        KilnParsedSource(code)
     }
 
     /// Seeds `shuffled()`, `randomElement()`, `Int.random(in:)` and friends in
@@ -91,9 +110,13 @@ public enum Kiln {
     ///     so an infinite loop becomes a reported error instead of a hang.
     /// - Returns: a `KilnValidation` with parse + runtime errors, soft warnings,
     ///   and whether visible content was produced.
+    ///   - context: what the check runs with: by default a stub
+    ///     (`KilnContext.stub()`), so firing every action touches no sensor,
+    ///     no real file or setting, and asks nobody for permission.
     @MainActor
-    public static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000) -> KilnValidation {
-        KilnEngine.validate(code, ticks: ticks, fuel: fuel)
+    public static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000,
+                                context: KilnContext? = nil) -> KilnValidation {
+        KilnEngine.validate(code, ticks: ticks, fuel: fuel, context: context ?? .stub())
     }
 
     /// The Swift a chat reply contains, ready to run: every ```swift block in
@@ -171,14 +194,24 @@ public enum Kiln {
     public static let version: String = "0.2.1"
 }
 
-/// A request the host answered (`Kiln.hostRequestHandler`).
-public struct KilnHostResponse {
-    public var statusCode: Int
-    public var body: Data?
-    public init(statusCode: Int, body: Data? = nil) {
-        self.statusCode = statusCode
-        self.body = body
+/// Source parsed for one run (`Kiln.parse`), ready for `Kiln.run(_:context:)`.
+/// Made on any thread; the parse is never changed after, so it can cross to
+/// the main actor.
+public struct KilnParsedSource: @unchecked Sendable {
+    let source: String
+    let program: Result<KEProgram, KESyntaxError>
+
+    init(_ source: String) {
+        self.source = source
+        do { program = .success(try KEParser.parse(source)) } catch let e as KESyntaxError {
+            program = .failure(e)
+        } catch {
+            program = .failure(KESyntaxError(message: "\(error)", line: 0, col: 0))
+        }
     }
+
+    /// Whether it parsed.
+    public var parsed: Bool { if case .success = program { return true }; return false }
 }
 
 // MARK: - Validation result
@@ -235,11 +268,18 @@ public struct KilnResult {
     /// The run behind `view`, for `tearDown` and `activeTaskCount`.
     var interp: KInterpreter?
 
+    /// The context the run had (`Kiln.run(_:context:)`).
+    public internal(set) var context: KilnContext?
+
     /// Stops the run: cancels every task the app started (`Task {}`,
-    /// `.task {}`, `async let`, task groups), invalidates its timers, and runs
-    /// none of its code again: no timer, delayed block or callback. For when
-    /// the app's screen closes (PLAN.md §1.7). Safe to call more than once.
-    @MainActor public func tearDown() { interp?.tearDown() }
+    /// `.task {}`, `async let`, task groups), invalidates its timers, stops
+    /// everything bridges registered with the context (`onTearDown`), and
+    /// runs none of its code again: no timer, delayed block or callback. For
+    /// when the app's screen closes (PLAN.md §1.7). Safe to call more than once.
+    @MainActor public func tearDown() {
+        interp?.tearDown()
+        context?.tearDown()
+    }
 
     /// Tasks the app has started that haven't ended.
     @MainActor public var activeTaskCount: Int { interp?.activeTaskCount ?? 0 }

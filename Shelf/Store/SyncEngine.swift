@@ -25,7 +25,9 @@ actor SyncEngine {
 
     private let cache: AppCache
     private let api: @Sendable () -> API?
-    private let appStorage: AppStorageKeys
+    /// Each app's settings and folder, which a sign-out clears.
+    private let defaults: AppDefaults
+    private let files: AppFiles
     /// What a deleted app leaves on the phone, and how to remove it.
     private let cleanup: AppCleanup
     /// Queued deletions the server refused for good since the last `takeRefusals`.
@@ -38,15 +40,16 @@ actor SyncEngine {
     /// Bumped by `reset`, so work begun before a sign-out writes nothing after it.
     private var generation = 0
 
-    /// `api` returns nil while signed out. `appStorage` is where Kiln keeps
-    /// apps' `@AppStorage`; tests pass their own suite. `cleanup` removes a
-    /// deleted app; without one, it's the source and `@AppStorage` only.
-    init(cache: AppCache, api: @escaping @Sendable () -> API?, appStorage: AppStorageKeys = AppStorageKeys(.standard),
-         cleanup: AppCleanup? = nil) {
+    /// `api` returns nil while signed out. `defaults` and `files` are each
+    /// app's settings and folder; tests pass their own. `cleanup` removes a
+    /// deleted app; without one, it's the source, settings and folder only.
+    init(cache: AppCache, api: @escaping @Sendable () -> API?, defaults: AppDefaults = .standard,
+         files: AppFiles = .standard, cleanup: AppCleanup? = nil) {
         self.cache = cache
         self.api = api
-        self.appStorage = appStorage
-        self.cleanup = cleanup ?? .library(cache: cache, appStorage: appStorage)
+        self.defaults = defaults
+        self.files = files
+        self.cleanup = cleanup ?? .library(cache: cache, defaults: defaults, files: files)
     }
 
     /// One full sync. Returns the index as written.
@@ -119,11 +122,12 @@ actor SyncEngine {
         refusals = []
     }
 
-    /// Sign Out: the cache, and every app's `@AppStorage` keys.
+    /// Sign Out: the cache, and every app's settings and files.
     func reset() {
         abandon()
         cache.removeAll()
-        appStorage.removeAll()
+        defaults.removeAll()
+        files.removeAll()
     }
 
     // MARK: Queue

@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**50 inputs: 49 identical, 1 different as expected, 0 different otherwise.**
+**53 inputs: 51 identical, 2 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -22,7 +22,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/LibraryApp.swift | 64 | 2 | identical |
 | fixtures/apps/async.swift | 283 | 14 | identical |
 | fixtures/apps/images.swift | 663 | 13 | identical |
-| fixtures/apps/network.swift | 211 | 14 | identical |
+| fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
 | fixtures/apps/state.swift | 599 | 13 | identical |
 | fixtures/apps/swift-language.swift | 1213 | 13 | identical |
@@ -39,6 +39,9 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/AppTypesRepro-2.swift | 234 | 13 | identical |
 | tests/AppTypesRepro-3.swift | 327 | 13 | identical |
 | tests/BreakoutRepro-0.swift | 8 | 2 | identical |
+| tests/ContextTests-0.swift | 2 | 1 | identical |
+| tests/ContextTests-4.swift | 9 | 2 | identical |
+| tests/ContextTests-8.swift | 6 | 1 | identical |
 | tests/KilnEngineTests-0.swift | 5 | 1 | identical |
 | tests/KilnEngineTests-1.swift | 6 | 1 | identical |
 | tests/KilnEngineTests-2.swift | 9 | 1 | identical |
@@ -180,5 +183,131 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
            Text(_literal: "New Expense")
 -          TextField("Category", text: $"")
 -            .textFieldStyle(.roundedBorder)
+…
+```
+
+## fixtures/apps/network.swift
+
+```diff
+--- before
++++ after
+@@ -17,195 +17,247 @@
+ == appeared (List.onAppear@88)
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.onSubmit@86
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.refreshable@87
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.onSubmit@86
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.refreshable@87
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.onSubmit@86
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.refreshable@87
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
+-      .onSubmit(of: .search, {fn})
+-      .refreshable({fn})
+-      .onAppear({fn})
+-== after List.onSubmit@86
+-ContentView {launches=[], rocket=nil, loading=true, message=nil, query="falcon"}
+-  NavigationStack({fn})
+-    List({fn})
+-      If false
+-      If false
+-      Section("Launches", {fn})
+-        If true
+-          ProgressView()
+-        ForEach([], {fn})
+-      .navigationTitle("Launches")
+-      .searchable(text: $"falcon")
 …
 ```

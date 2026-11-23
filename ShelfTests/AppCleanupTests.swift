@@ -8,14 +8,15 @@ struct AppCleanupTests {
         let folder = temporaryFolder()
         let cleanup = AppCleanup.library(
             cache: AppCache(root: folder.appending(path: "apps")),
-            appStorage: AppStorageKeys(.standard),
+            defaults: AppDefaults(legacy: .standard, prefix: "shelf-tests.\(UUID().uuidString)."),
+            files: AppFiles(root: folder.appending(path: "files")),
             data: AppData(root: folder.appending(path: "data"), api: { nil }),
             snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")),
             permissions: .inMemory())
-        #expect(cleanup.steps.map(\.name) == ["source", "@AppStorage", "DB store", "launch snapshot", "permission grants"])
+        #expect(cleanup.steps.map(\.name) == ["source", "settings suite", "files folder", "DB store", "launch snapshot", "permission grants"])
 
-        let bare = AppCleanup.library(cache: AppCache(root: folder), appStorage: AppStorageKeys(.standard))
-        #expect(bare.steps.map(\.name) == ["source", "@AppStorage"])
+        let bare = AppCleanup.library(cache: AppCache(root: folder), defaults: .standard, files: AppFiles(root: folder))
+        #expect(bare.steps.map(\.name) == ["source", "settings suite", "files folder"])
     }
 
     /// Where a later feature plugs in: its step runs with the rest, in order.
@@ -37,13 +38,20 @@ struct AppCleanupTests {
         let cache = AppCache(root: folder.appending(path: "apps"))
         let data = AppData(root: folder.appending(path: "data"), api: { nil })
         let snapshots = LaunchSnapshots(root: folder.appending(path: "Snapshots"))
-        let cleanup = AppCleanup.library(cache: cache, appStorage: AppStorageKeys(defaults), data: data, snapshots: snapshots)
+        let appDefaults = AppDefaults(legacy: defaults, prefix: suite + ".app.")
+        defer { appDefaults.removeAll() }
+        let files = AppFiles(root: folder.appending(path: "files"))
+        let cleanup = AppCleanup.library(cache: cache, defaults: appDefaults, files: files, data: data, snapshots: snapshots)
 
         for slug in ["habits", "habits-2"] {
             try cache.writeSource("// \(slug)", for: slug)
             let session = await data.open(slug, pullTimeout: .zero)
             try session.write(.string("x"), for: "k")
             await data.close(session)
+            defaults.set(1, forKey: "kiln.app.\(slug).k")
+            appDefaults.suite(for: slug).set(2, forKey: "since-1.7")
+            let documents = try #require(files.kiln(for: slug)).documents
+            try "x".write(to: documents.appending(path: "f.txt"), atomically: true, encoding: .utf8)
             defaults.set(1, forKey: "kiln.app.\(slug).k")
             let snapshot = try #require(snapshots.folder(for: slug))
             try FileManager.default.createDirectory(at: snapshot, withIntermediateDirectories: true)
@@ -55,11 +63,16 @@ struct AppCleanupTests {
         #expect(!cache.hasSource(for: "habits"))
         #expect(await data.usage()["habits"] == nil)
         #expect(defaults.object(forKey: "kiln.app.habits.k") == nil)
+        #expect(UserDefaults(suiteName: appDefaults.suiteName(for: "habits"))!.object(forKey: "since-1.7") == nil)
+        #expect(UserDefaults(suiteName: appDefaults.suiteName(for: "habits"))!.object(forKey: "k") == nil)
+        #expect(!FileManager.default.fileExists(atPath: files.folder(for: "habits")!.path(percentEncoded: false)))
         #expect(!FileManager.default.fileExists(atPath: snapshots.folder(for: "habits")!.path(percentEncoded: false)))
 
         #expect(cache.hasSource(for: "habits-2"))
         #expect(await data.usage()["habits-2"] != nil)
         #expect(defaults.integer(forKey: "kiln.app.habits-2.k") == 1)
+        #expect(UserDefaults(suiteName: appDefaults.suiteName(for: "habits-2"))!.integer(forKey: "since-1.7") == 2)
+        #expect(files.usage(of: "habits-2") > 0)
         #expect(FileManager.default.fileExists(atPath: snapshots.folder(for: "habits-2")!.path(percentEncoded: false)))
     }
 
