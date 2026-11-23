@@ -308,7 +308,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -725,7 +725,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -2186,7 +2186,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -2440,7 +2440,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -2569,7 +2569,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -2890,7 +2890,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -3120,7 +3120,7 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -3421,7 +3421,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "With a title, `systemImage:` and `value:`; `role:` is ignored.",
+      "overloadsCovered" : 17,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -6053,9 +6054,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "In `.toolbar { }`, by placement.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -6103,9 +6105,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "In `.toolbar { }`, by placement.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -6485,7 +6488,8 @@
     },
     {
       "family" : "Scenes",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Its content, in the app's card.",
+      "overloadsCovered" : 5,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -7630,9 +7634,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:calendar",
@@ -7655,9 +7659,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:colorScheme",
@@ -7992,9 +7996,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:dismiss",
@@ -8355,7 +8359,8 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always `.compact`.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -8956,9 +8961,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:locale",
@@ -9318,7 +9323,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`wrappedValue.dismiss()`; prefer `dismiss`.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -10209,7 +10215,8 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always `.compact`.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -11221,9 +11228,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.bouncy",
@@ -11259,9 +11266,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.default",
@@ -11286,9 +11293,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.easeIn",
@@ -11323,8 +11330,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.easeInOut",
@@ -11359,9 +11367,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.easeOut",
@@ -11396,9 +11404,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.interactiveSpring",
@@ -11447,9 +11455,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.interpolatingSpring",
@@ -11510,9 +11518,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.linear",
@@ -11547,9 +11555,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.smooth",
@@ -11585,9 +11593,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.snappy",
@@ -11623,9 +11631,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Animation.spring",
@@ -11753,9 +11761,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.identity",
@@ -11807,9 +11815,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.move",
@@ -11871,8 +11879,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.opacity",
@@ -11897,9 +11906,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.push",
@@ -11924,9 +11933,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.scale",
@@ -11962,9 +11971,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:AnyTransition.slide",
@@ -11989,9 +11998,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.accentColor",
@@ -12016,9 +12025,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.black",
@@ -12043,9 +12052,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.blue",
@@ -12070,9 +12079,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.brown",
@@ -12097,9 +12106,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.clear",
@@ -12124,9 +12133,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.cyan",
@@ -12151,9 +12160,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.gray",
@@ -12178,9 +12187,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.green",
@@ -12205,9 +12214,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.indigo",
@@ -12232,9 +12241,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.mint",
@@ -12259,9 +12268,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.orange",
@@ -12286,9 +12295,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.pink",
@@ -12313,9 +12322,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.primary",
@@ -12340,9 +12349,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.purple",
@@ -12367,9 +12376,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.red",
@@ -12394,9 +12403,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.secondary",
@@ -12421,9 +12430,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.teal",
@@ -12475,9 +12484,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.white",
@@ -12502,9 +12511,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Color.yellow",
@@ -12680,9 +12689,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.body",
@@ -12707,9 +12716,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.callout",
@@ -12734,9 +12743,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.caption",
@@ -12761,9 +12770,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.caption2",
@@ -12788,7 +12797,6 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -12865,9 +12873,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.footnote",
@@ -12892,9 +12900,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.headline",
@@ -12919,9 +12927,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.largeTitle",
@@ -12946,9 +12954,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.subheadline",
@@ -12973,7 +12981,7 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`size:weight:design:`, or a text style with `design:` and `weight:`.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -13037,9 +13045,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.title",
@@ -13064,9 +13072,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.title2",
@@ -13091,9 +13099,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Font.title3",
@@ -14056,9 +14064,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.background",
@@ -14083,9 +14091,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.bar",
@@ -14110,9 +14118,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.black",
@@ -14163,9 +14171,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.blue",
@@ -14190,9 +14198,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.brown",
@@ -14217,9 +14225,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.clear",
@@ -14308,9 +14316,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.cyan",
@@ -14429,9 +14437,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.foreground",
@@ -14456,9 +14464,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.gray",
@@ -14483,9 +14491,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.green",
@@ -14538,9 +14546,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.indigo",
@@ -14655,9 +14663,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.mint",
@@ -14708,9 +14716,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.orange",
@@ -14735,9 +14743,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.pink",
@@ -14788,9 +14796,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.primary",
@@ -14815,9 +14823,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.purple",
@@ -14842,9 +14850,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.quaternary",
@@ -14963,9 +14971,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.red",
@@ -14990,9 +14998,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.regularMaterial",
@@ -15017,9 +15025,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.secondary",
@@ -15070,9 +15078,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.separator",
@@ -15123,9 +15131,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.teal",
@@ -15150,9 +15158,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.tertiary",
@@ -15177,9 +15185,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.thickMaterial",
@@ -15204,9 +15212,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.thinMaterial",
@@ -15231,9 +15239,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.tint",
@@ -15258,9 +15266,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.ultraThickMaterial",
@@ -15285,9 +15293,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.ultraThinMaterial",
@@ -15312,9 +15320,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.white",
@@ -15365,9 +15373,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ShapeStyle.yellow",
@@ -15392,8 +15400,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.automatic",
@@ -15418,9 +15427,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.bottomBar",
@@ -15445,9 +15454,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.cancellationAction",
@@ -15472,9 +15481,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.confirmationAction",
@@ -15499,9 +15508,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.destructiveAction",
@@ -15526,9 +15535,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.keyboard",
@@ -15631,9 +15640,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.navigationBarLeading",
@@ -15658,9 +15667,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.navigationBarTrailing",
@@ -15685,9 +15694,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.primaryAction",
@@ -15712,9 +15721,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.principal",
@@ -15843,9 +15852,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.topBarLeading",
@@ -15896,9 +15905,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.topBarTrailing",
@@ -15924,7 +15933,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.blurReplace",
@@ -15959,9 +15968,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.identity",
@@ -15986,9 +15995,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.move",
@@ -16050,8 +16059,9 @@
     },
     {
       "family" : "Drawing",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.opacity",
@@ -16102,9 +16112,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.push",
@@ -16129,9 +16139,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.scale",
@@ -16167,9 +16177,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.slide",
@@ -16195,7 +16205,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:Transition.symbolEffect",
@@ -16355,9 +16365,8 @@
     },
     {
       "family" : "Chart3D",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 2,
-      "status" : "stub",
+      "status" : "missing",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.symbol",
@@ -16704,7 +16713,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -16864,9 +16872,9 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.cornerRadius",
@@ -16892,9 +16900,9 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.foregroundStyle",
@@ -16949,7 +16957,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -16976,7 +16983,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -17169,8 +17175,9 @@
     },
     {
       "family" : "Charts",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.position",
@@ -17239,7 +17246,7 @@
     {
       "family" : "Charts",
       "round" : 1,
-      "status" : "missing",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.symbol",
@@ -17295,7 +17302,7 @@
     {
       "family" : "Charts",
       "round" : 1,
-      "status" : "missing",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ChartContent.symbolSize",
@@ -19690,9 +19697,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accentColor",
@@ -20363,7 +20370,6 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -21212,7 +21218,6 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -21319,7 +21324,6 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -21377,9 +21381,9 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityHint",
@@ -21561,9 +21565,9 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityIdentifier",
@@ -21785,9 +21789,9 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 12,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityLabel",
@@ -22718,7 +22722,6 @@
     },
     {
       "family" : "Accessibility",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -22999,7 +23002,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Buttons and a message; or the old `Alert(title:message:dismissButton:)`, shown with one OK button.",
+      "overloadsCovered" : 14,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -23475,9 +23479,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:allowsHitTesting",
@@ -23589,9 +23593,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:animation",
@@ -23647,9 +23651,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:antialiased",
@@ -23812,9 +23815,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:aspectRatio",
@@ -23980,9 +23983,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:autocorrectionDisabled",
@@ -24031,9 +24034,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:background",
@@ -24247,9 +24250,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:badge",
@@ -24338,7 +24341,8 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "On a `Text`.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -24374,9 +24378,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always `.normal`.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:blendMode",
@@ -24400,9 +24404,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:blur",
@@ -24427,9 +24431,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:bold",
@@ -24473,9 +24477,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:border",
@@ -24500,9 +24504,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:brightness",
@@ -24526,9 +24530,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:buttonBorderShape",
@@ -24602,7 +24606,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -24723,7 +24727,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -24750,7 +24753,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -24866,7 +24868,8 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.hidden` hides it; content isn't customized yet.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -24994,7 +24997,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -25021,7 +25023,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -25350,7 +25351,8 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.hidden` hides it; content isn't customized yet.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -25478,7 +25480,6 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -25598,7 +25599,8 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.hidden` hides it; content isn't customized yet.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -25726,7 +25728,8 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`domain:` as a numeric range.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -26019,9 +26022,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:clipShape",
@@ -26046,9 +26049,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:clipped",
@@ -26099,9 +26102,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:colorInvert",
@@ -26125,9 +26128,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:colorMultiply",
@@ -26151,7 +26154,6 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -26177,9 +26179,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:compositingGroup",
@@ -26203,7 +26205,7 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -26790,9 +26792,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:contentShape",
@@ -26866,7 +26868,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.numericText()`; anything else cross-fades.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -26892,7 +26895,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Its menu items; `preview:` isn't shown.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -26951,9 +26955,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:contrast",
@@ -27002,9 +27006,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:controlSize",
@@ -27098,9 +27102,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:cornerRadius",
@@ -27229,7 +27233,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -27367,7 +27371,6 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -27598,9 +27601,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:disabled",
@@ -28142,9 +28145,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:drawingGroup",
@@ -28244,7 +28247,6 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -28280,9 +28282,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:edgesIgnoringSafeArea",
@@ -28306,7 +28308,8 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`\\.colorScheme` only.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -28343,9 +28346,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:environmentObject",
@@ -28963,9 +28966,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fill",
@@ -29061,9 +29064,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fixedSize",
@@ -29184,7 +29187,7 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted; `@FocusState` doesn't move the keyboard focus yet.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -29387,9 +29390,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:font",
@@ -29423,9 +29426,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fontDesign",
@@ -29459,9 +29462,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fontWeight",
@@ -29530,9 +29533,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:foregroundColor",
@@ -29566,9 +29569,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:foregroundStyle",
@@ -29650,9 +29653,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:frame",
@@ -29704,9 +29707,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:fullScreenCover",
@@ -29744,7 +29747,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -29795,7 +29798,7 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted, but no gesture runs yet.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -29958,9 +29961,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:grayscale",
@@ -30198,7 +30201,6 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -30224,7 +30226,6 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -30280,9 +30281,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:hidden",
@@ -30306,7 +30307,7 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted, but no gesture runs yet.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -30428,9 +30429,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:hueRotation",
@@ -30454,9 +30455,9 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:id",
@@ -30480,9 +30481,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ignoresSafeArea",
@@ -30519,9 +30520,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:imageScale",
@@ -30595,9 +30596,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Accepted on a shape, with no effect yet.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:inset",
@@ -30709,7 +30710,6 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -30735,9 +30735,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:interpolation",
@@ -30812,9 +30811,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:italic",
@@ -30883,9 +30882,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:kerning",
@@ -30977,9 +30976,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:keyboardType",
@@ -31094,9 +31093,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:labelStyle",
@@ -31248,9 +31247,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:layoutPriority",
@@ -31351,9 +31350,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:lineLimit",
@@ -31418,9 +31417,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:lineSpacing",
@@ -31505,9 +31504,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:listRowBackground",
@@ -31531,7 +31530,8 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always zero insets.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -31568,7 +31568,7 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -31697,7 +31697,6 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -31785,7 +31784,7 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -31856,7 +31855,6 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -32249,9 +32247,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:mask",
@@ -32478,9 +32476,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:minimumScaleFactor",
@@ -32582,9 +32580,10 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Your own `ViewModifier` structs: `body(content:)` runs with the view.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:modifier",
@@ -32608,9 +32607,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:monospaced",
@@ -32644,9 +32643,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:monospacedDigit",
@@ -32705,9 +32704,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:multilineTextAlignment",
@@ -32819,9 +32818,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationBarBackButtonHidden",
@@ -32845,7 +32844,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Hides the back button only.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -32995,9 +32995,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationBarTitleDisplayMode",
@@ -33021,7 +33021,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`for:` with any type the links push, and `isPresented:`.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -33292,9 +33293,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationTitle",
@@ -33446,9 +33447,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:offset",
@@ -33540,9 +33541,9 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onAppear",
@@ -33755,9 +33756,9 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onChange",
@@ -33869,9 +33870,10 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "On a `ForEach` in a `List`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onDelete",
@@ -33895,9 +33897,9 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onDisappear",
@@ -34157,7 +34159,6 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -34369,9 +34370,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onLongPressGesture",
@@ -34462,9 +34463,10 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "On a `ForEach` in a `List`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onMove",
@@ -34599,7 +34601,8 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Timer publishers only: `Timer.publish(every:on:in:).autoconnect()`.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -34741,9 +34744,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onSubmit",
@@ -34768,9 +34771,9 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:onTapGesture",
@@ -34832,9 +34835,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:opacity",
@@ -34858,9 +34861,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:overlay",
@@ -35005,9 +35008,10 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "A length, edges, edges and a length, or `EdgeInsets`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:padding",
@@ -35637,7 +35641,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -35663,7 +35667,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Shown as a sheet.",
+      "overloadsCovered" : 4,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -35797,9 +35802,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:position",
@@ -35904,9 +35909,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:preferredColorScheme",
@@ -36102,7 +36107,6 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -36128,9 +36132,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationDetents",
@@ -36165,7 +36169,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always visible.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -36376,7 +36381,6 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -36477,9 +36481,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:progressViewStyle",
@@ -36639,7 +36643,6 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -36665,9 +36668,10 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "The spinner stays until the closure, which may wait, is done.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:refreshable",
@@ -36753,9 +36757,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:renderingMode",
@@ -36906,9 +36910,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:resizable",
@@ -36933,9 +36937,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Accepted on a shape, with no effect yet.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:rotation",
@@ -36960,9 +36964,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:rotation3DEffect",
@@ -36990,9 +36994,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:rotationEffect",
@@ -37058,7 +37062,8 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.top` and `.bottom`.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -37146,9 +37151,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:saturation",
@@ -37172,9 +37177,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Accepted on a shape, with no effect yet.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scale",
@@ -37211,9 +37216,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scaleEffect",
@@ -37261,9 +37266,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scaledToFill",
@@ -37287,9 +37292,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scaledToFit",
@@ -37426,9 +37431,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollContentBackground",
@@ -37477,7 +37482,6 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -37555,9 +37559,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:scrollIndicators",
@@ -37680,7 +37684,6 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -37706,7 +37709,6 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -38017,7 +38019,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`text:` and `prompt:`.",
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -38613,7 +38616,7 @@
     },
     {
       "family" : "Haptics",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted; no feedback is played yet.",
       "round" : 2,
       "status" : "stub",
       "symbol" : {
@@ -38674,9 +38677,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:shadow",
@@ -38703,9 +38706,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:sheet",
@@ -38793,7 +38796,7 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted, but no gesture runs yet.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -39369,9 +39372,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:strikethrough",
@@ -39420,9 +39423,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:stroke",
@@ -39502,9 +39505,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:strokeBorder",
@@ -39588,7 +39591,8 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Always `.done`.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -40137,7 +40141,8 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "On `List` rows.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -40238,7 +40243,7 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
+      "notes" : "Accepted; the symbol doesn't animate yet.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -40303,9 +40308,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:symbolRenderingMode",
@@ -40450,9 +40455,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabItem",
@@ -40712,9 +40717,10 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Read by `Picker` and `TabView`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tag",
@@ -40749,9 +40755,10 @@
     },
     {
       "family" : "Core",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Cancelled when the view goes away, and restarted when `id` changes.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:task",
@@ -40848,9 +40855,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textCase",
@@ -40874,7 +40881,6 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -40925,9 +40931,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textFieldStyle",
@@ -40951,9 +40957,9 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textInputAutocapitalization",
@@ -41090,9 +41096,9 @@
     },
     {
       "family" : "Sharing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:textSelection",
@@ -41166,9 +41172,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tint",
@@ -41202,9 +41208,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toggleStyle",
@@ -41228,7 +41234,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Items by placement; `.toolbar(.hidden)` isn't supported.",
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -41296,7 +41303,6 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -41360,7 +41366,6 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: accepted, but 0.2.1 ignores it.",
       "round" : 1,
       "status" : "stub",
       "symbol" : {
@@ -41641,9 +41646,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tracking",
@@ -41879,9 +41884,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:transition",
@@ -41995,9 +42000,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:trim",
@@ -42022,9 +42027,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:truncationMode",
@@ -42162,9 +42167,9 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:underline",
@@ -42708,9 +42713,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:zIndex",
@@ -42766,8 +42771,9 @@
     },
     {
       "family" : "Core",
+      "notes" : "Kiln shows its `WindowGroup`'s content.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:App",
@@ -43039,7 +43045,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:InsettableShape",
@@ -43246,8 +43252,9 @@
     },
     {
       "family" : "Drawing",
+      "notes" : "`path(in:)` runs whenever SwiftUI draws it.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:Shape",
@@ -43438,8 +43445,9 @@
     },
     {
       "family" : "Core",
+      "notes" : "Each of your views is hosted by a real SwiftUI view that owns its `@State`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:View",
@@ -43454,8 +43462,9 @@
     },
     {
       "family" : "Core",
+      "notes" : "Applied with `.modifier(…)`.",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:ViewModifier",
@@ -43564,8 +43573,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.automatic",
@@ -43590,9 +43600,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.bordered",
@@ -43617,9 +43627,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.borderedProminent",
@@ -43644,9 +43654,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.borderless",
@@ -43733,9 +43743,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ButtonStyle.plain",
@@ -43963,8 +43973,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:DatePickerStyle.automatic",
@@ -43989,9 +44000,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:DatePickerStyle.compact",
@@ -44016,9 +44027,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:DatePickerStyle.graphical",
@@ -44043,9 +44054,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:DatePickerStyle.wheel",
@@ -44174,9 +44185,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:GaugeStyle.accessoryCircular",
@@ -44393,8 +44404,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:LabelStyle.automatic",
@@ -44419,9 +44431,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:LabelStyle.iconOnly",
@@ -44446,9 +44458,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:LabelStyle.titleAndIcon",
@@ -44473,9 +44485,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:LabelStyle.titleOnly",
@@ -44526,8 +44538,9 @@
     },
     {
       "family" : "Lists",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.automatic",
@@ -44552,9 +44565,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.grouped",
@@ -44579,9 +44592,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.inset",
@@ -44606,9 +44619,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.insetGrouped",
@@ -44633,9 +44646,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.plain",
@@ -44660,9 +44673,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ListStyle.sidebar",
@@ -44921,8 +44934,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.automatic",
@@ -44947,9 +44961,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.inline",
@@ -44974,9 +44988,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.menu",
@@ -45001,9 +45015,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.navigationLink",
@@ -45028,9 +45042,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.palette",
@@ -45055,9 +45069,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.segmented",
@@ -45108,9 +45122,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:PickerStyle.wheel",
@@ -45239,8 +45253,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ProgressViewStyle.automatic",
@@ -45265,9 +45280,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ProgressViewStyle.circular",
@@ -45292,9 +45307,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ProgressViewStyle.linear",
@@ -45849,8 +45864,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextFieldStyle.automatic",
@@ -45901,9 +45917,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextFieldStyle.plain",
@@ -45928,9 +45944,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TextFieldStyle.roundedBorder",
@@ -45955,8 +45971,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ToggleStyle.automatic",
@@ -45981,9 +45998,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ToggleStyle.button",
@@ -46008,9 +46025,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:ToggleStyle.switch",
@@ -46035,7 +46052,6 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -46087,7 +46103,7 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.default`, the eases with `duration:`, `.spring(response:dampingFraction:)` or `(duration:bounce:)`, `.bouncy`, `.snappy`, `.smooth`.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -46160,7 +46176,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.identity`.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -46316,7 +46333,7 @@
     {
       "family" : "Layout",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:EdgeInsets",
@@ -46418,7 +46435,6 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -46500,7 +46516,7 @@
     {
       "family" : "Drawing",
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:Gradient",
@@ -46548,7 +46564,6 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -47145,8 +47160,9 @@
     },
     {
       "family" : "Layout",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ScrollViewProxy",
@@ -47407,7 +47423,6 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -47528,8 +47543,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:ToolbarItemPlacement",
@@ -47560,7 +47576,7 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -47810,7 +47826,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Colors only: `stops:` aren't placed.",
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -47944,9 +47961,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:AnyView",
@@ -48097,7 +48114,7 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -48287,9 +48304,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 17,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Button",
@@ -48740,9 +48757,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Draws nothing yet: draw with a custom `Shape` instead.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Canvas",
@@ -48781,9 +48798,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Capsule",
@@ -48806,7 +48823,8 @@
     },
     {
       "family" : "Charts",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Bar, line, point, area, sector and rule marks, by value or by series; the axes and the legend can be hidden.",
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -48931,9 +48949,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Circle",
@@ -48956,7 +48974,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Named and system colors, `Color(red:green:blue:)`, `Color(hue:…)`, `Color(white:)`, hex strings, and `.opacity`.",
+      "overloadsCovered" : 11,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -49099,7 +49118,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -49338,9 +49357,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ContainerRelativeShape",
@@ -49363,9 +49382,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ContentUnavailableView",
@@ -49456,9 +49475,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ControlGroup",
@@ -49596,7 +49615,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`displayedComponents` `.date` and `.hourAndMinute`; an `in:` range isn't enforced.",
+      "overloadsCovered" : 16,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -50062,7 +50082,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -50162,9 +50182,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Divider",
@@ -50859,9 +50879,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:EditButton",
@@ -50900,9 +50920,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Ellipse",
@@ -50925,7 +50945,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Colors only: `stops:` aren't placed.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -50977,9 +50998,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:EmptyView",
@@ -51053,9 +51074,10 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Over arrays, ranges and bindings (`ForEach($items) { $item in }`), by `id:` or `Identifiable`.",
+      "overloadsCovered" : 17,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ForEach",
@@ -51422,9 +51444,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Form",
@@ -51456,7 +51478,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -51537,7 +51559,8 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`proxy.size`.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -51587,7 +51610,7 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -51615,9 +51638,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GridRow",
@@ -51641,9 +51664,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Group",
@@ -51794,9 +51817,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:GroupBox",
@@ -51910,9 +51933,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:HStack",
@@ -51962,7 +51985,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "SF Symbols (`systemName:`), the host's images by name; other assets show a placeholder.",
+      "overloadsCovered" : 6,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -52194,9 +52218,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 10,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Label",
@@ -52319,9 +52343,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 10,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LabeledContent",
@@ -52479,9 +52503,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LazyHGrid",
@@ -52508,9 +52532,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LazyHStack",
@@ -52536,9 +52560,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LazyVGrid",
@@ -52565,9 +52589,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LazyVStack",
@@ -52593,7 +52617,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Colors only: `stops:` aren't placed.",
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -52642,9 +52667,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Link",
@@ -52698,7 +52723,8 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Rows, sections, `onDelete` and `onMove`; `selection:` isn't kept.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -53827,9 +53853,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 11,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Menu",
@@ -54352,9 +54378,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 15,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:NavigationLink",
@@ -54656,7 +54682,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Shown as a stack of its sidebar.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -54764,7 +54791,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`path:` isn't kept; push with `NavigationLink(value:)` and `.navigationDestination(for:)`.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -54809,9 +54837,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:NavigationView",
@@ -55430,7 +55458,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`move(to:)`, lines, arcs, curves, rects and ellipses; a `Path` in a body is drawn like a shape.",
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -55913,7 +55942,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Rows are tagged with `.tag`, or by their `ForEach` id.",
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -56591,7 +56621,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -56769,7 +56799,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Colors only: `stops:` aren't placed.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -56873,9 +56904,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Rectangle",
@@ -56949,9 +56980,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:RoundedRectangle",
@@ -57042,9 +57073,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ScrollView",
@@ -57079,9 +57110,10 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`proxy.scrollTo(id, anchor:)`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ScrollViewReader",
@@ -57104,9 +57136,9 @@
     },
     {
       "family" : "Lists",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Section",
@@ -57410,9 +57442,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:SecureField",
@@ -57522,9 +57554,9 @@
     },
     {
       "family" : "Sharing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Shows its label; sharing isn't wired up yet.",
       "round" : 2,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ShareLink",
@@ -58039,7 +58071,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Labels and `onEditingChanged` are accepted but not shown.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -58240,9 +58273,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Spacer",
@@ -58321,9 +58354,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Stepper",
@@ -59240,7 +59273,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Tabs from `.tabItem` or `Tab`.",
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -59747,7 +59781,8 @@
     },
     {
       "family" : "Text",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Strings, `verbatim:`, `format:`, and dates with `style:`. A literal's numbers are formatted as SwiftUI does.",
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -59920,9 +59955,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:TextEditor",
@@ -59965,7 +60000,8 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.",
+      "overloadsCovered" : 14,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -60523,7 +60559,8 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "`.periodic(from:by:)` and `.everyMinute`; the closure gets `context.date`.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -60559,9 +60596,9 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 7,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Toggle",
@@ -60933,9 +60970,9 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:UnevenRoundedRectangle",
@@ -60972,9 +61009,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:VStack",
@@ -61081,9 +61118,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ViewThatFits",
@@ -61140,9 +61177,9 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:ZStack",
@@ -61217,9 +61254,10 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Kept per app.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:AppStorage",
@@ -61476,9 +61514,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Bindable",
@@ -61519,8 +61557,9 @@
     },
     {
       "family" : "Environment",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Binding",
@@ -61590,8 +61629,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "The key paths listed as environment values; not `@Environment(Model.self)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Environment",
@@ -61632,8 +61673,10 @@
     },
     {
       "family" : "Environment",
+      "notes" : "Set with `.environmentObject(_:)`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:EnvironmentObject",
@@ -61725,7 +61768,8 @@
     },
     {
       "family" : "Focus & Keyboard",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Holds a value; it doesn't move the keyboard focus yet.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -61840,9 +61884,8 @@
     },
     {
       "family" : "Gestures",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:GestureState",
@@ -61932,9 +61975,8 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
       "round" : 1,
-      "status" : "partial",
+      "status" : "stub",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Namespace",
@@ -61957,9 +61999,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:ObservedObject",
@@ -62025,7 +62067,8 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Kept while the app is open.",
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -62326,9 +62369,10 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "notes" : "Lives as long as the view, by SwiftUI's own identity rules.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:State",
@@ -62378,9 +62422,9 @@
     },
     {
       "family" : "Environment",
-      "notes" : "Interim: a case exists in the 0.2.1 engine; which overloads work isn't recorded.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:StateObject",
@@ -62446,15 +62490,466 @@
     }
   ],
   "extras" : [
+    "member:Angle.degrees",
+    "member:Angle.radians",
+    "member:Angle.zero",
+    "member:Animation.delay",
+    "member:Animation.repeatCount",
+    "member:Animation.repeatForever",
+    "member:Animation.speed",
+    "member:Array.append",
+    "member:Array.count",
+    "member:Array.description",
+    "member:Array.endIndex",
+    "member:Array.first",
+    "member:Array.indices",
+    "member:Array.insert",
+    "member:Array.isEmpty",
+    "member:Array.last",
+    "member:Array.lazy",
+    "member:Array.move",
+    "member:Array.popLast",
+    "member:Array.remove",
+    "member:Array.removeAll",
+    "member:Array.removeFirst",
+    "member:Array.removeLast",
+    "member:Array.removeSubrange",
+    "member:Array.reverse",
+    "member:Array.shuffle",
+    "member:Array.sort",
+    "member:Array.startIndex",
+    "member:Array.swapAt",
+    "member:AsyncStream.Continuation.finish",
+    "member:AsyncStream.Continuation.onTermination",
+    "member:AsyncStream.Continuation.yield",
+    "member:AsyncStream.makeAsyncIterator",
+    "member:AsyncStream.makeStream",
+    "member:AsyncThrowingStream.makeStream",
+    "member:Binding.constant",
+    "member:Bool.description",
+    "member:Bool.random",
+    "member:Bool.toggle",
+    "member:Bool.toggled",
+    "member:CGPoint.x",
+    "member:CGPoint.y",
+    "member:CGPoint.zero",
+    "member:CGRect.height",
+    "member:CGRect.insetBy",
+    "member:CGRect.maxX",
+    "member:CGRect.maxY",
+    "member:CGRect.midX",
+    "member:CGRect.midY",
+    "member:CGRect.minX",
+    "member:CGRect.minY",
+    "member:CGRect.offsetBy",
+    "member:CGRect.origin",
+    "member:CGRect.size",
+    "member:CGRect.width",
+    "member:CGRect.zero",
+    "member:CGSize.height",
+    "member:CGSize.width",
+    "member:CGSize.zero",
+    "member:Calendar.autoupdatingCurrent",
+    "member:Calendar.component",
+    "member:Calendar.current",
+    "member:Calendar.date",
+    "member:Calendar.dateComponents",
+    "member:Calendar.isDate",
+    "member:Calendar.isDateInToday",
+    "member:Calendar.isDateInTomorrow",
+    "member:Calendar.isDateInWeekend",
+    "member:Calendar.isDateInYesterday",
+    "member:Calendar.startOfDay",
+    "member:CheckedContinuation.resume",
+    "member:Color.description",
+    "member:Color.gradient",
     "member:Color.grey",
+    "member:Color.label",
+    "member:Color.mix",
+    "member:Color.opacity",
+    "member:Color.secondaryLabel",
+    "member:Color.secondarySystemBackground",
+    "member:Color.secondarySystemFill",
+    "member:Color.secondarySystemGroupedBackground",
+    "member:Color.separator",
+    "member:Color.systemBackground",
+    "member:Color.systemBlue",
+    "member:Color.systemBrown",
+    "member:Color.systemCyan",
+    "member:Color.systemFill",
+    "member:Color.systemGray",
+    "member:Color.systemGray2",
+    "member:Color.systemGray3",
+    "member:Color.systemGray4",
+    "member:Color.systemGray5",
+    "member:Color.systemGray6",
+    "member:Color.systemGreen",
+    "member:Color.systemGroupedBackground",
+    "member:Color.systemIndigo",
+    "member:Color.systemMint",
+    "member:Color.systemOrange",
+    "member:Color.systemPink",
+    "member:Color.systemPurple",
+    "member:Color.systemRed",
+    "member:Color.systemTeal",
+    "member:Color.systemYellow",
+    "member:Color.tertiaryLabel",
+    "member:Color.tertiarySystemBackground",
+    "member:Color.tertiarySystemFill",
+    "member:Data.count",
+    "member:Data.isEmpty",
+    "member:Date.addingTimeInterval",
+    "member:Date.compare",
+    "member:Date.description",
+    "member:Date.distance",
+    "member:Date.distantFuture",
+    "member:Date.distantPast",
+    "member:Date.formatted",
+    "member:Date.now",
+    "member:Date.timeIntervalSince",
+    "member:Date.timeIntervalSince1970",
+    "member:Date.timeIntervalSinceNow",
+    "member:Date.timeIntervalSinceReferenceDate",
+    "member:DateFormatter.date",
+    "member:DateFormatter.dateFormat",
+    "member:DateFormatter.dateStyle",
+    "member:DateFormatter.localizedString",
+    "member:DateFormatter.string",
+    "member:DateFormatter.timeStyle",
+    "member:Dictionary.compactMapValues",
+    "member:Dictionary.count",
+    "member:Dictionary.filter",
+    "member:Dictionary.first",
+    "member:Dictionary.isEmpty",
+    "member:Dictionary.keys",
+    "member:Dictionary.mapValues",
+    "member:Dictionary.merge",
+    "member:Dictionary.removeAll",
+    "member:Dictionary.removeValue",
+    "member:Dictionary.updateValue",
+    "member:Dictionary.values",
+    "member:DismissAction.callAsFunction",
+    "member:DispatchQueue.async",
+    "member:DispatchQueue.asyncAfter",
+    "member:DispatchQueue.global",
+    "member:DispatchQueue.main",
+    "member:DispatchQueue.sync",
+    "member:Double.description",
+    "member:Double.greatestFiniteMagnitude",
+    "member:Double.infinity",
+    "member:Double.isFinite",
+    "member:Double.isInfinite",
+    "member:Double.isNaN",
+    "member:Double.isZero",
+    "member:Double.leastNormalMagnitude",
+    "member:Double.magnitude",
+    "member:Double.nan",
+    "member:Double.pi",
+    "member:Double.random",
+    "member:Double.zero",
+    "member:Error.description",
+    "member:Error.localizedDescription",
+    "member:FloatingPoint.clamped",
+    "member:FloatingPoint.description",
+    "member:FloatingPoint.formatted",
+    "member:FloatingPoint.isMultiple",
+    "member:FloatingPoint.remainder",
+    "member:FloatingPoint.rounded",
+    "member:FloatingPoint.squareRoot",
+    "member:FloatingPoint.truncatingRemainder",
+    "member:Font.bold",
+    "member:Font.italic",
+    "member:Font.leading",
+    "member:Font.monospaced",
+    "member:Font.monospacedDigit",
+    "member:Font.smallCaps",
+    "member:Font.weight",
+    "member:Font.width",
+    "member:FormatStyle.grouping",
+    "member:FormatStyle.precision",
+    "member:Foundation.NSLog",
+    "member:Foundation.acos",
+    "member:Foundation.asin",
+    "member:Foundation.atan",
+    "member:Foundation.atan2",
+    "member:Foundation.cbrt",
+    "member:Foundation.ceil",
+    "member:Foundation.cos",
+    "member:Foundation.exp",
+    "member:Foundation.floor",
+    "member:Foundation.fmod",
+    "member:Foundation.hypot",
+    "member:Foundation.log",
+    "member:Foundation.log10",
+    "member:Foundation.log2",
+    "member:Foundation.pow",
+    "member:Foundation.round",
+    "member:Foundation.sin",
+    "member:Foundation.sqrt",
+    "member:Foundation.tan",
+    "member:Foundation.trunc",
+    "member:HTTPURLResponse.statusCode",
+    "member:HTTPURLResponse.url",
+    "member:IndexSet.contains",
+    "member:IndexSet.count",
+    "member:IndexSet.first",
+    "member:IndexSet.map",
+    "member:Int.advanced",
+    "member:Int.clamped",
+    "member:Int.description",
+    "member:Int.distance",
+    "member:Int.formatted",
+    "member:Int.isMultiple",
+    "member:Int.isZero",
+    "member:Int.magnitude",
+    "member:Int.max",
+    "member:Int.min",
+    "member:Int.quotientAndRemainder",
+    "member:Int.random",
+    "member:Int.signum",
+    "member:Int.zero",
+    "member:JSONDecoder.dateDecodingStrategy",
+    "member:JSONDecoder.decode",
+    "member:JSONDecoder.keyDecodingStrategy",
+    "member:JSONEncoder.dateEncodingStrategy",
+    "member:JSONEncoder.encode",
+    "member:JSONEncoder.keyEncodingStrategy",
+    "member:JSONEncoder.outputFormatting",
+    "member:Locale.current",
+    "member:Locale.identifier",
+    "member:MainActor.run",
+    "member:NumberFormatter.currencyCode",
+    "member:NumberFormatter.localizedString",
+    "member:NumberFormatter.maximumFractionDigits",
+    "member:NumberFormatter.minimumFractionDigits",
+    "member:NumberFormatter.numberStyle",
+    "member:NumberFormatter.string",
+    "member:Path.addArc",
+    "member:Path.addCurve",
+    "member:Path.addEllipse",
+    "member:Path.addLine",
+    "member:Path.addLines",
+    "member:Path.addPath",
+    "member:Path.addQuadCurve",
+    "member:Path.addRect",
+    "member:Path.addRoundedRect",
+    "member:Path.closeSubpath",
+    "member:Path.move",
+    "member:Range.clamped",
+    "member:Range.contains",
+    "member:Range.count",
+    "member:Range.first",
+    "member:Range.isEmpty",
+    "member:Range.last",
+    "member:Range.lowerBound",
+    "member:Range.upperBound",
+    "member:RelativeDateTimeFormatter.localizedString",
+    "member:ScrollViewProxy.scrollTo",
+    "member:Sequence.allSatisfy",
+    "member:Sequence.chunked",
+    "member:Sequence.compactMap",
+    "member:Sequence.contains",
+    "member:Sequence.count",
+    "member:Sequence.dropFirst",
+    "member:Sequence.dropLast",
+    "member:Sequence.elementsEqual",
+    "member:Sequence.enumerated",
+    "member:Sequence.filter",
+    "member:Sequence.first",
+    "member:Sequence.firstIndex",
+    "member:Sequence.flatMap",
+    "member:Sequence.forEach",
+    "member:Sequence.index",
+    "member:Sequence.isEmpty",
+    "member:Sequence.joined",
+    "member:Sequence.last",
+    "member:Sequence.lastIndex",
+    "member:Sequence.makeIterator",
+    "member:Sequence.map",
+    "member:Sequence.max",
+    "member:Sequence.min",
+    "member:Sequence.prefix",
+    "member:Sequence.randomElement",
+    "member:Sequence.reduce",
+    "member:Sequence.reversed",
+    "member:Sequence.shuffled",
+    "member:Sequence.sorted",
+    "member:Sequence.split",
+    "member:Sequence.starts",
+    "member:Sequence.suffix",
+    "member:Sequence.sum",
+    "member:Sequence.uniqued",
+    "member:Set.contains",
+    "member:Set.count",
+    "member:Set.first",
+    "member:Set.formIntersection",
+    "member:Set.formUnion",
+    "member:Set.insert",
+    "member:Set.intersection",
+    "member:Set.isDisjoint",
+    "member:Set.isEmpty",
+    "member:Set.isSubset",
+    "member:Set.isSuperset",
+    "member:Set.remove",
+    "member:Set.removeAll",
+    "member:Set.subtract",
+    "member:Set.subtracting",
+    "member:Set.symmetricDifference",
+    "member:Set.union",
     "member:ShapeStyle.accentColor",
     "member:ShapeStyle.grey",
     "member:ShapeStyle.material",
-    "modifier:dragToMove",
+    "member:String.append",
+    "member:String.capitalized",
+    "member:String.components",
+    "member:String.contains",
+    "member:String.count",
+    "member:String.data",
+    "member:String.description",
+    "member:String.dropFirst",
+    "member:String.dropLast",
+    "member:String.endIndex",
+    "member:String.first",
+    "member:String.firstIndex",
+    "member:String.formatted",
+    "member:String.hasPrefix",
+    "member:String.hasSuffix",
+    "member:String.index",
+    "member:String.indices",
+    "member:String.insert",
+    "member:String.isEmpty",
+    "member:String.isLetter",
+    "member:String.isLowercase",
+    "member:String.isNumber",
+    "member:String.isPunctuation",
+    "member:String.isUppercase",
+    "member:String.isWhitespace",
+    "member:String.last",
+    "member:String.localizedCapitalized",
+    "member:String.localizedCaseInsensitiveContains",
+    "member:String.localizedStandardContains",
+    "member:String.lowercased",
+    "member:String.lowercasedContains",
+    "member:String.padding",
+    "member:String.prefix",
+    "member:String.range",
+    "member:String.removeAll",
+    "member:String.removeFirst",
+    "member:String.removeLast",
+    "member:String.replacingOccurrences",
+    "member:String.reversed",
+    "member:String.self",
+    "member:String.split",
+    "member:String.startIndex",
+    "member:String.starts",
+    "member:String.suffix",
+    "member:String.trimmingCharacters",
+    "member:String.unicodeScalars",
+    "member:String.uppercased",
+    "member:String.utf8",
+    "member:String.wholeNumberValue",
+    "member:Swift.abs",
+    "member:Swift.assert",
+    "member:Swift.assertionFailure",
+    "member:Swift.debugPrint",
+    "member:Swift.fatalError",
+    "member:Swift.max",
+    "member:Swift.min",
+    "member:Swift.precondition",
+    "member:Swift.preconditionFailure",
+    "member:Swift.print",
+    "member:Swift.repeatElement",
+    "member:Swift.stride",
+    "member:Swift.swap",
+    "member:Swift.type",
+    "member:Swift.withCheckedContinuation",
+    "member:Swift.withCheckedThrowingContinuation",
+    "member:Swift.withDiscardingTaskGroup",
+    "member:Swift.withTaskCancellationHandler",
+    "member:Swift.withTaskGroup",
+    "member:Swift.withThrowingDiscardingTaskGroup",
+    "member:Swift.withThrowingTaskGroup",
+    "member:Swift.withUnsafeContinuation",
+    "member:Swift.withUnsafeThrowingContinuation",
+    "member:Swift.zip",
+    "member:SwiftUI.withAnimation",
+    "member:Task.cancel",
+    "member:Task.checkCancellation",
+    "member:Task.currentPriority",
+    "member:Task.detached",
+    "member:Task.isCancelled",
+    "member:Task.result",
+    "member:Task.sleep",
+    "member:Task.value",
+    "member:Task.yield",
+    "member:TaskGroup.addTask",
+    "member:TaskGroup.addTaskUnlessCancelled",
+    "member:TaskGroup.cancelAll",
+    "member:TaskGroup.isCancelled",
+    "member:TaskGroup.isEmpty",
+    "member:TaskGroup.next",
+    "member:TaskGroup.waitForAll",
+    "member:TimeZone.current",
+    "member:Timer.fire",
+    "member:Timer.invalidate",
+    "member:Timer.isValid",
+    "member:Timer.publish",
+    "member:Timer.scheduledTimer",
+    "member:UIScreen.bounds",
+    "member:UIScreen.main",
+    "member:URL.absoluteString",
+    "member:URL.host",
+    "member:URL.lastPathComponent",
+    "member:URLComponents.path",
+    "member:URLComponents.queryItems",
+    "member:URLComponents.string",
+    "member:URLComponents.url",
+    "member:URLQueryItem.name",
+    "member:URLQueryItem.value",
+    "member:URLRequest.httpBody",
+    "member:URLRequest.httpMethod",
+    "member:URLRequest.setValue",
+    "member:URLRequest.url",
+    "member:URLSession.data",
+    "member:URLSession.dataTask",
+    "member:URLSession.shared",
+    "member:URLSessionDataTask.cancel",
+    "member:URLSessionDataTask.resume",
+    "member:UUID.description",
+    "member:UUID.hashValue",
+    "member:UUID.uuidString",
+    "member:UserDefaults.array",
+    "member:UserDefaults.bool",
+    "member:UserDefaults.data",
+    "member:UserDefaults.dictionary",
+    "member:UserDefaults.double",
+    "member:UserDefaults.integer",
+    "member:UserDefaults.object",
+    "member:UserDefaults.removeObject",
+    "member:UserDefaults.set",
+    "member:UserDefaults.standard",
+    "member:UserDefaults.string",
+    "member:UserDefaults.stringArray",
+    "protocol:CaseIterable",
+    "protocol:Codable",
+    "protocol:Comparable",
+    "protocol:CustomStringConvertible",
+    "protocol:Decodable",
+    "protocol:Encodable",
+    "protocol:Equatable",
+    "protocol:Error",
+    "protocol:Hashable",
+    "protocol:Identifiable",
+    "protocol:LocalizedError",
+    "protocol:ObservableObject",
+    "protocol:PreviewProvider",
     "type:Alert",
     "type:Alignment",
     "type:Array",
     "type:ArraySlice",
+    "type:AsyncStream",
+    "type:AsyncStream.Continuation",
+    "type:AsyncThrowingStream",
     "type:Axis",
     "type:Binding",
     "type:Bool",
@@ -62464,6 +62959,7 @@
     "type:CGSize",
     "type:Calendar",
     "type:Character",
+    "type:CheckedContinuation",
     "type:ClosedRange",
     "type:ColorScheme",
     "type:ContentMode",
@@ -62473,11 +62969,16 @@
     "type:DateComponents",
     "type:DateFormatter",
     "type:Dictionary",
+    "type:DismissAction",
     "type:DispatchQueue",
     "type:Double",
     "type:Edge",
+    "type:Error",
     "type:Float",
     "type:Float64",
+    "type:FloatingPoint",
+    "type:FormatStyle",
+    "type:HTTPURLResponse",
     "type:HorizontalAlignment",
     "type:Image.Scale",
     "type:IndexSet",
@@ -62489,20 +62990,25 @@
     "type:JSONDecoder",
     "type:JSONEncoder",
     "type:Locale",
+    "type:MainActor",
     "type:Measurement",
     "type:NSColor",
     "type:NumberFormatter",
     "type:Range",
     "type:RelativeDateTimeFormatter",
+    "type:Sequence",
     "type:Set",
+    "type:ShapeStyle",
     "type:String",
     "type:Substring",
     "type:SymbolRenderingMode",
     "type:Task",
+    "type:TaskGroup",
     "type:TextAlignment",
     "type:TimeInterval",
     "type:TimeZone",
     "type:Timer",
+    "type:Transition",
     "type:UIApplication",
     "type:UIColor",
     "type:UIImpactFeedbackGenerator",
@@ -62515,29 +63021,30 @@
     "type:URLQueryItem",
     "type:URLRequest",
     "type:URLSession",
+    "type:URLSessionDataTask",
     "type:UUID",
+    "type:UnsafeContinuation",
     "type:UserDefaults",
     "type:VerticalAlignment",
     "type:Visibility",
-    "view:PathShape",
-    "view:UserShape"
+    "wrapper:Published"
   ],
   "families" : [
     {
       "family" : "Core",
-      "missing" : 10,
+      "missing" : 7,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 8,
+      "supported" : 11,
       "total" : 25,
       "wontDo" : 7
     },
     {
       "family" : "Controls",
-      "missing" : 85,
+      "missing" : 78,
       "missingNew" : 17,
       "round" : 1,
-      "supported" : 58,
+      "supported" : 65,
       "total" : 143,
       "wontDo" : 0
     },
@@ -62552,46 +63059,46 @@
     },
     {
       "family" : "Layout",
-      "missing" : 57,
+      "missing" : 55,
       "missingNew" : 11,
       "round" : 1,
-      "supported" : 35,
+      "supported" : 37,
       "total" : 92,
       "wontDo" : 0
     },
     {
       "family" : "Lists",
-      "missing" : 46,
+      "missing" : 45,
       "missingNew" : 6,
       "round" : 1,
-      "supported" : 16,
+      "supported" : 17,
       "total" : 62,
       "wontDo" : 0
     },
     {
       "family" : "Navigation",
-      "missing" : 142,
+      "missing" : 140,
       "missingNew" : 33,
       "round" : 1,
-      "supported" : 37,
+      "supported" : 39,
       "total" : 179,
       "wontDo" : 0
     },
     {
       "family" : "Gestures",
-      "missing" : 34,
+      "missing" : 35,
       "missingNew" : 1,
       "round" : 1,
-      "supported" : 5,
+      "supported" : 4,
       "total" : 39,
       "wontDo" : 0
     },
     {
       "family" : "Drawing",
-      "missing" : 130,
+      "missing" : 131,
       "missingNew" : 16,
       "round" : 1,
-      "supported" : 134,
+      "supported" : 133,
       "total" : 269,
       "wontDo" : 5
     },
@@ -62606,10 +63113,10 @@
     },
     {
       "family" : "Environment",
-      "missing" : 58,
+      "missing" : 56,
       "missingNew" : 6,
       "round" : 1,
-      "supported" : 12,
+      "supported" : 14,
       "total" : 70,
       "wontDo" : 0
     },
@@ -62624,10 +63131,10 @@
     },
     {
       "family" : "Charts",
-      "missing" : 55,
+      "missing" : 54,
       "missingNew" : 1,
       "round" : 1,
-      "supported" : 14,
+      "supported" : 15,
       "total" : 69,
       "wontDo" : 0
     },
@@ -62651,10 +63158,10 @@
     },
     {
       "family" : "Sharing",
-      "missing" : 6,
+      "missing" : 7,
       "missingNew" : 3,
       "round" : 2,
-      "supported" : 2,
+      "supported" : 1,
       "total" : 8,
       "wontDo" : 0
     },
@@ -62840,10 +63347,10 @@
     }
   ],
   "manifest" : {
-    "generator" : "coverage/interim-switch-scan",
-    "interim" : true,
-    "path" : "Tools/coverage/kiln-manifest.interim.json",
-    "symbols" : 478
+    "generator" : "kiln-registry",
+    "interim" : false,
+    "path" : "kiln-manifest.json",
+    "symbols" : 969
   },
   "schemaVersion" : 1,
   "sdk" : {

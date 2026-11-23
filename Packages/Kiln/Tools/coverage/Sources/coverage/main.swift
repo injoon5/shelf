@@ -26,7 +26,7 @@ while !args.isEmpty {
 
         Reads the iOS SDK's SwiftUI interfaces and writes Packages/Kiln/COVERAGE.md and
         coverage.json. The manifest is --manifest, else Packages/Kiln/kiln-manifest.json
-        (the registry's export), else an interim one built from the engine's switches.
+        (the registry's export; Tools/manifest.sh writes it).
         """)
         exit(0)
     default:

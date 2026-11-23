@@ -35,6 +35,12 @@ extension NavigationBridges {
                 }
             }
         }
+        // The old API: `.alert(isPresented:) { Alert(title:message:dismissButton:) }`.
+        r.type("Alert", .navigation, notes: "Shown with its title, its message and one OK button.") { t in
+            t.initializer("title:any message:any? dismissButton:any?") { c in .tuple(c.args, c.labels) }
+            t.initializer("title:any message:any? primaryButton:any secondaryButton:any") { c in .tuple(c.args, c.labels) }
+            t.initializer { c in .tuple(c.args, c.labels) }
+        }
         r.modifier("presentationDetents", .navigation) { m in
             m.form("_:any selection:binding?") { c, view in view.presentationDetents(detents(c[0])) }
         }

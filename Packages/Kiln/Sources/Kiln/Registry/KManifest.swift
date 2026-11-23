@@ -45,6 +45,9 @@ struct KManifest: Codable, Equatable {
 }
 
 extension KRegistry {
+    /// Receivers whose modifiers the coverage report keeps apart (`modifier:ChartContent.annotation`).
+    static let contentReceivers: Set<String> = ["ChartContent", "ToolbarContent", "TabContent", "Gesture", "Scene", "Chart3DContent"]
+
     /// The manifest of everything registered: Kiln's own bridges, and the
     /// host's unless `includeHost` is false (the checked-in file has Kiln's).
     func manifest(includeHost: Bool = true) -> KManifest {
@@ -73,7 +76,12 @@ extension KRegistry {
             symbol(b.manifestKind, b.name, owner: b.owner, b, overloads: overloads(b.forms.map(\.overload)))
         }
         for b in modifiers.values where !b.isInternal {
-            symbol("modifier", b.name, owner: b.owner, b, overloads: overloads(b.forms.map(\.overload)))
+            // Forms on content that isn't a view (`ChartContent`) are that receiver's modifier.
+            let byReceiver = Dictionary(grouping: b.forms.map(\.overload)) { o in o.receiver.flatMap { Self.contentReceivers.contains($0) ? $0 : nil } }
+            for (receiver, os) in byReceiver where receiver != nil && receiver != b.owner {
+                symbol("modifier", b.name, owner: receiver, b, overloads: overloads(os))
+            }
+            symbol("modifier", b.name, owner: b.owner, b, overloads: overloads(byReceiver[nil] ?? b.forms.map(\.overload)))
             if let styles = b.styles {
                 for s in styles.names { symbol("style", s, owner: styles.owner, b, overloads: [], support: .full, notes: "") }
             }
@@ -92,6 +100,11 @@ extension KRegistry {
             for (name, ms) in t.methods where t.staticProperties[name] == nil && t.staticMethods[name] == nil && t.properties[name] == nil {
                 symbol("member", name, owner: t.name, t, overloads: overloads(ms.map(\.overload)), notes: ms.first?.overload.notes ?? "")
             }
+        }
+        // Another name for a type (`CGFloat` is `Double` here).
+        for (alias, target) in aliases {
+            guard let t = types[target], !t.isInternal, types[alias] == nil, !hiddenAliases.contains(alias) else { continue }
+            symbol("type", alias, owner: nil, t, overloads: nil, notes: "The same as `\(target)` in Kiln.")
         }
         for f in functions.values {
             symbol("member", f.name, owner: f.owner, f, overloads: overloads(f.forms.map(\.overload)))

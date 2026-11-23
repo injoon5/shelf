@@ -88,6 +88,8 @@ extension DrawingBridges {
         }
         r.modifier("cornerRadius", .drawing) { m in
             m.form("_:number antialiased:bool?") { c, view in view.clipShape(RoundedRectangle(cornerRadius: c.cg(0) ?? 0)) }
+            // On a bar mark: read by the chart.
+            m.form("_:number style:any?", receiver: "ChartContent") { _, view in view }
         }
         r.modifier("clipShape", .drawing) { m in
             m.form("_:any style:any?") { c, view in

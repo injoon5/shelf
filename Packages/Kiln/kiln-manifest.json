@@ -5589,6 +5589,102 @@
       "support" : "full"
     },
     {
+      "family" : "Drawing",
+      "id" : "member:Transition.blurReplace",
+      "kind" : "member",
+      "name" : "blurReplace",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "stub"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.identity",
+      "kind" : "member",
+      "name" : "identity",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.move",
+      "kind" : "member",
+      "name" : "move",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.opacity",
+      "kind" : "member",
+      "name" : "opacity",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.push",
+      "kind" : "member",
+      "name" : "push",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.scale",
+      "kind" : "member",
+      "name" : "scale",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.slide",
+      "kind" : "member",
+      "name" : "slide",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "member:Transition.symbolEffect",
+      "kind" : "member",
+      "name" : "symbolEffect",
+      "overloads" : [
+
+      ],
+      "owner" : "Transition",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "stub"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:UIScreen.bounds",
       "kind" : "member",
@@ -5987,6 +6083,41 @@
       "support" : "stub"
     },
     {
+      "family" : "Drawing",
+      "id" : "modifier:ChartContent.cornerRadius",
+      "kind" : "modifier",
+      "name" : "cornerRadius",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "style"
+          ],
+          "receiver" : "ChartContent"
+        }
+      ],
+      "owner" : "ChartContent",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "modifier:ChartContent.foregroundStyle",
+      "kind" : "modifier",
+      "name" : "foregroundStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "by"
+          ],
+          "receiver" : "ChartContent"
+        }
+      ],
+      "owner" : "ChartContent",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "modifier:ChartContent.interpolationMethod",
       "kind" : "modifier",
@@ -6019,6 +6150,25 @@
       "owner" : "ChartContent",
       "source" : "Sources/Kiln/Charts.swift",
       "support" : "stub"
+    },
+    {
+      "family" : "Layout",
+      "id" : "modifier:ChartContent.position",
+      "kind" : "modifier",
+      "name" : "position",
+      "overloads" : [
+        {
+          "labels" : [
+            "by",
+            "axis",
+            "span"
+          ],
+          "receiver" : "ChartContent"
+        }
+      ],
+      "owner" : "ChartContent",
+      "source" : "Sources/Kiln/Layout.swift",
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -7201,12 +7351,6 @@
             "_",
             "_"
           ]
-        },
-        {
-          "labels" : [
-            "by"
-          ],
-          "receiver" : "ChartContent"
         }
       ],
       "source" : "Sources/Kiln/Effects.swift",
@@ -8207,14 +8351,6 @@
           "labels" : [
             "_"
           ]
-        },
-        {
-          "labels" : [
-            "by",
-            "axis",
-            "span"
-          ],
-          "receiver" : "ChartContent"
         },
         {
           "labels" : [
@@ -9783,6 +9919,32 @@
       "support" : "full"
     },
     {
+      "family" : "Navigation",
+      "id" : "type:Alert",
+      "kind" : "type",
+      "name" : "Alert",
+      "notes" : "Shown with its title, its message and one OK button.",
+      "overloads" : [
+        {
+          "labels" : [
+            "title",
+            "message",
+            "dismissButton"
+          ]
+        },
+        {
+          "labels" : [
+            "title",
+            "message",
+            "primaryButton",
+            "secondaryButton"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Presentations.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Layout",
       "id" : "type:Alignment",
       "kind" : "type",
@@ -9827,6 +9989,15 @@
       "id" : "type:Array",
       "kind" : "type",
       "name" : "Array",
+      "source" : "Sources/Kiln/Collections.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:ArraySlice",
+      "kind" : "type",
+      "name" : "ArraySlice",
+      "notes" : "The same as `Array` in Kiln.",
       "source" : "Sources/Kiln/Collections.swift",
       "support" : "partial"
     },
@@ -9887,6 +10058,15 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "type:CGFloat",
+      "kind" : "type",
+      "name" : "CGFloat",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "type:CGPoint",
       "kind" : "type",
@@ -9920,6 +10100,15 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:Character",
+      "kind" : "type",
+      "name" : "Character",
+      "notes" : "The same as `String` in Kiln.",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Concurrency",
       "id" : "type:CheckedContinuation",
       "kind" : "type",
@@ -9928,6 +10117,15 @@
 
       ],
       "source" : "Sources/Kiln/Concurrency.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:ClosedRange",
+      "kind" : "type",
+      "name" : "ClosedRange",
+      "notes" : "The same as `Range` in Kiln.",
+      "source" : "Sources/Kiln/Collections.swift",
       "support" : "partial"
     },
     {
@@ -9950,6 +10148,15 @@
 
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:ContiguousArray",
+      "kind" : "type",
+      "name" : "ContiguousArray",
+      "notes" : "The same as `Array` in Kiln.",
+      "source" : "Sources/Kiln/Collections.swift",
       "support" : "partial"
     },
     {
@@ -10058,6 +10265,24 @@
     },
     {
       "family" : "Language",
+      "id" : "type:Float",
+      "kind" : "type",
+      "name" : "Float",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Float64",
+      "kind" : "type",
+      "name" : "Float64",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
       "id" : "type:FloatingPoint",
       "kind" : "type",
       "name" : "FloatingPoint",
@@ -10153,6 +10378,42 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "type:Int16",
+      "kind" : "type",
+      "name" : "Int16",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Int32",
+      "kind" : "type",
+      "name" : "Int32",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Int64",
+      "kind" : "type",
+      "name" : "Int64",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:Int8",
+      "kind" : "type",
+      "name" : "Int8",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:JSONDecoder",
       "kind" : "type",
@@ -10199,21 +10460,21 @@
       "support" : "stub"
     },
     {
+      "family" : "Drawing",
+      "id" : "type:NSColor",
+      "kind" : "type",
+      "name" : "NSColor",
+      "notes" : "The same as `Color` in Kiln.",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:NumberFormatter",
       "kind" : "type",
       "name" : "NumberFormatter",
       "notes" : "`numberStyle`, the fraction digits and `currencyCode`; other settings are ignored.",
       "source" : "Sources/Kiln/Dates.swift",
-      "support" : "partial"
-    },
-    {
-      "family" : "Drawing",
-      "id" : "type:Path",
-      "kind" : "type",
-      "name" : "Path",
-      "notes" : "`move(to:)`, lines, arcs, curves, rects and ellipses; a `Path` in a body is drawn like a shape.",
-      "source" : "Sources/Kiln/Shapes.swift",
       "support" : "partial"
     },
     {
@@ -10290,6 +10551,15 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:Substring",
+      "kind" : "type",
+      "name" : "Substring",
+      "notes" : "The same as `String` in Kiln.",
+      "source" : "Sources/Kiln/Strings.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Layout",
       "id" : "type:SymbolRenderingMode",
       "kind" : "type",
@@ -10332,6 +10602,15 @@
       "support" : "partial"
     },
     {
+      "family" : "Language",
+      "id" : "type:TimeInterval",
+      "kind" : "type",
+      "name" : "TimeInterval",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:TimeZone",
       "kind" : "type",
@@ -10359,6 +10638,17 @@
       "support" : "partial"
     },
     {
+      "family" : "Drawing",
+      "id" : "type:Transition",
+      "kind" : "type",
+      "name" : "Transition",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:UIApplication",
       "kind" : "type",
@@ -10368,6 +10658,15 @@
       ],
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "stub"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "type:UIColor",
+      "kind" : "type",
+      "name" : "UIColor",
+      "notes" : "The same as `Color` in Kiln.",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
     },
     {
       "family" : "Haptics",
@@ -10407,6 +10706,15 @@
       "notes" : "Accepted; no feedback is played yet.",
       "source" : "Sources/Kiln/Haptics.swift",
       "support" : "stub"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:UInt",
+      "kind" : "type",
+      "name" : "UInt",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
     },
     {
       "family" : "Foundation",
@@ -10480,6 +10788,15 @@
 
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Concurrency",
+      "id" : "type:UnsafeContinuation",
+      "kind" : "type",
+      "name" : "UnsafeContinuation",
+      "notes" : "The same as `CheckedContinuation` in Kiln.",
+      "source" : "Sources/Kiln/Concurrency.swift",
       "support" : "partial"
     },
     {
@@ -11620,6 +11937,39 @@
       ],
       "source" : "Sources/Kiln/Navigation.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "view:Path",
+      "kind" : "view",
+      "name" : "Path",
+      "notes" : "`move(to:)`, lines, arcs, curves, rects and ellipses; a `Path` in a body is drawn like a shape.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "ellipseIn"
+          ]
+        },
+        {
+          "labels" : [
+            "roundedRect",
+            "cornerRadius",
+            "style"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Shapes.swift",
+      "support" : "partial"
     },
     {
       "family" : "Controls",

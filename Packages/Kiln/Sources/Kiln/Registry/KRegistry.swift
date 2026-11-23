@@ -604,7 +604,13 @@ final class KRegistry {
         contextFree[name] = resolve
     }
 
-    func alias(_ name: String, to target: String) { aliases[name] = target }
+    /// Another name for a type. An engine-only one (`ColorOrStyle`, what a
+    /// shape-style argument is evaluated against) stays out of the manifest.
+    func alias(_ name: String, to target: String, engineOnly: Bool = false) {
+        aliases[name] = target
+        if engineOnly { hiddenAliases.insert(name) }
+    }
+    private(set) var hiddenAliases: Set<String> = []
 
     func addConstant(_ name: String, _ value: @escaping @MainActor (KInterpreter) -> KV) { constants[name] = value }
 

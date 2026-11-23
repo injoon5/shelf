@@ -139,7 +139,7 @@ final class DrawingBridges: KBridgeFamily {
         }
         r.alias("UIColor", to: "Color")
         r.alias("NSColor", to: "Color")
-        r.alias("ColorOrStyle", to: "Color")
+        r.alias("ColorOrStyle", to: "Color", engineOnly: true)
         // A color as a view (a color value in a body).
         r.view("Color", .drawing) { v in
             v.engineOnly()
@@ -238,6 +238,14 @@ final class DrawingBridges: KBridgeFamily {
             return result
         }
 
+        // `Transition` (iOS 17): its members are read by `.transition` as symbols.
+        r.type("Transition", .drawing) { t in
+            t.membersInManifest = true
+            for name in ["opacity", "scale", "slide", "move", "push", "identity", "blurReplace", "symbolEffect"] {
+                t.staticProperty(name, support: name == "blurReplace" || name == "symbolEffect" ? .stub : .full) { _ in .native(.implicit(name, [])) }
+            }
+            t.anyStatic { _, name in .native(.implicit(name, [])) }
+        }
         r.type("AnyTransition", .drawing, notes: "`.opacity`, `.scale`, `.slide`, `.move(edge:)`, `.push(from:)`, `.identity`.") { t in
             t.membersInManifest = true
             for name in ["opacity", "scale", "slide", "move", "push", "identity"] { t.staticProperty(name) { _ in .native(.transition(name, [])) } }

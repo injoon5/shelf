@@ -6,7 +6,7 @@ What Kiln supports, as data. §1.4's bridge registry exports it, and three thing
 - **Shelf's prompt** (§7), which builds its "What works" section from the symbols and their `notes`;
 - **`Kiln.check`** (§1.8), and later a server-side symbol check (PLAN.md, Later).
 
-The registry writes it to `Packages/Kiln/kiln-manifest.json`, and it's checked in. When that file exists, the coverage tool uses it. Until then, the tool builds an **interim** manifest at `Tools/coverage/kiln-manifest.interim.json` (see [The interim manifest](#the-interim-manifest)).
+The registry writes it to `Packages/Kiln/kiln-manifest.json`, and it's checked in. The coverage tool reads it; `Tools/manifest.sh` regenerates it from the registry, and `RegistryTests.testManifestIsCurrent` fails when it's stale.
 
 The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.swift`. This page describes it.
 
@@ -128,19 +128,4 @@ Then delete `Tools/coverage/kiln-manifest.interim.json`, run `Tools/coverage.sh`
 
 ## The interim manifest
 
-`Tools/coverage/kiln-manifest.interim.json` is built by `Tools/coverage/Sources/CoverageKit/InterimManifest.swift`. It reads `Sources/Kiln/Engine/*.swift` as text, without compiling it, and never edits it. It looks at:
-
-| Where | What it becomes |
-|---|---|
-| `KERenderer.primitive`'s cases, `KBuiltins.viewNames` | views, chart marks and toolbar items (resolved against the SDK) |
-| `KModifiers.apply`'s cases, `KERenderer.modified`, `shapeModifier` and `text` | modifiers |
-| `KBuiltins.modifierNames` with no case | modifiers, `stub` (`apply` ignores a name it has no case for) |
-| a case that's only `return view` or `break` | `stub` |
-| nested cases under `case "pickerStyle"`, and `view.xStyle(.member)` calls in a `*Style` case | styles |
-| `KERenderer.shapeStyle`, `KBuiltins.colorNames`, `fontStyles`, `animation`, `font`, `KModifiers.transition`, `KERenderer.placement` | members |
-| `KERenderer.prepare` | property wrappers |
-| `KBuiltins.environmentDefault` | environment values |
-| `KBuiltins.construct`, `staticMember`, `callStatic` | types |
-| `m.name == "…"` inside `KChartPoint` | chart content modifiers |
-
-Everything it finds is `partial`, never `full`: a `case` says the name is handled, not which overloads work. So the interim numbers overstate support. They're the Round 1 baseline all the same, because they're what 0.2.1 has.
+Until §1.4, the coverage tool built a stand-in from the 0.2.1 switch files (`EngineScanner.swift`, `InterimManifest.swift`, `Tools/coverage/kiln-manifest.interim.json`). The registry replaced it: the switch files, the scanner and the interim file are gone, and the coverage tool now needs `kiln-manifest.json` (`Tools/manifest.sh` writes it). What the interim scan counted as supported and the registry doesn't list is deliberate: `.dragToMove` (the old dialect), `Chart3DContent.symbol` (a name match, not a bridge), and the engine-only `UserShape` and `PathShape`.

@@ -51,17 +51,11 @@ extension DrawingBridges {
         }
 
         r.type("Path", .drawing, notes: "`move(to:)`, lines, arcs, curves, rects and ellipses; a `Path` in a body is drawn like a shape.") { t in
-            t.initializer { c in
-                let box = KPathBox()
-                if case .native(.rect(let x, let y, let w, let h))? = c.first {
-                    let rect = CGRect(x: x, y: y, width: w, height: h)
-                    if c.labels.first == "ellipseIn" { box.path = Path(ellipseIn: rect) }
-                    else if let cr = c.arg("cornerRadius")?.asDouble { box.path = Path(roundedRect: rect, cornerRadius: cr) }
-                    else { box.path = Path(rect) }
-                }
-                if case .function(let f)? = c.last { _ = try c.interp.call(f, [.native(.path(KRef(box)))], [nil]) }
-                return .native(.path(KRef(box)))
+            t.manifestKind = "view"
+            for sig in ["", "_:closure", "_:CGRect", "roundedRect:CGRect cornerRadius:number style:any?", "ellipseIn:CGRect"] {
+                t.initializer(sig) { c in try path(c) }
             }
+            t.initializer { c in try path(c) }
             @MainActor func box(_ c: KCall) -> KPathBox { if case .native(.path(let b)) = c.receiver { return b.value }; return KPathBox() }
             @MainActor func pt(_ v: KV?) -> CGPoint { if case .native(.point(let x, let y))? = v { return CGPoint(x: x, y: y) }; return .zero }
             @MainActor func rect(_ v: KV?) -> CGRect {
@@ -126,6 +120,19 @@ extension DrawingBridges {
                 for s in sigs { m.formOnBase(s, receiver: "Shape") { c in shapeModifier(c) } }
             }
         }
+    }
+
+    /// `Path()`, `Path(rect)`, `Path(ellipseIn:)`, `Path { p in … }`.
+    @MainActor static func path(_ c: KCall) throws -> KV {
+        let box = KPathBox()
+        if case .native(.rect(let x, let y, let w, let h))? = c.first {
+            let rect = CGRect(x: x, y: y, width: w, height: h)
+            if c.labels.first == "ellipseIn" { box.path = Path(ellipseIn: rect) }
+            else if let cr = c.arg("cornerRadius")?.asDouble { box.path = Path(roundedRect: rect, cornerRadius: cr) }
+            else { box.path = Path(rect) }
+        }
+        if case .function(let f)? = c.last { _ = try c.interp.call(f, [.native(.path(KRef(box)))], [nil]) }
+        return .native(.path(KRef(box)))
     }
 
     /// A shape modifier on a shape; anything else is shown unchanged.
