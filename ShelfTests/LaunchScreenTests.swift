@@ -276,15 +276,13 @@ struct LaunchMotionTests {
     @Test func theOpenIsNotTheCloseInReverse() {
         let opening = CardMotion.look(progress: 0.3, opening: true)
         let closing = CardMotion.look(progress: 0.3, opening: false)
-        // Growing: the surface is already most of the way in, fitted to the
-        // card's width, and the Home Screen hardly blurred yet.
+        // Growing: the surface is already most of the way in, and the Home
+        // Screen hardly blurred yet.
         #expect(opening.content > 0.6)
-        #expect(opening.fit == 1)
         #expect(opening.blur < 3)
-        // Shrinking: the app has nearly given way to the icon, squashed,
-        // over a Home Screen still well blurred.
+        // Shrinking: the app has nearly given way to the icon, over a Home
+        // Screen still well blurred.
         #expect(closing.content < 0.2)
-        #expect(closing.fit == 0)
         #expect(closing.blur > 10)
         // Both are the Home Screen itself at the icon and fully behind at full screen.
         for opening in [true, false] {
@@ -301,7 +299,6 @@ struct LaunchMotionTests {
         let handoff = LookHandoff(from: growing, at: 0.4, opening: false)
         let atTurn = handoff.look(at: 0.4)
         #expect(abs(atTurn.content - growing.content) < 1e-9)
-        #expect(abs(atTurn.fit - growing.fit) < 1e-9)
         #expect(abs(atTurn.blur - growing.blur) < 1e-9)
         #expect(abs(atTurn.dim - growing.dim) < 1e-9)
         // Every small step changes it a little.
@@ -330,6 +327,19 @@ struct LaunchMotionTests {
         // Less as it grows, and never past the most a card leans.
         #expect(abs(CardMotion.openingLean(centerY: 462, height: 402, iconY: 523, progress: 0.8)) < abs(below))
         #expect(abs(CardMotion.openingLean(centerY: 0, height: 100, iconY: 874, progress: 0)) <= RunnerMetrics.maxLean)
+    }
+
+    @Test func itTurnsSidewaysByWhereItsIconIsAcross() {
+        // Photos, top right: the icon 0.28 card widths to the right, the
+        // right side forward (negative), about 0.086 radians that close.
+        let right = CardMotion.sideLean(centerX: 288, width: 197, iconX: 343, amount: 0.46)
+        #expect(right < 0)
+        #expect(abs(right + 0.086) < 0.02)
+        #expect(CardMotion.sideLean(centerX: 288, width: 197, iconX: 233, amount: 0.46) == -right)
+        // Level with its icon, or not moving yet, it doesn't turn.
+        #expect(CardMotion.sideLean(centerX: 201, width: 300, iconX: 201, amount: 1) == 0)
+        #expect(CardMotion.sideLean(centerX: 201, width: 300, iconX: 340, amount: 0) == 0)
+        #expect(abs(CardMotion.sideLean(centerX: 0, width: 10, iconX: 400, amount: 1)) <= RunnerMetrics.maxLean)
     }
 
     @Test func anOpenFromTheIconStartsAsTheIcon() {

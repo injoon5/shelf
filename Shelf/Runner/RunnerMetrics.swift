@@ -143,6 +143,16 @@ enum RunnerMetrics {
     /// Settings opens, from an icon level with the card, don't lean. Neither
     /// leans sideways.
     static let launchLean: CGFloat = 1.4
+    /// Opening and landing, the card also turns about its vertical axis by
+    /// the icon's place across: the side away from the icon goes back, by
+    /// this many radians per unit of (how far the icon is to the side of
+    /// its centre, in card widths) × (how far the card has come since it
+    /// set off, landing; how far it still has to grow, opening). Fitted to
+    /// one frame of a Photos close (icon at the top right, owner's iPhone
+    /// 17, `real-device-photos-open-close.mp4` at 2.45 s): the icon 0.28
+    /// card widths to its right, the card's right edge 2.3% taller than its
+    /// left, about 0.086 radians. Its opens turn the same way.
+    static let sideLean: CGFloat = 0.65
     static let maxLean: CGFloat = 0.14
     /// The distance of the eye from the screen for that lean, in points.
     static let leanPerspective: CGFloat = 500

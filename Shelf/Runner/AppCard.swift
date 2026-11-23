@@ -34,13 +34,12 @@ struct CardRoot: View {
 /// or its last snapshot), the app itself as it closes. Which shows, and how
 /// much, follows the card's size (`CardLook`).
 ///
-/// As Springboard's, the icon's tile stretches to the card but its glyph
-/// keeps its shape, scaled with the card's width (`fitArt`). The picture is
-/// squashed to the card as it shrinks (its width and height, not cropped);
-/// as it grows, the picture is drawn at the card's width from its top and
-/// cropped at the bottom, and the glyph rises with it (`fit`). The corners
-/// stay the display's until the card is nearly an icon. On its way to an
-/// icon below it, it leans back.
+/// As Springboard's, growing and shrinking alike, everything on the card
+/// keeps its shape and is scaled by the card's width from its top: the
+/// picture is cropped at the bottom, and the glyph is where it would be on
+/// a square icon at the card's top (`fitArt`). Only the tile's fill
+/// stretches to the card. The corners stay the display's until the card is
+/// nearly an icon. It leans in depth by where its icon is (`CardLean`).
 ///
 /// Like every `IconArtView`, its bounds are centred on its own origin, so
 /// the glyph and the picture sit at (0, 0) and stay centred while the
@@ -60,20 +59,14 @@ final class CardFaceView: IconArtView {
     /// Where it is headed, if it is moving by itself.
     private(set) var flight: CardFlight?
     private var springs = Motion.cardOpen
-    /// The lean, in radians about the horizontal axis, and what the
-    /// current flight does with it.
-    private(set) var lean: CGFloat = 0
-    private var leanFrom: CGFloat = 0
+    /// The lean, about the card's horizontal and vertical axes, and what
+    /// the current flight does with it.
+    private(set) var lean = CardLean.none
+    private var leanFrom = CardLean.none
     private var flightStartProgress: CGFloat = 1
     private var leans = false
-    /// Where the icon a growing card left is, down the screen, while it
-    /// leans away from it.
-    private var leansFrom: CGFloat?
-    /// How the picture is fitted to the card: 0 squashed to it, 1 at its
-    /// width from its top (`CardLook.fit`).
-    var fit: CGFloat = 1 {
-        didSet { if fit != oldValue { place(shown) } }
-    }
+    /// The middle of the icon a growing card left, while it leans by it.
+    private var leansFrom: CGPoint?
 
     init(face: IconFace, iconSize: CGFloat, screen: CGSize, fullRadius: CGFloat) {
         self.screen = screen
@@ -98,15 +91,15 @@ final class CardFaceView: IconArtView {
     func place(_ frame: CardFrame) {
         let size = frame.size
         shown = CardFrame(center: frame.center, size: size, radius: CardMotion.cornerRadius(size: size, full: fullRadius))
-        let wide = size.width / screen.width, squashed = size.height / screen.height
-        // Fitted, the picture is as tall as its width makes it, from the
-        // card's top; never shorter than the card.
-        let tall = max(squashed + (wide - squashed) * fit, squashed)
+        let wide = size.width / screen.width
+        // As tall as its width makes it, from the card's top; never shorter
+        // than the card (one growing past the screen's shape).
+        let tall = max(wide, size.height / screen.height)
         withoutActions {
             layer.position = frame.center
             content.layer.transform = CATransform3DMakeScale(wide, tall, 1)
             content.layer.position = CGPoint(x: 0, y: (screen.height * tall - size.height) / 2)
-            fitArt(to: size, top: fit)
+            fitArt(to: size)
             setOutline(size, radius: shown.radius)
         }
     }
@@ -118,7 +111,7 @@ final class CardFaceView: IconArtView {
     /// same way growing out of it, less as it grows; any other straightens
     /// up as it goes. It leans from the angle it has, without a jolt.
     func fly(to target: CardFrame, _ springs: Motion.CardSprings, velocity: CardVelocity? = nil, leans: Bool = false,
-             leansFrom icon: CGFloat? = nil, at time: Double = CACurrentMediaTime()) {
+             leansFrom icon: CGPoint? = nil, at time: Double = CACurrentMediaTime()) {
         let velocity = velocity ?? flight?.velocity(at: time) ?? .zero
         self.springs = springs
         if flight == nil || leans != self.leans || (icon == nil) != (leansFrom == nil) { flightStartProgress = progress(shown) }
@@ -130,7 +123,7 @@ final class CardFaceView: IconArtView {
         // What it leans by now, less what this flight's own lean is here,
         // fading out as it goes.
         let left = remaining(progress(shown), in: flight)
-        leanFrom = left > 0 ? (lean - ownLean(for: shown, in: flight)) / left : 0
+        leanFrom = left > 0 ? (lean - ownLean(for: shown, in: flight)) * (1 / left) : .none
     }
 
     /// The same flight, to where its target has moved, carrying on at the
@@ -149,7 +142,7 @@ final class CardFaceView: IconArtView {
         let arrived = flight.isSettled(at: time)
         let frame = arrived ? flight.target : flight.frame(at: time)
         place(frame)
-        setLean(arrived ? 0 : lean(for: frame, in: flight))
+        setLean(arrived ? .none : lean(for: frame, in: flight))
         if arrived { self.flight = nil }
         return arrived
     }
@@ -157,9 +150,8 @@ final class CardFaceView: IconArtView {
     /// The lean for `frame` on `flight`: what it had when the flight began,
     /// fading out as the card gets where it is going, plus its own: landing,
     /// toward its icon; growing, away from the one it left.
-    private func lean(for frame: CardFrame, in flight: CardFlight) -> CGFloat {
-        let lean = leanFrom * remaining(progress(frame), in: flight) + ownLean(for: frame, in: flight)
-        return min(max(lean, -RunnerMetrics.maxLean), RunnerMetrics.maxLean)
+    private func lean(for frame: CardFrame, in flight: CardFlight) -> CardLean {
+        (leanFrom * remaining(progress(frame), in: flight) + ownLean(for: frame, in: flight)).limited
     }
 
     /// How much of the way from where the flight started to its target the
@@ -169,24 +161,33 @@ final class CardFaceView: IconArtView {
         return abs(start - end) > 0.001 ? min(max((progress - end) / (start - end), 0), 1) : 0
     }
 
-    private func ownLean(for frame: CardFrame, in flight: CardFlight) -> CGFloat {
+    private func ownLean(for frame: CardFrame, in flight: CardFlight) -> CardLean {
         let now = progress(frame)
         if leans {
-            return CardMotion.lean(centerY: frame.center.y, height: frame.size.height, targetY: flight.target.center.y,
-                                   startProgress: flightStartProgress, progress: now)
+            let lost = max(flightStartProgress - now, 0)
+            return CardLean(back: CardMotion.lean(centerY: frame.center.y, height: frame.size.height,
+                                                  targetY: flight.target.center.y,
+                                                  startProgress: flightStartProgress, progress: now),
+                            side: CardMotion.sideLean(centerX: frame.center.x, width: frame.size.width,
+                                                      iconX: flight.target.center.x, amount: lost))
         }
         if let icon = leansFrom {
-            return CardMotion.openingLean(centerY: frame.center.y, height: frame.size.height, iconY: icon, progress: now)
+            return CardLean(back: CardMotion.openingLean(centerY: frame.center.y, height: frame.size.height,
+                                                         iconY: icon.y, progress: now),
+                            side: CardMotion.sideLean(centerX: frame.center.x, width: frame.size.width,
+                                                      iconX: icon.x, amount: 1 - now))
         }
-        return 0
+        return .none
     }
 
-    private func setLean(_ angle: CGFloat) {
-        guard angle != lean else { return }
-        lean = angle
+    private func setLean(_ lean: CardLean) {
+        guard lean != self.lean else { return }
+        self.lean = lean
         var transform = CATransform3DIdentity
         transform.m34 = -1 / RunnerMetrics.leanPerspective
-        withoutActions { layer.transform = CATransform3DRotate(transform, angle, 1, 0, 0) }
+        transform = CATransform3DRotate(transform, lean.back, 1, 0, 0)
+        transform = CATransform3DRotate(transform, lean.side, 0, 1, 0)
+        withoutActions { layer.transform = transform }
     }
 
     /// Stops the card where it is on screen and returns where that is. It
@@ -266,8 +267,8 @@ final class AppCard {
     private let screen: CGSize
     private let iconSize: CGFloat
     private let fullRadius: CGFloat
-    /// The middle of the icon it opened from, down the screen.
-    private let iconY: CGFloat
+    /// The middle of the icon it opened from.
+    private let icon: CGPoint
     private var grab: (frame: CardFrame, scale: CGFloat, finger: CGPoint, direction: CloseDirection)?
     private var travel: CGFloat = 0
     private var translation: CGPoint = .zero
@@ -282,7 +283,7 @@ final class AppCard {
         self.screen = screen
         self.iconSize = iconSize
         self.fullRadius = fullRadius
-        iconY = source.midY
+        icon = CGPoint(x: source.midX, y: source.midY)
         self.face = CardFaceView(face: face, iconSize: iconSize, screen: screen, fullRadius: fullRadius)
         host = UIHostingController(rootView: CardRoot(run: run, state: state, data: data))
         // Clear until the app is built, so the card's face is its launch screen.
@@ -336,7 +337,7 @@ final class AppCard {
         face.alpha = 1
         // Out of its icon, it leans away from it; back from a finger or a
         // landing, it straightens up.
-        face.fly(to: full, springs, velocity: velocity, leansFrom: wasOpened ? nil : iconY)
+        face.fly(to: full, springs, velocity: velocity, leansFrom: wasOpened ? nil : icon)
         wasOpened = true
     }
 
@@ -418,7 +419,6 @@ final class AppCard {
         let progress = progress
         look = handoff.look(at: progress)
         face.content.alpha = look.content
-        face.fit = look.fit
         if landingFades { face.alpha = min(progress / RunnerMetrics.landingFade, 1) }
     }
 

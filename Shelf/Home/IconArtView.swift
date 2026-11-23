@@ -136,13 +136,13 @@ class IconArtView: UIView {
 
     /// Scales the glyph for an outline of `size` without changing its
     /// shape, as Springboard's card does: only the tile's fill stretches to
-    /// the card. The glyph is as big as the outline's width makes it, and
-    /// sits `top` of the way (0 to 1) from the outline's centre to where it
-    /// would be in a square at the outline's top, which is where a growing
-    /// card draws it (`CardLook.fit`). An icon's glyph is drawn at its size.
-    func fitArt(to size: CGSize, top: CGFloat = 0) {
+    /// the card. The glyph is as big as the outline's width makes it, where
+    /// it would be on a square icon at the outline's top, as the app's
+    /// picture on a card is drawn from its top. An icon's glyph is drawn at
+    /// its size.
+    func fitArt(to size: CGSize) {
         let scale = size.width / iconSize
-        let y = (size.width - size.height) / 2 * min(max(top, 0), 1)
+        let y = (size.width - size.height) / 2
         withoutActions {
             glyph.transform = CATransform3DScale(CATransform3DMakeTranslation(0, min(y, 0), 0), scale, scale, 1)
         }
