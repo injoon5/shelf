@@ -176,7 +176,13 @@ final class LanguageTests: XCTestCase {
         let pets: [Animal] = [Animal(name: "a"), Dog(name: "d"), Puppy(name: "p")]
         for p in pets { print(p.speak()) }
         print(pets.filter { $0 is Dog }.count)
-        """, prints: "a makes a sound\nd barks\np barks\n2\n")
+        class Cat: Animal {
+            var lives: Int
+            init(name: String, lives: Int) { self.lives = lives; super.init(name: name) }
+            override func speak() -> String { super.speak() + " (meow, \\(lives) lives)" }
+        }
+        print(Cat(name: "c", lives: 9).speak())
+        """, prints: "a makes a sound\nd barks\np barks\n2\nc makes a sound (meow, 9 lives)\n")
     }
 
     func testConformanceDecidesWhatWorks() {

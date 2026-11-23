@@ -34,6 +34,12 @@ extension KInterpreter {
             if case .selfRef = base, let ctx = env.nearestSelf, !ctx.isStatic, let loc = try selfMemberLocation(ctx, name) {
                 return try read(loc)
             }
+            if case .ident("super", _) = base, let ctx = env.nearestSelf, let sup = ctx.type.superclass {
+                if let p = sup.computed[name] {
+                    return try runGetter(p, env: KEnv(parent: globalEnv, selfContext: KSelfContext(type: sup, location: ctx.location)))
+                }
+                return try member(try read(ctx.location), name, line: line)
+            }
             if let t = typeExpr(base, env) {
                 if let nested = t.nested[name] { return .type(.user(nested)) }
                 return try staticMember(t, name, line)
@@ -753,6 +759,16 @@ extension KInterpreter {
             return try callNamed(name, argExprs, env, line, expected)
 
         case .member(let baseExpr, let name, _):
+            // `super.speak()`, `super.init(name:)`: the superclass's own, on this `self`.
+            if case .ident("super", _) = baseExpr, let ctx = env.nearestSelf, let sup = ctx.type.superclass {
+                let candidates = name == "init" ? sup.inits : (sup.methods[name] ?? [])
+                guard let m = Self.fit(candidates, labels, closures: closures) else {
+                    try requireLabels(nil, among: candidates, labels, closures: closures, name: name, owner: sup.name, line: line)
+                    throw noMember(sup, name, line: line)
+                }
+                let args = try evalArgs(argExprs, env, params: m.params)
+                return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: sup, location: ctx.location, storage: ctx.storage), parent: globalEnv)
+            }
             if let t = typeExpr(baseExpr, env) {
                 if let nested = t.nested[name] { return try construct(nested, argExprs, env, line) }
                 if let c = t.enumCase(name) {
