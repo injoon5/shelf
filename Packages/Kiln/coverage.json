@@ -13307,7 +13307,7 @@
       "notes" : "From the view marked `.matchedTransitionSource(id:in:)` with the same id.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:NavigationTransition.zoom",
@@ -23520,7 +23520,7 @@
     },
     {
       "family" : "Layout",
-      "notes" : "The closure gets the view's dimensions: `d.width`, `d.height`, `d[.top]`. A `.center` guide is set for both axes, and `d[.center]` is the horizontal center.",
+      "notes" : "`.center` sets both axes' guides.",
       "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
@@ -37986,7 +37986,7 @@
     },
     {
       "family" : "Layout",
-      "notes" : "The closure's `content` takes `opacity`, `scaleEffect`, `offset`, `rotationEffect`, `blur`, `brightness`, `saturation`, `contrast`, `hueRotation` and `grayscale`, by `phase.isIdentity` or `phase.value`.",
+      "notes" : "`content` takes opacity, scale, offset, rotation, blur and color effects.",
       "overloadsCovered" : 2,
       "round" : 1,
       "status" : "partial",
@@ -49110,7 +49110,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Its members as a shape (`ButtonBorderShape.capsule`), filled with the foreground style; use `Capsule()` to `.fill` or `.stroke` one.",
+      "notes" : "As a shape it can't be `.fill`ed; use `Capsule()`.",
       "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",
@@ -60375,7 +60375,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "Bound to a `String`, or to an `AttributedString` (iOS 26), which keeps its styling. `selection:` isn't kept.",
+      "notes" : "`selection:` isn't kept.",
       "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
@@ -60421,7 +60421,7 @@
     },
     {
       "family" : "Controls",
-      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows. `selection:` isn't kept.",
+      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.",
       "overloadsCovered" : 23,
       "round" : 1,
       "status" : "partial",
@@ -62457,7 +62457,7 @@
     },
     {
       "family" : "Layout",
-      "notes" : "Scaled for the text size when the view first appears; it doesn't follow a later change of Dynamic Type.",
+      "notes" : "Scaled once, when the view appears.",
       "overloadsCovered" : 0,
       "round" : 1,
       "status" : "partial",

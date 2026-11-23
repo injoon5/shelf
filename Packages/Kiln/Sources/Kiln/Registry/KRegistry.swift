@@ -110,6 +110,24 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         }
     }
 
+    /// "What works" for the family in one tight line, written by hand when
+    /// its symbols are nearly all of SwiftUI's and listing them would be long.
+    /// nil: the prompt lists the family's names. Keep it true as bridges change.
+    public var promptLine: String? {
+        switch self {
+        case .controls:
+            return "every SwiftUI control and style: `Button` (`.glass`, `.glassProminent`), `Toggle`, `Picker`, `DatePicker` (`.graphical`), `MultiDatePicker`, `Slider` (`SliderTick`), `Stepper`, `ColorPicker`, `TextField`, `SecureField`, `TextEditor`, `Menu` (`primaryAction:`), `ControlGroup`, `Gauge`, `ProgressView`, `LabeledContent`, `RenameButton`, `Link`; your own `ButtonStyle`, `ToggleStyle`, `LabelStyle` and the other `makeBody(configuration:)` styles"
+        case .layout:
+            return "stacks, grids, `ScrollView` with `ScrollPosition`, `.paging` and `.viewAligned` targets, `.scrollTransition` and the `onScroll…` events, `GeometryReader`, `.onGeometryChange`, `ViewThatFits`, `.containerRelativeFrame`, `.safeAreaInset`, `.contentMargins`, `.alignmentGuide`, `Group(subviews:)` and `ForEach(subviews:)` with `.containerValue`, your own `Layout`, iOS 27.1's `ArrangementView`, and every frame, padding and scroll modifier"
+        case .lists:
+            return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
+        case .navigation:
+            return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        default:
+            return nil
+        }
+    }
+
     /// The folder under `Sources/Kiln/Bridges/`, and the suffix of its class.
     var folder: String {
         switch self {

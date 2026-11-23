@@ -8,6 +8,7 @@
       "supported" : 27
     },
     {
+      "line" : "every SwiftUI control and style: `Button` (`.glass`, `.glassProminent`), `Toggle`, `Picker`, `DatePicker` (`.graphical`), `MultiDatePicker`, `Slider` (`SliderTick`), `Stepper`, `ColorPicker`, `TextField`, `SecureField`, `TextEditor`, `Menu` (`primaryAction:`), `ControlGroup`, `Gauge`, `ProgressView`, `LabeledContent`, `RenameButton`, `Link`; your own `ButtonStyle`, `ToggleStyle`, `LabelStyle` and the other `makeBody(configuration:)` styles",
       "name" : "Controls",
       "stubs" : 0,
       "summary" : "buttons, toggles, pickers, sliders, text fields and the other controls",
@@ -20,18 +21,21 @@
       "supported" : 50
     },
     {
+      "line" : "stacks, grids, `ScrollView` with `ScrollPosition`, `.paging` and `.viewAligned` targets, `.scrollTransition` and the `onScroll…` events, `GeometryReader`, `.onGeometryChange`, `ViewThatFits`, `.containerRelativeFrame`, `.safeAreaInset`, `.contentMargins`, `.alignmentGuide`, `Group(subviews:)` and `ForEach(subviews:)` with `.containerValue`, your own `Layout`, iOS 27.1's `ArrangementView`, and every frame, padding and scroll modifier",
       "name" : "Layout",
       "stubs" : 0,
       "summary" : "stacks, grids, scroll views, frames and padding",
       "supported" : 163
     },
     {
+      "line" : "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier",
       "name" : "Lists",
       "stubs" : 0,
       "summary" : "lists, forms and sections",
       "supported" : 49
     },
     {
+      "line" : "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`",
       "name" : "Navigation",
       "stubs" : 0,
       "summary" : "navigation stacks, tabs, toolbars, sheets and alerts",
@@ -5244,7 +5248,7 @@
       ],
       "owner" : "NavigationTransition",
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Foundation",
@@ -10691,7 +10695,7 @@
       "id" : "modifier:alignmentGuide",
       "kind" : "modifier",
       "name" : "alignmentGuide",
-      "notes" : "The closure gets the view's dimensions: `d.width`, `d.height`, `d[.top]`. A `.center` guide is set for both axes, and `d[.center]` is the horizontal center.",
+      "notes" : "`.center` sets both axes' guides.",
       "overloads" : [
         {
           "labels" : [
@@ -14834,7 +14838,7 @@
       "id" : "modifier:scrollTransition",
       "kind" : "modifier",
       "name" : "scrollTransition",
-      "notes" : "The closure's `content` takes `opacity`, `scaleEffect`, `offset`, `rotationEffect`, `blur`, `brightness`, `saturation`, `contrast`, `hueRotation` and `grayscale`, by `phase.isIdentity` or `phase.value`.",
+      "notes" : "`content` takes opacity, scale, offset, rotation, blur and color effects.",
       "overloads" : [
         {
           "labels" : [
@@ -17696,7 +17700,7 @@
       "id" : "type:ActionSheet",
       "kind" : "type",
       "name" : "ActionSheet",
-      "notes" : "Old; prefer `.confirmationDialog`. Shown as one, with `.default`, `.destructive` and `.cancel` buttons.",
+      "notes" : "Shown as a `.confirmationDialog`.",
       "overloads" : [
         {
           "labels" : [
@@ -18647,7 +18651,7 @@
 
       ],
       "source" : "Sources/Kiln/Navigation.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Foundation",
@@ -19695,7 +19699,7 @@
       "id" : "view:ButtonBorderShape",
       "kind" : "view",
       "name" : "ButtonBorderShape",
-      "notes" : "Its members as a shape (`ButtonBorderShape.capsule`), filled with the foreground style; use `Capsule()` to `.fill` or `.stroke` one.",
+      "notes" : "As a shape it can't be `.fill`ed; use `Capsule()`.",
       "overloads" : [
         {
           "labels" : [
@@ -21580,7 +21584,7 @@
       "id" : "view:TextEditor",
       "kind" : "view",
       "name" : "TextEditor",
-      "notes" : "Bound to a `String`, or to an `AttributedString` (iOS 26), which keeps its styling. `selection:` isn't kept.",
+      "notes" : "`selection:` isn't kept.",
       "overloads" : [
         {
           "labels" : [
@@ -21602,7 +21606,7 @@
       "id" : "view:TextField",
       "kind" : "view",
       "name" : "TextField",
-      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows. `selection:` isn't kept.",
+      "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.",
       "overloads" : [
         {
           "labels" : [
@@ -21957,7 +21961,7 @@
       "id" : "wrapper:ScaledMetric",
       "kind" : "wrapper",
       "name" : "ScaledMetric",
-      "notes" : "Scaled for the text size when the view first appears; it doesn't follow a later change of Dynamic Type.",
+      "notes" : "Scaled once, when the view appears.",
       "overloads" : [
 
       ],

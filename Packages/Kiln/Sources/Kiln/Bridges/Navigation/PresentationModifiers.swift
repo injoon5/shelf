@@ -107,7 +107,7 @@ extension NavigationBridges {
             }
         }
         // The old API: `.actionSheet(isPresented:) { ActionSheet(title:message:buttons:) }`.
-        r.type("ActionSheet", .navigation, notes: "Old; prefer `.confirmationDialog`. Shown as one, with `.default`, `.destructive` and `.cancel` buttons.") { t in
+        r.type("ActionSheet", .navigation, notes: "Shown as a `.confirmationDialog`.") { t in
             t.initializer("title:any message:any? buttons:any?") { c in .tuple(c.args, c.labels) }
         }
         r.modifier("actionSheet", .navigation, notes: "Old; shown as a `confirmationDialog`.") { m in

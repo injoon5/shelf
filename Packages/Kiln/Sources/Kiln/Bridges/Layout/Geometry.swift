@@ -117,7 +117,7 @@ extension LayoutBridges {
             m.form("name:any") { c, view in view.coordinateSpace(name: c["name"].map(KLayout.spaceName) ?? "") }
         }
         r.modifier("alignmentGuide", .layout, support: .partial,
-                   notes: "The closure gets the view's dimensions: `d.width`, `d.height`, `d[.top]`. A `.center` guide is set for both axes, and `d[.center]` is the horizontal center.") { m in
+                   notes: "`.center` sets both axes' guides.") { m in
             m.form("_:any computeValue:closure") { c, view in alignmentGuide(c, view) }
             m.probe { _, _ in [.native(.object("ViewDimensions", KRef(NSObject())))] }
         }
@@ -195,7 +195,7 @@ extension LayoutBridges {
             }
         }
         r.wrapper("ScaledMetric", .layout, support: .partial,
-                  notes: "Scaled for the text size when the view first appears; it doesn't follow a later change of Dynamic Type.")
+                  notes: "Scaled once, when the view appears.")
     }
 
     /// The built-in insettable shapes, by their description.

@@ -309,7 +309,7 @@ final class ControlsBridges: KBridgeFamily {
     // MARK: Text fields
 
     static func textFields(_ r: KRegistry) {
-        r.view("TextField", .controls, support: .partial, notes: "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows. `selection:` isn't kept.") { v in
+        r.view("TextField", .controls, support: .partial, notes: "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.") { v in
             v.forms(["_:title text:binding prompt:any? axis:Axis?", "_:title text:binding onEditingChanged:closure? onCommit:action?",
                      "_:title text:binding selection:binding prompt:any? axis:Axis?",
                      "_:title value:binding format:any prompt:any?", "_:title value:binding formatter:any prompt:any?",
@@ -320,7 +320,7 @@ final class ControlsBridges: KBridgeFamily {
         r.view("SecureField", .controls) { v in
             v.forms(["_:title text:binding prompt:any?", "_:title text:binding onCommit:action", "text:binding prompt:any? label:content"]) { c in textField(c, secure: true) }
         }
-        r.view("TextEditor", .controls, support: .partial, notes: "Bound to a `String`, or to an `AttributedString` (iOS 26), which keeps its styling. `selection:` isn't kept.") { v in
+        r.view("TextEditor", .controls, support: .partial, notes: "`selection:` isn't kept.") { v in
             v.forms(["text:binding", "text:binding selection:binding"]) { c in textEditor(c) }
         }
     }

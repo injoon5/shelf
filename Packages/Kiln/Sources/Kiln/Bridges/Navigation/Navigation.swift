@@ -260,7 +260,7 @@ final class NavigationBridges: KBridgeFamily {
     // MARK: Navigation transitions
 
     static func transitions(_ r: KRegistry) {
-        r.type("NavigationTransition", .navigation, introduced: "18.0") { t in
+        r.type("NavigationTransition", .navigation, support: .full, introduced: "18.0") { t in
             t.membersInManifest = true
             t.staticProperty("automatic") { _ in .native(.implicit("automatic", [])) }
             t.staticProperty("crossFade", notes: "iOS 27.") { _ in .native(.implicit("crossFade", [])) }

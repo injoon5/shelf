@@ -151,8 +151,10 @@ struct PromptsTests {
         let families = PromptCatalog.listedFamilies(m)
         #expect(families.count >= 10)
         for f in families { #expect(works.contains("- **\(f.name):** "), "\(f.name) isn't listed") }
-        // Every view and modifier that works is named; no stub is.
-        for s in m.symbols where PromptCatalog.listedFamilies(m).contains(where: { $0.name == s.family }) {
+        // Every view and modifier that works is named, unless its family says
+        // itself in one line (`KilnFamily.promptLine`); no stub is.
+        for f in families where f.line != nil { #expect(works.contains("- **\(f.name):** \(f.line!)."), "\(f.name)'s line") }
+        for s in m.symbols where families.contains(where: { $0.name == s.family && $0.line == nil }) {
             let name = PromptCatalog.display(s)
             switch (s.kind, s.support) {
             case ("view", "full"), ("view", "partial"), ("modifier", "full"), ("modifier", "partial"):
@@ -163,7 +165,7 @@ struct PromptsTests {
             }
         }
         // A partial symbol's notes are quoted.
-        #expect(works.contains("`NavigationStack`: `path:` isn't kept"))
+        #expect(works.contains("`.alignmentGuide`: `.center` sets both axes' guides."))
         // What's written by hand isn't repeated here.
         #expect(!works.contains("**Language:**"))
         #expect(!works.contains("**Scenes:**"))

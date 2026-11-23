@@ -33,7 +33,7 @@ extension ControlsBridges {
         }
         // `ButtonBorderShape.capsule` and `TextInputBorderShape.roundedRectangle` as shapes.
         r.view("ButtonBorderShape", .controls, support: .partial,
-               notes: "Its members as a shape (`ButtonBorderShape.capsule`), filled with the foreground style; use `Capsule()` to `.fill` or `.stroke` one.") { v in
+               notes: "As a shape it can't be `.fill`ed; use `Capsule()`.") { v in
             v.form("_:ButtonBorderShape") { c in
                 if let shape = buttonBorderShape(c[0]) { shape } else { Capsule() }
             }

@@ -200,7 +200,7 @@ extension LayoutBridges {
             m.form("_:ScrollInputBehavior for:ScrollInputKind") { _, view in view }
         }
         r.modifier("scrollTransition", .layout, support: .partial,
-                   notes: "The closure's `content` takes `opacity`, `scaleEffect`, `offset`, `rotationEffect`, `blur`, `brightness`, `saturation`, `contrast`, `hueRotation` and `grayscale`, by `phase.isIdentity` or `phase.value`.") { m in
+                   notes: "`content` takes opacity, scale, offset, rotation, blur and color effects.") { m in
             m.forms(["transition:closure", "axis:Axis transition:closure", "_:any axis:Axis? transition:closure",
                      "topLeading:any bottomTrailing:any axis:Axis? transition:closure"]) { c, view in scrollTransition(c, view) }
             m.probe { _, _ in [.view(.empty), .native(.implicit("identity", []))] }

@@ -274,6 +274,26 @@ final class AppScenarios: LabCase {
     }
     func testCardStylesNative() { cards("native") }
     func testCardStylesKiln() { cards("kiln") }
+
+    // MARK: Plant care (Round 1A: controls, layout, lists, navigation)
+
+    func plants(_ mode: String) {
+        launch("PlantCare", mode)
+        snap("1 start")
+        tap("Monstera, 2 days")
+        snap("2 pushed a plant")
+        tap("Water now")
+        tap("Plants")
+        snap("3 watered and back")
+        tap("Add")
+        snap("4 sheet at medium")
+        tap("Add a fern")
+        tap("Settings")
+        tap("Remind me")
+        snap("5 settings, reminders off")
+    }
+    func testPlantCareNative() { plants("native") }
+    func testPlantCareKiln() { plants("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no
