@@ -1,0 +1,2 @@
+# Inputs whose transcript is meant to differ from the engine before §1.3, and why.
+# One per line: the input as Tools/diff.py names it, a space, the reason.
