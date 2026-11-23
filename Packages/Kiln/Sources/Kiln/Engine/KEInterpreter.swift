@@ -413,6 +413,10 @@ final class KInterpreter {
                 }, set: { _ in })
                 return .normal
             }
+            if let w = customWrapper(decl) {
+                try declareWrappedLocal(decl, w, env)
+                return .normal
+            }
             let value = try decl.initial.map { try eval($0, env, decl.type) } ?? .nilValue
             try bindPattern(decl.pattern, value, in: env, isLet: decl.isLet, type: decl.type)
             return .normal
@@ -834,6 +838,11 @@ final class KInterpreter {
                 return
             }
             if case .binding(let b)? = o.fields[name] { b.set(newValue); return }
+            if o.fields[name] == nil, let w = wrapped(o.type, name) {
+                try writeWrapped(.box(KBox(.object(o))), w, name, coerce(newValue, to: o.type.storedDecl(name)?.type), exists: o.fields[wrapperField(name)] != nil)
+                o.didChange()
+                return
+            }
             let decl = o.type.storedDecl(name)
             let old = o.fields[name] ?? .nilValue
             let v = coerce(newValue, to: decl?.type)
@@ -874,6 +883,13 @@ final class KInterpreter {
                     return
                 }
                 if case .binding(let b)? = s.fields[name], s.type.wrapper(of: name) == "Binding" { b.set(newValue); return }
+                if s.fields[name] == nil, let w = wrapped(s.type, name) {
+                    let decl = s.type.storedDecl(name)
+                    let old = decl?.didSet == nil ? KV.nilValue : ((try? readWrapped(s.fields[wrapperField(name)], name, line: 0)) ?? .nilValue)
+                    try writeWrapped(base, w, name, coerce(newValue, to: decl?.type), exists: s.fields[wrapperField(name)] != nil)
+                    if let ds = decl?.didSet { try runObserver(ds, old, selfLoc: base, type: s.type) }
+                    return
+                }
                 let decl = s.type.storedDecl(name)
                 let old = s.fields[name] ?? .nilValue
                 let v = coerce(newValue, to: decl?.type)
@@ -1288,8 +1304,9 @@ final class KInterpreter {
         case .range(let a, let b, let closed): return "\(describe(a))\(closed ? "..." : "..<")\(describe(b))"
         case .structV(let s):
             let parts = s.type.stored.compactMap { d -> String? in
-                guard let f = s.fields[d.name] else { return nil }
-                return "\(d.name): \(describe(f, quoted: true))"
+                if let f = s.fields[d.name] { return "\(d.name): \(describe(f, quoted: true))" }
+                if let f = s.fields["_" + d.name] { return "_\(d.name): \(describe(f, quoted: true))" }
+                return nil
             }
             return "\(s.type.name)(\(parts.joined(separator: ", ")))"
         case .enumV(let e):

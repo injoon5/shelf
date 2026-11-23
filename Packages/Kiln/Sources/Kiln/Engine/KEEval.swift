@@ -252,6 +252,7 @@ extension KInterpreter {
     func projection(_ ctx: KSelfContext, _ name: String) throws -> KV? {
         let t = ctx.type
         guard t.storedDecl(name) != nil || t.computed[name] != nil else { return nil }
+        if wrapped(t, name) != nil, let v = try projectedWrapped(try read(ctx.location), name, line: 0) { return v }
         if let storage = ctx.storage, let box = storage.box(name) {
             if case .binding = box.value, t.wrapper(of: name) == "Binding" { return box.value }
             return .binding(KBinding(get: { box.value }, set: { box.value = $0 }))
@@ -322,6 +323,8 @@ extension KInterpreter {
         switch base {
         case .structV(let s):
             if let f = s.fields[name] { return unwrapField(s.type, name, f) }
+            if wrapped(s.type, name) != nil { return try readWrapped(s.fields[wrapperField(name)], name, line: line) }
+            if name.hasPrefix("$"), let v = try projectedWrapped(base, String(name.dropFirst()), line: line) { return v }
             if let p = s.type.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: s.type, location: .box(KBox(base))))
                 return try runGetter(p, env: env)
@@ -356,6 +359,8 @@ extension KInterpreter {
         case .object(let o):
             readTracker?.objects[ObjectIdentifier(o)] = o
             if let f = o.fields[name] { return unwrapField(o.type, name, f) }
+            if wrapped(o.type, name) != nil { return try readWrapped(o.fields[wrapperField(name)], name, line: line) }
+            if name.hasPrefix("$"), let v = try projectedWrapped(base, String(name.dropFirst()), line: line) { return v }
             if let p = o.type.computed[name] {
                 let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: o.type, location: .box(KBox(base))))
                 return try runGetter(p, env: env)
@@ -986,6 +991,17 @@ extension KInterpreter {
         var fields: [String: KV] = [:]
         let env = KEnv(parent: globalEnv, selfContext: KSelfContext(type: t, location: .box(KBox(.type(.user(t)))), isStatic: true))
         for p in t.stored {
+            if let w = customWrapper(p) {
+                // `@Clamped(0...10) var x = 5`: `_x` holds the wrapper (KEWrappers).
+                let initial = try p.initial.map { coerce(try eval($0, env, p.type), to: p.type) }
+                if initial != nil || w.attribute.args.contains(where: { $0.label == "wrappedValue" }) || !w.type.inits.isEmpty || w.type.storedDecl("wrappedValue") == nil {
+                    if let wrapper = try? makeWrapper(w, wrappedValue: initial, env: env, line: p.line) {
+                        fields[wrapperField(p.name)] = wrapper
+                        if let v = try? member(wrapper, "wrappedValue", line: p.line) { env.declare(p.name, v) }
+                    }
+                }
+                continue
+            }
             if let initial = p.initial {
                 let v = coerce(try eval(initial, env, p.type), to: p.type)
                 fields[p.name] = v
@@ -1039,10 +1055,18 @@ extension KInterpreter {
             var found: Int? = labels.firstIndex(where: { $0 == p.name })
             if let f = found, used[f] { found = nil }
             if found == nil, nextPositional < args.count, labels[nextPositional] == nil, !used[nextPositional] { found = nextPositional }
-            if let i = found {
+            if let i = found, let w = customWrapper(p) {
+                used[i] = true
+                nextPositional = i + 1
+                values[wrapperField(p.name)] = try makeWrapper(w, wrappedValue: coerce(args[i], to: p.type), env: KEnv(parent: globalEnv), line: line)
+            } else if let i = found {
                 used[i] = true
                 nextPositional = i + 1
                 values[p.name] = try storedBuilderValue(t, p, coerce(args[i], to: p.type))
+            } else if customWrapper(p) != nil {
+                if values[wrapperField(p.name)] == nil, p.type?.isOptional != true {
+                    throw fail("Missing argument '\(p.name)' in call to \(t.name)", line)
+                }
             } else if values[p.name] == nil {
                 if p.wrapper == "Binding" || p.type.map({ if case .function = $0.core { return true }; return false }) == true {
                     values[p.name] = .nilValue

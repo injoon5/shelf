@@ -312,4 +312,79 @@ final class LanguageTests: XCTestCase {
         }
         XCTAssertFalse(t.lowercased().contains("error"), t)
     }
+
+    // MARK: Property wrappers
+
+    func testCustomPropertyWrappers() {
+        expect("""
+        @propertyWrapper
+        struct Clamped {
+            private var value: Int
+            let range: ClosedRange<Int>
+            init(wrappedValue: Int, _ range: ClosedRange<Int>) { self.range = range; value = min(max(wrappedValue, range.lowerBound), range.upperBound) }
+            var wrappedValue: Int {
+                get { value }
+                set { value = min(max(newValue, range.lowerBound), range.upperBound) }
+            }
+            var projectedValue: String { "\\(value) in \\(range.lowerBound)...\\(range.upperBound)" }
+        }
+        @propertyWrapper
+        struct Trimmed {
+            private var text = ""
+            var wrappedValue: String {
+                get { text }
+                set { text = newValue.trimmingCharacters(in: .whitespaces) }
+            }
+            init(wrappedValue: String) { self.wrappedValue = wrappedValue }
+        }
+        struct Speaker {
+            @Clamped(0...10) var volume = 5
+            @Trimmed var name: String
+            var plays = 0 { didSet { print("played", plays) } }
+            mutating func louder() { volume += 4 }
+        }
+        var s = Speaker(name: "  Hi  ")
+        print(s.volume, s.name)
+        s.louder(); s.louder()
+        print(s.volume, s.$volume)
+        s.name = "  Bye "
+        print("[" + s.name + "]")
+        s.volume = -3
+        print(s.volume)
+        final class Mixer {
+            @Clamped(1...3) var level = 9
+            @Trimmed var label = " a "
+        }
+        let m = Mixer()
+        m.level = 2
+        print(m.level, m.$level, m.label)
+        func local() {
+            @Clamped(0...1) var x = 7
+            x = 5
+            print(x, $x)
+        }
+        local()
+        """, prints: "5 Hi\n10 10 in 0...10\n[Bye]\n0\n2 2 in 1...3 a\n1 1 in 0...1\n")
+    }
+
+    func testPropertyWrapperInInitAndWithArguments() {
+        expect("""
+        @propertyWrapper
+        struct Scaled {
+            var raw: Double
+            var factor: Double
+            init(wrappedValue: Double, factor: Double = 2) { raw = wrappedValue; self.factor = factor }
+            var wrappedValue: Double { get { raw * factor } set { raw = newValue / factor } }
+        }
+        @propertyWrapper
+        struct Counted { var wrappedValue: Int; var projectedValue: Int { wrappedValue * 100 } }
+        struct Model {
+            @Scaled(factor: 10) var size: Double
+            @Counted var hits: Int
+            init(size: Double) { self.size = size; self.hits = 3 }
+        }
+        let m = Model(size: 1.5)
+        print(m.size, m.hits, m.$hits)
+        """, prints: "15.0 3 300\n")
+    }
 }

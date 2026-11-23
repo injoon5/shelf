@@ -142,7 +142,9 @@ extension KBuiltins {
             else if !keys.isEmpty { continue }   // not coded
             else { key = box.snakeCase ? snakeCase(p.name) : p.name }
             // A nil optional is left out, as `encodeIfPresent` does; `decode` reads a missing key as nil.
-            guard let value = fields[p.name], !value.isNil else { continue }
+            // A wrapped property (`@Clamped var x`) is its wrapped value.
+            let stored = fields[p.name] ?? (interp.customWrapper(p) != nil ? fields["_" + p.name].flatMap { try? interp.member($0, "wrappedValue", line: line) } : nil)
+            guard let value = stored, !value.isNil else { continue }
             if case .void = value { continue }
             out[key] = try encode(value, box, interp, line)
         }
@@ -264,10 +266,21 @@ extension KBuiltins {
                 }
             } else if let d = defaults[p.name] {
                 fields[p.name] = d
+            } else if defaults["_" + p.name] != nil {
+                continue   // a wrapped property keeps its wrapper's default
             } else if p.type?.isOptional == true || object[key] is NSNull {
                 fields[p.name] = .nilValue
             } else {
                 throw KEThrown(value: errorValue("The data couldn't be read because \"\(key)\" is missing (decoding \(t.name))."))
+            }
+        }
+        // Wrapped properties get their wrapper back, built with the decoded value.
+        for p in t.stored {
+            guard let w = interp.customWrapper(p) else { continue }
+            if let v = fields.removeValue(forKey: p.name) {
+                fields["_" + p.name] = try interp.makeWrapper(w, wrappedValue: v, env: KEnv(parent: interp.globalEnv), line: line)
+            } else if let d = defaults["_" + p.name] {
+                fields["_" + p.name] = d
             }
         }
         if t.isClass { return .object(KObject(type: t, fields: fields)) }
