@@ -1,0 +1,15 @@
+.DS_Store
+.build/
+.swiftpm/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+Packages/
+Package.resolved
+xcuserdata/
+*.xcuserstate
+.idea/
+.vscode/
+Lab/.build-quick/
+Lab/.sim-udid
+Lab/KilnLab.xcodeproj/
+Lab/KilnLab/Native/
