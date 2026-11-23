@@ -147,8 +147,8 @@ final class ListsBridges: KBridgeFamily {
             m.form("_:any?") { c, view in
                 if let e = KLayout.edgeInsets(c[0]) { view.listRowInsets(e) } else if c[0]?.isNil == false { view.listRowInsets(EdgeInsets()) } else { view.listRowInsets(nil) }
             }
-            m.form("_:Edge.Set _:number?", introduced: "18.0") { c, view in
-                if #available(iOS 18.0, macOS 26.0, *) { AnyView(view.listRowInsets(c.edges(0), c.cg(1))) } else { view }
+            m.form("_:Edge.Set _:number?", introduced: "26.0") { c, view in
+                if #available(iOS 26.0, macOS 26.0, *) { AnyView(view.listRowInsets(c.edges(0), c.cg(1))) } else { view }
             }
         }
         r.modifier("listSectionSeparator", .lists) { m in
@@ -168,6 +168,7 @@ final class ListsBridges: KBridgeFamily {
             }
             m.form("edge:HorizontalEdge? allowsFullSwipe:bool? content:content onPresentationChanged:closure", introduced: "27.0") { c, view in swipeActionsNotified(c, view) }
             m.probe { label, _ in label == "onPresentationChanged" ? [.bool(true)] : [] }
+            m.form("edge:HorizontalEdge? allowsFullSwipe:bool? content:content", receiver: "TabContent") { _, view in view }
         }
     }
 

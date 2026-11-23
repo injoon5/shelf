@@ -195,7 +195,7 @@ final class KTranscript {
         case .primitive(let name, let args, let labels, let line):
             emit(depth, "\(name)(\(arguments(args, labels)))")
             let a = KArgs(args: args, labels: labels)
-            if KRenderer.eachRowNames.contains(name) || name == "List" && a.first.map({ if case .function = $0 { return false }; return true }) == true {
+            if KRenderer.eachRowNames.contains(name) || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for (r, row) in KRenderer(interp: interp).forEachRows(a).enumerated() {
                     emit(depth + 1, "row \(show(row.id))")
                     for (i, c) in row.views.enumerated() { walk(c, depth: depth + 2, path: path + "/r\(r).\(i)") }

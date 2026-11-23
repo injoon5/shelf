@@ -283,8 +283,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "TabContent",
         "deprecated" : false,
@@ -1313,8 +1314,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Moves the system's `.search`, `.sidebarToggle` or `.title` item.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -3426,10 +3429,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "With a title, `systemImage:` and `value:`; `role:` is ignored.",
-      "overloadsCovered" : 17,
+      "notes" : "A title with `systemImage:` or `image:`, `value:` for `TabView(selection:)`, and `role: .search`.",
+      "overloadsCovered" : 26,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "TabContent",
         "deprecated" : false,
@@ -4010,8 +4013,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Groups tabs in the iPad sidebar; on iPhone its tabs are in the tab bar.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "TabContent",
         "deprecated" : false,
@@ -6113,8 +6118,8 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "In `.toolbar { }`, by placement.",
-      "overloadsCovered" : 1,
+      "notes" : "In `.toolbar { }`: several items at one placement.",
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -6152,8 +6157,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Items for the toolbar's overflow (…) menu.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -6177,8 +6184,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Separates toolbar items: `.flexible` (the default) or `.fixed`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -6203,8 +6212,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A menu on the navigation title.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "ToolbarContent",
         "deprecated" : false,
@@ -8033,8 +8044,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:dismissSearch",
@@ -8179,8 +8191,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`editMode?.wrappedValue` is `.active` or `.inactive` (`isEditing`); set it to start editing.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:editMode",
@@ -8543,8 +8557,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isPresented",
@@ -8616,8 +8631,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isSearching",
@@ -8640,8 +8656,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:isTabBarShowingSections",
@@ -9173,8 +9190,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:navigationLinkIndicatorVisibility",
@@ -9608,8 +9626,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:searchSuggestionsPlacement",
@@ -9922,8 +9941,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.inline` while the tab bar is minimized, else `.expanded`.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:tabViewBottomAccessoryPlacement",
@@ -10090,8 +10111,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:toolbarLabelStyle",
@@ -10114,8 +10136,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "iOS 27.1.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "environment:toolbarVerticalEdge",
@@ -13223,8 +13247,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:NavigationTransition.automatic",
@@ -13249,8 +13274,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "iOS 27.",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:NavigationTransition.crossFade",
@@ -13275,8 +13302,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "From the view marked `.matchedTransitionSource(id:in:)` with the same id.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:NavigationTransition.zoom",
@@ -13303,7 +13332,7 @@
     {
       "family" : "Navigation",
       "round" : 1,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationDetent.custom",
@@ -13324,12 +13353,14 @@
           }
         ],
         "owner" : "PresentationDetent"
-      }
+      },
+      "wontDo" : "custom-presentation-detent"
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationDetent.fraction",
@@ -13354,8 +13385,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationDetent.height",
@@ -13380,8 +13412,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationDetent.large",
@@ -13406,8 +13439,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationDetent.medium",
@@ -13432,8 +13466,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationSizing.automatic",
@@ -13458,8 +13493,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationSizing.fitted",
@@ -13484,8 +13520,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationSizing.form",
@@ -13510,8 +13547,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:PresentationSizing.page",
@@ -15583,8 +15621,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.largeSubtitle",
@@ -15609,8 +15648,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.largeTitle",
@@ -15635,8 +15675,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.navigation",
@@ -15769,8 +15810,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.secondaryAction",
@@ -15795,8 +15837,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.status",
@@ -15821,8 +15864,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.subtitle",
@@ -15847,8 +15891,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.title",
@@ -15900,8 +15945,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "member:ToolbarItemPlacement.topBarPinnedTrailing",
@@ -18464,8 +18510,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.accessibilityHint",
@@ -18524,8 +18571,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.accessibilityIdentifier",
@@ -18551,8 +18599,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.accessibilityInputLabels",
@@ -18600,8 +18649,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.accessibilityLabel",
@@ -18660,8 +18710,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.accessibilityValue",
@@ -18720,8 +18771,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A count or text, on a list row or a tab.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.badge",
@@ -18786,8 +18839,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Its menu items; `preview:` isn't shown.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.contextMenu",
@@ -18812,8 +18867,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.customizationBehavior",
@@ -18839,8 +18895,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.customizationID",
@@ -18865,8 +18922,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.defaultSectionExpansion",
@@ -18891,8 +18949,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.defaultVisibility",
@@ -18918,8 +18977,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.disabled",
@@ -18997,8 +19057,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Shown when a pointer hovers (iPad with a trackpad); nothing on touch.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.help",
@@ -19053,8 +19115,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.hidden",
@@ -19079,8 +19142,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.popover",
@@ -19121,8 +19186,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.sectionActions",
@@ -19173,8 +19239,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "On `List` rows, and (iOS 27) on any view in a scroll view marked `.swipeActionsContainer()`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.swipeActions",
@@ -19201,8 +19269,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:TabContent.tabPlacement",
@@ -19482,8 +19551,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.axisBehavior",
@@ -19518,8 +19588,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.contentMarginsRemoved",
@@ -19554,8 +19625,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.customizationBehavior",
@@ -19580,8 +19652,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.defaultCustomization",
@@ -19617,8 +19690,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "The namespace is the navigation stack's (or the sheet's): ids must be unique there.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.matchedTransitionSource",
@@ -19655,8 +19730,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.sharedBackgroundVisibility",
@@ -19691,8 +19767,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:ToolbarContent.visibilityPriority",
@@ -21678,8 +21755,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityInputLabels",
@@ -22752,8 +22830,9 @@
     },
     {
       "family" : "Accessibility",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:accessibilityValue",
@@ -22970,8 +23049,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Old; shown as a `confirmationDialog`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:actionSheet",
@@ -24284,6 +24365,7 @@
     },
     {
       "family" : "Lists",
+      "notes" : "A count or text, on a list row or a tab.",
       "overloadsCovered" : 5,
       "round" : 1,
       "status" : "supported",
@@ -26878,8 +26960,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "visionOS and macOS place these; on iPhone it shows nothing.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:contentToolbar",
@@ -27309,8 +27393,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultAdaptableTabBarPlacement",
@@ -27458,8 +27543,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:defaultTabBarPlacement",
@@ -27535,8 +27621,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:dialogIcon",
@@ -27560,8 +27647,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "macOS shows it in a dialog; on iPhone it shows nothing.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:dialogSuppressionToggle",
@@ -27707,8 +27796,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Asks before a sheet is swiped or cancelled away, when `shouldPresent` is true.",
+      "overloadsCovered" : 8,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:dismissalConfirmationDialog",
@@ -30641,8 +30732,9 @@
     },
     {
       "family" : "Controls",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:indexViewStyle",
@@ -30692,8 +30784,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A trailing column on iPad; a sheet on iPhone.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:inspector",
@@ -30718,8 +30812,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:inspectorColumnWidth",
@@ -30780,8 +30875,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:interactiveDismissDisabled",
@@ -32398,8 +32494,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "The namespace is the navigation stack's (or the sheet's): ids must be unique there.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:matchedTransitionSource",
@@ -32461,8 +32559,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:menuActionDismissBehavior",
@@ -32934,10 +33033,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Hides the back button only.",
+      "notes" : "Old; prefer `.toolbar(.hidden, for: .navigationBar)`.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationBarHidden",
@@ -32961,8 +33060,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Old; prefer `.toolbar`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationBarItems",
@@ -33007,8 +33108,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Old; `.navigationTitle` and `.navigationBarTitleDisplayMode`.",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationBarTitle",
@@ -33111,10 +33214,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "`for:` with any type the links push, and `isPresented:`.",
-      "overloadsCovered" : 2,
+      "notes" : "`for:` with any type the links push, `isPresented:`, and `item:`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationDestination",
@@ -33241,8 +33344,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationLinkIndicatorVisibility",
@@ -33266,8 +33370,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationSplitViewColumnWidth",
@@ -33303,8 +33408,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.balanced`, `.prominentDetail`, or your own `NavigationSplitViewStyle`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationSplitViewStyle",
@@ -33328,8 +33435,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationSubtitle",
@@ -33449,8 +33557,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.zoom(sourceID:in:)` from a `.matchedTransitionSource`, `.crossFade` (iOS 27) or `.automatic`, on the pushed or presented view.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationTransition",
@@ -33474,8 +33584,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Old; on iPhone every style is a stack.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:navigationViewStyle",
@@ -35769,10 +35881,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Shown as a sheet.",
+      "notes" : "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`.",
       "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:popover",
@@ -35862,8 +35974,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Shown as `.popover`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:popoverCore",
@@ -36087,8 +36201,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationBackground",
@@ -36123,8 +36238,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.enabled`, `.enabled(upThrough: .medium)`, `.disabled`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationBackgroundInteraction",
@@ -36148,8 +36265,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.popover` keeps a popover a popover on iPhone; `.sheet`, `.fullScreenCover`, `.none`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationCompactAdaptation",
@@ -36184,8 +36303,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationContentInteraction",
@@ -36209,8 +36329,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationCornerRadius",
@@ -36234,6 +36355,7 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.medium`, `.large`, `.fraction(_:)`, `.height(_:)`; `selection:` follows the one shown.",
       "overloadsCovered" : 1,
       "round" : 1,
       "status" : "supported",
@@ -36271,10 +36393,9 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Always visible.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationDragIndicator",
@@ -36298,8 +36419,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationPlacement",
@@ -36323,8 +36445,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.form`, `.page`, `.fitted`: how big a sheet is on iPad.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:presentationSizing",
@@ -36824,8 +36948,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "What a `RenameButton` runs: a closure, or a focus binding to set.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:renameAction",
@@ -37128,8 +37254,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A bar that scroll edge effects blur under, like `.safeAreaInset`.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:safeAreaBar",
@@ -37896,8 +38024,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "On a suggestion: tapping it fills the field with this text (or adds this token).",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchCompletion",
@@ -37931,8 +38061,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Inline dictation is visionOS's; on iPhone the field keeps its usual dictation.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchDictationBehavior",
@@ -37992,8 +38124,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchPresentationToolbarBehavior",
@@ -38017,8 +38150,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchScopes",
@@ -38056,7 +38190,7 @@
     {
       "family" : "Navigation",
       "round" : 1,
-      "status" : "missing",
+      "status" : "later",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchSelection",
@@ -38076,12 +38210,14 @@
             "signature" : "func searchSelection(_ selection: Binding<TextSelection?>) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "search-selection"
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchSuggestions",
@@ -38116,8 +38252,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.minimize`: the search field shrinks to a button in the toolbar.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchToolbarBehavior",
@@ -38141,10 +38279,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "`text:` and `prompt:`.",
-      "overloadsCovered" : 8,
+      "notes" : "`text:` with `placement:`, `prompt:` and `isPresented:`; `tokens:` (with `token:`) and `suggestions:`.",
+      "overloadsCovered" : 27,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:searchable",
@@ -38653,8 +38791,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:sectionActions",
@@ -39373,8 +39512,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Old; `.statusBarHidden(_:)`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:statusBar",
@@ -39398,8 +39539,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Hides the status bar while the app's card is open.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:statusBarHidden",
@@ -40563,8 +40706,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabBarMinimizeBehavior",
@@ -40614,8 +40758,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "A bar above the tab bar (a mini player); `isEnabled:` hides it.",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewBottomAccessory",
@@ -40650,8 +40796,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "Bound to a `TabViewCustomization` in `@State`; the iPad sidebar's edits are kept while the app is open.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewCustomization",
@@ -40675,8 +40823,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewSearchActivation",
@@ -40700,8 +40849,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewSidebarBottomBar",
@@ -40725,8 +40876,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewSidebarFooter",
@@ -40750,8 +40903,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "In the iPad sidebar of a `.sidebarAdaptable` `TabView`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewSidebarHeader",
@@ -40775,8 +40930,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.page` (a swiping carousel, with `indexDisplayMode:`), `.sidebarAdaptable`, `.tabBarOnly`.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:tabViewStyle",
@@ -41374,10 +41531,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Items by placement; `.toolbar(.hidden)` isn't supported.",
-      "overloadsCovered" : 3,
+      "notes" : "Items by placement, in order, with `ToolbarSpacer`s; `.toolbar(.hidden, for:)` hides a bar.",
+      "overloadsCovered" : 5,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbar",
@@ -41443,8 +41600,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarBackground",
@@ -41480,8 +41638,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarBackgroundVisibility",
@@ -41506,8 +41665,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "stub",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarColorScheme",
@@ -41532,8 +41692,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`.onScrollDown`, `.onScrollUp` or `.never`, for the bars named.",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarMinimizationBehavior",
@@ -41558,8 +41720,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarMinimizationRestoration",
@@ -41584,8 +41747,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarMinimizationSafeAreaAdjustment",
@@ -41610,8 +41774,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarOverflowMenu",
@@ -41635,8 +41800,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarRole",
@@ -41660,8 +41826,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarTitleDisplayMode",
@@ -41685,8 +41852,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarTitleMenu",
@@ -41710,8 +41878,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarVerticalBehavior",
@@ -41735,8 +41904,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarVerticalCompressionBehavior",
@@ -41760,8 +41930,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:toolbarVisibility",
@@ -44552,8 +44723,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:IndexViewStyle.page",
@@ -44966,8 +45138,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationSplitViewStyle.automatic",
@@ -44992,8 +45165,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationSplitViewStyle.balanced",
@@ -45018,8 +45192,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationSplitViewStyle.prominentDetail",
@@ -45044,8 +45219,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationViewStyle.automatic",
@@ -45070,8 +45246,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationViewStyle.columns",
@@ -45096,8 +45273,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:NavigationViewStyle.stack",
@@ -45835,8 +46013,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TabViewStyle.automatic",
@@ -45861,8 +46040,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TabViewStyle.page",
@@ -45897,8 +46077,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TabViewStyle.sidebarAdaptable",
@@ -45923,8 +46104,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:TabViewStyle.tabBarOnly",
@@ -47008,8 +47190,10 @@
     },
     {
       "family" : "Navigation",
+      "notes" : "`append`, `removeLast()`, `count`, `isEmpty`; `NavigationPath()` or from an array.",
+      "overloadsCovered" : 4,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:NavigationPath",
@@ -47172,8 +47356,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:PresentationDetent",
@@ -47375,8 +47560,9 @@
     },
     {
       "family" : "Navigation",
+      "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:SearchFieldPlacement",
@@ -54894,10 +55080,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Shown as a stack of its sidebar.",
+      "notes" : "Two or three columns on iPad; on iPhone it's a stack from the sidebar. `columnVisibility:` and `preferredCompactColumn:` are kept.",
       "overloadsCovered" : 2,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:NavigationSplitView",
@@ -55003,10 +55189,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "`path:` isn't kept; push with `NavigationLink(value:)` and `.navigationDestination(for:)`.",
-      "overloadsCovered" : 2,
+      "notes" : "Push with `NavigationLink(value:)` and `.navigationDestination(for:)`; `path:` is an array of values or a `NavigationPath`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:NavigationStack",
@@ -59498,10 +59684,10 @@
     },
     {
       "family" : "Navigation",
-      "notes" : "Tabs from `.tabItem` or `Tab`.",
+      "notes" : "`Tab`s (with `value:`, `role: .search`) and `TabSection`s, or views with `.tabItem`; `selection:` is the tab's value.",
       "overloadsCovered" : 1,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:TabView",
@@ -63007,6 +63193,10 @@
     "member:Locale.current",
     "member:Locale.identifier",
     "member:MainActor.run",
+    "member:NavigationPath.append",
+    "member:NavigationPath.count",
+    "member:NavigationPath.isEmpty",
+    "member:NavigationPath.removeLast",
     "member:NumberFormatter.currencyCode",
     "member:NumberFormatter.localizedString",
     "member:NumberFormatter.maximumFractionDigits",
@@ -63275,6 +63465,16 @@
     "member:UserDefaults.string",
     "member:UserDefaults.stringArray",
     "member:UserDefaults.url",
+    "modifier:axisBehavior",
+    "modifier:contentMarginsRemoved",
+    "modifier:customizationBehavior",
+    "modifier:customizationID",
+    "modifier:defaultCustomization",
+    "modifier:defaultSectionExpansion",
+    "modifier:defaultVisibility",
+    "modifier:sharedBackgroundVisibility",
+    "modifier:tabPlacement",
+    "modifier:visibilityPriority",
     "protocol:CaseIterable",
     "protocol:Codable",
     "protocol:Comparable",
@@ -63288,6 +63488,7 @@
     "protocol:LocalizedError",
     "protocol:ObservableObject",
     "protocol:PreviewProvider",
+    "type:ActionSheet",
     "type:Alert",
     "type:Alignment",
     "type:Array",
@@ -63347,7 +63548,9 @@
     "type:MainActor",
     "type:Measurement",
     "type:NSColor",
+    "type:NavigationTransition",
     "type:NumberFormatter",
+    "type:PresentationSizing",
     "type:Range",
     "type:Regex",
     "type:Regex.Match",
@@ -63361,6 +63564,7 @@
     "type:String",
     "type:Substring",
     "type:SymbolRenderingMode",
+    "type:TabViewCustomization",
     "type:Task",
     "type:TaskGroup",
     "type:TextAlignment",
@@ -63402,10 +63606,10 @@
     },
     {
       "family" : "Controls",
-      "missing" : 1,
+      "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 140,
+      "supported" : 141,
       "total" : 143,
       "wontDo" : 2
     },
@@ -63438,12 +63642,12 @@
     },
     {
       "family" : "Navigation",
-      "missing" : 136,
-      "missingNew" : 33,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 1,
-      "supported" : 40,
+      "supported" : 174,
       "total" : 179,
-      "wontDo" : 3
+      "wontDo" : 5
     },
     {
       "family" : "Gestures",
@@ -63483,10 +63687,10 @@
     },
     {
       "family" : "Accessibility",
-      "missing" : 59,
+      "missing" : 57,
       "missingNew" : 5,
       "round" : 1,
-      "supported" : 3,
+      "supported" : 5,
       "total" : 62,
       "wontDo" : 0
     },
@@ -63711,7 +63915,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 1249
+    "symbols" : 1399
   },
   "schemaVersion" : 1,
   "sdk" : {

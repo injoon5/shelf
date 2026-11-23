@@ -145,6 +145,7 @@ extension ControlsBridges {
         }
         r.modifier("disabled", .controls) { m in
             m.form("_:bool") { c, view in view.disabled(c.bool(0, default: true)) }
+            m.form("_:bool", receiver: "TabContent") { _, view in view }
         }
     }
 

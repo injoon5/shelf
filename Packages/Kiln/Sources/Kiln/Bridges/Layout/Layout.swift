@@ -203,7 +203,10 @@ final class LayoutBridges: KBridgeFamily {
                 if let ratio = c.cg(0) { view.aspectRatio(ratio, contentMode: mode) } else { view.aspectRatio(contentMode: mode) }
             }
         }
-        r.modifier("hidden", .layout) { m in m.form("") { _, view in view.hidden() } }
+        r.modifier("hidden", .layout) { m in
+            m.form("") { _, view in view.hidden() }
+            m.form("_:bool?", receiver: "TabContent") { _, view in view }
+        }
         r.modifier("scaledToFit", .layout) { m in m.form("") { _, view in view.scaledToFit() } }
         r.modifier("scaledToFill", .layout) { m in m.form("") { _, view in view.scaledToFill() } }
         r.modifier("safeAreaInset", .layout) { m in

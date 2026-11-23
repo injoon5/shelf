@@ -12,6 +12,7 @@ import SwiftUI
 extension ControlsBridges {
     static func moreControls(_ r: KRegistry) {
         controlViews(r)
+        symbolicTypes(r)
         controlModifiers(r)
         controlEnvironment(r)
     }
@@ -55,6 +56,15 @@ extension ControlsBridges {
 
     // MARK: Modifiers
 
+    static func symbolicTypes(_ r: KRegistry) {
+        for name in ["ButtonRole", "ControlSize", "MenuOrder", "ButtonRepeatBehavior", "ButtonSizing", "PaletteSelectionEffect"] {
+            r.type(name, .controls) { t in
+                t.internal()
+                t.anyStatic { _, member in .native(.implicit(member, [])) }
+            }
+        }
+    }
+
     static let visibilities = ["automatic", "visible", "hidden"]
 
     static func controlModifiers(_ r: KRegistry) {
@@ -95,6 +105,7 @@ extension ControlsBridges {
         }
         r.modifier("help", .controls, notes: "Shown when a pointer hovers (iPad with a trackpad); nothing on touch.") { m in
             m.form("_:title") { c, view in view.help(c.string(0) ?? "") }
+            m.form("_:title", receiver: "TabContent", introduced: "27.0") { _, view in view }
         }
         r.modifier("backgroundStyle", .controls) { m in
             m.form("_:ShapeStyle") { c, view in

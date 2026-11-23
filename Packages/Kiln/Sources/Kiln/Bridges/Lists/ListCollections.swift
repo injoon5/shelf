@@ -22,6 +22,12 @@ struct KOutlineNode: Identifiable {
 
 extension ListsBridges {
     static func collections(_ r: KRegistry) {
+        for name in ["Prominence", "BadgeProminence", "ListSectionSpacing", "EditActions", "ListItemTint"] {
+            r.type(name, .lists) { t in
+                t.internal()
+                t.anyStatic { _, member in .native(.implicit(member, [])) }
+            }
+        }
         outlines(r)
         reordering(r)
         listModifiers(r)

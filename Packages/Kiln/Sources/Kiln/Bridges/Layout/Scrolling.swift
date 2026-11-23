@@ -34,6 +34,12 @@ extension LayoutBridges {
 
     static func scrollTypes(_ r: KRegistry) {
         if #available(iOS 18.0, macOS 15.0, *) { scrollPositionType(r) }
+        for name in ["ScrollPhase", "ScrollTransitionPhase", "ScrollBounceBehavior", "ScrollIndicatorVisibility", "ContentMarginPlacement", "ScrollAnchorRole"] {
+            r.type(name, .layout) { t in
+                t.internal()
+                t.anyStatic { _, member in .native(.implicit(member, [])) }
+            }
+        }
         r.type("ScrollTargetBehavior", .layout) { t in
             t.membersInManifest = true
             t.staticProperty("paging") { _ in .native(.implicit("paging", [])) }

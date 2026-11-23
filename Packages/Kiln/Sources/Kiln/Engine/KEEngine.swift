@@ -281,7 +281,7 @@ final class KProbe {
         case .primitive(let name, let args, let labels, _):
             if Self.visible.contains(name) { renderedContent = true }
             let a = KArgs(args: args, labels: labels)
-            if KRenderer.eachRowNames.contains(name) || name == "List" && a.first.map({ if case .function = $0 { return false }; return true }) == true {
+            if KRenderer.eachRowNames.contains(name) || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for row in KRenderer(interp: interp).forEachRows(a) {
                     row.views.forEach { walk($0, depth: depth + 1) }
                 }

@@ -161,6 +161,22 @@
       "status": "later",
       "source": "Round 1 (Lists)",
       "match": { "ids": ["modifier:onInsert"] }
+    },
+    {
+      "id": "custom-presentation-detent",
+      "what": "`PresentationDetent.custom(_:)` with your own `CustomPresentationDetent`",
+      "reason": "SwiftUI calls its static `height(in:)` while it lays out the sheet, off the main actor, where Kiln's code can't run; `.fraction(_:)` and `.height(_:)` cover the same sizes.",
+      "status": "wontDo",
+      "source": "Round 1 (Navigation)",
+      "match": { "ids": ["member:PresentationDetent.custom"] }
+    },
+    {
+      "id": "search-selection",
+      "what": "`.searchSelection(_:)`: the selected range in the search field",
+      "reason": "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
+      "status": "later",
+      "source": "Round 1 (Navigation)",
+      "match": { "ids": ["modifier:searchSelection"] }
     }
   ]
 }
