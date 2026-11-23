@@ -1,17 +1,31 @@
 import SwiftUI
 import Observation
 
-/// How icons are drawn: in their own colours, or as clear glass. Both follow
-/// light and dark mode, as the system's Home Screen icons do.
-enum IconStyle: String, CaseIterable, Identifiable, Sendable {
-    case color, clear
+/// Whether icons are light or dark: with the system, or held at one
+/// whatever the system does, as Springboard's Customize panel holds them.
+/// Only the icons: labels, the dock's glass and the wallpaper always follow
+/// the system.
+enum IconAppearance: String, CaseIterable, Identifiable, Sendable {
+    case automatic, light, dark
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .color: "Color"
-        case .clear: "Clear"
+        case .automatic: String(localized: "Automatic")
+        case .light: String(localized: "Light")
+        case .dark: String(localized: "Dark")
+        }
+    }
+
+    /// The tone every icon is drawn in while the system is `style`. The one
+    /// place this setting is read: the stage sets the result on the window
+    /// (`IconToneTrait`), and every icon reads that.
+    func tone(system style: UIUserInterfaceStyle) -> IconTone {
+        switch self {
+        case .automatic: IconTone(style)
+        case .light: .light
+        case .dark: .dark
         }
     }
 }
@@ -32,7 +46,7 @@ enum WallpaperChoice: String, CaseIterable, Identifiable, Sendable {
 @MainActor
 @Observable
 final class ShelfSettings {
-    var iconStyle: IconStyle { didSet { defaults.set(iconStyle.rawValue, forKey: "iconStyle") } }
+    var iconAppearance: IconAppearance { didSet { defaults.set(iconAppearance.rawValue, forKey: Self.iconAppearanceKey) } }
     /// Whether the change prompt carries the app's full source.
     var includeSource: Bool { didSet { defaults.set(includeSource, forKey: "includeSource") } }
     var wallpaper: WallpaperChoice { didSet { defaults.set(wallpaper.rawValue, forKey: "wallpaper") } }
@@ -40,12 +54,18 @@ final class ShelfSettings {
     private(set) var customWallpaper: UIImage?
 
     private static let wallpaperSide: CGFloat = 3000
-    @ObservationIgnored private let defaults = Account.defaults
+    @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let wallpaperURL = URL.applicationSupportDirectory.appending(path: "wallpaper.jpg")
+    private static let iconAppearanceKey = "iconAppearance"
+    /// What Icon Appearance replaced: Icon Style, Color or Clear (and before
+    /// that Default, Dark and Tinted). None of them chose light or dark, so
+    /// every one reads as Automatic.
+    static let retiredIconStyleKey = "iconStyle"
 
-    init() {
-        // Styles Shelf no longer offers (Default, Dark, Tinted) come back as Color.
-        iconStyle = IconStyle(rawValue: defaults.string(forKey: "iconStyle") ?? "") ?? .color
+    init(defaults: UserDefaults = Account.defaults) {
+        self.defaults = defaults
+        defaults.removeObject(forKey: Self.retiredIconStyleKey)
+        iconAppearance = IconAppearance(rawValue: defaults.string(forKey: Self.iconAppearanceKey) ?? "") ?? .automatic
         includeSource = defaults.object(forKey: "includeSource") as? Bool ?? true
         let picked = UIImage(contentsOfFile: wallpaperURL.path)
         let saved = WallpaperChoice(rawValue: defaults.string(forKey: "wallpaper") ?? "") ?? .photo

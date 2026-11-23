@@ -11,4 +11,13 @@ enum SettingsMetrics {
     static let fieldInset: CGFloat = 18
     static let fieldRadius: CGFloat = 25
     static let glyphGap: CGFloat = 36
+
+    // Icon Appearance's row of icons: the dock's four, at a size that fits
+    // four across a form row on the narrowest iPhone (Shelf's own choice;
+    // Springboard shows its Customize panel over the Home Screen instead).
+    static let appearanceIconCount = 4
+    static let appearanceIconSize: CGFloat = 54
+    static let appearanceIconGap: CGFloat = 22
+    static let appearanceSpacing: CGFloat = 14
+    static let appearancePadding: CGFloat = 6
 }

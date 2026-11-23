@@ -186,16 +186,17 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
     }
 
     /// The Home Screen keeps the chosen appearance behind any app, and so
-    /// do icons everywhere: the tone is set once, on the window, so the
-    /// grid, the dock, cards' faces and sheets' previews all read the same
-    /// value. For now it follows the system; Icon Appearance (§0.5) will
-    /// set it from Settings.
+    /// do icons everywhere. The icon tone is Icon Appearance resolved
+    /// against that appearance, here and nowhere else, and set once, on the
+    /// window, so the grid, the dock, search's rows, the lifted and carried
+    /// icon, cards' faces and sheets' previews all read the same value.
+    /// Labels, the glass and the wallpaper follow the appearance itself.
     private func holdAppearance() {
         let style = chosenStyle
         for layer in [wallpaper as UIView?, homeView, overlay, list, search].compactMap({ $0 }) where layer.overrideUserInterfaceStyle != style {
             layer.overrideUserInterfaceStyle = style
         }
-        let tone = IconTone(style)
+        let tone = settings.iconAppearance.tone(system: style)
         // Reading an override that was never set throws, so ask the
         // window's traits instead.
         if let window = view.window, window.traitCollection[IconToneTrait.self] != tone {
@@ -250,6 +251,8 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
 
     override func updateProperties() {
         super.updateProperties()
+        // It reads Icon Appearance, so the icons follow a change in Settings.
+        holdAppearance()
         if model.isSearching != search.isOpen {
             if model.isSearching {
                 openSearch()

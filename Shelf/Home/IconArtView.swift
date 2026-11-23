@@ -97,8 +97,14 @@ class IconArtView: UIView {
 
     // MARK: Painting
 
+    /// The tone it was last painted in: the window's `IconToneTrait`,
+    /// which the stage resolves from Icon Appearance.
+    private(set) var paintedTone: IconTone?
+
     private func repaint() {
-        let palette = IconPalette(face, tone: traitCollection.iconTone)
+        let tone = traitCollection.iconTone
+        paintedTone = tone
+        let palette = IconPalette(face, tone: tone)
         let scale = traitCollection.displayScale > 0 ? traitCollection.displayScale : 3
         withoutActions {
             tile.colors = showsArt ? [palette.top.cgColor, palette.bottom.cgColor] : [UIColor.clear.cgColor, UIColor.clear.cgColor]

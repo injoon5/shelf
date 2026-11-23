@@ -218,9 +218,11 @@ struct HomeGeometry: Equatable {
                       width: size.width - 2 * dockInset, height: height)
     }
     var dockRadius: CGFloat { HomeMetrics.dockRadius * scale }
-    /// The dock's outline, on screen: the glass, and where a carried icon
-    /// counts as over the dock.
-    var dockOutline: UIBezierPath { UIBezierPath(roundedRect: dockFrame, cornerRadius: dockRadius) }
+    /// The dock's outline, on screen, where a carried icon counts as over
+    /// the dock. SwiftUI's continuous corner is within 4 px at 3x of the
+    /// glass's (`cornerConfiguration`); `UIBezierPath(roundedRect:)`'s is 20
+    /// px rounder.
+    var dockOutline: Path { RoundedRectangle(cornerRadius: dockRadius, style: .continuous).path(in: dockFrame) }
     var dockIconPitch: CGFloat { iconSize + HomeMetrics.dockIconGap * scale }
 
     var pillFrame: CGRect {
