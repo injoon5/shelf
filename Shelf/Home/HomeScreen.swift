@@ -23,11 +23,16 @@ struct HomeScreen: View {
             // system has the edges to itself.
             .defersSystemGestures(on: model.run == nil ? [] : [.top, .bottom])
             .sheet(item: $model.sheet) { sheet in
-                switch sheet {
-                case .settings: SettingsView()
-                case .newApp: NewAppSheet(app: nil, source: nil)
-                case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
+                Group {
+                    switch sheet {
+                    case .settings: SettingsView()
+                    case .newApp: NewAppSheet(app: nil, source: nil)
+                    case .change(let app): NewAppSheet(app: app, source: library.source(for: app.slug))
+                    }
                 }
+                // The icon tone the stage set on the window, which a sheet
+                // wouldn't otherwise see change while it's up.
+                .environment(\.iconTone, model.iconTone)
             }
             .onChange(of: library.isSignedIn) { model.stopEditing() }
             // Leaving the foreground ends a drag (the stage lets go of its

@@ -175,6 +175,10 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         #endif
         view.window?.windowScene?.registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (_: UIWindowScene, _) in
             self?.holdAppearance()
+            // The screen's traits, which `chosenStyle` reads, change after
+            // the scene's: read alone, now, they left the icons a switch
+            // behind (dark with the system light, and the other way round).
+            DispatchQueue.main.async { self?.holdAppearance() }
         }
     }
 
@@ -202,6 +206,7 @@ final class StageController: UIViewController, UIGestureRecognizerDelegate {
         if let window = view.window, window.traitCollection[IconToneTrait.self] != tone {
             window.traitOverrides.iconTone = tone
         }
+        if model.iconTone != tone { model.iconTone = tone }
     }
 
     override func viewDidLayoutSubviews() {

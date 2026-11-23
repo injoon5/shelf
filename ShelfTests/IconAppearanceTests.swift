@@ -69,6 +69,8 @@ import UIKit
             settings.iconAppearance = appearance
             settle(stage)
             let expected = appearance.tone(system: system)
+            // What sheets carry in SwiftUI's environment.
+            #expect(model.iconTone == expected)
             let icons = artViews(in: window)
             let names = Set(icons.map { String(describing: type(of: $0)) })
             #expect(names.contains("CardFaceView"))
