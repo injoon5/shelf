@@ -18,8 +18,9 @@ SIM=$(cat "$KILN/Lab/.sim-udid" 2>/dev/null || xcrun simctl list devices availab
 WORK=$(mktemp -d -t kilniter)
 
 echo "== bench"
-# Against 0.2.1's numbers: an input more than 10% slower is marked SLOWER.
-"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/baseline-0.2.1.json" | tee "$OUT/bench.txt"
+# Against the latest recorded step (Benchmarks/README.md): an input more than
+# 10% slower is marked SLOWER.
+"$KILN/Benchmarks/run.sh" "$OUT/bench.json" --compare "$KILN/Benchmarks/after-1.2-one-engine.json" | tee "$OUT/bench.txt"
 
 echo "== lab"
 cd "$KILN/Lab"

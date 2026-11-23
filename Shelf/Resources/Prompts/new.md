@@ -134,7 +134,6 @@ Kiln reads and writes JSON by a type's stored properties and its `CodingKeys`:
 - A one-sided range in a `case` (`case 90...:`) stops the whole file from running. Write `case 90...100:`.
 - Calling a method straight on `allCases` (`Kind.allCases.map { … }`) fails. Store it first: `let kinds = Kind.allCases`. `ForEach(Kind.allCases)` works.
 - `$value.animation()` on a binding. Use `.animation(_:value:)` on the view.
-- Don't write `GameCanvas(`, `.onTick(`, `.onSwipe`, `.dragToMove`, `Storage.save`, `Storage.load`, `BarChart(`, `LineChart(`, `Map(latitude:` or `Map(markers:` anywhere in the file, not even in a comment or a string. They switch Kiln to an older engine where most of the above stops working.
 
 ## Design
 

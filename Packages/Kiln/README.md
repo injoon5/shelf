@@ -31,6 +31,7 @@
 >
 > - `JSONEncoder().encode`, `[T].self`, and a decoded `UUID` staying a `UUID` (Shelf's former `kiln-0.2.1.patch`).
 > - `Tools/KilnBench` times Shelf's fixtures too, and [Benchmarks/](Benchmarks/) keeps the numbers each step is held to.
+> - One engine: the original interpreter is deleted (see [One engine](#one-engine)).
 >
 > The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
 
@@ -138,9 +139,9 @@ let check = Kiln.validate(source)   // check.isValid, check.errors
 | Seeded runs; `Color` opacity as a style | 5 of 5 | 100% | 5 of 5 |
 | A sixth app (tabs, search, a shared store); SwiftUI's number formatting | 6 of 6 | 100% | 5 of 5 |
 
-## Two engines
+## One engine
 
-`Kiln.run` and `Kiln.validate` use the engine described above. Code written for the original interpreter's guided dialect (`GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage`, `BarChart(` / `LineChart(`, `Map(latitude:`) still runs on the original interpreter. Set `Kiln.engine = .legacy` to use it for everything.
+Upstream 0.2.1 had two: the engine described above, and the original interpreter, which still ran code written in its guided dialect (`GameCanvas`, `.onTick`, `.onSwipe`, `.dragToMove`, `Storage`, `BarChart(` / `LineChart(`, `Map(latitude:`). This copy deletes the original interpreter, `Kiln.engine` with it, and `Kiln.register`, whose bridges only that interpreter read. Everything runs on one engine; code in the old dialect fails with its line (`Cannot find 'GameCanvas' in scope`).
 
 ## API
 
@@ -151,7 +152,6 @@ public enum Kiln {
     static func swiftSource(fromMarkdown markdown: String) -> String
     static func swiftSource(running block: String, inReply markdown: String) -> String
     static func looksLikeApp(_ code: String) -> Bool
-    @MainActor static var engine: Engine            // .automatic, .modern, .legacy
     @MainActor static var randomSeed: UInt64?
     @MainActor static var hostImageProvider: ((String) -> Image?)?
 }

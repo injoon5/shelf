@@ -1,11 +1,9 @@
 //
 //  KEEngine.swift
-//  Kiln engine 2
+//  Kiln's engine
 //
 //  Entry points: compile a source file, find the view to show, run it, and
-//  validate it headlessly. Kiln.run / Kiln.validate try this engine first and
-//  fall back to the original interpreter for its guided dialect (GameCanvas,
-//  onTick, Storage, …) or anything this engine can't parse.
+//  validate it headlessly. Kiln.run and Kiln.validate call straight through.
 //
 
 import SwiftUI
@@ -32,12 +30,6 @@ enum KilnEngine {
         case noView(String)
     }
 
-    /// Code written for the original interpreter's guided dialect.
-    static func isLegacyDialect(_ code: String) -> Bool {
-        ["GameCanvas(", ".onTick(", ".onSwipe", ".dragToMove", "BarChart(", "LineChart(", "Storage.save", "Storage.load",
-         "Map(latitude", "Map(markers"].contains { code.contains($0) }
-    }
-
     static func compile(_ code: String) throws -> Compiled {
         let program: KEProgram
         do {
@@ -46,7 +38,6 @@ enum KilnEngine {
             throw Failure.syntax(formatSyntaxError(e, code))
         }
         let interp = try KInterpreter(program: program)
-        interp.consoleSink = { SwiftRunner.shared.consoleOutput = $0 }
         guard let root = findRoot(program, interp, code) else {
             let views = program.types.filter { $0.inherits.contains("View") }.map(\.name)
             if views.isEmpty {
@@ -94,9 +85,7 @@ enum KilnEngine {
 
     // MARK: - Run
 
-    /// nil means "use the original interpreter".
-    static func run(_ code: String) -> KilnResult? {
-        if isLegacyDialect(code) { return nil }
+    static func run(_ code: String) -> KilnResult {
         do {
             let compiled = try compile(code)
             let view = AnyView(KRootView(compiled: compiled))
@@ -112,8 +101,7 @@ enum KilnEngine {
 
     // MARK: - Validate
 
-    static func validate(_ code: String, ticks: Int, fuel: Int) -> KilnValidation? {
-        if isLegacyDialect(code) { return nil }
+    static func validate(_ code: String, ticks: Int, fuel: Int) -> KilnValidation {
         let compiled: Compiled
         do {
             compiled = try compile(code)

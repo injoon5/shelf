@@ -5,13 +5,6 @@ import XCTest
 // types, so Kiln gaps are found without burning thermally-limited device time.
 @MainActor
 final class AppTypesRepro: XCTestCase {
-    override func setUp() {
-        super.setUp()
-        // Mirror Bond's bridges so Storage-backed apps validate as they would live.
-        Kiln.register("Storage.has") { _ in .bool(false) }
-        Kiln.register("Storage.load") { _ in .null }
-        Kiln.register("Storage.save") { _ in .null }
-    }
     func v(_ name: String, _ src: String) {
         let r = Kiln.validate(src)
         XCTAssertTrue(r.hasView && r.renderedContent && r.errors.isEmpty && r.warnings.isEmpty,
@@ -93,41 +86,6 @@ final class AppTypesRepro: XCTestCase {
                     Button("Next") { index = (index + 1) % cards.count; flipped = false }
                         .padding().background(Color.gray).foregroundColor(.white).cornerRadius(10)
                 }
-            }
-        }
-        """)
-    }
-
-    // Expense tracker: add name+amount, list, running total, persisted.
-    func testExpenses() {
-        v("expenses", """
-        import SwiftUI
-        struct ContentView: View {
-            @State private var items = []
-            @State private var name = ""
-            @State private var amount = ""
-            var body: some View {
-                VStack(spacing: 12) {
-                    Text("Expenses").font(.largeTitle).bold()
-                    HStack {
-                        TextField("Name", text: $name).padding(8).background(Color.gray).cornerRadius(8)
-                        TextField("Amount", text: $amount).padding(8).background(Color.gray).cornerRadius(8)
-                        Button("Add") {
-                            if name != "" {
-                                items.append(["name": name, "amount": amount])
-                                name = ""; amount = ""
-                                Storage.save("items", items)
-                            }
-                        }.padding(8).background(Color.blue).foregroundColor(.white).cornerRadius(8)
-                    }
-                    ScrollView {
-                        ForEach(items, id: \\.self) { item in
-                            HStack { Text(item["name"] ?? ""); Spacer(); Text("$" + (item["amount"] ?? "")) }
-                                .padding().background(Color.gray).cornerRadius(8)
-                        }
-                    }
-                    Spacer()
-                }.padding().onAppear { if Storage.has("items") { items = Storage.load("items") } }
             }
         }
         """)

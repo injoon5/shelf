@@ -20,9 +20,9 @@ Shelf needs iOS 27.
 
 ## What's next
 
-[PLAN.md](PLAN.md) starts with Shelf itself: an audit of how the Home Screen behaves, moving the Home Screen to UIKit and Core Animation (the sheets stay SwiftUI), search rebuilt as App Library's list, deleting apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a better launch screen. Then it takes Kiln into this repo and rebuilds it:
+[PLAN.md](PLAN.md) starts with Shelf itself: an audit of how the Home Screen behaves, moving the Home Screen to UIKit and Core Animation (the sheets stay SwiftUI), search rebuilt as App Library's list, deleting apps, Automatic/Light/Dark icons in place of Clear, the dock's shape, a card that stays on screen during a swipe up, and a better launch screen. Then it rebuilds Kiln, which is now in this repo and down to one engine:
 
-- **The rebuild:** one engine instead of two, real `async`, and a registry of bridges that also drives the prompt and a coverage report.
+- **The rebuild:** a bytecode VM with real `async`, and a registry of bridges that also drives the prompt and a coverage report.
 - **Then, in rounds:**
   - the rest of SwiftUI;
   - haptics, sharing, text parsing, units, audio, `WebView`, `Chart3D` and WebSockets;

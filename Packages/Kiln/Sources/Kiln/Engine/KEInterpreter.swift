@@ -89,9 +89,8 @@ final class KInterpreter {
     let globalEnv = KEnv(parent: nil)
     var functions: [String: [KEFuncDecl]] = [:]
 
-    var console = "" { didSet { consoleSink?(console) } }
-    /// Mirrors console output to the host (Haplo AI's Console tab).
-    var consoleSink: ((String) -> Void)?
+    /// What the code has printed.
+    var console = ""
     /// Set when an `init?` body executes `return nil`.
     var returnedNil = false
     var errors: [String] = []

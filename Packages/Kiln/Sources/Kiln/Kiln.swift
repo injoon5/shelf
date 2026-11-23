@@ -2,9 +2,8 @@
 //  Kiln.swift
 //  Kiln — a Swift/SwiftUI interpreter you can embed in any iOS or macOS app.
 //
-//  Public API surface. The interpreter internals live in `SwiftRunner` and
-//  friends; this file exposes a tight, drop-in namespace that's stable
-//  across versions.
+//  Public API surface. The interpreter lives in `Engine/` (`KilnEngine`,
+//  `KInterpreter`, `KRenderer` …); this file is the namespace hosts call.
 //
 
 import SwiftUI
@@ -55,24 +54,8 @@ public enum Kiln {
     /// No compilation step is involved — this is pure interpretation.
     @MainActor
     public static func run(_ code: String) -> KilnResult {
-        // The original interpreter only runs its guided dialect (GameCanvas, onTick,
-        // Storage …); everything else goes to the modern engine, whose errors are
-        // clearer and which never loops forever on code it can't read.
-        if engine != .legacy, let result = KilnEngine.run(code) { return result }
-        let raw = SwiftRunner.shared.run(code)
-        return KilnResult(
-            view: raw.view,
-            consoleOutput: raw.consoleOutput,
-            errors: raw.errors
-        )
+        KilnEngine.run(code)
     }
-
-    /// Which interpreter runs code. `.automatic` (the default) uses the modern
-    /// engine — full Swift types, closures, SwiftUI state and controls — and
-    /// hands code written in the original interpreter's guided dialect
-    /// (GameCanvas, onTick, Storage …) to the original interpreter.
-    public enum Engine: Sendable { case automatic, modern, legacy }
-    @MainActor public static var engine: Engine = .automatic
 
     /// Seeds `shuffled()`, `randomElement()`, `Int.random(in:)` and friends in
     /// code run after it is set, so a run can be repeated exactly. nil (the
@@ -86,14 +69,14 @@ public enum Kiln {
     /// a lazy view wrapper (so render-time crashes, blank screens, and throwing
     /// handlers all look like success), `validate` eagerly evaluates the view
     /// body — running helper functions and firing lifecycle + interaction
-    /// handlers (onAppear, onTapGesture, onTick, onSwipe, Button actions) — and
+    /// handlers (onAppear, onTapGesture, onReceive, Button actions) — and
     /// reports the runtime problems it hits plus whether anything actually
     /// rendered.
     ///
     /// - Parameters:
     ///   - code: the Swift/SwiftUI source (must define `struct ContentView`).
-    ///   - ticks: how many times to fire each `.onTick` handler (drives a few
-    ///     frames of any game loop so animation/collision bugs surface). Default 8.
+    ///   - ticks: how many times to fire each `onReceive` timer handler, so a
+    ///     few frames of a timer-driven app run. Default 8.
     ///   - fuel: max interpreted steps before the run is aborted as a runaway
     ///     loop. Default 2,000,000 — ample for real phone UI/games, but bounded
     ///     so an infinite loop becomes a reported error instead of a hang.
@@ -101,8 +84,7 @@ public enum Kiln {
     ///   and whether visible content was produced.
     @MainActor
     public static func validate(_ code: String, ticks: Int = 8, fuel: Int = 2_000_000) -> KilnValidation {
-        if engine != .legacy, let v = KilnEngine.validate(code, ticks: ticks, fuel: fuel) { return v }
-        return SwiftRunner.shared.probe(code, ticks: ticks, fuel: fuel)
+        KilnEngine.validate(code, ticks: ticks, fuel: fuel)
     }
 
     /// The Swift a chat reply contains, ready to run: every ```swift block in
@@ -178,82 +160,6 @@ public enum Kiln {
     /// Convenience flag: returns the latest known version of the Kiln
     /// public API. Bumped on breaking changes.
     public static let version: String = "0.2.1"
-
-    // MARK: - Native bridges (host capabilities)
-
-    /// Register a native Swift function the interpreted code can call by name —
-    /// the way to expose real Apple-framework capabilities (HealthKit, haptics,
-    /// device info, Calendar, …) to Kiln apps. The closure receives the call's
-    /// evaluated arguments and returns a value.
-    ///
-    /// ```swift
-    /// Kiln.register("Haptics.play") { _ in
-    ///     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-    ///     return .null
-    /// }
-    /// // interpreted app: Haptics.play()
-    /// ```
-    ///
-    /// Use a bare name (`steps`) for a global function, or `Type.method`
-    /// (`Health.steps`) for a namespaced call.
-    @MainActor
-    public static func register(_ name: String, _ fn: @escaping ([KilnValue]) -> KilnValue) {
-        SwiftRunnerState.nativeBridges[name] = { values in
-            KilnValue.toInternal(fn(values.map(KilnValue.fromInternal)))
-        }
-    }
-
-    /// Remove a previously registered bridge.
-    @MainActor
-    public static func unregister(_ name: String) {
-        SwiftRunnerState.nativeBridges[name] = nil
-    }
-}
-
-// MARK: - KilnValue (public bridge value)
-
-/// The value type passed to/from native bridges registered via `Kiln.register`.
-/// Mirrors the interpreter's internal JSON-shaped value model.
-public enum KilnValue: Equatable, Sendable {
-    case number(Double)
-    case string(String)
-    case bool(Bool)
-    case array([KilnValue])
-    case object([String: KilnValue])
-    case null
-
-    /// Read a number regardless of stored numeric/bool/string form.
-    public var doubleValue: Double? {
-        switch self {
-        case .number(let n): return n
-        case .bool(let b): return b ? 1 : 0
-        case .string(let s): return Double(s)
-        default: return nil
-        }
-    }
-    public var stringValue: String? { if case .string(let s) = self { return s }; return nil }
-
-    // Internal <-> public conversions (`Value` is module-internal).
-    static func fromInternal(_ v: Value) -> KilnValue {
-        switch v {
-        case .number(let n): return .number(n)
-        case .string(let s): return .string(s)
-        case .boolean(let b): return .bool(b)
-        case .array(let a): return .array(a.map(fromInternal))
-        case .object(let o): return .object(o.mapValues(fromInternal))
-        case .nil: return .null
-        }
-    }
-    static func toInternal(_ v: KilnValue) -> Value {
-        switch v {
-        case .number(let n): return .number(n)
-        case .string(let s): return .string(s)
-        case .bool(let b): return .boolean(b)
-        case .array(let a): return .array(a.map(toInternal))
-        case .object(let o): return .object(o.mapValues(toInternal))
-        case .null: return .nil
-        }
-    }
 }
 
 // MARK: - Validation result
