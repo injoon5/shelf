@@ -302,6 +302,17 @@ PLAN.md §3, Round 2C (Foundation and the standard library), with Round 2B merge
 - **Kiln Lab** (`Tools/iterate.sh`): 16 of 16 apps match native on every step but `Terrain`, whose last step reads the slider after the UI test drags it (2.9 against 3.0, and the other way on a rerun); `Ledger` matches on every step, labels 100%.
 - **New inputs.** The fixture `foundation-stdlib` and Lab's `Ledger`, with nothing to compare against.
 
+### after-4b-round3b.json
+
+PLAN.md §4.5 and §4.6, Round 3B (Core Motion and Core Location), with `shelf-fixes` merged, against the bar `after-3c-round2c.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-4b-round3b.json --compare Benchmarks/after-3c-round2c.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is `AppleIntelligence/timer.md` at 6.4%, then `apps/audio.swift` at 5.5% and `Apps/HabitTracker.swift` at 5.3%.
+- **Noise.** Three earlier runs, made while other worktrees benchmarked and tested on the same Mac (load 6 to 9), each flagged a different pair of sub-millisecond fixtures 11–13% slower (`views-custom-protocols`, `views-input`, then `gestures-canvas`, `text-parsing` with a 9.5 ms median against a 5.5 ms minimum); none repeated, and this run, at a lower load, flags none.
+- **What it costs.** A member read checks first whether its base is a native suspension (`await` over a chain); a shorthand `if let`/`guard let` checks for `self`.
+- **Kiln Lab:** `Wayfinder` matches native on every step (labels and screens).
+- **New inputs.** The fixtures `motion` and `location` and Lab's `Wayfinder`, with nothing to compare against.
+
 ## §3.7: SurfacePlot
 
 `SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.
