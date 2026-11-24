@@ -801,6 +801,10 @@ final class KInterpreter {
             if case .ident(let tn, _) = base, env.lookup(tn) == nil, let t = types[tn], !(env.nearestSelf.map { (try? selfMemberLocation($0, tn)) != nil } ?? false) {
                 return .staticMember(t, name)
             }
+            // `Self.calendar.date(…)`: a static member through `Self`.
+            if case .ident("Self", _) = base, let t = env.nearestSelf?.type, t.staticDecls[name] != nil {
+                return .staticMember(t, name)
+            }
             let baseLoc = try lvalue(base, env)
             return try memberLocation(baseLoc, name)
         case .subscriptAccess(let base, let args, let line):

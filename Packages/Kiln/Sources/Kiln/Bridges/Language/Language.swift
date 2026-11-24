@@ -66,7 +66,16 @@ final class LanguageBridges: KBridgeFamily {
         }
         r.function("fmod", .language, owner: "Foundation") { c in .double(fmod(c.at(0)?.asDouble ?? 0, c.at(1)?.asDouble ?? 1)) }
         r.function("zip", .language) { c in
-            let a = try c.interp.sequence(c.at(0) ?? .nilValue), b = try c.interp.sequence(c.at(1) ?? .nilValue)
+            // A one-sided range (`zip(1..., names)`) runs as long as the other sequence.
+            func items(_ v: KV, _ other: KV) throws -> [KV] {
+                if case .range(let lo, .nilValue, _) = v, let start = lo.asInt {
+                    let n = (try? c.interp.sequence(other).count) ?? 0
+                    return (0..<n).map { .int(start + $0) }
+                }
+                return try c.interp.sequence(v)
+            }
+            let x = c.at(0) ?? .nilValue, y = c.at(1) ?? .nilValue
+            let a = try items(x, y), b = try items(y, x)
             return .array(zip(a, b).map { .tuple([$0, $1], [nil, nil]) })
         }
         r.function("stride", .language) { c in

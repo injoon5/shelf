@@ -333,6 +333,8 @@ Sort multi-key tuple compare ::
 => maz
 Dictionary(grouping:by:) :: Dictionary(grouping: [1, 2, 3, 4], by: { $0 % 2 }).count => 2
 Dictionary(grouping:) values :: Dictionary(grouping: ["apple", "avocado", "banana"], by: { $0.first! })["a"]! => ["apple", "avocado"]
+Dictionary(grouping:by: keyPath) :: Dictionary(grouping: ["apple", "avocado", "banana"], by: \.first).keys.sorted { $0! < $1! }.map { String($0!) } => ["a", "b"]
+zip(1..., _:) :: Array(zip(1..., ["x", "y"])).map { "\($0)\($1)" } => ["1x", "2y"]
 Dictionary(uniqueKeysWithValues:) :: Dictionary(uniqueKeysWithValues: [("a", 1)]).count => 1
 Dictionary(_:uniquingKeysWith:) :: Dictionary([("a", 1), ("a", 2)], uniquingKeysWith: +)["a"]! => 3
 Dictionary subscript default :: { var d: [String: Int] = [:]; d["a", default: 0] += 1; return d["a"]! }() => 1
