@@ -24,13 +24,18 @@ final class KGeometry {
         self.bounds = bounds
     }
 
+    /// `proxy[anchor]` (Environment/Preferences.swift): an anchor's rect or point here.
+    var resolve: (@MainActor (KAnchorValue) -> KV)?
+
     @MainActor static func of(_ proxy: GeometryProxy) -> KGeometry {
-        KGeometry(size: proxy.size, safeArea: proxy.safeAreaInsets,
-                  frame: { space in
-                      if let named = KLayout.namedSpace(space) { return proxy.frame(in: named) }
-                      return proxy.frame(in: KLayout.coordinateSpace(space))
-                  },
-                  bounds: { space in KLayout.namedSpace(space).flatMap { proxy.bounds(of: $0) } })
+        let g = KGeometry(size: proxy.size, safeArea: proxy.safeAreaInsets,
+                          frame: { space in
+                              if let named = KLayout.namedSpace(space) { return proxy.frame(in: named) }
+                              return proxy.frame(in: KLayout.coordinateSpace(space))
+                          },
+                          bounds: { space in KLayout.namedSpace(space).flatMap { proxy.bounds(of: $0) } })
+        g.resolve = { a in a.resolved(proxy) }
+        return g
     }
 
     /// What `Kiln.validate` hands a `GeometryReader`'s closure.

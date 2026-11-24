@@ -24,3 +24,19 @@ tests/ControlsBridgeTests-7.swift Round 1A: `\.isEnabled` and `\.controlSize` ar
 tests/ListsBridgeTests-7.swift Round 1A: `\.defaultMinListRowHeight` and `\.isScrollEnabled` are read from SwiftUI's environment; before, nil.
 tests/NavigationBridgeTests-5.swift Round 1A: `\.isSearching` and `\.dismissSearch` are read from SwiftUI's environment; before, nil.
 tests/NavigationBridgeTests-8.swift Round 1A: `\.isPresented` is read from SwiftUI's environment; before, nil.
+Packages/Kiln/Examples/Apps/DoodlePad.swift Round 1's Lab example: before, gestures, Canvas and focus weren't bridged (Canvas drew nothing; @FocusState and .gesture were stubs).
+fixtures/apps/accessibility-motion.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
+fixtures/apps/charts.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
+fixtures/apps/focus-environment.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
+fixtures/apps/gestures-canvas.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
+tests/RestOfSwiftUITests-0.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-10.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-11.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-12.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-13.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-14.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-15.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-16.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-19.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-3.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+tests/RestOfSwiftUITests-6.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.

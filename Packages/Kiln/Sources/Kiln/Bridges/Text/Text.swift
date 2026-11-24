@@ -16,6 +16,7 @@ final class KTextBridges: KBridgeFamily {
         text(r)
         fonts(r)
         typography(r)
+        typesetting(r)
         attributed(r)
     }
 

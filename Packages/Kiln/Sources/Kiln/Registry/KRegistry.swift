@@ -81,11 +81,11 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .layout: return "stacks, grids, scroll views, frames and padding"
         case .lists: return "lists, forms and sections"
         case .navigation: return "navigation stacks, tabs, toolbars, sheets and alerts"
-        case .gestures: return "taps, long presses, drags, pinches and rotations"
+        case .gestures: return "taps, long presses, drags, pinches, rotations and composed gestures"
         case .drawing: return "shapes, paths, colors, gradients, images, effects and animation"
-        case .focus: return "keyboard focus, submit and keyboard types"
+        case .focus: return "keyboard focus, submit, keyboard types and hardware keys"
         case .environment: return "state, bindings, observable models and environment values"
-        case .accessibility: return "accessibility labels, hints and values"
+        case .accessibility: return "accessibility labels, traits, actions and rotors"
         case .charts: return "Swift Charts"
         case .scenes: return "the app's scene"
         case .haptics: return "haptic feedback"
@@ -123,6 +123,22 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
         case .navigation:
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        case .core:
+            return "views' life cycle (`onAppear`, `.task`, `onChange`, `onReceive`), `TimelineView` (`.animation`, `.periodic`, `.everyMinute`, `.explicit`), and the `@Entry` and `@Animatable` macros"
+        case .text:
+            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values"
+        case .gestures:
+            return "every gesture (`TapGesture`, `SpatialTapGesture`, `LongPressGesture`, `DragGesture`, `MagnifyGesture`, `RotateGesture`, your own `Gesture`) with `.onChanged`, `.onEnded`, `.updating` and `@GestureState`, `.simultaneously`, `.sequenced`, `.exclusively`; `.gesture`, `.simultaneousGesture`, `.highPriorityGesture`, `.onTapGesture` (with the tap's location), `.onLongPressGesture`, hover and Pencil. A drag that starts at the very top or bottom edge closes the app instead"
+        case .drawing:
+            return "shapes and their operations (`union`, `inset`, `rotation`), `Path`, every color, gradient (`MeshGradient` too) and shape style, `Image` with `.symbolEffect`, `Canvas` with `GraphicsContext`, Liquid Glass (`.glassEffect`, `GlassEffectContainer`, `.glassEffectID`), `matchedGeometryEffect`, every visual effect, blend mode, animation and transition, `.contentTransition(.numericText())`, `phaseAnimator`, `keyframeAnimator`, `visualEffect`, and your own `Shape`, `Animatable` and `Transition`"
+        case .focus:
+            return "`@FocusState` (a `Bool`, or an enum of fields) with `.focused`, `.defaultFocus`, `.onSubmit` and `.submitLabel`; keyboard and text content types, `.scrollDismissesKeyboard`, `@FocusedValue`, `.keyboardShortcut` and `.onKeyPress`"
+        case .environment:
+            return "`@State`, `@Binding`, `@Observable` with `@Bindable` and `@Environment(Model.self)`, `@AppStorage`, your own `@Entry` values, every SwiftUI environment value (`\\.scenePhase` is `.active` while the app is open; `\\.openURL` opens web, mail, phone and Maps links), `PreferenceKey`, and `.redacted`"
+        case .accessibility:
+            return "every `accessibility…` modifier (labels, values, traits, actions, rotors, `@AccessibilityFocusState`), the speech modifiers and the accessibility environment values"
+        case .charts:
+            return "every mark and plot (`LinePlot(x:y:domain:)` draws a function), `.foregroundStyle(by:)`, annotations, `AxisMarks`, scales, legends, `.chartXSelection`, `.chartScrollableAxes` and `.chartOverlay` with `ChartProxy`; each axis takes one kind of value (text, numbers or dates)"
         default:
             return nil
         }
@@ -489,6 +505,8 @@ final class KViewBridge: KBridge {
     /// Makes the value a call evaluates to. Default: the view description
     /// (`.primitive`), which the renderer shows with `render`.
     var make: (@MainActor (KCall) throws -> KV)?
+    /// How a check runs its closures (KProbeCall); nil: each as content, with no arguments.
+    var probe: KProbe.Hook?
 }
 
 /// A modifier: how its arguments are taken, and how it changes a view.
@@ -498,7 +516,7 @@ final class KModifierBridge: KBridge {
     /// What `Kiln.validate` (and the transcript) pass a closure argument
     /// that isn't view content, by its label: `alignmentGuide`'s
     /// `computeValue` gets a `ViewDimensions`. nil: called with nothing.
-    var probe: (@MainActor (String?, KInterpreter) -> [KV]?)?
+    var sampleArgs: (@MainActor (String?, KInterpreter) -> [KV]?)?
     struct Form {
         let overload: KOverload
         /// The view with the modifier applied. `c.base` is the description of
@@ -514,6 +532,39 @@ final class KModifierBridge: KBridge {
     /// For styles: the style protocol and its members (`ButtonStyle`: `bordered`…).
     var styles: (owner: String, names: [String])?
     var owner: String?
+    /// How a check runs its closures (KProbeCall); nil: each as content, with no arguments.
+    var probe: KProbe.Hook?
+}
+
+/// A closure a check (`Kiln.validate`) or the transcript runs, with
+/// arguments like the ones SwiftUI passes: a `Canvas` renderer gets a context
+/// and a size, a drag's `onChanged` a drag value.
+struct KProbeCall {
+    enum Use {
+        /// It makes views: they're walked.
+        case content
+        /// An event fires it: it runs once, after the walk.
+        case action
+    }
+    let fn: KFunction
+    var args: [KV] = []
+    var use: Use = .content
+    var canWait = false
+}
+
+extension KProbe {
+    /// For a modifier, `base` is the view (or gesture) it's on. The arguments
+    /// carry their parameters' labels, a trailing closure's too (`labeled`).
+    typealias Hook = @MainActor (_ base: KView?, _ args: KArgs, _ interp: KInterpreter) -> [KProbeCall]
+
+    /// The arguments as written, each labelled with the parameter it was bound
+    /// to: `Canvas { … }`'s closure is `renderer`.
+    static func labeled(_ args: [KV], _ labels: [String?], _ bound: KBound?) -> KArgs {
+        guard let bound, bound.binding.count == args.count else { return KArgs(args: args, labels: labels) }
+        let params = bound.overload.params
+        let named = bound.binding.enumerated().map { i, p in p < params.count ? (params[p].label ?? labels[i]) : labels[i] }
+        return KArgs(args: args, labels: named)
+    }
 }
 
 /// A native type: initializers, static members, properties and methods.
@@ -597,10 +648,16 @@ final class KEnvironmentBridge: KBridge {
     var live: (@MainActor (EnvironmentValues, KInterpreter) -> KV)?
     /// Written by `.environment(\.key, value)`.
     var write: (@MainActor (AnyView, KV, KCall) -> AnyView)?
+    /// Sets SwiftUI's value in place, for `.environment(\.key, v)` and
+    /// `transformEnvironment` (Values.swift).
+    var writeEnvironment: (@MainActor (inout EnvironmentValues, KV, KInterpreter) -> Void)?
 }
 
 /// A property wrapper the engine implements (`@State`, `@AppStorage`).
 final class KWrapperBridge: KBridge {}
+
+/// A macro the engine reads as a declaration (`@Entry`, `@Animatable`; KEMacros).
+final class KMacroBridge: KBridge {}
 
 // MARK: - The registry
 
@@ -625,6 +682,7 @@ final class KRegistry {
     private(set) var protocols: [String: KProtocolBridge] = [:]
     private(set) var environment: [String: KEnvironmentBridge] = [:]
     private(set) var wrappers: [String: KWrapperBridge] = [:]
+    private(set) var macros: [String: KMacroBridge] = [:]
     /// Result builders bridges declare (`RegexComponentBuilder`), by attribute name (KEBuilders).
     private(set) var resultBuilders: [String: KNativeBuilder] = [:]
     /// `.name` with no expected type, by name (`.infinity`, `.degrees(…)`, `.red`).
@@ -699,6 +757,11 @@ final class KRegistry {
         wrappers[b.name] = b
     }
 
+    func add(_ b: KMacroBridge) {
+        claim("macro:" + b.name, b.family, b.source)
+        macros[b.name] = b
+    }
+
     func addResultBuilder(_ b: KNativeBuilder) {
         resultBuilders[b.name] = b
     }
@@ -720,7 +783,7 @@ final class KRegistry {
     /// Every bridge, for the manifest.
     var allBridges: [KBridge] {
         Array(views.values) as [KBridge] + Array(modifiers.values) + Array(types.values) + Array(functions.values)
-            + Array(protocols.values) + Array(environment.values) + Array(wrappers.values)
+            + Array(protocols.values) + Array(environment.values) + Array(wrappers.values) + Array(macros.values)
     }
 
     // MARK: Values → types

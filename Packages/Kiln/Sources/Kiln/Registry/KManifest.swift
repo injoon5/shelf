@@ -156,6 +156,7 @@ extension KRegistry {
         }
         for e in environment.values { symbol("environment", e.name, owner: nil, e, overloads: []) }
         for w in wrappers.values { symbol("wrapper", w.name, owner: nil, w, overloads: []) }
+        for m in macros.values { symbol("macro", m.name, owner: nil, m, overloads: []) }
 
         // One entry per id: a name registered as a property and a method
         // (`first`, `first(where:)`) is one member.

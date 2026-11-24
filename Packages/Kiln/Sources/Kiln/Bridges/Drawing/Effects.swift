@@ -109,6 +109,8 @@ extension DrawingBridges {
             m.form("antialiased:bool?") { _, view in view.clipped() }
         }
         r.modifier("shadow", .drawing) { m in
+            // `.red.shadow(.drop(radius: 2))`: a style's shadow, read where the style is (`styledColor`).
+            m.form("_:any", receiver: "ShapeStyle") { _, view in view }
             m.form("color:ColorOrStyle? radius:number x:number? y:number?") { c, view in
                 view.shadow(color: c.color("color") ?? Color.black.opacity(0.33), radius: c.cg("radius") ?? 4, x: c.cg("x") ?? 0, y: c.cg("y") ?? 0)
             }
@@ -165,10 +167,8 @@ extension DrawingBridges {
             }
         }
         r.modifier("colorInvert", .drawing) { m in m.form("") { _, view in view.colorInvert() } }
-        r.modifier("blendMode", .drawing, support: .stub, notes: "Always `.normal`.") { m in m.form("_:BlendMode") { _, view in view.blendMode(.normal) } }
         r.modifier("compositingGroup", .drawing) { m in m.form("") { _, view in view.compositingGroup() } }
         r.modifier("drawingGroup", .drawing) { m in m.form("opaque:bool? colorMode:any?") { _, view in view.drawingGroup() } }
-        r.modifier("luminanceToAlpha", .drawing, support: .stub) { m in m.stub([""]) }
     }
 
     // MARK: Transforms
@@ -216,10 +216,8 @@ extension DrawingBridges {
                 if let mine = appTransition(c[0], c.interp) { view.transition(mine) } else { view.transition(transition(c[0], c.interp)) }
             }
         }
-        r.modifier("contentTransition", .drawing, support: .partial, notes: "`.numericText()`; anything else cross-fades.") { m in
-            m.form("_:ContentTransition") { c, view in
-                if let n = c.symbol(0), n.hasPrefix("numericText") { view.contentTransition(.numericText()) } else { view.contentTransition(.opacity) }
-            }
+        r.modifier("contentTransition", .drawing) { m in
+            m.form("_:ContentTransition") { c, view in view.contentTransition(contentTransition(c[0], c.interp)) }
         }
     }
 
@@ -269,6 +267,8 @@ extension DrawingBridges {
             return .move(edge: .bottom)
         case "push": return .push(from: .trailing)
         case "identity": return .identity
+        case "blurReplace": return blurReplace(args)
+        case "symbolEffect": return AnyTransition(SymbolEffectTransition(effect: AppearSymbolEffect.appear, options: .default))
         case "offset":
             var x = 0.0, y = 0.0
             if case .native(.size(let w, let h))? = args.first { x = w; y = h }

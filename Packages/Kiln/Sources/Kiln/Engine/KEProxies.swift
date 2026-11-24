@@ -357,6 +357,14 @@ enum KAnimatable {
         case .native(.angle(let d)): return [d]
         case .void: return []
         case .native(.boxed(let b)) where b.type == "EmptyAnimatableData": return []
+        case .structV(let st):
+            // The app's own `VectorArithmetic` type: its stored numbers, in order.
+            var out: [Double] = []
+            for p in st.type.stored where !p.isStatic {
+                guard let field = st.fields[p.name], let f = flatten(field) else { return nil }
+                out += f
+            }
+            return out
         default: return nil
         }
     }
@@ -371,6 +379,11 @@ enum KAnimatable {
         case .native(.size): let w = next(); return .native(.size(w, next()))
         case .native(.rect): let x = next(), y = next(), w = next(); return .native(.rect(x, y, w, next()))
         case .native(.angle): return .native(.angle(next()))
+        case .structV(var st):
+            for p in st.type.stored where !p.isStatic {
+                if let field = st.fields[p.name] { st.fields[p.name] = unflatten(field, &values) }
+            }
+            return .structV(st)
         default: return template
         }
     }

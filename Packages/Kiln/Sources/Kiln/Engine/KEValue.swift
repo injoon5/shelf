@@ -135,6 +135,9 @@ extension KV: Hashable {
         case (.type(let x), .type(let y)): return x.name == y.name
         case (.binding(let x), .binding(let y)): return x === y
         case (.view(let x), .view(let y)): return x === y
+        // An enum-like native value against the symbol the app wrote (`size == .large`).
+        case (.native(.boxed(let x)), .native(.implicit(let n, let args))) where x.caseName != nil && args.isEmpty: return x.caseName == n
+        case (.native(.implicit(let n, let args)), .native(.boxed(let y))) where y.caseName != nil && args.isEmpty: return y.caseName == n
         case (.native(let x), .native(let y)): return x == y
         default: return false
         }
@@ -258,11 +261,24 @@ final class KBox {
 final class KBinding {
     let get: () -> KV
     let set: (KV) -> Void
+    /// Passed for an `inout` parameter of a closure the app wrote (a
+    /// gesture's `updating`, `transformEnvironment`): assigning the
+    /// parameter writes through.
+    var isInout = false
+    /// What SwiftUI's own projection is, when there is one: a `@FocusState`'s
+    /// `FocusState.Binding` (KEHostInputs).
+    var native: Any?
     init(get: @escaping () -> KV, set: @escaping (KV) -> Void) {
         self.get = get
         self.set = set
     }
     static func constant(_ v: KV) -> KBinding { KBinding(get: { v }, set: { _ in }) }
+    /// For an `inout` closure parameter.
+    static func inOut(get: @escaping () -> KV, set: @escaping (KV) -> Void) -> KBinding {
+        let b = KBinding(get: get, set: set)
+        b.isInout = true
+        return b
+    }
 }
 
 /// Lexical scope. Method and body frames carry a `self`.

@@ -276,7 +276,11 @@ extension KInterpreter {
         if wrapped(t, name) != nil, let v = try projectedWrapped(try read(ctx.location), name, line: 0) { return v }
         if let storage = ctx.storage, let box = storage.box(name) {
             if case .binding = box.value, t.wrapper(of: name) == "Binding" { return box.value }
-            return .binding(KBinding(get: { box.value }, set: { box.value = $0 }))
+            let b = KBinding(get: { box.value }, set: { box.value = $0 })
+            // `$field` for `.focused`: SwiftUI's own FocusState binding (KEHostInputs);
+            // `$offset` for `.updating`: the value a gesture's end resets to.
+            b.native = storage.native(name) ?? storage.initials[name].map { KGestureStateReset(initial: $0) }
+            return .binding(b)
         }
         let selfValue = try read(ctx.location)
         if case .structV(let s) = selfValue, case .binding(let b)? = s.fields[name] { return .binding(b) }
@@ -589,6 +593,15 @@ extension KInterpreter {
         case (.tuple(let x, _), .tuple(let y, _)):
             for (p, q) in zip(x, y) where !equal(p, q) { return try compare(op, p, q, line) }
             c = 0
+        case (.native(.boxed(let x)), _) where x.order != nil, (_, .native(.boxed(let x))) where x.order != nil:
+            // Ordered native values (`dynamicTypeSize >= .accessibility1`); a symbol is resolved by the value's type.
+            func order(_ v: KV) -> Int? {
+                if case .native(.boxed(let b)) = v { return b.order }
+                if case .native(.implicit(let n, _)) = v, case .native(.boxed(let b))? = registry.type(x.type)?.implicit?(n, [], []) { return b.order }
+                return nil
+            }
+            guard let oa = order(a), let ob = order(b) else { throw comparableFailure(a, b, line) }
+            c = oa < ob ? -1 : (oa > ob ? 1 : 0)
         case (.structV, _) where a.userType?.staticMethods["<"] != nil, (.object, _) where a.userType?.staticMethods["<"] != nil:
             let f = a.userType!.staticMethods["<"]!.first!
             let lt = truthy(try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv))
@@ -630,6 +643,13 @@ extension KInterpreter {
         case (.array(let x), .array(let y)) where op == "+": return .array(x + y)
         case (.array(let x), _) where op == "+": return .array(x + [b])
         case (.view(let x), .view(let y)) where op == "+": return .view(.textConcat(x, y))
+        // `Angle`: `a + b`, `a - b`, `a * 2`, `a / 2` (SwiftUI's own arithmetic).
+        case (.native(.angle(let x)), .native(.angle(let y))) where op == "+" || op == "-":
+            return .native(.angle(op == "+" ? x + y : x - y))
+        case (.native(.angle(let x)), _) where (op == "*" || op == "/") && b.asDouble != nil:
+            return .native(.angle(op == "*" ? x * b.asDouble! : x / b.asDouble!))
+        case (_, .native(.angle(let y))) where op == "*" && a.asDouble != nil:
+            return .native(.angle(a.asDouble! * y))
         case (.native(.date(let d)), _) where op == "+" || op == "-":
             if let s = b.asDouble { return .native(.date(op == "+" ? d.addingTimeInterval(s) : d.addingTimeInterval(-s))) }
             if case .native(.date(let e)) = b, op == "-" { return .double(d.timeIntervalSince(e)) }
@@ -1019,6 +1039,10 @@ extension KInterpreter {
             let args = try evalArgs(argExprs, env, params: m.params)
             return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: s.type, location: .box(KBox(.structV(s)))), parent: globalEnv)
         }
+        // A method of the value itself, not a modifier (`Circle().path(in:)`).
+        if registry.modifier(name) == nil, registry.type("View")?.methods[name] != nil {
+            return try nativeMethod(.view(v), name, argExprs, env, line).0
+        }
         return try applyModifier(v, name, argExprs, env, line)
     }
 
@@ -1071,7 +1095,8 @@ extension KInterpreter {
     func memberwiseParams(_ t: KType) -> [KEVarDecl] {
         t.stored.filter { p in
             if p.isLet && p.initial != nil { return false }
-            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage", "FocusedValue"].contains(w) { return false }
+            if let w = p.wrapper, ["Environment", "EnvironmentObject", "FocusState", "Namespace", "GestureState", "AppStorage", "SceneStorage", "FocusedValue",
+                                          "AccessibilityFocusState", "FocusedBinding", "FocusedObject"].contains(w) { return false }
             return true
         }
     }

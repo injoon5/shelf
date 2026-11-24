@@ -131,6 +131,8 @@ let validation = Kiln.validate(source)   // validation.isValid, validation.error
 
 **SwiftUI.** Every `View` struct you write is hosted by a real SwiftUI view, so `@State` lives and dies by SwiftUI's own identity rules, and `@Binding`, `@StateObject`, `@ObservedObject`, `@EnvironmentObject`, `@Environment(\.dismiss)` and `@AppStorage` behave as compiled. `List` (rows, sections, `onDelete`), `Form`, `Section` headers and footers, `Picker` with tags (segmented, menu, wheel), `Stepper`, `Toggle`, `Slider`, `TextField` with text or `value:format:`, `DatePicker`, `NavigationStack` with `navigationDestination`, `TabView`, `.searchable`, sheets, alerts, toolbars, `Timer.publish` with `onReceive`, `withAnimation` and transitions, Swift Charts, custom `Shape`s and `Path`, grids, `GeometryReader`, and about 120 modifiers. Text is formatted the way SwiftUI formats it (`Text("\(1400) pages")` reads "1,400 pages").
 
+**Round 1, the rest of SwiftUI.** Every public view and modifier in SwiftUI is bridged or listed as won't-do in [COVERAGE.md](COVERAGE.md): every gesture, composed, with `@GestureState`; `Canvas` with a `GraphicsContext` that's a value; Liquid Glass; `matchedGeometryEffect`; phase and keyframe animators on SwiftUI's own timelines; symbol effects; a `@FocusState` that moves the keyboard; every environment value read from SwiftUI (`\.scenePhase` and `\.openURL` through the host); preferences; Swift Charts built from SwiftUI's own marks and axes; and every accessibility modifier.
+
 **Waiting.** `async` functions and closures, `await`, `Task {}` and `Task.detached {}`, `.task {}` and `.task(id:)` (cancelled when the view goes away), `.refreshable` that waits, `Task.sleep(for:)` and `(nanoseconds:)` that really wait, `Task.isCancelled` and `checkCancellation()`, `async let`, `withTaskGroup` and `withThrowingTaskGroup`, `for await` over task groups and `AsyncStream`s (`yield`, `finish`, `onTermination`, `makeStream`), `withCheckedContinuation`, and `await MainActor.run {}`. All of it runs on the main actor, like a SwiftUI app's own code, and none of it blocks the main thread.
 
 **Networking.** `try await URLSession.shared.data(from:)` (or `for:` a `URLRequest`), which waits without blocking, `dataTask(with:) { … }.resume()`, `URLComponents` and `URLQueryItem`, and `JSONDecoder().decode(T.self, from:)` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase`, optionals, defaults, nested types and raw-value enums.
@@ -149,6 +151,7 @@ let validation = Kiln.validate(source)   // validation.isValid, validation.error
 | Seeded runs; `Color` opacity as a style | 5 of 5 | 100% | 5 of 5 |
 | A sixth app (tabs, search, a shared store); SwiftUI's number formatting | 6 of 6 | 100% | 5 of 5 |
 | Bridges in a registry (§1.4): unknown modifiers are errors | 7 of 7 | 100% | 4 of 5: `expense.md` writes `.stepValue(0.1)`, which isn't SwiftUI |
+| Round 1: a doodle pad (gestures, `Canvas`, focus) | DoodlePad matches native on every step | 100% | as before |
 
 ## Coverage
 
@@ -272,7 +275,8 @@ Kiln interprets; it does not compile, so some things are out of reach:
 - No UIKit or AppKit bridges (`UIViewRepresentable`), no SwiftData or Core Data, no third-party packages.
 - Only what's in the registry runs. A view, modifier or initializer it doesn't have, or argument labels SwiftUI doesn't have, stop the code with an error and a line; [COVERAGE.md](COVERAGE.md) lists what's there.
 - `await` inside an `if` or `switch` *expression*, on the left of an assignment, or in a `case` pattern isn't supported; use a statement. Inside an expression, the parts that wait are evaluated before the rest of it.
-- Macros are read as declarations (`@Observable`, `@Entry`, `@Animatable`), not expanded; others are ignored. `@Animatable` marks what animates, but custom shapes don't interpolate until §1.5's proxies.
+- Macros are read as declarations (`@Observable`, `@Entry`, `@Animatable`), not expanded; others are ignored.
+- What SwiftUI calls on its render thread every frame (`TextRenderer`, `CustomAnimation`, Metal shaders) isn't supported: app code runs on the main thread.
 - Overloads of your own functions are picked by argument labels, not by argument types.
 
 When something is out of reach Kiln reports the line it stopped on instead of crashing.

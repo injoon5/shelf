@@ -262,25 +262,23 @@ final class CheckTests: XCTestCase {
     // MARK: Stubs
 
     func testStubIsAWarningNotAnError() throws {
-        let check = Kiln.check(app(#"Image(systemName: "star").symbolEffect(.bounce, value: count)"#))
+        let check = Kiln.check(app(#"Image(systemName: "star").sensoryFeedback(.success, trigger: count)"#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         let warning = try XCTUnwrap(check.warnings.first)
         XCTAssertEqual(warning.kind, .stub)
-        XCTAssertEqual(warning.message, "`.symbolEffect` is accepted but has no effect yet")
-        XCTAssertEqual(warning.suggestion, "Accepted; the symbol doesn't animate yet")
+        XCTAssertEqual(warning.message, "`.sensoryFeedback` is accepted but has no effect yet")
+        XCTAssertEqual(warning.suggestion, "Accepted; no feedback is played yet")
     }
 
     func testStubViewAndTypeAreWarnings() {
         let check = Kiln.check(app(#"""
             VStack {
-                Canvas { context, size in }
                 Button("Tap") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
             }
             """#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         XCTAssertEqual(Set(check.warnings.map(\.kind)), [.stub])
-        XCTAssertEqual(check.warnings.map(\.message), ["`Canvas` is accepted but has no effect yet",
-                                                       "`UIImpactFeedbackGenerator` is accepted but has no effect yet"])
+        XCTAssertEqual(check.warnings.map(\.message), ["`UIImpactFeedbackGenerator` is accepted but has no effect yet"])
     }
 
     // MARK: Results
@@ -288,7 +286,7 @@ final class CheckTests: XCTestCase {
     func testErrorsComeFirstInLineOrder() {
         let check = Kiln.check(app(#"""
             VStack {
-                Text("a").symbolEffect(.bounce, value: count)
+                Text("a").sensoryFeedback(.success, trigger: count)
                 Text("b").zzz()
                 Text("c").yyy()
             }

@@ -166,6 +166,15 @@ final class KTranscript {
             walk(base, depth: depth, path: path)
             emit(depth + 1, ".\(m.name)(\(arguments(m.args, m.labels)))")
             let label = "\(base.primitiveName ?? "view").\(m.name)@\(m.line)"
+            // `Tools/diff.sh` builds this file into an engine from before the
+            // registry (`KILN_BASELINE`), which has none of what follows.
+            #if !KILN_BASELINE
+            if let hook = interp.registry.modifier(m.name)?.probe {
+                probe(hook(base, KProbe.labeled(m.args, m.labels, m.bound), interp), label: label, depth: depth + 2, path: path + ".m\(m.name)")
+                for (i, arg) in m.args.enumerated() { if case .view(let inner) = arg { walk(inner, depth: depth + 2, path: path + ".m\(m.name)\(i)") } }
+                return
+            }
+            #endif
             if KProbe.actionModifiers.contains(m.name), case .function(let f)? = m.args.last {
                 switch m.name {
                 case "onAppear", "task":
@@ -187,7 +196,11 @@ final class KTranscript {
                     walk(inner, depth: depth + 2, path: path + ".m\(m.name)\(i)")
                 case .function(let f):
                     if m.labels[i] == "item" { continue }
-                    content(f, interp.registry.modifier(m.name)?.probe?(m.labels[i], interp) ?? [], depth: depth + 2, path: path + ".m\(m.name)\(i)")
+                    #if KILN_BASELINE
+                    content(f, [], depth: depth + 2, path: path + ".m\(m.name)\(i)")
+                    #else
+                    content(f, interp.registry.modifier(m.name)?.sampleArgs?(m.labels[i], interp) ?? [], depth: depth + 2, path: path + ".m\(m.name)\(i)")
+                    #endif
                 default:
                     continue
                 }
@@ -195,7 +208,17 @@ final class KTranscript {
         case .primitive(let name, let args, let labels, let line):
             emit(depth, "\(name)(\(arguments(args, labels)))")
             let a = KArgs(args: args, labels: labels)
-            if KRenderer.eachRowNames.contains(name) || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
+            #if KILN_BASELINE
+            let eachRow = name == "ForEach"
+            #else
+            if let hook = interp.registry.view(name)?.probe {
+                probe(hook(nil, KProbe.labeled(args, labels, v.bound), interp), label: "\(name)@\(line)", depth: depth + 1, path: path)
+                for (i, arg) in args.enumerated() { if case .view(let inner) = arg { walk(inner, depth: depth + 1, path: path + "/a\(i)") } }
+                return
+            }
+            let eachRow = KRenderer.eachRowNames.contains(name)
+            #endif
+            if eachRow || name == "List" && a.firstIsUnlabeled && a.first.map({ if case .function = $0 { return false }; return true }) == true {
                 for (r, row) in KRenderer(interp: interp).forEachRows(a).enumerated() {
                     emit(depth + 1, "row \(show(row.id))")
                     for (i, c) in row.views.enumerated() { walk(c, depth: depth + 2, path: path + "/r\(r).\(i)") }
@@ -217,9 +240,11 @@ final class KTranscript {
                     if name == "ScrollViewReader" { continue }
                     var sample: [KV] = []
                     if name == "GeometryReader" { sample = [.tuple([.native(.size(393, 852))], ["size"])] }
+                    #if !KILN_BASELINE
                     if name == "Group", label == "transform" {
                         sample = [a["sections"] != nil ? KSubviews.headlessSections(a["sections"], interp) : KSubviews.headlessCollection(a["subviews"], interp)]
                     }
+                    #endif
                     if name == "AsyncImage" { sample = [.native(.asyncPhase("empty", KRef(nil)))] }
                     if name == "TimelineView" { sample = [.tuple([.native(.date(Date(timeIntervalSince1970: 0)))], ["date"])] }
                     content(f, sample, depth: depth + 1, path: path + "/a\(i)")
@@ -229,6 +254,18 @@ final class KTranscript {
             }
         }
     }
+
+    #if !KILN_BASELINE
+    /// A bridge's own closures, with the arguments SwiftUI would pass them.
+    private func probe(_ calls: [KProbeCall], label: String, depth: Int, path: String) {
+        for (i, call) in calls.enumerated() {
+            switch call.use {
+            case .action: actions.append((label, call.fn, call.args, false, call.canWait))
+            case .content: content(call.fn, call.args, depth: depth, path: path + "/p\(i)")
+            }
+        }
+    }
+    #endif
 
     private func content(_ f: KFunction, _ args: [KV], depth: Int, path: String) {
         do {

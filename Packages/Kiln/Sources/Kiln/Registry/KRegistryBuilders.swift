@@ -106,6 +106,20 @@ extension KRegistry {
         add(b)
     }
 
+    /// An environment value SwiftUI has: `read` gives the app SwiftUI's value
+    /// where the view is shown, and `write` is what `.environment(\.name, v)`
+    /// sets. `value` is what a check (and a view before it's shown) reads.
+    func environmentValue(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil,
+                          file: String = #fileID, value: @escaping @MainActor (KInterpreter) -> KV = { _ in .nilValue },
+                          read: @escaping @MainActor (EnvironmentValues, KInterpreter) -> KV,
+                          write: (@MainActor (inout EnvironmentValues, KV, KInterpreter) -> Void)? = nil) {
+        let b = KEnvironmentBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file))
+        b.value = value
+        b.live = read
+        b.writeEnvironment = write
+        add(b)
+    }
+
     /// An environment value read from SwiftUI's own environment where the
     /// view is shown, and optionally written by `.environment(\.name, v)`.
     func liveEnvironment(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil,
@@ -116,6 +130,11 @@ extension KRegistry {
         b.live = read
         b.write = write
         add(b)
+    }
+
+    /// A Swift macro the engine reads (`@Entry`, `@Animatable`): the manifest lists it as `macro:Name`.
+    func macro(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil, file: String = #fileID) {
+        add(KMacroBridge(name: name, family: family, support: support, introduced: nil, notes: notes, source: Self.source(file)))
     }
 
     func wrapper(_ name: String, _ family: KilnFamily, support: KilnSupport = .full, notes: String? = nil, file: String = #fileID) {
@@ -165,6 +184,8 @@ struct KViewBuilder {
 
     var manifestKind: String { get { bridge.manifestKind } nonmutating set { bridge.manifestKind = newValue } }
     var owner: String? { get { bridge.owner } nonmutating set { bridge.owner = newValue } }
+    /// How a check runs its closures, with the arguments SwiftUI would pass.
+    func probe(_ hook: @escaping KProbe.Hook) { bridge.probe = hook }
     /// Engine-made: shown by the renderer, never written by an app.
     func engineOnly() {
         bridge.constructible = false
@@ -218,8 +239,10 @@ struct KModifierBuilder {
 
     func styles(_ owner: String, _ names: [String]) { bridge.styles = (owner, names) }
     /// Sample arguments `Kiln.validate` passes a closure argument, by label.
-    func probe(_ f: @escaping @MainActor (String?, KInterpreter) -> [KV]?) { bridge.probe = f }
+    func probe(_ f: @escaping @MainActor (String?, KInterpreter) -> [KV]?) { bridge.sampleArgs = f }
     var owner: String? { get { bridge.owner } nonmutating set { bridge.owner = newValue } }
+    /// How a check runs its closures, with the arguments SwiftUI would pass.
+    func probe(_ hook: @escaping KProbe.Hook) { bridge.probe = hook }
 }
 
 @MainActor

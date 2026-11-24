@@ -265,7 +265,18 @@ final class LayoutBridges: KBridgeFamily {
         }
         r.type("CGRect", .layout) { t in
             t.initializer { c in
-                if case .native(.point(let x, let y))? = c.arg("origin"), case .native(.size(let w, let h))? = c.arg("size") { return .native(.rect(x, y, w, h)) }
+                // `origin: .zero` and `size: .zero` arrive as symbols (the initializer takes any labels).
+                func point(_ v: KV?) -> (Double, Double)? {
+                    if case .native(.point(let x, let y))? = v { return (x, y) }
+                    if case .native(.implicit("zero", _))? = v { return (0, 0) }
+                    return nil
+                }
+                func size(_ v: KV?) -> (Double, Double)? {
+                    if case .native(.size(let w, let h))? = v { return (w, h) }
+                    if case .native(.implicit("zero", _))? = v { return (0, 0) }
+                    return nil
+                }
+                if let (x, y) = point(c.arg("origin")), let (w, h) = size(c.arg("size")) { return .native(.rect(x, y, w, h)) }
                 return .native(.rect(c.arg("x")?.asDouble ?? 0, c.arg("y")?.asDouble ?? 0, c.arg("width")?.asDouble ?? 0, c.arg("height")?.asDouble ?? 0))
             }
             t.staticProperty("zero") { _ in .native(.rect(0, 0, 0, 0)) }

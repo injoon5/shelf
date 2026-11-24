@@ -670,6 +670,21 @@ Driven by the coverage report. "Done" means every public view and modifier in th
 
 **Prompt:** each family gets its line in "What works", built from the manifest. **Fixtures:** one app per family. **Lab:** one example app that uses gestures, `Canvas` and focus, compared against native.
 
+### §2 status: gestures, drawing, focus, environment, charts, text, accessibility, core and scenes
+
+Built (Round 1's second half; Controls, Layout, Lists and Navigation are 1A's). `COVERAGE.md`: every one of these families is at 100%, each symbol bridged or in won't-do, and Round 1 as a whole has nothing missing.
+
+- **Gestures** (`Bridges/Gestures/`): every gesture kind and your own `Gesture`, built from its description into SwiftUI's `AnyGesture` (`KGestureBuilder`); `onChanged`, `onEnded`, `map`, `updating` with `@GestureState` (reset by a real `GestureState` when the gesture ends or is cancelled), `simultaneously`, `sequenced`, `exclusively`; the three attach modifiers with `including:` and `isEnabled:`; taps with their location, long presses with `onPressingChanged`, hover, Pencil, hinges.
+  - **Shelf's close gestures win at the edges.** The stage's edge and status-bar recognizers are required to fail before any recognizer in the card (`shouldBeRequiredToFailBy`), and only take touches that start in their strips. Checked on the simulator with an app whose zero-distance `DragGesture` covers the whole screen: up from the bottom edge closes the card; up from the middle, and sideways inside the bottom strip, are the app's.
+- **Drawing** (`Bridges/Drawing/`): `Canvas` for real (the renderer runs in `body` and records; SwiftUI's `Canvas` replays; `GraphicsContext` is a value, with fills, strokes, text, images, symbols, transforms, clips, layers and filters); Liquid Glass (`glassEffect`, `GlassEffectContainer`, `glassEffectID`, `glassEffectUnion`, `glassEffectTransition`, `backgroundExtensionEffect`); `matchedGeometryEffect` with `@Namespace`; `phaseAnimator`; `keyframeAnimator` and `KeyframeTimeline` on SwiftUI's own `KeyframeTimeline`s; `symbolEffect` with every effect and option; content transitions; `visualEffect` (from the view's frame, a frame behind while scrolling); `MeshGradient`; shape operations; every shape style; the iOS 17 transition types; `Spring`, `UnitCurve`, `timingCurve`; your own `VectorArithmetic`.
+- **Focus & Keyboard** (`Bridges/Focus/`): `@FocusState` (a `Bool` or an optional enum) is a real `FocusState` (`Engine/KEHostInputs.swift`), so `.focused`, `field = .email` and `.defaultFocus` move the keyboard; focused values through real `FocusedValues` slots; submit, keyboard types, content types, `scrollDismissesKeyboard`, keyboard shortcuts and key presses.
+- **Environment** (`Bridges/Environment/`): every SwiftUI environment value, read from SwiftUI where the view is shown and set by `.environment` and `transformEnvironment`; `\.scenePhase` is the lower of the system's phase and the run's (`KilnContext.scenePhase`: Shelf's card sets it, `.active` open, `.inactive` under a finger or closing, `.background` when it lands, delivered before teardown); `\.openURL` and every link go through `KilnContext.openURL` (Shelf's `URLPolicy`: http(s), mail, phone, messages, FaceTime and Maps open in their apps; other schemes are refused); preferences folded with the app's `reduce`, anchors included.
+- **Charts** (`Bridges/Charts/`): every mark, vectorized plots as marks, function plots sampled at 200 points, all mark modifiers, `AxisMarks` with grid lines, ticks and labels, scales, legends, axis labels and styles, selection (x, y, angle; value and range), scrolling, `chartOverlay`/`chartBackground`/`chartGesture` with `ChartProxy`.
+- **Text, Accessibility, Core, Scenes:** the remaining text modifiers; every accessibility modifier for real, with `@AccessibilityFocusState` and rotors; `TimelineView`'s schedules; the macros; `scenePadding`. Scenes' rest is won't-do (a Shelf app is one screen in a card).
+- **Won't do** (`wont-do.json`, the table below): the §1.9 proposals are accepted; added: render-thread protocols (`TextRenderer`, `customAttribute`, `CustomAnimation`, your own `VisualEffect`), rich-text formatting definitions, chart descriptors, URLs and Handoff, `persistentSystemOverlays` and `defaultAppStorage`.
+- **Engine:** host inputs (above); `inout` closure parameters; bridges' `probe` hooks so `validate` and the transcript call closures with SwiftUI's kind of arguments; macros in the registry; native value-type setters write back; `Angle` arithmetic; `CGRect(origin: .zero, size:)`.
+- **Checks:** `RestOfSwiftUITests` (unit tests per family, and Round 1's four fixtures run as Shelf runs them); fixtures `gestures-canvas`, `focus-environment`, `charts`, `accessibility-motion`; Kiln Lab's `DoodlePad` matches native at every step; checked by hand on the simulator in a card: drawing and dragging in Sketch Pad, focus moving through Sign Up (`.textContentType(.newPassword)` brings up iOS's strong password), Step Charts, Breathe. `Shelf/Demo.swift`'s `-ShelfDemoFixtures <folder>` loads fixture apps for that.
+
 ---
 
 ## 3. Round 2: APIs with no permission prompt
@@ -918,6 +933,10 @@ For Kiln work, every merge includes: the coverage report regenerated, the prompt
 | Subclassing native classes in app code (`UIView`, `Dimension`) | An interpreted type can't be a native subclass. Protocol proxies cover the common cases. |
 | UIKit beyond the representable allowlist | Each controller is bridged on purpose. |
 | Bluetooth, NFC, HealthKit, HomeKit | Entitlements, or delegate-heavy APIs for little use here. |
+| StoreKit, Apple Pay and Wallet, RealityKit/SceneKit/SpriteKit, MusicKit, Sign in with Apple, system services (Siri tips, Screen Time, PermissionKit…), Xcode previews | Proposed by §1.9, accepted in Round 1: they need App Store products, merchant or pass IDs, entitlements or registration per app, or scene graphs of native subclasses; previews have no canvas in Shelf. |
+| `TextRenderer`, `customAttribute`, `CustomAnimation`, an app's own `VisualEffect` | SwiftUI calls them on its render thread every frame, where app code can't run. |
+| Rich-text formatting definitions, custom chart descriptors | Attribute-scope and `AXChartDescriptor` types an app declares can't be made native; a `Chart` describes itself to VoiceOver. |
+| `onOpenURL`, `userActivity`, `onContinueUserActivity`, `persistentSystemOverlays`, `defaultAppStorage` | A Shelf app has no URL scheme or activity types; Shelf owns the home indicator; each app has one settings store. |
 
 ## Later
 

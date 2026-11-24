@@ -296,6 +296,31 @@ final class AppScenarios: LabCase {
     }
     func testPlantCareNative() { plants("native") }
     func testPlantCareKiln() { plants("kiln") }
+
+    // MARK: Doodle pad (Round 1: gestures, Canvas, focus)
+
+    func doodle(_ mode: String) {
+        launch("DoodlePad", mode)
+        snap("1 start")
+        guard let canvas = element("Doodle canvas") else { note("missing: Doodle canvas"); return }
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.7))
+            .press(forDuration: 0.05, thenDragTo: canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.85)))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).doubleTap()
+        snap("2 drew and stamped")
+        if let label = element("Drag me") {
+            let from = label.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            from.press(forDuration: 0.05, thenDragTo: from.withOffset(CGVector(dx: 90, dy: 0)))
+        } else { note("missing: Drag me") }
+        snap("3 moved the label")
+        tap("Edit title")
+        app.typeText("Pond\n")
+        snap("4 title submitted, note focused")
+        app.typeText("Ducks\n")
+        tap("Save")
+        snap("5 saved")
+    }
+    func testDoodlePadNative() { doodle("native") }
+    func testDoodlePadKiln() { doodle("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no
