@@ -50,7 +50,7 @@ extension LocationBridges {
         r.type("CLLocationUpdate", .location, support: .full,
                notes: "`for try await update in CLLocationUpdate.liveUpdates()`: `update.location`, `authorizationDenied`, `accuracyLimited`, `stationary`.") { t in
             t.staticMethod("liveUpdates", "_:CLLocationUpdate.LiveConfiguration?") { c in
-                let configuration = c.symbol(0) ?? "default"
+                let configuration = KNativeEnum.name(c[0]) ?? "default"
                 let interp = c.interp
                 let seq = KAsyncSequence(name: "CLLocationUpdate.Updates") { [weak interp] in
                     let channel = KAsyncChannel(interp: interp)
@@ -73,10 +73,10 @@ extension LocationBridges {
         r.type("CLServiceSession", .location, support: .full,
                notes: "`CLServiceSession(authorization: .whenInUse)`: asks first, and keeps location on while you hold it; `diagnostics` for `for try await`.") { t in
             t.initializer("authorization:CLServiceSession.AuthorizationRequirement") { c in
-                KServiceSession.make(c, requirement: c.symbol("authorization") ?? "whenInUse")
+                KServiceSession.make(c, requirement: KNativeEnum.name(c["authorization"]) ?? "whenInUse")
             }
             t.initializer("authorization:CLServiceSession.AuthorizationRequirement fullAccuracyPurposeKey:string") { c in
-                KServiceSession.make(c, requirement: c.symbol("authorization") ?? "whenInUse")
+                KServiceSession.make(c, requirement: KNativeEnum.name(c["authorization"]) ?? "whenInUse")
             }
             t.method("invalidate", "") { c in c.object(KServiceSession.self)?.invalidate(); return .void }
             t.property("diagnostics") { c in
@@ -303,7 +303,7 @@ extension LocationBridges {
         r.view("LocationButton", .location,
                notes: "Asks for location when tapped (the host's sheet the first time), then runs the action if allowed.") { v in
             v.form("action:action") { c in KLocationButton(title: "currentLocation", c: c) }
-            v.form("_:LocationButton.Title? action:action") { c in KLocationButton(title: c.symbol(0) ?? "currentLocation", c: c) }
+            v.form("_:LocationButton.Title? action:action") { c in KLocationButton(title: KNativeEnum.name(c[0]) ?? "currentLocation", c: c) }
         }
         r.type("LocationButton.Title", .location, support: .full) { t in
             t.staticProperties(Dictionary(uniqueKeysWithValues: buttonTitles.map { ($0, KV.native(.implicit($0, []))) }))

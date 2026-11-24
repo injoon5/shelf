@@ -773,7 +773,8 @@ struct KEParser {
                     next()
                     conds.append(.optionalBinding(pattern, try parseExpression(noTrailing: true)))
                 } else if case .binding(let n, _) = pattern {
-                    conds.append(.optionalBinding(pattern, .ident(n, line: cur.line)))   // if let x
+                    // `if let x`; `guard let self` in a `[weak self]` closure reads `self`.
+                    conds.append(.optionalBinding(pattern, n == "self" ? .selfRef(line: cur.line) : .ident(n, line: cur.line)))
                 }
             } else if atIdent("case") {
                 next()

@@ -38,10 +38,13 @@ extension LocationBridges {
                                           "locationManagerDidChangeAuthorization(_:)?", "locationManager(_:didChangeAuthorization:)?",
                                           "locationManager(_:didUpdateHeading:)?", "locationManagerShouldDisplayHeadingCalibration(_:)?"],
                            notes: "`manager.delegate = self` from an `NSObject` subclass; called on the main actor.")
-        symbols(r, "CLAuthorizationStatus", ["notDetermined", "restricted", "denied", "authorizedAlways", "authorizedWhenInUse", "authorized"])
-        symbols(r, "CLAccuracyAuthorization", ["fullAccuracy", "reducedAccuracy"])
-        symbols(r, "CLActivityType", ["other", "automotiveNavigation", "fitness", "otherNavigation", "airborne"])
-        symbols(r, "CLDeviceOrientation", ["unknown", "portrait", "portraitUpsideDown", "landscapeLeft", "landscapeRight", "faceUp", "faceDown"])
+        KNativeEnum.register(r, .location, "CLAuthorizationStatus", [("notDetermined", 0), ("restricted", 1), ("denied", 2), ("authorizedAlways", 3),
+                                                                    ("authorizedWhenInUse", 4), ("authorized", 3)])
+        KNativeEnum.register(r, .location, "CLAccuracyAuthorization", [("fullAccuracy", 0), ("reducedAccuracy", 1)])
+        KNativeEnum.register(r, .location, "CLActivityType", [("other", 1), ("automotiveNavigation", 2), ("fitness", 3), ("otherNavigation", 4),
+                                                             ("airborne", 5)])
+        KNativeEnum.register(r, .location, "CLDeviceOrientation", [("unknown", 0), ("portrait", 1), ("portraitUpsideDown", 2), ("landscapeLeft", 3),
+                                                                  ("landscapeRight", 4), ("faceUp", 5), ("faceDown", 6)])
 
         r.type("CLLocationManager", .location, support: .full,
                notes: "While the app is open: authorization (asks first), `startUpdatingLocation`, `requestLocation`, heading. No background updates or monitoring.") { t in
@@ -56,7 +59,7 @@ extension LocationBridges {
             }
             t.staticMethod("locationServicesEnabled", "") { c in .bool(KLocationManager.servicesEnabled(c.interp)) }
             t.staticMethod("headingAvailable", "") { c in .bool(KLocationManager.headingAvailable(c.interp)) }
-            t.staticMethod("authorizationStatus", "") { c in .native(.implicit(KLocationManager.authorization(c.interp, device: nil), [])) }
+            t.staticMethod("authorizationStatus", "") { c in KNativeEnum.value("CLAuthorizationStatus", KLocationManager.authorization(c.interp, device: nil)) }
             t.staticMethod("significantLocationChangeMonitoringAvailable", "") { _ in .bool(false) }
             t.staticMethod("isMonitoringAvailable", "for:any") { _ in .bool(false) }
             t.staticMethod("isRangingAvailable", "") { _ in .bool(false) }
@@ -68,8 +71,8 @@ extension LocationBridges {
                 }
                 try me(c).setDelegate(v.isNil ? nil : v)
             })
-            t.property("authorizationStatus") { c in .native(.implicit(try me(c).authorization, [])) }
-            t.property("accuracyAuthorization") { c in .native(.implicit(try me(c).accuracy, [])) }
+            t.property("authorizationStatus") { c in KNativeEnum.value("CLAuthorizationStatus", try me(c).authorization) }
+            t.property("accuracyAuthorization") { c in KNativeEnum.value("CLAccuracyAuthorization", try me(c).accuracy) }
             t.property("location") { c in try me(c).lastLocation }
             t.property("heading") { c in try me(c).lastHeading?.kv ?? .nilValue }
             t.property("desiredAccuracy", { c in .double(try me(c).desiredAccuracy) }, set: { c in
@@ -81,11 +84,11 @@ extension LocationBridges {
             t.property("headingFilter", { c in .double(try me(c).headingFilter) }, set: { c in
                 try me(c).headingFilter = c.args.first?.asDouble ?? 1
             })
-            t.property("activityType", { c in .native(.implicit(try me(c).activityType, [])) }, set: { c in
-                try me(c).activityType = c.symbol(0) ?? "other"
+            t.property("activityType", { c in KNativeEnum.value("CLActivityType", try me(c).activityType) }, set: { c in
+                try me(c).activityType = KNativeEnum.name(c.args.first) ?? "other"
             })
-            t.property("headingOrientation", { c in .native(.implicit(try me(c).headingOrientation, [])) }, set: { c in
-                try me(c).headingOrientation = c.symbol(0) ?? "portrait"
+            t.property("headingOrientation", { c in KNativeEnum.value("CLDeviceOrientation", try me(c).headingOrientation) }, set: { c in
+                try me(c).headingOrientation = KNativeEnum.name(c.args.first) ?? "portrait"
             })
             t.property("pausesLocationUpdatesAutomatically", { c in .bool(try me(c).pauses) }, set: { c in
                 try me(c).pauses = c.interp.truthy(c.args.first ?? .bool(true))
@@ -126,13 +129,6 @@ extension LocationBridges {
         r.nativeClass(CLHeading.self, "CLHeading")
         #endif
         #endif
-    }
-
-    /// An enum-like type whose cases are symbols.
-    static func symbols(_ r: KRegistry, _ name: String, _ cases: [String]) {
-        r.type(name, .location, support: .full) { t in
-            t.staticProperties(Dictionary(uniqueKeysWithValues: cases.map { ($0, KV.native(.implicit($0, []))) }))
-        }
     }
 }
 
@@ -251,7 +247,7 @@ final class KLocationManager: NSObject {
     /// Tells the delegate what authorization is now, both ways iOS does.
     private func authorizationChanged() {
         send("locationManagerDidChangeAuthorization(_:)", [])
-        send("locationManager(_:didChangeAuthorization:)", [.native(.implicit(authorization, []))])
+        send("locationManager(_:didChangeAuthorization:)", [KNativeEnum.value("CLAuthorizationStatus", authorization)])
     }
 
     func setDelegate(_ v: KV?) {

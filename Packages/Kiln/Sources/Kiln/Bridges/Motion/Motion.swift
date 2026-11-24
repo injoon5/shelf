@@ -86,7 +86,7 @@ final class MotionBridges: KBridgeFamily {
                     frames = []
                     #endif
                 }
-                return .array(frames.map { .native(.implicit($0, [])) })
+                return .array(frames.map { KNativeEnum.value("CMAttitudeReferenceFrame", $0) })
             }
 
             for sensor in KMotionManager.Sensor.allCases {
@@ -104,15 +104,15 @@ final class MotionBridges: KBridgeFamily {
                 }
                 if sensor == .deviceMotion {
                     t.method("startDeviceMotionUpdates", "using:CMAttitudeReferenceFrame") { c in
-                        try me(c).start(sensor, handler: nil, frame: c.symbol("using")); return .void
+                        try me(c).start(sensor, handler: nil, frame: KNativeEnum.name(c["using"])); return .void
                     }
                     t.method("startDeviceMotionUpdates", "using:CMAttitudeReferenceFrame to:any withHandler:closure") { c in
-                        try me(c).start(sensor, handler: c.function("withHandler"), frame: c.symbol("using")); return .void
+                        try me(c).start(sensor, handler: c.function("withHandler"), frame: KNativeEnum.name(c["using"])); return .void
                     }
                 }
                 t.method("stop\(name)Updates", "") { c in try me(c).stop(sensor); return .void }
             }
-            t.property("attitudeReferenceFrame") { c in .native(.implicit(try me(c).frame, [])) }
+            t.property("attitudeReferenceFrame") { c in KNativeEnum.value("CMAttitudeReferenceFrame", try me(c).frame) }
             t.property("showsDeviceMovementDisplay", { c in .bool(try me(c).showsDeviceMovementDisplay) }, set: { c in
                 try me(c).showsDeviceMovementDisplay = c.interp.truthy(c.args.first ?? .bool(false))
             })

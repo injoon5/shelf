@@ -51,6 +51,10 @@ final class DeviceSystemPermissions: NSObject, SystemPermissions {
             default: .notDetermined
             }
         case .motion:
+            #if targetEnvironment(simulator)
+            // No motion coprocessor, so iOS never asks; apps read Kiln's fake (RunContext.provideSensors).
+            if !CMMotionActivityManager.isActivityAvailable() { return .allowed }
+            #endif
             switch CMMotionActivityManager.authorizationStatus() {
             case .authorized: .allowed
             case .denied: .denied

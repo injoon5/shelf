@@ -1,0 +1,24 @@
+# Core Motion's values: everyday calls, each with the value compiled Swift
+# prints. Format: Sources/Kiln/Registry/KilnCorpus.swift.
+# Values: Tools/corpus/oracle.py --write. The sensors themselves are tested
+# with KilnFakeMotion (MotionLocationTests), since the Mac has none.
+
+prelude ::
+    import CoreMotion
+
+## Values
+
+CMAcceleration(x:y:z:) :: CMAcceleration(x: 0.1, y: -0.2, z: -0.98) => CMAcceleration(x: 0.1, y: -0.2, z: -0.98)
+CMAcceleration.z :: CMAcceleration(x: 0.1, y: -0.2, z: -0.98).z => -0.98
+CMRotationRate(x:y:z:) :: CMRotationRate(x: 1, y: 2, z: 3) => CMRotationRate(x: 1.0, y: 2.0, z: 3.0)
+CMMagneticField(x:y:z:) :: CMMagneticField(x: 22, y: 0, z: -40) => CMMagneticField(x: 22.0, y: 0.0, z: -40.0)
+CMQuaternion(x:y:z:w:) :: CMQuaternion(x: 0, y: 0, z: 0, w: 1) => CMQuaternion(x: 0.0, y: 0.0, z: 0.0, w: 1.0)
+CMAcceleration magnitude :: { let a = CMAcceleration(x: 0, y: -0.6, z: -0.8); return (a.x * a.x + a.y * a.y + a.z * a.z).squareRoot() }() => 1.0
+CMAcceleration set x ::
+    var a = CMAcceleration(x: 0, y: 0, z: -1)
+    a.x = 0.5
+    print(a)
+=> CMAcceleration(x: 0.5, y: 0.0, z: -1.0)
+CMAttitudeReferenceFrame.rawValue :: CMAttitudeReferenceFrame.xTrueNorthZVertical.rawValue => 8
+CMAuthorizationStatus.rawValue :: CMAuthorizationStatus.denied.rawValue => 2
+CMAuthorizationStatus == :: CMAuthorizationStatus.authorized == .authorized => true

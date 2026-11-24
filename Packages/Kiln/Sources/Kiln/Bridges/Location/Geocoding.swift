@@ -318,8 +318,9 @@ extension LocationBridges {
         r.type("MKError", .location, support: .full) { t in
             t.property("code") { c in KLocationErrors.code(c.receiver) }
             t.properties(["localizedDescription", "description"]) { c, _ in .string(c.object(NSError.self)?.localizedDescription ?? "") }
-            for (name, _) in KLocationErrors.mapCodes { t.staticProperty(name) { _ in .native(.implicit(name, [])) } }
+            for (name, _) in KLocationErrors.mapCodes { t.staticProperty(name) { _ in KNativeEnum.value("MKError.Code", name) } }
         }
+        KNativeEnum.register(r, .location, "MKError.Code", KLocationErrors.mapCodes)
 
         r.type("CLGeocoder", .location, support: .full,
                notes: "For older code; prefer `MKReverseGeocodingRequest`. With a handler or `await`.") { t in

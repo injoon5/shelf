@@ -330,11 +330,11 @@ extension MotionBridges {
             t.property("userAcceleration") { c in me(c)?.userAcceleration.kv ?? .nilValue }
             t.property("magneticField") { c in
                 guard let m = me(c) else { return .nilValue }
-                return .tuple([m.magneticField.kv, .native(.implicit(accuracyName(m.magneticAccuracy), []))], ["field", "accuracy"])
+                return .tuple([m.magneticField.kv, KNativeEnum.value("CMMagneticFieldCalibrationAccuracy", accuracyName(m.magneticAccuracy))], ["field", "accuracy"])
             }
             t.property("heading") { c in .double(me(c)?.heading ?? -1) }
             t.property("timestamp") { c in .double(me(c)?.timestamp ?? 0) }
-            t.property("sensorLocation") { c in .native(.implicit(me(c)?.sensorLocation ?? "default", [])) }
+            t.property("sensorLocation") { c in KNativeEnum.value("CMDeviceMotion.SensorLocation", me(c)?.sensorLocation ?? "default") }
         }
         r.alias("CMCalibratedMagneticField.Accuracy", to: "CMMagneticFieldCalibrationAccuracy")
 
@@ -345,26 +345,14 @@ extension MotionBridges {
             }
         }
 
-        // Enum-like types, compared with `==` and `switch`.
-        symbols(r, "CMAttitudeReferenceFrame", ["xArbitraryZVertical", "xArbitraryCorrectedZVertical", "xMagneticNorthZVertical", "xTrueNorthZVertical"])
-        symbols(r, "CMMagneticFieldCalibrationAccuracy", ["uncalibrated", "low", "medium", "high"])
-        symbols(r, "CMDeviceMotion.SensorLocation", ["default", "headphoneLeft", "headphoneRight"])
-        symbols(r, "CMAuthorizationStatus", ["notDetermined", "restricted", "denied", "authorized"])
-        symbols(r, "CMMotionActivityConfidence", ["low", "medium", "high"])
-        symbols(r, "CMPedometerEventType", ["pause", "resume"])
-    }
-
-    /// An enum-like type whose cases are symbols.
-    static func symbols(_ r: KRegistry, _ name: String, _ cases: [String]) {
-        r.type(name, .motion, support: .full) { t in
-            t.staticProperties(Dictionary(uniqueKeysWithValues: cases.map { ($0, KV.native(.implicit($0, []))) }))
-            t.property("rawValue") { c in
-                if case .native(.implicit(let n, _)) = c.receiver, let i = cases.firstIndex(of: n) {
-                    return .int(name == "CMMagneticFieldCalibrationAccuracy" ? i - 1 : (name == "CMAttitudeReferenceFrame" ? 1 << i : i))
-                }
-                return .int(0)
-            }
-        }
+        // Enum-like types, compared with `==` and `switch`, with their raw values.
+        KNativeEnum.register(r, .motion, "CMAttitudeReferenceFrame", [("xArbitraryZVertical", 1), ("xArbitraryCorrectedZVertical", 2),
+                                                                     ("xMagneticNorthZVertical", 4), ("xTrueNorthZVertical", 8)])
+        KNativeEnum.register(r, .motion, "CMMagneticFieldCalibrationAccuracy", [("uncalibrated", -1), ("low", 0), ("medium", 1), ("high", 2)])
+        KNativeEnum.register(r, .motion, "CMDeviceMotion.SensorLocation", [("default", 0), ("headphoneLeft", 1), ("headphoneRight", 2)])
+        KNativeEnum.register(r, .motion, "CMAuthorizationStatus", [("notDetermined", 0), ("restricted", 1), ("denied", 2), ("authorized", 3)])
+        KNativeEnum.register(r, .motion, "CMMotionActivityConfidence", [("low", 0), ("medium", 1), ("high", 2)])
+        KNativeEnum.register(r, .motion, "CMPedometerEventType", [("pause", 0), ("resume", 1)])
     }
 
     static func accuracyName(_ raw: Int) -> String {
@@ -374,5 +362,48 @@ extension MotionBridges {
         case 2: return "high"
         default: return "uncalibrated"
         }
+    }
+}
+
+/// A case of a native enum (`CLAuthorizationStatus.denied`): typed, so
+/// `status == .denied`, `switch` and `rawValue` work as in Swift.
+struct KEnumCase: Hashable, KDescribable {
+    let name: String
+    let raw: Int
+    func describe(_ interp: KInterpreter) -> String { name }
+}
+
+@MainActor
+enum KNativeEnum {
+    /// Type → its cases and raw values.
+    private static var tables: [String: [(String, Int)]] = [:]
+
+    static func register(_ r: KRegistry, _ family: KilnFamily, _ type: String, _ cases: [(String, Int)]) {
+        tables[type] = cases
+        r.type(type, family, support: .full) { t in
+            for (name, _) in cases { t.staticProperty(name) { _ in value(type, name) } }
+            t.implicit { name, args, _ in args.isEmpty && cases.contains { $0.0 == name } ? value(type, name) : nil }
+            t.property("rawValue") { c in .int(raw(c.receiver) ?? 0) }
+        }
+    }
+
+    /// `type.name` as the app sees it.
+    static func value(_ type: String, _ name: String) -> KV {
+        let raw = tables[type]?.first { $0.0 == name }?.1 ?? 0
+        return .native(.boxed(KBoxed(type, KEnumCase(name: name, raw: raw), caseName: name)))
+    }
+
+    /// The case's name, whether it arrived typed or as a bare `.name`.
+    nonisolated static func name(_ v: KV?) -> String? {
+        switch v {
+        case .native(.boxed(let b))?: return (b.value.base as? KEnumCase)?.name ?? b.caseName
+        case .native(.implicit(let n, _))?: return n
+        default: return nil
+        }
+    }
+
+    nonisolated static func raw(_ v: KV?) -> Int? {
+        if case .native(.boxed(let b))? = v { return (b.value.base as? KEnumCase)?.raw }
+        return nil
     }
 }

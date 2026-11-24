@@ -583,6 +583,15 @@ final class MotionLocationTests: XCTestCase {
         }
     }
 
+    /// Shelf's two fixtures, checked, validated and shown with a check's fakes.
+    func testShelfsFixturesRunOnTheFakes() throws {
+        let apps = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appending(path: "../../../../fixtures/apps").standardized
+        for name in ["motion", "location"] {
+            let source = try String(contentsOf: apps.appending(path: "\(name).swift"), encoding: .utf8)
+            XCTAssertEqual(BridgeTest.problems(source), [], name)
+        }
+    }
+
     func testValidateRunsAHandlerOnceWithAStillDevice() {
         let result = Kiln.validate("""
         import SwiftUI

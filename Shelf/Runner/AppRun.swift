@@ -66,6 +66,7 @@ enum RunContext {
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        provideSensors(context)
         context.openURL = { URLPolicy.open($0) }
         return context
     }
@@ -84,12 +85,23 @@ enum RunContext {
         context.provide(AppAudio.session())
         // Its web pages' cookies and storage go with it.
         context.provide(KilnEphemeralWebsiteData())
+        provideSensors(context)
         context.openURL = { URLPolicy.open($0) }
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: folder)
         }
         return context
+    }
+
+    /// The simulator has no motion sensors (plan §4.5): its apps get Kiln's
+    /// fake, a phone held while walking, so they can be tried there. Its
+    /// location is the simulator's own (`xcrun simctl location`). A phone
+    /// gets its real sensors.
+    static func provideSensors(_ context: KilnContext) {
+        #if targetEnvironment(simulator)
+        context.provide(KilnFakeMotion.walking())
+        #endif
     }
 
     /// A check (`Kiln.validate`): Kiln's stub context, with a session for

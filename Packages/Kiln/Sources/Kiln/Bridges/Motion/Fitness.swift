@@ -124,17 +124,17 @@ extension MotionBridges {
         #if os(iOS) || os(watchOS)
         if caps.isUngated, fake(c) == nil {
             switch CMMotionActivityManager.authorizationStatus() {
-            case .authorized: return .native(.implicit("authorized", []))
-            case .denied: return .native(.implicit("denied", []))
-            case .restricted: return .native(.implicit("restricted", []))
-            default: return .native(.implicit("notDetermined", []))
+            case .authorized: return KNativeEnum.value("CMAuthorizationStatus", "authorized")
+            case .denied: return KNativeEnum.value("CMAuthorizationStatus", "denied")
+            case .restricted: return KNativeEnum.value("CMAuthorizationStatus", "restricted")
+            default: return KNativeEnum.value("CMAuthorizationStatus", "notDetermined")
             }
         }
         #endif
         switch caps.status(.motion) {
-        case .allowed: return .native(.implicit("authorized", []))
-        case .denied: return .native(.implicit("denied", []))
-        case .notAsked: return .native(.implicit("notDetermined", []))
+        case .allowed: return KNativeEnum.value("CMAuthorizationStatus", "authorized")
+        case .denied: return KNativeEnum.value("CMAuthorizationStatus", "denied")
+        case .notAsked: return KNativeEnum.value("CMAuthorizationStatus", "notDetermined")
         }
     }
 
@@ -323,7 +323,7 @@ extension MotionBridges {
             for kind in KilnFakeMotion.Activity.allCases {
                 t.property(kind.rawValue) { c in .bool(a(c)?.kind == kind) }
             }
-            t.property("confidence") { c in .native(.implicit(a(c)?.confidence ?? "low", [])) }
+            t.property("confidence") { c in KNativeEnum.value("CMMotionActivityConfidence", a(c)?.confidence ?? "low") }
             t.property("startDate") { c in a(c).map { .native(.date($0.start)) } ?? .nilValue }
             t.property("timestamp") { c in .double(MotionBridges.uptime) }
         }
@@ -493,7 +493,7 @@ final class KPedometer: KMotionFeed {
         if fake != nil {
             soon { [weak self] in
                 guard self?.eventsOn == true else { return }
-                self?.call(handler, [.tuple([.native(.date(Date())), .native(.implicit("resume", []))], ["date", "type"]), .nilValue])
+                self?.call(handler, [.tuple([.native(.date(Date())), KNativeEnum.value("CMPedometerEventType", "resume")], ["date", "type"]), .nilValue])
             }
             return
         }
@@ -503,7 +503,7 @@ final class KPedometer: KMotionFeed {
             KMotionFeed.onMain {
                 guard let self, self.eventsOn else { return }
                 let (event, error) = box.value
-                let value: KV = event.map { .tuple([.native(.date($0.date)), .native(.implicit($0.type == .pause ? "pause" : "resume", []))],
+                let value: KV = event.map { .tuple([.native(.date($0.date)), KNativeEnum.value("CMPedometerEventType", $0.type == .pause ? "pause" : "resume")],
                                                   ["date", "type"]) } ?? .nilValue
                 self.call(handler, [value, error.map { .native(.object("Error", KRef($0 as NSError))) } ?? .nilValue])
             }

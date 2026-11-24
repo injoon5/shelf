@@ -1,0 +1,48 @@
+# Core Location's values: everyday calls, each with the value compiled Swift
+# prints. Format: Sources/Kiln/Registry/KilnCorpus.swift.
+# Values: Tools/corpus/oracle.py --write. Where the device is comes from
+# KilnFakeLocation in tests (MotionLocationTests), not from here.
+
+prelude ::
+    import CoreLocation
+    let park = CLLocation(latitude: 37.3349, longitude: -122.009)
+    let ferry = CLLocation(latitude: 37.7955, longitude: -122.3937)
+
+## Coordinates
+
+CLLocationCoordinate2D(latitude:longitude:) :: CLLocationCoordinate2D(latitude: 1, longitude: 2) => CLLocationCoordinate2D(latitude: 1.0, longitude: 2.0)
+CLLocationCoordinate2D.latitude :: CLLocationCoordinate2D(latitude: 37.5, longitude: -122).latitude => 37.5
+CLLocationCoordinate2D set :: { var c = CLLocationCoordinate2D(latitude: 0, longitude: 0); c.longitude = 10; return c }() => CLLocationCoordinate2D(latitude: 0.0, longitude: 10.0)
+CLLocationCoordinate2DIsValid :: CLLocationCoordinate2DIsValid(CLLocationCoordinate2D(latitude: 37, longitude: -122)) => true
+CLLocationCoordinate2DIsValid invalid :: CLLocationCoordinate2DIsValid(kCLLocationCoordinate2DInvalid) => false
+CLLocationCoordinate2DIsValid out of range :: CLLocationCoordinate2DIsValid(CLLocationCoordinate2D(latitude: 91, longitude: 0)) => false
+CLLocationCoordinate2DMake :: CLLocationCoordinate2DMake(10, 20).longitude => 20.0
+CLLocationDegrees :: { let d: CLLocationDegrees = 12.5; return d * 2 }() => 25.0
+
+## Locations
+
+CLLocation.coordinate :: park.coordinate => CLLocationCoordinate2D(latitude: 37.3349, longitude: -122.009)
+# CoreLocation measures over a sphere or the ellipsoid depending on the process
+# (61,388 m or 61,444 m here), so distances are compared in kilometers.
+CLLocation.distance(from:) :: (park.distance(from: ferry) / 1000).rounded() => 61.0
+CLLocation.distance(from:) km :: String(format: "%.1f km", park.distance(from: ferry) / 1000) => 61.4 km
+CLLocation defaults :: "\(park.altitude) \(park.course) \(park.speed) \(park.horizontalAccuracy) \(park.verticalAccuracy)" => 0.0 -1.0 -1.0 0.0 -1.0
+CLLocation(coordinate:altitude:...) ::
+    let l = CLLocation(coordinate: CLLocationCoordinate2D(latitude: 1, longitude: 2), altitude: 30, horizontalAccuracy: 5, verticalAccuracy: 3, course: 90, speed: 1.5, timestamp: Date(timeIntervalSince1970: 0))
+    print(l.altitude, l.course, l.speed, l.horizontalAccuracy, l.verticalAccuracy, l.timestamp)
+=> 30.0 90.0 1.5 5.0 3.0 1970-01-01 00:00:00 +0000
+CLLocation courseAccuracy ::
+    let l = CLLocation(coordinate: CLLocationCoordinate2D(latitude: 1, longitude: 2), altitude: 0, horizontalAccuracy: 5, verticalAccuracy: 3, course: 180, courseAccuracy: 10, speed: 2, speedAccuracy: 0.5, timestamp: Date(timeIntervalSince1970: 0))
+    print(l.courseAccuracy, l.speedAccuracy)
+=> 10.0 0.5
+CLLocationDistance :: { let d: CLLocationDistance = park.distance(from: park); return d }() => 0.0
+Measurement from a distance :: Measurement(value: park.distance(from: ferry), unit: UnitLength.meters).converted(to: .miles).value.rounded() => 38.0
+
+## Constants
+
+kCLLocationAccuracyBest :: kCLLocationAccuracyBest => -1.0
+kCLLocationAccuracyNearestTenMeters :: kCLLocationAccuracyNearestTenMeters => 10.0
+kCLLocationAccuracyKilometer :: kCLLocationAccuracyKilometer => 1000.0
+kCLDistanceFilterNone :: kCLDistanceFilterNone => -1.0
+CLError.Code.rawValue :: CLError.Code.denied.rawValue => 1
+CLAuthorizationStatus == [ios] :: CLAuthorizationStatus.authorizedWhenInUse == .authorizedWhenInUse => true

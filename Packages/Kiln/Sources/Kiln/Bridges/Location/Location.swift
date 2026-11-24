@@ -188,16 +188,10 @@ final class LocationBridges: KBridgeFamily {
             t.property("code") { c in KLocationErrors.code(c.receiver) }
             t.property("errorCode") { c in .int(c.object(NSError.self)?.code ?? 0) }
             t.properties(["localizedDescription", "description"]) { c, _ in .string(c.object(NSError.self)?.localizedDescription ?? "") }
-            for (name, _) in KLocationErrors.codes { t.staticProperty(name) { _ in .native(.implicit(name, [])) } }
+            for (name, _) in KLocationErrors.codes { t.staticProperty(name) { _ in KNativeEnum.value("CLError.Code", name) } }
             t.staticProperty("Code") { _ in .type(.builtin("CLError.Code")) }
         }
-        r.type("CLError.Code", .location, support: .full) { t in
-            t.staticProperties(Dictionary(uniqueKeysWithValues: KLocationErrors.codes.map { ($0.0, KV.native(.implicit($0.0, []))) }))
-            t.property("rawValue") { c in
-                if case .native(.implicit(let n, _)) = c.receiver { return .int(KLocationErrors.codes.first { $0.0 == n }?.1 ?? 0) }
-                return .int(0)
-            }
-        }
+        KNativeEnum.register(r, .location, "CLError.Code", KLocationErrors.codes)
 
         #if canImport(CoreLocation)
         r.nativeClass(CLLocation.self, "CLLocation")
@@ -324,8 +318,8 @@ enum KLocationErrors {
     /// `error.code`: Core Location's and MapKit's as their enum's cases, others as a number.
     @MainActor static func code(_ v: KV) -> KV {
         guard case .native(.object(_, let ref)) = v, let e = ref.value as? NSError else { return .int(0) }
-        if e.domain == domain, let name = codes.first(where: { $0.1 == e.code })?.0 { return .native(.implicit(name, [])) }
-        if e.domain == mapDomain, let name = mapCodes.first(where: { $0.1 == e.code })?.0 { return .native(.implicit(name, [])) }
+        if e.domain == domain, let name = codes.first(where: { $0.1 == e.code })?.0 { return KNativeEnum.value("CLError.Code", name) }
+        if e.domain == mapDomain, let name = mapCodes.first(where: { $0.1 == e.code })?.0 { return KNativeEnum.value("MKError.Code", name) }
         return .int(e.code)
     }
 }

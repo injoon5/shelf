@@ -968,3 +968,18 @@ generic typealias ::
 => 3
 shadowing in if let :: { let x: Int? = 3; if let x { return x * 2 }; return 0 }() => 6
 string interpolation expression :: { let n = 3; return "n=\(n * 2), \(n > 2 ? "big" : "small")" }() => n=6, big
+guard let self in a weak closure ::
+    final class Counter {
+        var n = 1
+        func adder() -> () -> Int {
+            { [weak self] in
+                guard let self else { return 0 }
+                self.n += 1
+                return self.n
+            }
+        }
+    }
+    let c = Counter()
+    let add = c.adder()
+    print(add(), add())
+=> 2 3
