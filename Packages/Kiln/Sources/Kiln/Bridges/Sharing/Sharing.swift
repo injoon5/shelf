@@ -149,7 +149,7 @@ final class SharingBridges: KBridgeFamily {
             t.internal()
             for n in ["automatic", "upstream", "downstream"] { t.staticProperty(n) { _ in .native(.implicit(n, [])) } }
         }
-        r.type("TextSelection", .sharing, introduced: "18.0",
+        r.type("TextSelection", .sharing, support: .full, introduced: "18.0",
                notes: "`TextField(text:selection:)` and `TextEditor(text:selection:)` keep it; `.indices` is `.selection(range)` in character offsets, so `text[range]` reads it.") { t in
             t.initializer("range:any") { c in
                 guard case .range(let lo, let hi, let closed)? = c["range"], let l = lo.asInt, let h = hi.asInt else { throw c.fail("needs a range") }

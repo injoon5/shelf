@@ -16,7 +16,7 @@
       "supported" : 138
     },
     {
-      "line" : "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values; parsing text: `Regex` (literals, `Regex(\"…\")`, RegexBuilder with `Capture`, `TryCapture` and `Reference`), `NSRegularExpression`, `NSDataDetector`, `Scanner`, `CharacterSet`, NaturalLanguage (`NLTokenizer`, `NLTagger`, `NLLanguageRecognizer`, `NLEmbedding`), `Date(_:strategy:)`, `Double(_:format:)` and `Decimal`",
+      "line" : "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values; parsing: `Regex` and RegexBuilder, `NSRegularExpression`, `NSDataDetector`, `Scanner`, `NLTokenizer`, `NLTagger`, `NLLanguageRecognizer`, `NLEmbedding`, `Date(_:strategy:)`, `Double(_:format:)`, `Decimal`",
       "name" : "Text",
       "stubs" : 0,
       "summary" : "text and fonts",
@@ -92,21 +92,21 @@
       "supported" : 2
     },
     {
-      "line" : "`.sensoryFeedback` in all three forms (a trigger, a `condition:`, or a closure returning the feedback) with every `SensoryFeedback`, and `UIImpactFeedbackGenerator`, `UINotificationFeedbackGenerator` and `UISelectionFeedbackGenerator`",
+      "line" : "`.sensoryFeedback` (a trigger, `condition:`, or a closure returning one) with every `SensoryFeedback`; UIKit's three feedback generators",
       "name" : "Haptics",
       "stubs" : 0,
       "summary" : "haptic feedback",
       "supported" : 57
     },
     {
-      "line" : "`ShareLink` for a `String`, `URL`, `Image`, `Data` or your own `Transferable` (one `item:` or `items:`, with a `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `.textSelection(.enabled)` and `TextSelection`, and iOS 27's `.copyable`, `.cuttable` and `.pasteDestination`",
+      "line" : "`ShareLink` (a `String`, `URL`, `Image`, `Data` or your `Transferable`; `items:`; `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `TextSelection`, `.copyable`, `.pasteDestination`",
       "name" : "Sharing",
       "stubs" : 1,
       "summary" : "the share sheet and the clipboard",
       "supported" : 33
     },
     {
-      "line" : "`Measurement` in every unit Foundation has (`UnitLength`, `UnitMass`, `UnitTemperature`, `UnitVolume`, `UnitSpeed`, `UnitDuration`, `UnitEnergy`…) or your own with `UnitConverterLinear`: `converted(to:)`, arithmetic, comparison, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`",
+      "line" : "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`",
       "name" : "Units",
       "stubs" : 0,
       "summary" : "measurements and unit conversion",
@@ -31967,7 +31967,7 @@
       "id" : "protocol:Transferable",
       "kind" : "protocol",
       "name" : "Transferable",
-      "notes" : "Your own type, for `ShareLink`, `PasteButton` and copy and paste: `CodableRepresentation(contentType:)`, `DataRepresentation`, `ProxyRepresentation(exporting:importing:)`, with `.suggestedFileName` and `.exportingCondition`.",
+      "notes" : "For `ShareLink`, `PasteButton` and paste: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation`.",
       "proxy" : true,
       "requirements" : [
         "static transferRepresentation"
@@ -35798,7 +35798,7 @@
         }
       ],
       "source" : "Sources/Kiln/Sharing.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Language",

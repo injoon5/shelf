@@ -74,9 +74,9 @@ struct NewAppCheckTests {
     }
 
     @Test func warningsAreShownAndDontBlock() async {
-        let (model, library) = await Self.pasted(Self.reply(#"Image(systemName: "star").sensoryFeedback(.success, trigger: count)"#))
+        let (model, library) = await Self.pasted(Self.reply(#"Button("Zone") { print(TimeZone.current) }"#))
         #expect(model.checkError == nil)
-        #expect(model.warnings == ["Line 11: `.sensoryFeedback` is accepted but has no effect yet. Accepted; no feedback is played yet"])
+        #expect(model.warnings == ["Line 11: `TimeZone` is accepted but has no effect yet"])
         #expect(model.canInstall(in: library))
     }
 

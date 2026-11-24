@@ -41,7 +41,7 @@ final class KTransferRep {
 extension SharingBridges {
     static func transferable(_ r: KRegistry) {
         r.protocolBridge("Transferable", .sharing, requirements: ["static transferRepresentation"], support: .partial,
-                         notes: "Your own type, for `ShareLink`, `PasteButton` and copy and paste: `CodableRepresentation(contentType:)`, `DataRepresentation`, `ProxyRepresentation(exporting:importing:)`, with `.suggestedFileName` and `.exportingCondition`.") { app in
+                         notes: "For `ShareLink`, `PasteButton` and paste: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation`.") { app in
             KTransferItem(app)
         }
         r.resultBuilder("TransferRepresentationBuilder", .sharing) { b in

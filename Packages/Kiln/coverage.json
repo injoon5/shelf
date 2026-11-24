@@ -48290,7 +48290,7 @@
       "notes" : "`TextField(text:selection:)` and `TextEditor(text:selection:)` keep it; `.indices` is `.selection(range)` in character offsets, so `text[range]` reads it.",
       "overloadsCovered" : 3,
       "round" : 2,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "type:TextSelection",
@@ -64674,7 +64674,7 @@
     "member:UnitMass.ounces",
     "member:UnitMass.ouncesTroy",
     "member:UnitMass.picograms",
-    "member:UnitMass.poundsMass",
+    "member:UnitMass.pounds",
     "member:UnitMass.shortTons",
     "member:UnitMass.slugs",
     "member:UnitMass.stones",

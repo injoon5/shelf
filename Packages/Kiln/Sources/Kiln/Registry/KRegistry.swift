@@ -126,7 +126,7 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .core:
             return "views' life cycle (`onAppear`, `.task`, `onChange`, `onReceive`), `TimelineView` (`.animation`, `.periodic`, `.everyMinute`, `.explicit`), and the `@Entry` and `@Animatable` macros"
         case .text:
-            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values; parsing text: `Regex` (literals, `Regex(\"…\")`, RegexBuilder with `Capture`, `TryCapture` and `Reference`), `NSRegularExpression`, `NSDataDetector`, `Scanner`, `CharacterSet`, NaturalLanguage (`NLTokenizer`, `NLTagger`, `NLLanguageRecognizer`, `NLEmbedding`), `Date(_:strategy:)`, `Double(_:format:)` and `Decimal`"
+            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values; parsing: `Regex` and RegexBuilder, `NSRegularExpression`, `NSDataDetector`, `Scanner`, `NLTokenizer`, `NLTagger`, `NLLanguageRecognizer`, `NLEmbedding`, `Date(_:strategy:)`, `Double(_:format:)`, `Decimal`"
         case .gestures:
             return "every gesture (`TapGesture`, `SpatialTapGesture`, `LongPressGesture`, `DragGesture`, `MagnifyGesture`, `RotateGesture`, your own `Gesture`) with `.onChanged`, `.onEnded`, `.updating` and `@GestureState`, `.simultaneously`, `.sequenced`, `.exclusively`; `.gesture`, `.simultaneousGesture`, `.highPriorityGesture`, `.onTapGesture` (with the tap's location), `.onLongPressGesture`, hover and Pencil. A drag that starts at the very top or bottom edge closes the app instead"
         case .drawing:
@@ -140,11 +140,11 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .charts:
             return "every mark and plot (`LinePlot(x:y:domain:)` draws a function), `.foregroundStyle(by:)`, annotations, `AxisMarks`, scales, legends, `.chartXSelection`, `.chartScrollableAxes` and `.chartOverlay` with `ChartProxy`; each axis takes one kind of value (text, numbers or dates)"
         case .haptics:
-            return "`.sensoryFeedback` in all three forms (a trigger, a `condition:`, or a closure returning the feedback) with every `SensoryFeedback`, and `UIImpactFeedbackGenerator`, `UINotificationFeedbackGenerator` and `UISelectionFeedbackGenerator`"
+            return "`.sensoryFeedback` (a trigger, `condition:`, or a closure returning one) with every `SensoryFeedback`; UIKit's three feedback generators"
         case .sharing:
-            return "`ShareLink` for a `String`, `URL`, `Image`, `Data` or your own `Transferable` (one `item:` or `items:`, with a `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `.textSelection(.enabled)` and `TextSelection`, and iOS 27's `.copyable`, `.cuttable` and `.pasteDestination`"
+            return "`ShareLink` (a `String`, `URL`, `Image`, `Data` or your `Transferable`; `items:`; `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `TextSelection`, `.copyable`, `.pasteDestination`"
         case .units:
-            return "`Measurement` in every unit Foundation has (`UnitLength`, `UnitMass`, `UnitTemperature`, `UnitVolume`, `UnitSpeed`, `UnitDuration`, `UnitEnergy`…) or your own with `UnitConverterLinear`: `converted(to:)`, arithmetic, comparison, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`"
+            return "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`"
         default:
             return nil
         }
