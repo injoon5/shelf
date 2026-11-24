@@ -55,7 +55,7 @@
       "name" : "Drawing",
       "stubs" : 0,
       "summary" : "shapes, paths, colors, gradients, images, effects and animation",
-      "supported" : 417
+      "supported" : 420
     },
     {
       "line" : "`@FocusState` (a `Bool`, or an enum of fields) with `.focused`, `.defaultFocus`, `.onSubmit` and `.submitLabel`; keyboard and text content types, `.scrollDismissesKeyboard`, `@FocusedValue`, `.keyboardShortcut` and `.onKeyPress`",
@@ -83,7 +83,7 @@
       "name" : "Charts",
       "stubs" : 0,
       "summary" : "Swift Charts",
-      "supported" : 73
+      "supported" : 75
     },
     {
       "name" : "Scenes",
@@ -110,22 +110,25 @@
       "supported" : 0
     },
     {
+      "line" : "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`. Sound stops when the app closes",
       "name" : "Audio",
       "stubs" : 0,
       "summary" : "playing sounds",
-      "supported" : 0
+      "supported" : 82
     },
     {
+      "line" : "`WebView(url:)`, or `WebView(page)` with a `WebPage()`: `load`, `title`, `url`, `isLoading`, `estimatedProgress`, `reload()`, `backForwardList`, `try await page.callJavaScript(…)`; the `.webView…` modifiers and `.findNavigator`. Each app has its own cookies",
       "name" : "Web",
       "stubs" : 0,
       "summary" : "web views and web pages",
-      "supported" : 0
+      "supported" : 31
     },
     {
+      "line" : "`Chart3D` with `PointMark(x:y:z:)` and `SurfacePlot(x:y:z:) { [state] x, z in … }`, their style and material modifiers, `.chart3DPose` (a binding people drag), `.chart3DCameraProjection` and `.chartZScale`. Every axis plots numbers; `RuleMark` and `RectangleMark` don't draw in 3D",
       "name" : "Chart3D",
       "stubs" : 0,
       "summary" : "3D charts",
-      "supported" : 0
+      "supported" : 22
     },
     {
       "name" : "Files",
@@ -179,7 +182,7 @@
       "name" : "Language",
       "stubs" : 0,
       "summary" : "Swift's standard library",
-      "supported" : 267
+      "supported" : 272
     },
     {
       "name" : "Foundation",
@@ -194,10 +197,11 @@
       "supported" : 41
     },
     {
+      "line" : "`try await URLSession.shared.data(from:)` or `data(for:)` a `URLRequest`, then `JSONDecoder`; `URLComponents`; `bytes(from:)` with `for try await line in bytes.lines`; WebSockets: `webSocketTask(with:)`, `resume()`, `try await send(.string(text))` and `receive()` (`.string`/`.data`) in a loop. Use `await` in `.task`, not completion handlers",
       "name" : "Networking",
       "stubs" : 0,
       "summary" : "URLSession requests",
-      "supported" : 23
+      "supported" : 42
     }
   ],
   "gaps" : [
@@ -761,6 +765,14 @@
             "x",
             "y"
           ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -796,6 +808,14 @@
             "y",
             "width",
             "height"
+          ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
           ]
         },
         {
@@ -861,6 +881,14 @@
       "kind" : "content",
       "name" : "RuleMark",
       "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
+        },
         {
           "labels" : [
             "x",
@@ -1027,6 +1055,25 @@
         }
       ],
       "source" : "Sources/Kiln/Animators.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "content:SurfacePlot",
+      "introduced" : "26.0",
+      "kind" : "content",
+      "name" : "SurfacePlot",
+      "overloads" : [
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z",
+            "function"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -2844,6 +2891,800 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.averagePower",
+      "kind" : "member",
+      "name" : "averagePower",
+      "overloads" : [
+        {
+          "labels" : [
+            "forChannel"
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.currentTime",
+      "kind" : "member",
+      "name" : "currentTime",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.data",
+      "kind" : "member",
+      "name" : "data",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.deviceCurrentTime",
+      "kind" : "member",
+      "name" : "deviceCurrentTime",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.duration",
+      "kind" : "member",
+      "name" : "duration",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.enableRate",
+      "kind" : "member",
+      "name" : "enableRate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.isMeteringEnabled",
+      "kind" : "member",
+      "name" : "isMeteringEnabled",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.isPlaying",
+      "kind" : "member",
+      "name" : "isPlaying",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.numberOfChannels",
+      "kind" : "member",
+      "name" : "numberOfChannels",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.numberOfLoops",
+      "kind" : "member",
+      "name" : "numberOfLoops",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.pan",
+      "kind" : "member",
+      "name" : "pan",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.pause",
+      "kind" : "member",
+      "name" : "pause",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.peakPower",
+      "kind" : "member",
+      "name" : "peakPower",
+      "overloads" : [
+        {
+          "labels" : [
+            "forChannel"
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.play",
+      "kind" : "member",
+      "name" : "play",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "atTime"
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.prepareToPlay",
+      "kind" : "member",
+      "name" : "prepareToPlay",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.rate",
+      "kind" : "member",
+      "name" : "rate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.setVolume",
+      "kind" : "member",
+      "name" : "setVolume",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "fadeDuration"
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.stop",
+      "kind" : "member",
+      "name" : "stop",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.updateMeters",
+      "kind" : "member",
+      "name" : "updateMeters",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.url",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioPlayer.volume",
+      "kind" : "member",
+      "name" : "volume",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.actionAtItemEnd",
+      "kind" : "member",
+      "name" : "actionAtItemEnd",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.currentItem",
+      "kind" : "member",
+      "name" : "currentItem",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.currentTime",
+      "kind" : "member",
+      "name" : "currentTime",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.isMuted",
+      "kind" : "member",
+      "name" : "isMuted",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.pause",
+      "kind" : "member",
+      "name" : "pause",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.play",
+      "kind" : "member",
+      "name" : "play",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.rate",
+      "kind" : "member",
+      "name" : "rate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.replaceCurrentItem",
+      "kind" : "member",
+      "name" : "replaceCurrentItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "with"
+          ]
+        }
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.seek",
+      "kind" : "member",
+      "name" : "seek",
+      "overloads" : [
+        {
+          "labels" : [
+            "to"
+          ]
+        }
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.timeControlStatus",
+      "kind" : "member",
+      "name" : "timeControlStatus",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayer.volume",
+      "kind" : "member",
+      "name" : "volume",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayer",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayerItem.currentTime",
+      "kind" : "member",
+      "name" : "currentTime",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVPlayerItem",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayerItem.duration",
+      "kind" : "member",
+      "name" : "duration",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayerItem",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVPlayerItem.status",
+      "kind" : "member",
+      "name" : "status",
+      "overloads" : [
+
+      ],
+      "owner" : "AVPlayerItem",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.currentLanguageCode",
+      "kind" : "member",
+      "name" : "currentLanguageCode",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.gender",
+      "kind" : "member",
+      "name" : "gender",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.identifier",
+      "kind" : "member",
+      "name" : "identifier",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.language",
+      "kind" : "member",
+      "name" : "language",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.name",
+      "kind" : "member",
+      "name" : "name",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.quality",
+      "kind" : "member",
+      "name" : "quality",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesisVoice.speechVoices",
+      "kind" : "member",
+      "name" : "speechVoices",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesisVoice",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.continueSpeaking",
+      "kind" : "member",
+      "name" : "continueSpeaking",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.isPaused",
+      "kind" : "member",
+      "name" : "isPaused",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.isSpeaking",
+      "kind" : "member",
+      "name" : "isSpeaking",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.pauseSpeaking",
+      "kind" : "member",
+      "name" : "pauseSpeaking",
+      "overloads" : [
+        {
+          "labels" : [
+            "at"
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.speak",
+      "kind" : "member",
+      "name" : "speak",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.stopSpeaking",
+      "kind" : "member",
+      "name" : "stopSpeaking",
+      "overloads" : [
+        {
+          "labels" : [
+            "at"
+          ]
+        }
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechSynthesizer.usesApplicationAudioSession",
+      "kind" : "member",
+      "name" : "usesApplicationAudioSession",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechSynthesizer",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.pitchMultiplier",
+      "kind" : "member",
+      "name" : "pitchMultiplier",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.postUtteranceDelay",
+      "kind" : "member",
+      "name" : "postUtteranceDelay",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.preUtteranceDelay",
+      "kind" : "member",
+      "name" : "preUtteranceDelay",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.prefersAssistiveTechnologySettings",
+      "kind" : "member",
+      "name" : "prefersAssistiveTechnologySettings",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.rate",
+      "kind" : "member",
+      "name" : "rate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.speechString",
+      "kind" : "member",
+      "name" : "speechString",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.voice",
+      "kind" : "member",
+      "name" : "voice",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVSpeechUtterance.volume",
+      "kind" : "member",
+      "name" : "volume",
+      "overloads" : [
+
+      ],
+      "owner" : "AVSpeechUtterance",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "member:Angle.degrees",
       "kind" : "member",
@@ -2877,6 +3718,38 @@
       ],
       "owner" : "Angle",
       "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Angle2D.degrees",
+      "kind" : "member",
+      "name" : "degrees",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Angle2D",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Angle2D.radians",
+      "kind" : "member",
+      "name" : "radians",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Angle2D",
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -3604,6 +4477,38 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "member:AudioToolbox.AudioServicesPlayAlertSound",
+      "kind" : "member",
+      "name" : "AudioServicesPlayAlertSound",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "AudioToolbox",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AudioToolbox.AudioServicesPlaySystemSound",
+      "kind" : "member",
+      "name" : "AudioServicesPlaySystemSound",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "AudioToolbox",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "member:BasicChartSymbolShape.asterisk",
       "kind" : "member",
@@ -4167,6 +5072,66 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "member:CMTime.indefinite",
+      "kind" : "member",
+      "name" : "indefinite",
+      "overloads" : [
+
+      ],
+      "owner" : "CMTime",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CMTime.isIndefinite",
+      "kind" : "member",
+      "name" : "isIndefinite",
+      "overloads" : [
+
+      ],
+      "owner" : "CMTime",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CMTime.isValid",
+      "kind" : "member",
+      "name" : "isValid",
+      "overloads" : [
+
+      ],
+      "owner" : "CMTime",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CMTime.seconds",
+      "kind" : "member",
+      "name" : "seconds",
+      "overloads" : [
+
+      ],
+      "owner" : "CMTime",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CMTime.zero",
+      "kind" : "member",
+      "name" : "zero",
+      "overloads" : [
+
+      ],
+      "owner" : "CMTime",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:Calendar.autoupdatingCurrent",
       "kind" : "member",
@@ -4270,6 +5235,32 @@
       "owner" : "Calendar",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Chart3DPose.azimuth",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "azimuth",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DPose",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Chart3DPose.inclination",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "inclination",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DPose",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -5098,6 +6089,39 @@
       ],
       "owner" : "ContentTransition",
       "source" : "Sources/Kiln/Animators.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CoreMedia.CMTimeGetSeconds",
+      "kind" : "member",
+      "name" : "CMTimeGetSeconds",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "CoreMedia",
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:CoreMedia.CMTimeMakeWithSeconds",
+      "kind" : "member",
+      "name" : "CMTimeMakeWithSeconds",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "preferredTimescale"
+          ]
+        }
+      ],
+      "owner" : "CoreMedia",
+      "source" : "Sources/Kiln/Audio.swift",
       "support" : "full"
     },
     {
@@ -8203,6 +9227,30 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "member:NSRange.length",
+      "kind" : "member",
+      "name" : "length",
+      "overloads" : [
+
+      ],
+      "owner" : "NSRange",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:NSRange.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "NSRange",
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Navigation",
       "id" : "member:NavigationPath.append",
       "kind" : "member",
@@ -8910,6 +9958,18 @@
       ],
       "owner" : "RenameAction",
       "source" : "Sources/Kiln/Values.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Rotation3D.identity",
+      "kind" : "member",
+      "name" : "identity",
+      "overloads" : [
+
+      ],
+      "owner" : "Rotation3D",
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -12551,6 +13611,53 @@
     },
     {
       "family" : "Networking",
+      "id" : "member:URLSession.AsyncBytes.characters",
+      "kind" : "member",
+      "name" : "characters",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSession.AsyncBytes",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSession.AsyncBytes.lines",
+      "kind" : "member",
+      "name" : "lines",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSession.AsyncBytes",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSession.bytes",
+      "kind" : "member",
+      "name" : "bytes",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "delegate"
+          ]
+        },
+        {
+          "labels" : [
+            "from",
+            "delegate"
+          ]
+        }
+      ],
+      "owner" : "URLSession",
+      "source" : "Sources/Kiln/Networking.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Networking",
       "id" : "member:URLSession.data",
       "kind" : "member",
       "name" : "data",
@@ -12582,6 +13689,28 @@
     },
     {
       "family" : "Networking",
+      "id" : "member:URLSession.webSocketTask",
+      "kind" : "member",
+      "name" : "webSocketTask",
+      "overloads" : [
+        {
+          "labels" : [
+            "with"
+          ]
+        },
+        {
+          "labels" : [
+            "with",
+            "protocols"
+          ]
+        }
+      ],
+      "owner" : "URLSession",
+      "source" : "Sources/Kiln/Networking.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Networking",
       "id" : "member:URLSessionDataTask.cancel",
       "kind" : "member",
       "name" : "cancel",
@@ -12597,6 +13726,183 @@
       "owner" : "URLSessionDataTask",
       "source" : "Sources/Kiln/Networking.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.Message.data",
+      "kind" : "member",
+      "name" : "data",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask.Message",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.Message.string",
+      "kind" : "member",
+      "name" : "string",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask.Message",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.cancel",
+      "kind" : "member",
+      "name" : "cancel",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "with",
+            "reason"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.closeCode",
+      "kind" : "member",
+      "name" : "closeCode",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.closeReason",
+      "kind" : "member",
+      "name" : "closeReason",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.maximumMessageSize",
+      "kind" : "member",
+      "name" : "maximumMessageSize",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.receive",
+      "kind" : "member",
+      "name" : "receive",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "completionHandler"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.resume",
+      "kind" : "member",
+      "name" : "resume",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.send",
+      "kind" : "member",
+      "name" : "send",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "completionHandler"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.sendPing",
+      "kind" : "member",
+      "name" : "sendPing",
+      "overloads" : [
+        {
+          "labels" : [
+            "pongReceiveHandler"
+          ]
+        }
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "member:URLSessionWebSocketTask.state",
+      "kind" : "member",
+      "name" : "state",
+      "overloads" : [
+
+      ],
+      "owner" : "URLSessionWebSocketTask",
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
     },
     {
       "family" : "Language",
@@ -13666,6 +14972,401 @@
       "support" : "full"
     },
     {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.initialURL",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "initialURL",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.title",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "title",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.url",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.backList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "backList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.currentItem",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "currentItem",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.forwardList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "forwardList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.backForwardList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "backForwardList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.callJavaScript",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "callJavaScript",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "arguments",
+            "in",
+            "contentWorld"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.customUserAgent",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "customUserAgent",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.estimatedProgress",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "estimatedProgress",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.hasOnlySecureContent",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "hasOnlySecureContent",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.isLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isLoading",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.load",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "load",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "mimeType",
+            "characterEncoding",
+            "baseURL"
+          ]
+        },
+        {
+          "labels" : [
+            "html",
+            "baseURL"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.navigations",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "navigations",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.reload",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "reload",
+      "overloads" : [
+        {
+          "labels" : [
+            "fromOrigin"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.stopLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "stopLoading",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.themeColor",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "themeColor",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.title",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "title",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.url",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "modifier:Chart3DContent.foregroundStyle",
+      "kind" : "modifier",
+      "name" : "foregroundStyle",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "by"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.metalness",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "metalness",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.roughness",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "roughness",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Charts",
+      "id" : "modifier:Chart3DContent.symbol",
+      "kind" : "modifier",
+      "name" : "symbol",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Charts.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.symbolRotation",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "symbolRotation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Charts",
+      "id" : "modifier:Chart3DContent.symbolSize",
+      "kind" : "modifier",
+      "name" : "symbolSize",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Charts.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Accessibility",
       "id" : "modifier:ChartContent.accessibilityHidden",
       "kind" : "modifier",
@@ -14033,6 +15734,13 @@
       "name" : "symbol",
       "overloads" : [
         {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
+        {
           "labels" : [
             "_"
           ],
@@ -14061,6 +15769,13 @@
       "kind" : "modifier",
       "name" : "symbolSize",
       "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
         {
           "labels" : [
             "_"
@@ -15932,6 +17647,38 @@
       "support" : "full"
     },
     {
+      "family" : "Chart3D",
+      "id" : "modifier:chart3DCameraProjection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chart3DCameraProjection",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chart3DPose",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chart3DPose",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "modifier:chartAngleSelection",
       "introduced" : "17.0",
@@ -16511,6 +18258,94 @@
       ],
       "source" : "Sources/Kiln/Charts.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZAxis",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZAxis",
+      "notes" : "`.hidden` hides it; its marks aren't customized yet.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZAxisLabel",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZAxisLabel",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "position",
+            "alignment",
+            "spacing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZScale",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZScale",
+      "notes" : "`domain:` as a numeric range.",
+      "overloads" : [
+        {
+          "labels" : [
+            "domain",
+            "range",
+            "type"
+          ]
+        },
+        {
+          "labels" : [
+            "range",
+            "type"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZSelection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZSelection",
+      "notes" : "A number's `value:` binding.",
+      "overloads" : [
+        {
+          "labels" : [
+            "range"
+          ]
+        },
+        {
+          "labels" : [
+            "value"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "partial"
     },
     {
       "family" : "Drawing",
@@ -22579,6 +24414,143 @@
       "support" : "partial"
     },
     {
+      "family" : "Web",
+      "id" : "modifier:webViewBackForwardNavigationGestures",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewBackForwardNavigationGestures",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewContentBackground",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewContentBackground",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewElementFullscreenBehavior",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewElementFullscreenBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewLinkPreviews",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewLinkPreviews",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewMagnificationGestures",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewMagnificationGestures",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewOnScrollGeometryChange",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewOnScrollGeometryChange",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "of",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "of",
+            "action"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewScrollPosition",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewScrollPosition",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewTextSelection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewTextSelection",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Text",
       "id" : "modifier:writingDirection",
       "introduced" : "26.0",
@@ -22607,6 +24579,36 @@
         }
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "protocol:AVAudioPlayerDelegate",
+      "kind" : "protocol",
+      "name" : "AVAudioPlayerDelegate",
+      "proxy" : true,
+      "requirements" : [
+        "audioPlayerDidFinishPlaying(_:successfully:)?",
+        "audioPlayerDecodeErrorDidOccur(_:error:)?"
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "protocol:AVSpeechSynthesizerDelegate",
+      "kind" : "protocol",
+      "name" : "AVSpeechSynthesizerDelegate",
+      "proxy" : true,
+      "requirements" : [
+        "speechSynthesizer(_:didStart:)?",
+        "speechSynthesizer(_:didFinish:)?",
+        "speechSynthesizer(_:didPause:)?",
+        "speechSynthesizer(_:didContinue:)?",
+        "speechSynthesizer(_:didCancel:)?",
+        "speechSynthesizer(_:willSpeakRangeOfSpeechString:utterance:)?"
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
       "support" : "full"
     },
     {
@@ -23371,6 +25373,30 @@
       ],
       "owner" : "ButtonStyle",
       "source" : "Sources/Kiln/ControlStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "style:Chart3DSurfaceStyle.heightBased",
+      "kind" : "style",
+      "name" : "heightBased",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DSurfaceStyle",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "style:Chart3DSurfaceStyle.normalBased",
+      "kind" : "style",
+      "name" : "normalBased",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DSurfaceStyle",
+      "source" : "Sources/Kiln/Effects.swift",
       "support" : "full"
     },
     {
@@ -24154,6 +26180,134 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "type:AVAudioPlayer",
+      "kind" : "type",
+      "name" : "AVAudioPlayer",
+      "overloads" : [
+        {
+          "labels" : [
+            "contentsOf",
+            "fileTypeHint"
+          ]
+        },
+        {
+          "labels" : [
+            "data",
+            "fileTypeHint"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVPlayer",
+      "kind" : "type",
+      "name" : "AVPlayer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        },
+        {
+          "labels" : [
+            "playerItem"
+          ]
+        },
+        {
+          "labels" : [
+            "url"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVPlayerItem",
+      "kind" : "type",
+      "name" : "AVPlayerItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "url"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVSpeechBoundary",
+      "kind" : "type",
+      "name" : "AVSpeechBoundary",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVSpeechSynthesisVoice",
+      "kind" : "type",
+      "name" : "AVSpeechSynthesisVoice",
+      "overloads" : [
+        {
+          "labels" : [
+            "identifier"
+          ]
+        },
+        {
+          "labels" : [
+            "language"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVSpeechSynthesizer",
+      "kind" : "type",
+      "name" : "AVSpeechSynthesizer",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVSpeechUtterance",
+      "kind" : "type",
+      "name" : "AVSpeechUtterance",
+      "overloads" : [
+        {
+          "labels" : [
+            "ssmlRepresentation"
+          ]
+        },
+        {
+          "labels" : [
+            "string"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Navigation",
       "id" : "type:ActionSheet",
       "kind" : "type",
@@ -24215,6 +26369,26 @@
       "name" : "Angle",
       "source" : "Sources/Kiln/Drawing.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Angle2D",
+      "kind" : "type",
+      "name" : "Angle2D",
+      "overloads" : [
+        {
+          "labels" : [
+            "degrees"
+          ]
+        },
+        {
+          "labels" : [
+            "radians"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -24416,6 +26590,18 @@
       "support" : "full"
     },
     {
+      "family" : "Chart3D",
+      "id" : "type:BasicChart3DSymbolShape",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "BasicChart3DSymbolShape",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "type:BasicChartSymbolShape",
       "kind" : "type",
@@ -24534,6 +26720,28 @@
       "support" : "partial"
     },
     {
+      "family" : "Audio",
+      "id" : "type:CMTime",
+      "kind" : "type",
+      "name" : "CMTime",
+      "overloads" : [
+        {
+          "labels" : [
+            "seconds",
+            "preferredTimescale"
+          ]
+        },
+        {
+          "labels" : [
+            "value",
+            "timescale"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:Calendar",
       "kind" : "type",
@@ -24550,6 +26758,35 @@
       "notes" : "The same as `String` in Kiln.",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Chart3DCameraProjection",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "Chart3DCameraProjection",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Chart3DPose",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "Chart3DPose",
+      "overloads" : [
+        {
+          "labels" : [
+            "azimuth",
+            "inclination"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Charts",
@@ -25431,6 +27668,17 @@
       "support" : "partial"
     },
     {
+      "family" : "Audio",
+      "id" : "type:NSRange",
+      "kind" : "type",
+      "name" : "NSRange",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Speech.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Navigation",
       "id" : "type:NavigationPath",
       "kind" : "type",
@@ -25708,6 +27956,39 @@
 
       ],
       "source" : "Sources/Kiln/Values.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Rotation3D",
+      "kind" : "type",
+      "name" : "Rotation3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "angle",
+            "axis"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:RotationAxis3D",
+      "kind" : "type",
+      "name" : "RotationAxis3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -26033,6 +28314,15 @@
       ],
       "source" : "Sources/Kiln/Layout.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:SystemSoundID",
+      "kind" : "type",
+      "name" : "SystemSoundID",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
     },
     {
       "family" : "Navigation",
@@ -26374,6 +28664,42 @@
       "support" : "full"
     },
     {
+      "family" : "Language",
+      "id" : "type:UInt16",
+      "kind" : "type",
+      "name" : "UInt16",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:UInt32",
+      "kind" : "type",
+      "name" : "UInt32",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:UInt64",
+      "kind" : "type",
+      "name" : "UInt64",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:UInt8",
+      "kind" : "type",
+      "name" : "UInt8",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:URL",
       "kind" : "type",
@@ -26419,6 +28745,18 @@
     },
     {
       "family" : "Networking",
+      "id" : "type:URLSession.AsyncBytes",
+      "kind" : "type",
+      "name" : "URLSession.AsyncBytes",
+      "notes" : "`for try await` over its bytes, `.lines` or `.characters`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
       "id" : "type:URLSessionDataTask",
       "kind" : "type",
       "name" : "URLSessionDataTask",
@@ -26427,6 +28765,40 @@
       ],
       "source" : "Sources/Kiln/Networking.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Networking",
+      "id" : "type:URLSessionWebSocketTask",
+      "kind" : "type",
+      "name" : "URLSessionWebSocketTask",
+      "notes" : "Closed (`.goingAway`) when the app closes.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "type:URLSessionWebSocketTask.CloseCode",
+      "kind" : "type",
+      "name" : "URLSessionWebSocketTask.CloseCode",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Networking",
+      "id" : "type:URLSessionWebSocketTask.Message",
+      "kind" : "type",
+      "name" : "URLSessionWebSocketTask.Message",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Streams.swift",
+      "support" : "full"
     },
     {
       "family" : "Language",
@@ -26622,6 +28994,46 @@
       ],
       "source" : "Sources/Kiln/Layout.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Web",
+      "id" : "type:WebPage",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "type:WebPage.BackForwardList",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage.BackForwardList",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "type:WebPage.BackForwardList.Item",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage.BackForwardList.Item",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -26937,6 +29349,35 @@
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "view:Chart3D",
+      "introduced" : "26.0",
+      "kind" : "view",
+      "name" : "Chart3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -29110,6 +31551,27 @@
       "support" : "full"
     },
     {
+      "family" : "Audio",
+      "id" : "view:VideoPlayer",
+      "kind" : "view",
+      "name" : "VideoPlayer",
+      "overloads" : [
+        {
+          "labels" : [
+            "player"
+          ]
+        },
+        {
+          "labels" : [
+            "player",
+            "videoOverlay"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Audio.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "view:ViewThatFits",
       "kind" : "view",
@@ -29123,6 +31585,27 @@
         }
       ],
       "source" : "Sources/Kiln/Layout.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "view:WebView",
+      "introduced" : "26.0",
+      "kind" : "view",
+      "name" : "WebView",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "url"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
       "support" : "full"
     },
     {
@@ -29450,9 +31933,9 @@
     },
     {
       "id" : "private-style-protocols",
-      "reason" : "SwiftUI keeps their requirements private (`_makeView`, `_body`), so no app can adopt them, compiled or not. The built-in styles all work.",
+      "reason" : "SwiftUI and Swift Charts keep their requirements private (`_makeView`, `_body`, `_resolve`), so no app can adopt them, compiled or not. The built-in styles all work.",
       "status" : "wontDo",
-      "what" : "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle` or `IndexViewStyle`"
+      "what" : "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle`, `IndexViewStyle` or `Chart3DSurfaceStyle`"
     },
     {
       "id" : "tables",
@@ -29477,6 +31960,18 @@
       "reason" : "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
       "status" : "later",
       "what" : "`.searchSelection(_:)`: the selected range in the search field"
+    },
+    {
+      "id" : "web-scroll-input",
+      "reason" : "iOS has no `ScrollInputKind` to pass it: its kinds are watchOS's and visionOS's.",
+      "status" : "wontDo",
+      "what" : "`.webViewScrollInputBehavior(_:for:)`"
+    },
+    {
+      "id" : "realtime-audio",
+      "reason" : "They'd call the app's code on the audio thread, many times a second; `AVAudioPlayer` plays `Data` the app makes (§3.5).",
+      "status" : "wontDo",
+      "what" : "Real-time audio render callbacks (`AVAudioSourceNode`, `AVAudioSinkNode`, taps)"
     },
     {
       "id" : "render-thread-protocols",

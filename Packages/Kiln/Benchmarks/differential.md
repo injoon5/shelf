@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**112 inputs: 73 identical, 39 different as expected, 0 different otherwise.**
+**128 inputs: 79 identical, 49 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -12,10 +12,12 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/Apps/ExpenseTracker.swift | 1654 | 13 | identical |
 | Packages/Kiln/Examples/Apps/FocusTimer.swift | 910 | 13 | identical |
 | Packages/Kiln/Examples/Apps/HabitTracker.swift | 1105 | 13 | identical |
+| Packages/Kiln/Examples/Apps/LineFeed.swift | 156 | 13 | identical |
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/PlantCare.swift | 1455 | 13 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
 | Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
+| Packages/Kiln/Examples/Apps/Terrain.swift | 29 | 1 | expected (Round 2 §3.7's Lab example: before, Chart3D and SurfacePlot weren't bridged.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
 | Packages/Kiln/Examples/Apps/WaveStudio.swift | 341 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/expense.md | 754 | 13 | expected (The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.) |
@@ -27,6 +29,8 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/LibraryApp.swift | 64 | 2 | identical |
 | fixtures/apps/accessibility-motion.swift | 2 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/async.swift | 283 | 14 | identical |
+| fixtures/apps/audio.swift | 2 | 1 | expected (Round 2 §3.5's fixture: before, AVAudioPlayer, AVSpeechSynthesizer and VideoPlayer weren't bridged.) |
+| fixtures/apps/chart3d.swift | 29 | 1 | expected (Round 2 §3.7's fixture: before, Chart3D and SurfacePlot weren't bridged.) |
 | fixtures/apps/charts.swift | 81 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/controls-styles.swift | 508 | 13 | expected (Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.) |
 | fixtures/apps/focus-environment.swift | 703 | 13 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
@@ -38,6 +42,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
 | fixtures/apps/state.swift | 599 | 13 | identical |
+| fixtures/apps/streams.swift | 363 | 14 | expected (Round 2 §3.8's fixture: before, webSocketTask and bytes(from:) weren't bridged.) |
 | fixtures/apps/swift-builders.swift | 339 | 13 | expected (§1.6's fixture: before, the Card's @ViewBuilder content and the @Entry tint were missing and the steps builder stopped the body.) |
 | fixtures/apps/swift-codable.swift | 2 | 1 | expected (§1.6's fixture: before, the regex literal didn't parse.) |
 | fixtures/apps/swift-language.swift | 1213 | 13 | identical |
@@ -50,6 +55,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/views-lists-controls.swift | 1547 | 13 | identical |
 | fixtures/apps/views-navigation.swift | 861 | 13 | identical |
 | fixtures/apps/views-uikit.swift | 9 | 1 | expected (§1.5's fixture: before, the representable, its picker and `SharePreview` didn't exist.) |
+| fixtures/apps/web.swift | 2 | 1 | expected (Round 2 §3.6's fixture: before, WebView and WebPage weren't bridged.) |
 | Packages/Kiln/Benchmarks/Workloads/Arithmetic.swift | 8 | 2 | identical |
 | Packages/Kiln/Benchmarks/Workloads/Collections.swift | 112 | 2 | identical |
 | Packages/Kiln/Benchmarks/Workloads/Objects.swift | 8 | 2 | identical |
@@ -57,8 +63,13 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/AppTypesRepro-1.swift | 17 | 1 | identical |
 | tests/AppTypesRepro-2.swift | 234 | 13 | identical |
 | tests/AppTypesRepro-3.swift | 327 | 13 | identical |
+| tests/AudioBridgeTests-1.swift | 3 | 1 | expected (Round 2 §3.5: before, AVSpeechSynthesizer and AVPlayer weren't bridged.) |
 | tests/BreakoutRepro-0.swift | 8 | 2 | identical |
 | tests/BridgeTestSupport-0.swift | 2 | 1 | identical |
+| tests/Chart3DBridgeTests-0.swift | 5 | 1 | expected (Round 2 §3.7: before, Chart3D and SurfacePlot weren't bridged.) |
+| tests/Chart3DBridgeTests-1.swift | 3 | 1 | identical |
+| tests/Chart3DBridgeTests-2.swift | 3 | 1 | identical |
+| tests/Chart3DBridgeTests-3.swift | 3 | 1 | identical |
 | tests/CheckSamples-0.swift | 634 | 13 | identical |
 | tests/CheckSamples-1.swift | 637 | 13 | identical |
 | tests/CheckSamples-2.swift | 338 | 13 | identical |
@@ -116,8 +127,13 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
+| tests/StreamsBridgeTests-3.swift | 3 | 1 | identical |
+| tests/StreamsBridgeTests-4.swift | 3 | 1 | identical |
+| tests/StreamsBridgeTests-5.swift | 12 | 2 | expected (Round 2 §3.8: before, webSocketTask wasn't bridged.) |
+| tests/StreamsBridgeTests-6.swift | 13 | 2 | expected (Round 2 §3.8: before, webSocketTask wasn't bridged.) |
 | tests/WeatherRepro-0.swift | 209 | 13 | identical |
 | tests/WeatherRepro-1.swift | 183 | 14 | identical |
+| tests/WebBridgeTests-0.swift | 2 | 1 | expected (Round 2 §3.6: before, WebView and WebPage weren't bridged.) |
 
 ## Packages/Kiln/Examples/Apps/DoodlePad.swift
 
@@ -371,6 +387,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## Packages/Kiln/Examples/Apps/Terrain.swift
+
+```diff
+--- before
++++ after
+@@ -1,29 +1,832 @@
+ == start
+-ContentView {ripple=1.5, pose=.default, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
+-  NavigationStack({fn})
+-    Form({fn})
+-      Section({fn})
+-        content failed
+-      Section("View", {fn})
+-        HStack({fn})
+-          Text(_literal: "Turned")
+-          Spacer()
+-          Text(_literal: "0°")
+-            .foregroundStyle(Color)
+-            .monospacedDigit()
+-        Picker("Angle", selection: $0, {fn})
+-          Text(_literal: "Default")
+-            .tag(0)
+-          Text(_literal: "Front")
+-            .tag(1)
+-          Text(_literal: "Top")
+-            .tag(2)
+-          .pickerStyle(.segmented)
+-        Toggle("Perspective", isOn: $true)
+-        Toggle("Peaks", isOn: $true)
+-      Section("Terrain", {fn})
+-        LabeledContent("Ripple", value: 1.5, format: FormatStyle)
+-        Slider(value: $1.5, in: 0.5...3.0)
+-        If false
+-      .navigationTitle("Terrain")
+-error: Line 32: Cannot find 'Chart3D' in scope
++ContentView {ripple=1.5, pose=Chart3DPose, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
++  NavigationStack({fn})
++    Form({fn})
++      Section({fn})
++        Chart3D({fn})
++          SurfacePlot(x: "East", y: "Height", z: "North", {fn})
++            .foregroundStyle(.heightBased)
++            .roughness(0.4)
++          If true
++            ForEach([Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")], {fn})
++              row <uuid>
++                PointMark(x: .value("East", -1.5), y: .value("Height", 1.2), z: .value("North", -1.0))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 0.5), y: .value("Height", 0.8), z: .value("North", 1.5))
++                  .foregroundStyle(by: .value("Kind", "Ridge"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 1.8), y: .value("Height", 0.2), z: .value("North", -1.8))
++                  .foregroundStyle(by: .value("Kind", "Pass"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", -0.4), y: .value("Height", 1.6), z: .value("North", 0.3))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++          .chart3DPose($Chart3DPose)
++          .chart3DCameraProjection(.perspective)
++          .chartXScale(domain: -2...2)
++          .chartZScale(domain: -2...2)
++          .chartZAxisLabel("North")
++          .chartZSelection(value: $nil)
++          .frame(height: 320)
++      Section("View", {fn})
++        HStack({fn})
++          Text(_literal: "Turned")
++          Spacer()
++          Text(_literal: "-29°")
++            .foregroundStyle(Color)
++            .monospacedDigit()
++        Picker("Angle", selection: $0, {fn})
++          Text(_literal: "Default")
++            .tag(0)
++          Text(_literal: "Front")
++            .tag(1)
++          Text(_literal: "Top")
++            .tag(2)
++          .pickerStyle(.segmented)
++        Toggle("Perspective", isOn: $true)
++        Toggle("Peaks", isOn: $true)
++      Section("Terrain", {fn})
++        LabeledContent("Ripple", value: 1.5, format: FormatStyle)
++        Slider(value: $1.5, in: 0.5...3.0)
++        If false
++      .navigationTitle("Terrain")
++== after SurfacePlot@33
++ContentView {ripple=1.5, pose=Chart3DPose, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
++  NavigationStack({fn})
++    Form({fn})
++      Section({fn})
++        Chart3D({fn})
++          SurfacePlot(x: "East", y: "Height", z: "North", {fn})
++            .foregroundStyle(.heightBased)
++            .roughness(0.4)
++          If true
++            ForEach([Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")], {fn})
++              row <uuid>
++                PointMark(x: .value("East", -1.5), y: .value("Height", 1.2), z: .value("North", -1.0))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 0.5), y: .value("Height", 0.8), z: .value("North", 1.5))
++                  .foregroundStyle(by: .value("Kind", "Ridge"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 1.8), y: .value("Height", 0.2), z: .value("North", -1.8))
+…
+```
+
 ## Packages/Kiln/Examples/AppleIntelligence/expense.md
 
 ```diff
@@ -620,6 +762,258 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +    .accessibilityRotor("Controls", {fn})
 +      AccessibilityRotorEntry("Start button", id: "start")
 +    .speechAnnouncementsQueued()
+…
+```
+
+## fixtures/apps/audio.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,788 @@
+ == start
+-error: Line 43: Cannot find 'AVSpeechSynthesizer' in scope
++ContentView {player=nil, listener=Listener{onFinish: {fn}, onSpoken: {fn}}, synth=AVSpeechSynthesizer, stream=AVPlayer, frequency=440.0, volume=0.8, fast=false, loops=0, status="Ready", phrase="Hello from Shelf", voices=[], voiceID=""}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Tone", {fn})
++        LabeledContent("Pitch", value: "440 Hz")
++        Slider(value: $440.0, in: 220...880, step: 20)
++        Slider(value: $0.8, in: 0...1, {fn})
++          Text(_literal: "Volume")
++          .onChange(of: 0.8, {fn})
++        Toggle("Faster", isOn: $false)
++        Stepper("Repeats: 0", value: $0, in: 0...5)
++        Button("Play Tone", systemImage: "play.fill", {fn})
++        Button("Save and Play File", systemImage: "doc", {fn})
++        Button("Stop", systemImage: "stop.fill", {fn})
++        Text("Ready")
++          .foregroundStyle(Color)
++      Section("System Sounds", {fn})
++        Button("Click", {fn})
++        Button("Vibrate", {fn})
++      Section("Speech", {fn})
++        TextField("Phrase", text: $"Hello from Shelf")
++        Picker("Voice", selection: $"", {fn})
++          Text(_literal: "Default")
++            .tag("")
++          ForEach([], id: KeyPath, {fn})
++        Button("Speak", systemImage: "waveform", {fn})
++        Button("Stop Speaking", {fn})
++      Section("Stream", {fn})
++        VideoPlayer(player: AVPlayer)
++          .frame(height: 180)
++        Button("Play Stream", {fn})
++      .navigationTitle("Tone Lab")
++      .onAppear({fn})
++== appeared (Form.onAppear@95)
++ContentView {player=AVAudioPlayer, listener=Listener{onFinish: {fn}, onSpoken: {fn}}, synth=AVSpeechSynthesizer, stream=AVPlayer, frequency=440.0, volume=0.8, fast=false, loops=0, status="Stopped", phrase="Hello from Shelf", voices=[AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, …], voiceID=""}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Tone", {fn})
++        LabeledContent("Pitch", value: "440 Hz")
++        Slider(value: $440.0, in: 220...880, step: 20)
++        Slider(value: $0.8, in: 0...1, {fn})
++          Text(_literal: "Volume")
++          .onChange(of: 0.8, {fn})
++        Toggle("Faster", isOn: $false)
++        Stepper("Repeats: 0", value: $0, in: 0...5)
++        Button("Play Tone", systemImage: "play.fill", {fn})
++        Button("Save and Play File", systemImage: "doc", {fn})
++        Button("Stop", systemImage: "stop.fill", {fn})
++        Text("Stopped")
++          .foregroundStyle(Color)
++      Section("System Sounds", {fn})
++        Button("Click", {fn})
++        Button("Vibrate", {fn})
++      Section("Speech", {fn})
++        TextField("Phrase", text: $"Hello from Shelf")
++        Picker("Voice", selection: $"", {fn})
++          Text(_literal: "Default")
++            .tag("")
++          ForEach([AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice], id: KeyPath, {fn})
++            row "com.apple.voice.compact.en-US.Samantha"
++              Text("Samantha")
++                .tag("com.apple.voice.compact.en-US.Samantha")
++            row "com.apple.eloquence.en-US.Eddy"
++              Text("Eddy")
++                .tag("com.apple.eloquence.en-US.Eddy")
++            row "com.apple.eloquence.en-US.Flo"
++              Text("Flo")
++                .tag("com.apple.eloquence.en-US.Flo")
++            row "com.apple.eloquence.en-US.Grandma"
++              Text("Grandma")
++                .tag("com.apple.eloquence.en-US.Grandma")
++            row "com.apple.eloquence.en-US.Grandpa"
++              Text("Grandpa")
++                .tag("com.apple.eloquence.en-US.Grandpa")
++            row "com.apple.eloquence.en-US.Reed"
++              Text("Reed")
++                .tag("com.apple.eloquence.en-US.Reed")
++            row "com.apple.eloquence.en-US.Rocko"
++              Text("Rocko")
++                .tag("com.apple.eloquence.en-US.Rocko")
++            row "com.apple.eloquence.en-US.Sandy"
++              Text("Sandy")
++                .tag("com.apple.eloquence.en-US.Sandy")
++        Button("Speak", systemImage: "waveform", {fn})
++        Button("Stop Speaking", {fn})
++      Section("Stream", {fn})
++        VideoPlayer(player: AVPlayer)
++          .frame(height: 180)
++        Button("Play Stream", {fn})
++      .navigationTitle("Tone Lab")
++      .onAppear({fn})
++== after Button[Click]@74
++ContentView {player=AVAudioPlayer, listener=Listener{onFinish: {fn}, onSpoken: {fn}}, synth=AVSpeechSynthesizer, stream=AVPlayer, frequency=440.0, volume=0.8, fast=false, loops=0, status="Stopped", phrase="Hello from Shelf", voices=[AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, AVSpeechSynthesisVoice, …], voiceID=""}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Tone", {fn})
++        LabeledContent("Pitch", value: "440 Hz")
++        Slider(value: $440.0, in: 220...880, step: 20)
++        Slider(value: $0.8, in: 0...1, {fn})
++          Text(_literal: "Volume")
++          .onChange(of: 0.8, {fn})
++        Toggle("Faster", isOn: $false)
++        Stepper("Repeats: 0", value: $0, in: 0...5)
++        Button("Play Tone", systemImage: "play.fill", {fn})
++        Button("Save and Play File", systemImage: "doc", {fn})
++        Button("Stop", systemImage: "stop.fill", {fn})
++        Text("Stopped")
++          .foregroundStyle(Color)
++      Section("System Sounds", {fn})
++        Button("Click", {fn})
++        Button("Vibrate", {fn})
++      Section("Speech", {fn})
++        TextField("Phrase", text: $"Hello from Shelf")
++        Picker("Voice", selection: $"", {fn})
++          Text(_literal: "Default")
+…
+```
+
+## fixtures/apps/chart3d.swift
+
+```diff
+--- before
++++ after
+@@ -1,29 +1,832 @@
+ == start
+-ContentView {ripple=1.5, pose=.default, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
+-  NavigationStack({fn})
+-    Form({fn})
+-      Section({fn})
+-        content failed
+-      Section("View", {fn})
+-        HStack({fn})
+-          Text(_literal: "Turned")
+-          Spacer()
+-          Text(_literal: "0°")
+-            .foregroundStyle(Color)
+-            .monospacedDigit()
+-        Picker("Angle", selection: $0, {fn})
+-          Text(_literal: "Default")
+-            .tag(0)
+-          Text(_literal: "Front")
+-            .tag(1)
+-          Text(_literal: "Top")
+-            .tag(2)
+-          .pickerStyle(.segmented)
+-        Toggle("Perspective", isOn: $true)
+-        Toggle("Peaks", isOn: $true)
+-      Section("Terrain", {fn})
+-        LabeledContent("Ripple", value: 1.5, format: FormatStyle)
+-        Slider(value: $1.5, in: 0.5...3.0)
+-        If false
+-      .navigationTitle("Terrain")
+-error: Line 36: Cannot find 'Chart3D' in scope
++ContentView {ripple=1.5, pose=Chart3DPose, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
++  NavigationStack({fn})
++    Form({fn})
++      Section({fn})
++        Chart3D({fn})
++          SurfacePlot(x: "East", y: "Height", z: "North", {fn})
++            .foregroundStyle(.heightBased)
++            .roughness(0.4)
++          If true
++            ForEach([Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")], {fn})
++              row <uuid>
++                PointMark(x: .value("East", -1.5), y: .value("Height", 1.2), z: .value("North", -1.0))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 0.5), y: .value("Height", 0.8), z: .value("North", 1.5))
++                  .foregroundStyle(by: .value("Kind", "Ridge"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 1.8), y: .value("Height", 0.2), z: .value("North", -1.8))
++                  .foregroundStyle(by: .value("Kind", "Pass"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", -0.4), y: .value("Height", 1.6), z: .value("North", 0.3))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++          .chart3DPose($Chart3DPose)
++          .chart3DCameraProjection(.perspective)
++          .chartXScale(domain: -2...2)
++          .chartZScale(domain: -2...2)
++          .chartZAxisLabel("North")
++          .chartZSelection(value: $nil)
++          .frame(height: 320)
++      Section("View", {fn})
++        HStack({fn})
++          Text(_literal: "Turned")
++          Spacer()
++          Text(_literal: "-29°")
++            .foregroundStyle(Color)
++            .monospacedDigit()
++        Picker("Angle", selection: $0, {fn})
++          Text(_literal: "Default")
++            .tag(0)
++          Text(_literal: "Front")
++            .tag(1)
++          Text(_literal: "Top")
++            .tag(2)
++          .pickerStyle(.segmented)
++        Toggle("Perspective", isOn: $true)
++        Toggle("Peaks", isOn: $true)
++      Section("Terrain", {fn})
++        LabeledContent("Ripple", value: 1.5, format: FormatStyle)
++        Slider(value: $1.5, in: 0.5...3.0)
++        If false
++      .navigationTitle("Terrain")
++== after SurfacePlot@37
++ContentView {ripple=1.5, pose=Chart3DPose, perspective=true, showPeaks=true, depth=nil, peaks=[Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")]}
++  NavigationStack({fn})
++    Form({fn})
++      Section({fn})
++        Chart3D({fn})
++          SurfacePlot(x: "East", y: "Height", z: "North", {fn})
++            .foregroundStyle(.heightBased)
++            .roughness(0.4)
++          If true
++            ForEach([Peak(id: <uuid>, name: "North", x: -1.5, height: 1.2, z: -1.0, kind: "Summit"), Peak(id: <uuid>, name: "Ridge", x: 0.5, height: 0.8, z: 1.5, kind: "Ridge"), Peak(id: <uuid>, name: "Saddle", x: 1.8, height: 0.2, z: -1.8, kind: "Pass"), Peak(id: <uuid>, name: "Spire", x: -0.4, height: 1.6, z: 0.3, kind: "Summit")], {fn})
++              row <uuid>
++                PointMark(x: .value("East", -1.5), y: .value("Height", 1.2), z: .value("North", -1.0))
++                  .foregroundStyle(by: .value("Kind", "Summit"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 0.5), y: .value("Height", 0.8), z: .value("North", 1.5))
++                  .foregroundStyle(by: .value("Kind", "Ridge"))
++                  .symbol(.sphere)
++                  .symbolSize(0.06)
++                  .metalness(0.2)
++              row <uuid>
++                PointMark(x: .value("East", 1.8), y: .value("Height", 0.2), z: .value("North", -1.8))
 …
 ```
 
@@ -1525,6 +1919,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/streams.swift
+
+```diff
+--- before
++++ after
+@@ -25,339 +25,338 @@
+ == appeared (List.task@60, List.task@61)
+-error: Line 69: Value of type 'URLSession' has no method 'webSocketTask'
+-ContentView {socket=nil, lines=[], draft="", status="Connecting…", headlines=["Offline"]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Status", {fn})
+-        Text("Connecting…")
+-          .foregroundStyle(Color)
+-      Section("Chat", {fn})
+-        ForEach([], {fn})
+-      Section("Headlines", {fn})
+-        ForEach(["Offline"], id: KeyPath, {fn})
+-          row "Offline"
+-            Text("Offline")
+-      .safeAreaInset(edge: .bottom, {fn})
+-        HStack({fn})
+-          TextField("Message", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-            .onSubmit({fn})
+-          Button("Send", {fn})
+-            .disabled(true)
+-          .padding()
+-          .background(.bar)
+-      .navigationTitle("Echo Chat")
+-      .task({fn})
+-      .task({fn})
+-      .onDisappear({fn})
+-== after TextField.onSubmit@50
+-ContentView {socket=nil, lines=[], draft="", status="Connecting…", headlines=["Offline"]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Status", {fn})
+-        Text("Connecting…")
+-          .foregroundStyle(Color)
+-      Section("Chat", {fn})
+-        ForEach([], {fn})
+-      Section("Headlines", {fn})
+-        ForEach(["Offline"], id: KeyPath, {fn})
+-          row "Offline"
+-            Text("Offline")
+-      .safeAreaInset(edge: .bottom, {fn})
+-        HStack({fn})
+-          TextField("Message", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-            .onSubmit({fn})
+-          Button("Send", {fn})
+-            .disabled(true)
+-          .padding()
+-          .background(.bar)
+-      .navigationTitle("Echo Chat")
+-      .task({fn})
+-      .task({fn})
+-      .onDisappear({fn})
+-== after Button[Send]@51
+-ContentView {socket=nil, lines=[], draft="", status="Connecting…", headlines=["Offline"]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Status", {fn})
+-        Text("Connecting…")
+-          .foregroundStyle(Color)
+-      Section("Chat", {fn})
+-        ForEach([], {fn})
+-      Section("Headlines", {fn})
+-        ForEach(["Offline"], id: KeyPath, {fn})
+-          row "Offline"
+-            Text("Offline")
+-      .safeAreaInset(edge: .bottom, {fn})
+-        HStack({fn})
+-          TextField("Message", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-            .onSubmit({fn})
+-          Button("Send", {fn})
+-            .disabled(true)
+-          .padding()
+-          .background(.bar)
+-      .navigationTitle("Echo Chat")
+-      .task({fn})
+-      .task({fn})
+-      .onDisappear({fn})
+-== after TextField.onSubmit@50
+-ContentView {socket=nil, lines=[], draft="", status="Connecting…", headlines=["Offline"]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Status", {fn})
+-        Text("Connecting…")
+-          .foregroundStyle(Color)
+-      Section("Chat", {fn})
+-        ForEach([], {fn})
+-      Section("Headlines", {fn})
+-        ForEach(["Offline"], id: KeyPath, {fn})
+-          row "Offline"
+-            Text("Offline")
+-      .safeAreaInset(edge: .bottom, {fn})
+-        HStack({fn})
+-          TextField("Message", text: $"")
+-            .textFieldStyle(.roundedBorder)
+-            .onSubmit({fn})
+-          Button("Send", {fn})
+-            .disabled(true)
+-          .padding()
+-          .background(.bar)
+-      .navigationTitle("Echo Chat")
+-      .task({fn})
+-      .task({fn})
+-      .onDisappear({fn})
+-== after Button[Send]@51
+-ContentView {socket=nil, lines=[], draft="", status="Connecting…", headlines=["Offline"]}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Status", {fn})
+-        Text("Connecting…")
+-          .foregroundStyle(Color)
+-      Section("Chat", {fn})
+-        ForEach([], {fn})
+-      Section("Headlines", {fn})
+-        ForEach(["Offline"], id: KeyPath, {fn})
+-          row "Offline"
+…
+```
+
 ## fixtures/apps/swift-builders.swift
 
 ```diff
@@ -2152,6 +2672,384 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          (no body)
 +== after Button[Choose Photo]@111
 +ContentView {image=nil, picking=true, caption="A day at the sea"}
+…
+```
+
+## fixtures/apps/web.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,629 @@
+ == start
+-error: Line 10: Cannot find 'WebPage' in scope
++ContentView {page=WebPage, address="https://www.apple.com", words=0, finding=false, showNotes=false}
++  NavigationStack({fn})
++    VStack(spacing: 0, {fn})
++      If false
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.enabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.visible)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++      .navigationTitle("Browser")
++      .navigationBarTitleDisplayMode(.inline)
++      .toolbar({fn})
++        ToolbarItemGroup(placement: .bottomBar, {fn})
++          Button("Back", systemImage: "chevron.left", {fn})
++            If false
++            .disabled(true)
++          Button("Forward", systemImage: "chevron.right", {fn})
++            If false
++            .disabled(true)
++          Spacer()
++          Button("Count Words", systemImage: "textformat.size", {fn})
++          Button("Find", systemImage: "magnifyingglass", {fn})
++          Button("Reload", systemImage: "arrow.clockwise", {fn})
++        ToolbarItem(placement: .topBarTrailing, {fn})
++          Button("Notes", systemImage: "note.text", {fn})
++      .safeAreaInset(edge: .top, {fn})
++        TextField("Address", text: $"https://www.apple.com")
++          .textFieldStyle(.roundedBorder)
++          .keyboardType(.URL)
++          .textInputAutocapitalization(.never)
++          .autocorrectionDisabled()
++          .onSubmit({fn})
++          .padding(.horizontal)
++      .overlay(alignment: .bottomTrailing, {fn})
++        If false
++      .sheet(isPresented: $true, {fn})
++        NavigationStack({fn})
++          WebView(url: URL(https://developer.apple.com/documentation/webkit))
++            .navigationTitle("WebKit")
++      .onAppear({fn})
++== appeared (VStack.onAppear@76)
++ContentView {page=WebPage, address="https://www.apple.com", words=0, finding=true, showNotes=true}
++  NavigationStack({fn})
++    VStack(spacing: 0, {fn})
++      If true
++        ProgressView(value: 0.1)
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.enabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.visible)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $true)
++      .navigationTitle("Browser")
++      .navigationBarTitleDisplayMode(.inline)
++      .toolbar({fn})
++        ToolbarItemGroup(placement: .bottomBar, {fn})
++          Button("Back", systemImage: "chevron.left", {fn})
++            If false
++            .disabled(true)
++          Button("Forward", systemImage: "chevron.right", {fn})
++            If false
++            .disabled(true)
++          Spacer()
++          Button("Count Words", systemImage: "textformat.size", {fn})
++          Button("Find", systemImage: "magnifyingglass", {fn})
++          Button("Reload", systemImage: "arrow.clockwise", {fn})
++        ToolbarItem(placement: .topBarTrailing, {fn})
++          Button("Notes", systemImage: "note.text", {fn})
++      .safeAreaInset(edge: .top, {fn})
++        TextField("Address", text: $"https://www.apple.com")
++          .textFieldStyle(.roundedBorder)
++          .keyboardType(.URL)
++          .textInputAutocapitalization(.never)
++          .autocorrectionDisabled()
++          .onSubmit({fn})
++          .padding(.horizontal)
++      .overlay(alignment: .bottomTrailing, {fn})
++        If false
++      .sheet(isPresented: $true, {fn})
++        NavigationStack({fn})
++          WebView(url: URL(https://developer.apple.com/documentation/webkit))
++            .navigationTitle("WebKit")
++      .onAppear({fn})
++== after TextField.onSubmit@58
++ContentView {page=WebPage, address="https://www.apple.com", words=0, finding=false, showNotes=true}
++  NavigationStack({fn})
++    VStack(spacing: 0, {fn})
++      If true
++        ProgressView(value: 0.1)
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.enabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.visible)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++      .navigationTitle("Browser")
++      .navigationBarTitleDisplayMode(.inline)
++      .toolbar({fn})
++        ToolbarItemGroup(placement: .bottomBar, {fn})
++          Button("Back", systemImage: "chevron.left", {fn})
++            If false
++            .disabled(true)
++          Button("Forward", systemImage: "chevron.right", {fn})
++            If false
++            .disabled(true)
++          Spacer()
++          Button("Count Words", systemImage: "textformat.size", {fn})
++          Button("Find", systemImage: "magnifyingglass", {fn})
+…
+```
+
+## tests/AudioBridgeTests-1.swift
+
+```diff
+--- before
++++ after
+@@ -2,2 +2,143 @@
+ error: Line 19: Cannot find 'tone' in scope
+-error: Line 24: Cannot find 'AVSpeechSynthesizer' in scope
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="idle"}
++  VStack({fn})
++    Text("idle")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Beep]@31
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Click]@32
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Say]@33
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Beep]@31
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Click]@32
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Say]@33
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Beep]@31
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Click]@32
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Say]@33
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
++    Button("Say", {fn})
++    VideoPlayer(player: AVPlayer)
++      .frame(height: 200)
++    VideoPlayer(player: AVPlayer, {fn})
++      Text(_literal: "Overlay")
++== after Button[Beep]@31
++ContentView {player=nil, sounds=Sounds{finished: 0, spoken: 0}, synth=AVSpeechSynthesizer, video=AVPlayer, status="error"}
++  VStack({fn})
++    Text("error")
++    Button("Beep", {fn})
++    Button("Click", {fn})
+…
+```
+
+## tests/Chart3DBridgeTests-0.swift
+
+```diff
+--- before
++++ after
+@@ -1,5 +1,364 @@
+ == start
+-ContentView {pose=.front, frequency=2.0, depth=nil, samples=[Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")]}
+-  VStack({fn})
+-    content failed
+-error: Line 24: Cannot find 'Chart3D' in scope
++ContentView {pose=Chart3DPose, frequency=2.0, depth=nil, samples=[Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")]}
++  VStack({fn})
++    Chart3D([Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")], {fn})
++      PointMark(x: .value("X", nil), y: .value("Y", nil), z: .value("Z", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .symbol(.cube)
++        .symbolSize(0.04)
++        .metalness(0.3)
++        .roughness(0.6)
++        .symbolRotation(Rotation3D)
++      .chart3DPose($Chart3DPose)
++      .chart3DCameraProjection(.perspective)
++      .chartZAxisLabel("Depth")
++      .chartZScale(domain: 0...4)
++      .chartZSelection(value: $nil)
++    Chart3D({fn})
++      SurfacePlot(x: "X", y: "Height", z: "Z", {fn})
++        .foregroundStyle(.heightBased)
++      PointMark(x: .value("X", 0.0), y: .value("Y", 1.0), z: .value("Z", 0.0))
++        .foregroundStyle(Color)
++      .chartXScale(domain: -3...3)
++      .chartZScale(domain: -3...3)
++      .chart3DPose(Chart3DPose)
++      .chartZAxis(.hidden)
++    Text(_literal: "0")
++    Button("Top", {fn})
++    Slider(value: $2.0, in: 1...4)
++== after SurfacePlot@40
++ContentView {pose=Chart3DPose, frequency=2.0, depth=nil, samples=[Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")]}
++  VStack({fn})
++    Chart3D([Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")], {fn})
++      PointMark(x: .value("X", nil), y: .value("Y", nil), z: .value("Z", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .symbol(.cube)
++        .symbolSize(0.04)
++        .metalness(0.3)
++        .roughness(0.6)
++        .symbolRotation(Rotation3D)
++      .chart3DPose($Chart3DPose)
++      .chart3DCameraProjection(.perspective)
++      .chartZAxisLabel("Depth")
++      .chartZScale(domain: 0...4)
++      .chartZSelection(value: $nil)
++    Chart3D({fn})
++      SurfacePlot(x: "X", y: "Height", z: "Z", {fn})
++        .foregroundStyle(.heightBased)
++      PointMark(x: .value("X", 0.0), y: .value("Y", 1.0), z: .value("Z", 0.0))
++        .foregroundStyle(Color)
++      .chartXScale(domain: -3...3)
++      .chartZScale(domain: -3...3)
++      .chart3DPose(Chart3DPose)
++      .chartZAxis(.hidden)
++    Text(_literal: "0")
++    Button("Top", {fn})
++    Slider(value: $2.0, in: 1...4)
++== after Button[Top]@53
++ContentView {pose=Chart3DPose, frequency=2.0, depth=nil, samples=[Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")]}
++  VStack({fn})
++    Chart3D([Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")], {fn})
++      PointMark(x: .value("X", nil), y: .value("Y", nil), z: .value("Z", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .symbol(.cube)
++        .symbolSize(0.04)
++        .metalness(0.3)
++        .roughness(0.6)
++        .symbolRotation(Rotation3D)
++      .chart3DPose($Chart3DPose)
++      .chart3DCameraProjection(.perspective)
++      .chartZAxisLabel("Depth")
++      .chartZScale(domain: 0...4)
++      .chartZSelection(value: $nil)
++    Chart3D({fn})
++      SurfacePlot(x: "X", y: "Height", z: "Z", {fn})
++        .foregroundStyle(.heightBased)
++      PointMark(x: .value("X", 0.0), y: .value("Y", 1.0), z: .value("Z", 0.0))
++        .foregroundStyle(Color)
++      .chartXScale(domain: -3...3)
++      .chartZScale(domain: -3...3)
++      .chart3DPose(Chart3DPose)
++      .chartZAxis(.hidden)
++    Text(_literal: "0")
++    Button("Top", {fn})
++    Slider(value: $2.0, in: 1...4)
++== after SurfacePlot@40
++ContentView {pose=Chart3DPose, frequency=2.0, depth=nil, samples=[Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")]}
++  VStack({fn})
++    Chart3D([Sample(id: <uuid>, x: 0.0, y: 0.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 0.25, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 0.5, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 0.75, z: 0.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 1.0, z: 0.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 1.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 1.5, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 1.75, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 2.0, z: 1.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 2.25, z: 1.0, kind: "Odd"), Sample(id: <uuid>, x: 0.0, y: 2.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 1.0, y: 2.75, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 2.0, y: 3.0, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 3.0, y: 3.25, z: 2.0, kind: "Odd"), Sample(id: <uuid>, x: 4.0, y: 3.5, z: 2.0, kind: "Even"), Sample(id: <uuid>, x: 0.0, y: 3.75, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 1.0, y: 4.0, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 2.0, y: 4.25, z: 3.0, kind: "Odd"), Sample(id: <uuid>, x: 3.0, y: 4.5, z: 3.0, kind: "Even"), Sample(id: <uuid>, x: 4.0, y: 4.75, z: 3.0, kind: "Odd")], {fn})
++      PointMark(x: .value("X", nil), y: .value("Y", nil), z: .value("Z", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .symbol(.cube)
++        .symbolSize(0.04)
++        .metalness(0.3)
++        .roughness(0.6)
++        .symbolRotation(Rotation3D)
++      .chart3DPose($Chart3DPose)
++      .chart3DCameraProjection(.perspective)
++      .chartZAxisLabel("Depth")
++      .chartZScale(domain: 0...4)
++      .chartZSelection(value: $nil)
++    Chart3D({fn})
++      SurfacePlot(x: "X", y: "Height", z: "Z", {fn})
++        .foregroundStyle(.heightBased)
++      PointMark(x: .value("X", 0.0), y: .value("Y", 1.0), z: .value("Z", 0.0))
++        .foregroundStyle(Color)
++      .chartXScale(domain: -3...3)
++      .chartZScale(domain: -3...3)
++      .chart3DPose(Chart3DPose)
++      .chartZAxis(.hidden)
++    Text(_literal: "0")
++    Button("Top", {fn})
++    Slider(value: $2.0, in: 1...4)
++== after Button[Top]@53
 …
 ```
 
@@ -3323,5 +4221,157 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      .union(<view>)
 +        Rectangle()
 +          .offset(x: 20)
+…
+```
+
+## tests/StreamsBridgeTests-5.swift
+
+```diff
+--- before
++++ after
+@@ -7,3 +7,4 @@
+ console: stream offline
+-error: Line 9: Value of type 'URLSession' has no method 'webSocketTask'
++console: send offline
++console: receive offline
+ ContentView {}
+```
+
+## tests/StreamsBridgeTests-6.swift
+
+```diff
+--- before
++++ after
+@@ -7,4 +7,3 @@
+ == appeared (List.task@9, List.task@15)
+-error: Line 16: Value of type 'URLSession' has no method 'webSocketTask'
+-ContentView {lines=[], socket=nil}
++ContentView {lines=[], socket=URLSessionWebSocketTask}
+   List([], id: KeyPath, {fn})
+```
+
+## tests/WebBridgeTests-0.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,336 @@
+ == start
+-error: Line 5: Cannot find 'WebPage' in scope
++ContentView {page=WebPage, answer="", showFind=false, position=ScrollPosition, offset=0.0}
++  NavigationStack({fn})
++    VStack({fn})
++      Text("")
++      ProgressView(value: 0.0)
++      Text("Idle")
++      Text("none")
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.disabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.hidden)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++        .webViewScrollPosition($ScrollPosition)
++        .webViewOnScrollGeometryChange(for: Double, of: {fn}, {fn})
++      WebView(url: URL(https://example.com))
++        .frame(height: 100)
++      Text("")
++      Button("Back", {fn})
++      Button("Reload", {fn})
++      .task({fn})
++== appeared (VStack.task@36)
++ContentView {page=WebPage, answer="", showFind=false, position=ScrollPosition, offset=nil}
++  NavigationStack({fn})
++    VStack({fn})
++      Text("")
++      ProgressView(value: 0.1)
++      Text("Loading")
++      Text("about:blank")
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.disabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.hidden)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++        .webViewScrollPosition($ScrollPosition)
++        .webViewOnScrollGeometryChange(for: Double, of: {fn}, {fn})
++      WebView(url: URL(https://example.com))
++        .frame(height: 100)
++      Text("")
++      Button("Back", {fn})
++      Button("Reload", {fn})
++      .task({fn})
++== after Button[Back]@31
++ContentView {page=WebPage, answer="", showFind=false, position=ScrollPosition, offset=nil}
++  NavigationStack({fn})
++    VStack({fn})
++      Text("")
++      ProgressView(value: 0.1)
++      Text("Loading")
++      Text("about:blank")
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.disabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.hidden)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++        .webViewScrollPosition($ScrollPosition)
++        .webViewOnScrollGeometryChange(for: Double, of: {fn}, {fn})
++      WebView(url: URL(https://example.com))
++        .frame(height: 100)
++      Text("")
++      Button("Back", {fn})
++      Button("Reload", {fn})
++      .task({fn})
++== after Button[Reload]@34
++ContentView {page=WebPage, answer="", showFind=false, position=ScrollPosition, offset=nil}
++  NavigationStack({fn})
++    VStack({fn})
++      Text("")
++      ProgressView(value: 0.1)
++      Text("Loading")
++      Text("about:blank")
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.disabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.hidden)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++        .webViewScrollPosition($ScrollPosition)
++        .webViewOnScrollGeometryChange(for: Double, of: {fn}, {fn})
++      WebView(url: URL(https://example.com))
++        .frame(height: 100)
++      Text("")
++      Button("Back", {fn})
++      Button("Reload", {fn})
++      .task({fn})
++== after Button[Back]@31
++ContentView {page=WebPage, answer="", showFind=false, position=ScrollPosition, offset=nil}
++  NavigationStack({fn})
++    VStack({fn})
++      Text("")
++      ProgressView(value: 0.1)
++      Text("Loading")
++      Text("about:blank")
++      WebView(WebPage)
++        .webViewBackForwardNavigationGestures(.enabled)
++        .webViewMagnificationGestures(.disabled)
++        .webViewLinkPreviews(.disabled)
++        .webViewTextSelection(.enabled)
++        .webViewContentBackground(.hidden)
++        .webViewElementFullscreenBehavior(.enabled)
++        .findNavigator(isPresented: $false)
++        .webViewScrollPosition($ScrollPosition)
++        .webViewOnScrollGeometryChange(for: Double, of: {fn}, {fn})
++      WebView(url: URL(https://example.com))
++        .frame(height: 100)
 …
 ```

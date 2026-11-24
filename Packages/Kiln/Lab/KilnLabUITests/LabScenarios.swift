@@ -347,6 +347,21 @@ final class AppScenarios: LabCase {
     }
     func testTerrainNative() { terrain("native") }
     func testTerrainKiln() { terrain("kiln") }
+
+    // MARK: Line feed (Round 2 §3.8: streamed responses)
+
+    func feed(_ mode: String) {
+        launch("LineFeed", mode)
+        snap("1 start")
+        tap("Load")
+        Thread.sleep(forTimeInterval: 1)
+        snap("2 loaded")
+        tap("Load")
+        Thread.sleep(forTimeInterval: 1)
+        snap("3 loaded again")
+    }
+    func testLineFeedNative() { feed("native") }
+    func testLineFeedKiln() { feed("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

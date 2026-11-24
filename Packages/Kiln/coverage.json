@@ -2459,7 +2459,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 3,
+      "overloadsCovered" : 4,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -2589,7 +2589,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 9,
+      "overloadsCovered" : 10,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -2911,7 +2911,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 6,
+      "overloadsCovered" : 7,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -3385,8 +3385,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 4,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "conformsTo" : "Chart3DContent",
         "deprecated" : false,
@@ -7921,31 +7922,6 @@
       "wontDo" : "sign-in-with-apple"
     },
     {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:defaultAppStorageDefaults",
-        "introduced" : "13.0",
-        "kind" : "environment",
-        "module" : "SwiftUI",
-        "name" : "defaultAppStorageDefaults",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUI",
-            "signature" : "var defaultAppStorageDefaults: UserDefaults"
-          }
-        ]
-      }
-    },
-    {
       "family" : "Lists",
       "overloadsCovered" : 0,
       "round" : 1,
@@ -9022,56 +8998,6 @@
       }
     },
     {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:listRowSpacing",
-        "introduced" : "15.0",
-        "kind" : "environment",
-        "module" : "SwiftUI",
-        "name" : "listRowSpacing",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "15.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUI",
-            "signature" : "var listRowSpacing: CGFloat?"
-          }
-        ]
-      }
-    },
-    {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:listSectionSpacing",
-        "introduced" : "17.0",
-        "kind" : "environment",
-        "module" : "SwiftUI",
-        "name" : "listSectionSpacing",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "17.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUI",
-            "signature" : "var listSectionSpacing: ListSectionSpacing?"
-          }
-        ]
-      }
-    },
-    {
       "family" : "Text",
       "overloadsCovered" : 0,
       "round" : 1,
@@ -9494,56 +9420,6 @@
         ]
       },
       "wontDo" : "storekit"
-    },
-    {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:realHorizontalSizeClass",
-        "introduced" : "13.0",
-        "kind" : "environment",
-        "module" : "SwiftUICore",
-        "name" : "realHorizontalSizeClass",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUICore",
-            "signature" : "var realHorizontalSizeClass: UserInterfaceSizeClass?"
-          }
-        ]
-      }
-    },
-    {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:realVerticalSizeClass",
-        "introduced" : "13.0",
-        "kind" : "environment",
-        "module" : "SwiftUICore",
-        "name" : "realVerticalSizeClass",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUICore",
-            "signature" : "var realVerticalSizeClass: UserInterfaceSizeClass?"
-          }
-        ]
-      }
     },
     {
       "family" : "3D & Games",
@@ -10092,31 +9968,6 @@
             ],
             "module" : "SwiftUICore",
             "signature" : "var textCase: Text.Case?"
-          }
-        ]
-      }
-    },
-    {
-      "family" : "Environment",
-      "overloadsCovered" : 0,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "environment:textContentType",
-        "introduced" : "13.0",
-        "kind" : "environment",
-        "module" : "SwiftUI",
-        "name" : "textContentType",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUI",
-            "signature" : "var textContentType: String?"
           }
         ]
       }
@@ -16469,8 +16320,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 3,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.foregroundStyle",
@@ -16515,8 +16367,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.metalness",
@@ -16541,34 +16394,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "modifier:Chart3DContent.modifier",
-        "introduced" : "26.0",
-        "kind" : "modifier",
-        "module" : "Charts",
-        "name" : "modifier",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "26.0",
-            "labels" : [
-              "_"
-            ],
-            "module" : "Charts",
-            "receiver" : "Chart3DContent",
-            "signature" : "func modifier<M>(_ modifier: M) -> some Chart3DContent where M : _Chart3DContentModifier"
-          }
-        ],
-        "owner" : "Chart3DContent"
-      }
-    },
-    {
-      "family" : "Chart3D",
-      "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.roughness",
@@ -16593,8 +16421,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.symbol",
@@ -16619,8 +16448,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.symbolRotation",
@@ -16645,8 +16475,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:Chart3DContent.symbolSize",
@@ -18393,33 +18224,6 @@
       "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
-        "id" : "modifier:Scene.modifier",
-        "introduced" : "14.0",
-        "kind" : "modifier",
-        "module" : "SwiftUI",
-        "name" : "modifier",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "14.0",
-            "labels" : [
-              "_"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "Scene",
-            "signature" : "func modifier<T>(_ modifier: T) -> ModifiedContent<Self, T>"
-          }
-        ],
-        "owner" : "Scene"
-      },
-      "wontDo" : "documents-windows-scenes"
-    },
-    {
-      "family" : "Scenes",
-      "round" : 1,
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
         "id" : "modifier:Scene.onChange",
         "introduced" : "14.0",
         "kind" : "modifier",
@@ -18499,34 +18303,6 @@
       "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
-        "id" : "modifier:Scene.preference",
-        "introduced" : "16.0",
-        "kind" : "modifier",
-        "module" : "SwiftUI",
-        "name" : "preference",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "16.0",
-            "labels" : [
-              "key",
-              "value"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "Scene",
-            "signature" : "func preference<K>(key: K.Type = K.self, value: K.Value) -> some Scene where K : PreferenceKey"
-          }
-        ],
-        "owner" : "Scene"
-      },
-      "wontDo" : "documents-windows-scenes"
-    },
-    {
-      "family" : "Scenes",
-      "round" : 1,
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
         "id" : "modifier:Scene.restorationBehavior",
         "introduced" : "18.0",
         "kind" : "modifier",
@@ -18570,34 +18346,6 @@
             "module" : "SwiftUI",
             "receiver" : "Scene",
             "signature" : "func transformEnvironment<V>(_ keyPath: WritableKeyPath<EnvironmentValues, V>, transform: @escaping (inout V) -> Void) -> some Scene"
-          }
-        ],
-        "owner" : "Scene"
-      },
-      "wontDo" : "documents-windows-scenes"
-    },
-    {
-      "family" : "Scenes",
-      "round" : 1,
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "modifier:Scene.transformPreference",
-        "introduced" : "16.0",
-        "kind" : "modifier",
-        "module" : "SwiftUI",
-        "name" : "transformPreference",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "16.0",
-            "labels" : [
-              "_",
-              "_"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "Scene",
-            "signature" : "func transformPreference<K>(_ key: K.Type = K.self, _ callback: @escaping (inout K.Value) -> Void) -> some Scene where K : PreferenceKey"
           }
         ],
         "owner" : "Scene"
@@ -24352,31 +24100,6 @@
       }
     },
     {
-      "family" : "Store",
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "modifier:automaticSubscriptionStorePickerItemBackgroundInternal",
-        "introduced" : "18.0",
-        "kind" : "modifier",
-        "module" : "_StoreKit_SwiftUI",
-        "name" : "automaticSubscriptionStorePickerItemBackgroundInternal",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "18.0",
-            "labels" : [
-              "_"
-            ],
-            "module" : "_StoreKit_SwiftUI",
-            "receiver" : "View",
-            "signature" : "func automaticSubscriptionStorePickerItemBackgroundInternal(_ style: (some ShapeStyle)?) -> some View"
-          }
-        ]
-      },
-      "wontDo" : "storekit"
-    },
-    {
       "family" : "Drawing",
       "overloadsCovered" : 6,
       "round" : 1,
@@ -24995,8 +24718,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chart3DCameraProjection",
@@ -25020,8 +24744,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chart3DPose",
@@ -26229,8 +25954,10 @@
     },
     {
       "family" : "Chart3D",
+      "notes" : "`.hidden` hides it; its marks aren't customized yet.",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartZAxis",
@@ -26264,8 +25991,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 3,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartZAxisLabel",
@@ -26318,8 +26046,10 @@
     },
     {
       "family" : "Chart3D",
+      "notes" : "`domain:` as a numeric range.",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartZScale",
@@ -26367,8 +26097,10 @@
     },
     {
       "family" : "Chart3D",
+      "notes" : "A number's `value:` binding.",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "partial",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:chartZSelection",
@@ -36201,7 +35933,7 @@
     {
       "family" : "Navigation",
       "notes" : "A popover on iPad; on iPhone a sheet, unless `.presentationCompactAdaptation(.popover)`.",
-      "overloadsCovered" : 4,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -36212,31 +35944,6 @@
         "module" : "SwiftUI",
         "name" : "popover",
         "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "18.0",
-            "labels" : [
-              "isPresented",
-              "attachmentAnchor",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popover<Content>(isPresented: Binding<Bool>, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds), @ContentBuilder content: @escaping () -> Content) -> some View where Content : View"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-              "isPresented",
-              "attachmentAnchor",
-              "arrowEdge",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popover<Content>(isPresented: Binding<Bool>, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds), arrowEdge: Edge, @ContentBuilder content: @escaping () -> Content) -> some View where Content : View"
-          },
           {
             "deprecated" : false,
             "introduced" : "13.0",
@@ -36252,31 +35959,6 @@
           },
           {
             "deprecated" : false,
-            "introduced" : "18.0",
-            "labels" : [
-              "item",
-              "attachmentAnchor",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popover<Item, Content>(item: Binding<Item?>, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds), @ContentBuilder content: @escaping (Item) -> Content) -> some View where Item : Identifiable, Content : View"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
-              "item",
-              "attachmentAnchor",
-              "arrowEdge",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popover<Item, Content>(item: Binding<Item?>, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds), arrowEdge: Edge, @ContentBuilder content: @escaping (Item) -> Content) -> some View where Item : Identifiable, Content : View"
-          },
-          {
-            "deprecated" : false,
             "introduced" : "13.0",
             "labels" : [
               "item",
@@ -36287,50 +35969,6 @@
             "module" : "SwiftUI",
             "receiver" : "View",
             "signature" : "func popover<Item, Content>(item: Binding<Item?>, attachmentAnchor: PopoverAttachmentAnchor = .rect(.bounds), arrowEdge: Edge? = nil, @ContentBuilder content: @escaping (Item) -> Content) -> some View where Item : Identifiable, Content : View"
-          }
-        ]
-      }
-    },
-    {
-      "family" : "Navigation",
-      "notes" : "Shown as `.popover`.",
-      "overloadsCovered" : 2,
-      "round" : 1,
-      "status" : "supported",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "modifier:popoverCore",
-        "introduced" : "18.1",
-        "kind" : "modifier",
-        "module" : "SwiftUI",
-        "name" : "popoverCore",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "18.1",
-            "labels" : [
-              "isPresented",
-              "attachmentAnchor",
-              "arrowEdges",
-              "isDetachable",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popoverCore<Content>(isPresented: Binding<Bool>, attachmentAnchor: PopoverAttachmentAnchor, arrowEdges: Edge.Set?, isDetachable: Bool, @ContentBuilder content: @escaping () -> Content) -> some View where Content : View"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "18.1",
-            "labels" : [
-              "item",
-              "attachmentAnchor",
-              "arrowEdges",
-              "content"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func popoverCore<Item, Content>(item: Binding<Item?>, attachmentAnchor: PopoverAttachmentAnchor, arrowEdges: Edge.Set?, @ContentBuilder content: @escaping (Item) -> Content) -> some View where Item : Identifiable, Content : View"
           }
         ]
       }
@@ -39816,32 +39454,6 @@
       }
     },
     {
-      "family" : "Scenes",
-      "round" : 1,
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
-        "id" : "modifier:staticAllowsWindowActivationEvents",
-        "introduced" : "26.0",
-        "kind" : "modifier",
-        "module" : "SwiftUI",
-        "name" : "staticAllowsWindowActivationEvents",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "26.0",
-            "labels" : [
-
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func staticAllowsWindowActivationEvents() -> some View"
-          }
-        ]
-      },
-      "wontDo" : "documents-windows-scenes"
-    },
-    {
       "family" : "Navigation",
       "notes" : "Old; `.statusBarHidden(_:)`.",
       "overloadsCovered" : 1,
@@ -40599,32 +40211,6 @@
       "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
-        "id" : "modifier:subscriptionStorePickerOptionStrokeInternal",
-        "introduced" : "18.0",
-        "kind" : "modifier",
-        "module" : "_StoreKit_SwiftUI",
-        "name" : "subscriptionStorePickerOptionStrokeInternal",
-        "overloads" : [
-          {
-            "deprecated" : false,
-            "introduced" : "18.0",
-            "labels" : [
-              "style",
-              "lineWidth"
-            ],
-            "module" : "_StoreKit_SwiftUI",
-            "receiver" : "View",
-            "signature" : "func subscriptionStorePickerOptionStrokeInternal(style: some ShapeStyle, lineWidth: CGFloat = 1.0) -> some View"
-          }
-        ]
-      },
-      "wontDo" : "storekit"
-    },
-    {
-      "family" : "Store",
-      "status" : "wontDo",
-      "symbol" : {
-        "deprecated" : false,
         "id" : "modifier:subscriptionStorePolicyDestination",
         "introduced" : "17.0",
         "kind" : "modifier",
@@ -41363,16 +40949,6 @@
             "deprecated" : false,
             "introduced" : "13.0",
             "labels" : [
-              "_"
-            ],
-            "module" : "SwiftUICore",
-            "receiver" : "View",
-            "signature" : "func tag<V>(_ tag: V) -> some View where V : Hashable"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "13.0",
-            "labels" : [
               "_",
               "includeOptional"
             ],
@@ -41386,7 +40962,7 @@
     {
       "family" : "Core",
       "notes" : "Cancelled when the view goes away, and restarted when `id` changes.",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 0,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -41425,29 +41001,6 @@
             "module" : "SwiftUI",
             "receiver" : "View",
             "signature" : "func task(name: String? = nil, priority: TaskPriority = .userInitiated, file: String = #fileID, line: Int = #line, @_inheritActorContext _ action: sending @escaping @isolated(any) () async -> Void) -> some View"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "15.0",
-            "labels" : [
-              "priority",
-              "_"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func task(priority: TaskPriority = .userInitiated, @_inheritActorContext _ action: @escaping @Sendable () async -> Void) -> some View"
-          },
-          {
-            "deprecated" : false,
-            "introduced" : "15.0",
-            "labels" : [
-              "id",
-              "priority",
-              "_"
-            ],
-            "module" : "SwiftUI",
-            "receiver" : "View",
-            "signature" : "func task<T>(id value: T, priority: TaskPriority = .userInitiated, @_inheritActorContext _ action: @escaping @Sendable () async -> Void) -> some View where T : Equatable"
           },
           {
             "deprecated" : false,
@@ -43024,8 +42577,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewBackForwardNavigationGestures",
@@ -43049,8 +42603,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewContentBackground",
@@ -43074,8 +42629,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewElementFullscreenBehavior",
@@ -43099,8 +42655,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewLinkPreviews",
@@ -43124,8 +42681,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewMagnificationGestures",
@@ -43149,8 +42707,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewOnScrollGeometryChange",
@@ -43177,7 +42736,7 @@
     {
       "family" : "Web",
       "round" : 2,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewScrollInputBehavior",
@@ -43198,12 +42757,14 @@
             "signature" : "func webViewScrollInputBehavior(_ behavior: ScrollInputBehavior, for input: ScrollInputKind) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "web-scroll-input"
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewScrollPosition",
@@ -43227,8 +42788,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewTextSelection",
@@ -43492,7 +43054,7 @@
     {
       "family" : "Chart3D",
       "round" : 2,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "protocol:Chart3DSurfaceStyle",
@@ -43503,7 +43065,8 @@
         "overloads" : [
 
         ]
-      }
+      },
+      "wontDo" : "private-style-protocols"
     },
     {
       "family" : "Layout",
@@ -44478,8 +44041,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 0,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:Chart3DSurfaceStyle.heightBased",
@@ -44525,8 +44089,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 0,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "style:Chart3DSurfaceStyle.normalBased",
@@ -49665,8 +49230,9 @@
     },
     {
       "family" : "Chart3D",
+      "overloadsCovered" : 3,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:Chart3D",
@@ -61914,8 +61480,9 @@
     },
     {
       "family" : "Audio",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:VideoPlayer",
@@ -61974,8 +61541,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:WebView",
@@ -63336,9 +62904,76 @@
     "content:AxisTick",
     "content:AxisValueLabel",
     "content:KeyframeTrack",
+    "environment:defaultAppStorageDefaults",
+    "environment:listRowSpacing",
+    "environment:listSectionSpacing",
+    "environment:realHorizontalSizeClass",
+    "environment:realVerticalSizeClass",
+    "environment:textContentType",
+    "member:AVAudioPlayer.averagePower",
+    "member:AVAudioPlayer.currentTime",
+    "member:AVAudioPlayer.data",
+    "member:AVAudioPlayer.delegate",
+    "member:AVAudioPlayer.deviceCurrentTime",
+    "member:AVAudioPlayer.duration",
+    "member:AVAudioPlayer.enableRate",
+    "member:AVAudioPlayer.isMeteringEnabled",
+    "member:AVAudioPlayer.isPlaying",
+    "member:AVAudioPlayer.numberOfChannels",
+    "member:AVAudioPlayer.numberOfLoops",
+    "member:AVAudioPlayer.pan",
+    "member:AVAudioPlayer.pause",
+    "member:AVAudioPlayer.peakPower",
+    "member:AVAudioPlayer.play",
+    "member:AVAudioPlayer.prepareToPlay",
+    "member:AVAudioPlayer.rate",
+    "member:AVAudioPlayer.setVolume",
+    "member:AVAudioPlayer.stop",
+    "member:AVAudioPlayer.updateMeters",
+    "member:AVAudioPlayer.url",
+    "member:AVAudioPlayer.volume",
+    "member:AVPlayer.actionAtItemEnd",
+    "member:AVPlayer.currentItem",
+    "member:AVPlayer.currentTime",
+    "member:AVPlayer.isMuted",
+    "member:AVPlayer.pause",
+    "member:AVPlayer.play",
+    "member:AVPlayer.rate",
+    "member:AVPlayer.replaceCurrentItem",
+    "member:AVPlayer.seek",
+    "member:AVPlayer.timeControlStatus",
+    "member:AVPlayer.volume",
+    "member:AVPlayerItem.currentTime",
+    "member:AVPlayerItem.duration",
+    "member:AVPlayerItem.status",
+    "member:AVSpeechSynthesisVoice.currentLanguageCode",
+    "member:AVSpeechSynthesisVoice.gender",
+    "member:AVSpeechSynthesisVoice.identifier",
+    "member:AVSpeechSynthesisVoice.language",
+    "member:AVSpeechSynthesisVoice.name",
+    "member:AVSpeechSynthesisVoice.quality",
+    "member:AVSpeechSynthesisVoice.speechVoices",
+    "member:AVSpeechSynthesizer.continueSpeaking",
+    "member:AVSpeechSynthesizer.delegate",
+    "member:AVSpeechSynthesizer.isPaused",
+    "member:AVSpeechSynthesizer.isSpeaking",
+    "member:AVSpeechSynthesizer.pauseSpeaking",
+    "member:AVSpeechSynthesizer.speak",
+    "member:AVSpeechSynthesizer.stopSpeaking",
+    "member:AVSpeechSynthesizer.usesApplicationAudioSession",
+    "member:AVSpeechUtterance.pitchMultiplier",
+    "member:AVSpeechUtterance.postUtteranceDelay",
+    "member:AVSpeechUtterance.preUtteranceDelay",
+    "member:AVSpeechUtterance.prefersAssistiveTechnologySettings",
+    "member:AVSpeechUtterance.rate",
+    "member:AVSpeechUtterance.speechString",
+    "member:AVSpeechUtterance.voice",
+    "member:AVSpeechUtterance.volume",
     "member:Angle.degrees",
     "member:Angle.radians",
     "member:Angle.zero",
+    "member:Angle2D.degrees",
+    "member:Angle2D.radians",
     "member:Animation.delay",
     "member:Animation.repeatCount",
     "member:Animation.repeatForever",
@@ -63380,6 +63015,8 @@
     "member:AttributedString.font",
     "member:AttributedString.foregroundColor",
     "member:AttributedString.link",
+    "member:AudioToolbox.AudioServicesPlayAlertSound",
+    "member:AudioToolbox.AudioServicesPlaySystemSound",
     "member:BasicChartSymbolShape.asterisk",
     "member:BasicChartSymbolShape.circle",
     "member:BasicChartSymbolShape.cross",
@@ -63426,6 +63063,11 @@
     "member:CGSize.height",
     "member:CGSize.width",
     "member:CGSize.zero",
+    "member:CMTime.indefinite",
+    "member:CMTime.isIndefinite",
+    "member:CMTime.isValid",
+    "member:CMTime.seconds",
+    "member:CMTime.zero",
     "member:Calendar.autoupdatingCurrent",
     "member:Calendar.component",
     "member:Calendar.current",
@@ -63437,6 +63079,8 @@
     "member:Calendar.isDateInWeekend",
     "member:Calendar.isDateInYesterday",
     "member:Calendar.startOfDay",
+    "member:Chart3DPose.azimuth",
+    "member:Chart3DPose.inclination",
     "member:ChartProxy.plotAreaSize",
     "member:ChartProxy.plotSize",
     "member:ChartProxy.position",
@@ -63479,6 +63123,8 @@
     "member:Color.tertiaryLabel",
     "member:Color.tertiarySystemBackground",
     "member:Color.tertiarySystemFill",
+    "member:CoreMedia.CMTimeGetSeconds",
+    "member:CoreMedia.CMTimeMakeWithSeconds",
     "member:Data.count",
     "member:Data.isEmpty",
     "member:Data.write",
@@ -63713,6 +63359,8 @@
     "member:Material.thin",
     "member:Material.ultraThick",
     "member:Material.ultraThin",
+    "member:NSRange.length",
+    "member:NSRange.location",
     "member:NavigationPath.append",
     "member:NavigationPath.count",
     "member:NavigationPath.isEmpty",
@@ -63759,6 +63407,7 @@
     "member:Regex.wholeMatch",
     "member:RelativeDateTimeFormatter.localizedString",
     "member:RenameAction.callAsFunction",
+    "member:Rotation3D.identity",
     "member:ScrollPosition.edge",
     "member:ScrollPosition.isPositionedByUser",
     "member:ScrollPosition.point",
@@ -64000,11 +63649,26 @@
     "member:URLRequest.httpMethod",
     "member:URLRequest.setValue",
     "member:URLRequest.url",
+    "member:URLSession.AsyncBytes.characters",
+    "member:URLSession.AsyncBytes.lines",
+    "member:URLSession.bytes",
     "member:URLSession.data",
     "member:URLSession.dataTask",
     "member:URLSession.shared",
+    "member:URLSession.webSocketTask",
     "member:URLSessionDataTask.cancel",
     "member:URLSessionDataTask.resume",
+    "member:URLSessionWebSocketTask.Message.data",
+    "member:URLSessionWebSocketTask.Message.string",
+    "member:URLSessionWebSocketTask.cancel",
+    "member:URLSessionWebSocketTask.closeCode",
+    "member:URLSessionWebSocketTask.closeReason",
+    "member:URLSessionWebSocketTask.maximumMessageSize",
+    "member:URLSessionWebSocketTask.receive",
+    "member:URLSessionWebSocketTask.resume",
+    "member:URLSessionWebSocketTask.send",
+    "member:URLSessionWebSocketTask.sendPing",
+    "member:URLSessionWebSocketTask.state",
     "member:UTF8.self",
     "member:UTType.audio",
     "member:UTType.commaSeparatedText",
@@ -64090,6 +63754,25 @@
     "member:ViewDimensions.width",
     "member:ViewSpacing.distance",
     "member:ViewSpacing.zero",
+    "member:WebPage.BackForwardList.Item.initialURL",
+    "member:WebPage.BackForwardList.Item.title",
+    "member:WebPage.BackForwardList.Item.url",
+    "member:WebPage.BackForwardList.backList",
+    "member:WebPage.BackForwardList.currentItem",
+    "member:WebPage.BackForwardList.forwardList",
+    "member:WebPage.backForwardList",
+    "member:WebPage.callJavaScript",
+    "member:WebPage.customUserAgent",
+    "member:WebPage.estimatedProgress",
+    "member:WebPage.hasOnlySecureContent",
+    "member:WebPage.isLoading",
+    "member:WebPage.load",
+    "member:WebPage.navigations",
+    "member:WebPage.reload",
+    "member:WebPage.stopLoading",
+    "member:WebPage.themeColor",
+    "member:WebPage.title",
+    "member:WebPage.url",
     "modifier:axisBehavior",
     "modifier:contentMarginsRemoved",
     "modifier:customizationBehavior",
@@ -64097,9 +63780,12 @@
     "modifier:defaultCustomization",
     "modifier:defaultSectionExpansion",
     "modifier:defaultVisibility",
+    "modifier:popoverCore",
     "modifier:sharedBackgroundVisibility",
     "modifier:tabPlacement",
     "modifier:visibilityPriority",
+    "protocol:AVAudioPlayerDelegate",
+    "protocol:AVSpeechSynthesizerDelegate",
     "protocol:CLLocationManagerDelegate",
     "protocol:CaseIterable",
     "protocol:Codable",
@@ -64121,9 +63807,17 @@
     "protocol:UINavigationControllerDelegate",
     "protocol:UIViewControllerRepresentable",
     "protocol:UIViewRepresentable",
+    "type:AVAudioPlayer",
+    "type:AVPlayer",
+    "type:AVPlayerItem",
+    "type:AVSpeechBoundary",
+    "type:AVSpeechSynthesisVoice",
+    "type:AVSpeechSynthesizer",
+    "type:AVSpeechUtterance",
     "type:ActionSheet",
     "type:Alert",
     "type:Alignment",
+    "type:Angle2D",
     "type:AnimatablePair",
     "type:AnyLayout",
     "type:Array",
@@ -64133,6 +63827,7 @@
     "type:AsyncThrowingStream",
     "type:AttributedString",
     "type:Axis",
+    "type:BasicChart3DSymbolShape",
     "type:BasicChartSymbolShape",
     "type:Binding",
     "type:Bool",
@@ -64141,8 +63836,11 @@
     "type:CGPoint",
     "type:CGRect",
     "type:CGSize",
+    "type:CMTime",
     "type:Calendar",
     "type:Character",
+    "type:Chart3DCameraProjection",
+    "type:Chart3DPose",
     "type:CheckedContinuation",
     "type:ClosedRange",
     "type:CodableRepresentation",
@@ -64196,6 +63894,7 @@
     "type:MainActor",
     "type:Measurement",
     "type:NSColor",
+    "type:NSRange",
     "type:NavigationTransition",
     "type:NumberFormatter",
     "type:OpenURLAction",
@@ -64208,6 +63907,8 @@
     "type:Regex.Match",
     "type:RelativeDateTimeFormatter",
     "type:RenameAction",
+    "type:Rotation3D",
+    "type:RotationAxis3D",
     "type:ScrollTargetBehavior",
     "type:Sequence",
     "type:Set",
@@ -64218,6 +63919,7 @@
     "type:String",
     "type:Substring",
     "type:SymbolRenderingMode",
+    "type:SystemSoundID",
     "type:TabViewCustomization",
     "type:Task",
     "type:TaskGroup",
@@ -64244,12 +63946,20 @@
     "type:UIViewControllerRepresentableContext",
     "type:UIVisualEffectView",
     "type:UInt",
+    "type:UInt16",
+    "type:UInt32",
+    "type:UInt64",
+    "type:UInt8",
     "type:URL",
     "type:URLComponents",
     "type:URLQueryItem",
     "type:URLRequest",
     "type:URLSession",
+    "type:URLSession.AsyncBytes",
     "type:URLSessionDataTask",
+    "type:URLSessionWebSocketTask",
+    "type:URLSessionWebSocketTask.CloseCode",
+    "type:URLSessionWebSocketTask.Message",
     "type:UTF8",
     "type:UTType",
     "type:UUID",
@@ -64263,6 +63973,9 @@
     "type:ViewDimensions",
     "type:ViewSpacing",
     "type:Visibility",
+    "type:WebPage",
+    "type:WebPage.BackForwardList",
+    "type:WebPage.BackForwardList.Item",
     "type:ZStackLayout",
     "wrapper:Published"
   ],
@@ -64317,8 +64030,8 @@
       "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 174,
-      "total" : 179,
+      "supported" : 173,
+      "total" : 178,
       "wontDo" : 5
     },
     {
@@ -64353,8 +64066,8 @@
       "missing" : 0,
       "missingNew" : 0,
       "round" : 1,
-      "supported" : 70,
-      "total" : 70,
+      "supported" : 64,
+      "total" : 64,
       "wontDo" : 0
     },
     {
@@ -64381,8 +64094,8 @@
       "missingNew" : 0,
       "round" : 1,
       "supported" : 2,
-      "total" : 57,
-      "wontDo" : 55
+      "total" : 53,
+      "wontDo" : 51
     },
     {
       "family" : "Haptics",
@@ -64413,30 +64126,30 @@
     },
     {
       "family" : "Audio",
-      "missing" : 1,
+      "missing" : 0,
       "missingNew" : 0,
       "round" : 2,
-      "supported" : 0,
+      "supported" : 1,
       "total" : 1,
       "wontDo" : 0
     },
     {
       "family" : "Web",
-      "missing" : 10,
-      "missingNew" : 10,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 2,
-      "supported" : 0,
+      "supported" : 9,
       "total" : 10,
-      "wontDo" : 0
+      "wontDo" : 1
     },
     {
       "family" : "Chart3D",
-      "missing" : 18,
-      "missingNew" : 18,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 2,
-      "supported" : 0,
-      "total" : 18,
-      "wontDo" : 0
+      "supported" : 16,
+      "total" : 17,
+      "wontDo" : 1
     },
     {
       "family" : "Files",
@@ -64523,8 +64236,8 @@
       "missing" : 0,
       "missingNew" : 0,
       "supported" : 0,
-      "total" : 65,
-      "wontDo" : 65
+      "total" : 63,
+      "wontDo" : 63
     },
     {
       "family" : "Wallet",
@@ -64587,7 +64300,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 1991
+    "symbols" : 2155
   },
   "schemaVersion" : 1,
   "sdk" : {

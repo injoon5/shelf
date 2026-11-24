@@ -28,9 +28,11 @@ toolbars, `Timer.publish`/`onReceive`, `withAnimation` and transitions, Swift
 Charts, custom `Shape`s and `Path`, grids, `GeometryReader`, and about 120
 modifiers.
 
-**Networking.** `URLSession.shared.data(from:)` / `data(for:)` (waits for the
-response, at most 20 s), `dataTask(with:completionHandler:)` + `resume()` (calls
-back on the main thread), `URLComponents`, `URLQueryItem`, `URLRequest`, and
+**Networking.** `try await URLSession.shared.data(from:)` / `data(for:)` (waits
+without blocking), `bytes(from:)` with `.lines`, WebSockets (`webSocketTask`,
+`send`, `receive`, `sendPing`, `cancel(with:reason:)`, closed with the app),
+`dataTask(with:completionHandler:)` + `resume()` (calls back on the main
+thread), `URLComponents`, `URLQueryItem`, `URLRequest`, and
 `JSONDecoder().decode(T.self, from:)` into user `Decodable` types (CodingKeys,
 `.convertFromSnakeCase`, `.iso8601`, optionals, defaults, nested and raw-value
 enum types). Caught errors are `Error` values with `localizedDescription`.
