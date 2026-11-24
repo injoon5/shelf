@@ -183,7 +183,7 @@
             "passing" : 91
           },
           {
-            "entries" : 142,
+            "entries" : 143,
             "failing" : [
 
             ],
@@ -192,7 +192,7 @@
             ],
             "ios" : 0,
             "name" : "Collections",
-            "passing" : 141
+            "passing" : 142
           },
           {
             "entries" : 111,
@@ -370,9 +370,9 @@
     {
       "line" : "`ShareLink` (a `String`, `URL`, `Image`, `Data` or your `Transferable`; `items:`; `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `TextSelection`, `.copyable`, `.pasteDestination`",
       "name" : "Sharing",
-      "stubs" : 1,
+      "stubs" : 0,
       "summary" : "the share sheet and the clipboard",
-      "supported" : 33
+      "supported" : 39
     },
     {
       "line" : "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`",
@@ -382,11 +382,11 @@
       "supported" : 341
     },
     {
-      "line" : "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`. Sound stops when the app closes",
+      "line" : "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`; `AVAudioRecorder` into the app's folder, with metering (`record()` asks for the microphone). Sound and recording stop when the app closes",
       "name" : "Audio",
       "stubs" : 0,
-      "summary" : "playing sounds",
-      "supported" : 79
+      "summary" : "playing and recording sounds",
+      "supported" : 122
     },
     {
       "line" : "`WebView(url:)`, or `WebView(page)` with a `WebPage()`: `load`, `title`, `url`, `isLoading`, `estimatedProgress`, `reload()`, `backForwardList`, `try await page.callJavaScript(…)`; the `.webView…` modifiers and `.findNavigator`. Each app has its own cookies",
@@ -403,22 +403,25 @@
       "supported" : 22
     },
     {
+      "line" : "files in the app's folder stay on this device (`DB` is what syncs); `.fileImporter` (read its URLs while open, or copy them in), `.fileExporter` with your `FileDocument`, `Data` or `Transferable`, `.fileMover`, `.quickLookPreview`, `.draggable`, `.dropDestination`, `UTType`",
       "name" : "Files",
       "stubs" : 0,
-      "summary" : "importing and exporting files",
-      "supported" : 42
+      "summary" : "the app's files, the file pickers, and drag and drop",
+      "supported" : 254
     },
     {
+      "line" : "`PhotosPicker` (one item, or `maxSelectionCount:`; `matching: .images`; `.photosPickerStyle(.inline)`) and `.photosPicker`; then `try await item.loadTransferable(type: Data.self)` and `UIImage(data:)`. Save with `UIImageWriteToSavedPhotosAlbum`, which asks first",
       "name" : "Photos",
       "stubs" : 0,
-      "summary" : "the photo picker",
-      "supported" : 0
+      "summary" : "the photo picker, and saving to Photos",
+      "supported" : 43
     },
     {
+      "line" : "`UIImagePickerController` with `.camera` in a `UIViewControllerRepresentable` whose `Coordinator` is the delegate; check `isSourceTypeAvailable(.camera)` first. Shelf asks for the camera",
       "name" : "Camera",
       "stubs" : 0,
       "summary" : "taking photos with the camera",
-      "supported" : 12
+      "supported" : 28
     },
     {
       "line" : "`CMMotionManager` (a handler on `.main`, or read `deviceMotion` in a `TimelineView`; 60 Hz at most), `CMPedometer`, `CMAltimeter`, `CMMotionActivityManager`, `CMHeadphoneMotionManager` (these four ask first: handle the error)",
@@ -456,14 +459,14 @@
       "name" : "Language",
       "stubs" : 0,
       "summary" : "Swift's standard library",
-      "supported" : 667
+      "supported" : 668
     },
     {
       "line" : "Foundation as compiled: `Date`, `Calendar`, `DateComponents`, `DateInterval`, `TimeZone`, `Locale`, every formatter and format style, `Data`, JSON and property lists, `UserDefaults`, files in the app's folder, `NotificationCenter`, `Logger`, Dispatch, `Bundle`/`ProcessInfo`/`UIDevice`, CryptoKit's hashes",
       "name" : "Foundation",
       "stubs" : 1,
       "summary" : "dates, formatters, JSON, files and settings",
-      "supported" : 578
+      "supported" : 581
     },
     {
       "line" : "`Task`, task groups, `AsyncStream`, continuations, `Duration` and the clocks; Combine: subjects, `Just`, `Future`, `@Published`'s `$name`, the usual operators, `sink`, `assign`, `AnyCancellable`",
@@ -2922,6 +2925,17 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "environment:springLoadingBehavior",
+      "kind" : "environment",
+      "name" : "springLoadingBehavior",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "environment:symbolColorRenderingMode",
       "kind" : "environment",
@@ -3415,6 +3429,68 @@
     },
     {
       "family" : "Audio",
+      "id" : "member:AVAudioApplication.isInputMuted",
+      "kind" : "member",
+      "name" : "isInputMuted",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioApplication",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioApplication.recordPermission",
+      "kind" : "member",
+      "name" : "recordPermission",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioApplication",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioApplication.requestRecordPermission",
+      "kind" : "member",
+      "name" : "requestRecordPermission",
+      "overloads" : [
+        {
+          "async" : true,
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "completionHandler"
+          ],
+          "member" : "static",
+          "signature" : "completionHandler:closure"
+        }
+      ],
+      "owner" : "AVAudioApplication",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioApplication.shared",
+      "kind" : "member",
+      "name" : "shared",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioApplication",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
       "id" : "member:AVAudioPlayer.averagePower",
       "kind" : "member",
       "name" : "averagePower",
@@ -3732,6 +3808,605 @@
       "owner" : "AVAudioPlayer",
       "source" : "Sources/Kiln/Audio.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.high",
+      "kind" : "member",
+      "name" : "high",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.low",
+      "kind" : "member",
+      "name" : "low",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.max",
+      "kind" : "member",
+      "name" : "max",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.medium",
+      "kind" : "member",
+      "name" : "medium",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.min",
+      "kind" : "member",
+      "name" : "min",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioQuality.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioQuality",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.averagePower",
+      "kind" : "member",
+      "name" : "averagePower",
+      "overloads" : [
+        {
+          "labels" : [
+            "forChannel"
+          ],
+          "member" : "method",
+          "signature" : "forChannel:number"
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.currentTime",
+      "kind" : "member",
+      "name" : "currentTime",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.deleteRecording",
+      "kind" : "member",
+      "name" : "deleteRecording",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.deviceCurrentTime",
+      "kind" : "member",
+      "name" : "deviceCurrentTime",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.isMeteringEnabled",
+      "kind" : "member",
+      "name" : "isMeteringEnabled",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.isRecording",
+      "kind" : "member",
+      "name" : "isRecording",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.pause",
+      "kind" : "member",
+      "name" : "pause",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.peakPower",
+      "kind" : "member",
+      "name" : "peakPower",
+      "overloads" : [
+        {
+          "labels" : [
+            "forChannel"
+          ],
+          "member" : "method",
+          "signature" : "forChannel:number"
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.prepareToRecord",
+      "kind" : "member",
+      "name" : "prepareToRecord",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.record",
+      "kind" : "member",
+      "name" : "record",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "atTime",
+            "forDuration"
+          ],
+          "member" : "method",
+          "signature" : "atTime:number forDuration:number?"
+        },
+        {
+          "labels" : [
+            "forDuration"
+          ],
+          "member" : "method",
+          "signature" : "forDuration:number"
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.settings",
+      "kind" : "member",
+      "name" : "settings",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.stop",
+      "kind" : "member",
+      "name" : "stop",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.updateMeters",
+      "kind" : "member",
+      "name" : "updateMeters",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioRecorder.url",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioRecorder",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.category",
+      "kind" : "member",
+      "name" : "category",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.isInputAvailable",
+      "kind" : "member",
+      "name" : "isInputAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.isOtherAudioPlaying",
+      "kind" : "member",
+      "name" : "isOtherAudioPlaying",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.overrideOutputAudioPort",
+      "kind" : "member",
+      "name" : "overrideOutputAudioPort",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.recordPermission",
+      "kind" : "member",
+      "name" : "recordPermission",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.requestRecordPermission",
+      "kind" : "member",
+      "name" : "requestRecordPermission",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:closure"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.sampleRate",
+      "kind" : "member",
+      "name" : "sampleRate",
+      "overloads" : [
+
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.setActive",
+      "kind" : "member",
+      "name" : "setActive",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "options"
+          ],
+          "member" : "method",
+          "signature" : "_:bool options:any"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:bool"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.setCategory",
+      "kind" : "member",
+      "name" : "setCategory",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "mode",
+            "options"
+          ],
+          "member" : "method",
+          "signature" : "_:any mode:any options:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "mode",
+            "policy",
+            "options"
+          ],
+          "member" : "method",
+          "signature" : "_:any mode:any policy:any options:any"
+        },
+        {
+          "labels" : [
+            "_",
+            "options"
+          ],
+          "member" : "method",
+          "signature" : "_:any options:any"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.setMode",
+      "kind" : "member",
+      "name" : "setMode",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.setPreferredIOBufferDuration",
+      "kind" : "member",
+      "name" : "setPreferredIOBufferDuration",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:number"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.setPreferredSampleRate",
+      "kind" : "member",
+      "name" : "setPreferredSampleRate",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:number"
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Audio",
+      "id" : "member:AVAudioSession.sharedInstance",
+      "kind" : "member",
+      "name" : "sharedInstance",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "AVAudioSession",
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:AVCaptureDevice.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:AVMediaType"
+        }
+      ],
+      "owner" : "AVCaptureDevice",
+      "source" : "Sources/Kiln/CameraGate.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:AVCaptureDevice.requestAccess",
+      "kind" : "member",
+      "name" : "requestAccess",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "completionHandler"
+          ],
+          "member" : "static",
+          "signature" : "for:AVMediaType completionHandler:closure"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:AVMediaType"
+        }
+      ],
+      "owner" : "AVCaptureDevice",
+      "source" : "Sources/Kiln/CameraGate.swift",
+      "support" : "partial"
     },
     {
       "family" : "Audio",
@@ -15997,6 +16672,235 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "member:DragSession.draggedItemIDs",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "draggedItemIDs",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "method",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "DragSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DragSession.draggedItemIndex",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "draggedItemIndex",
+      "overloads" : [
+
+      ],
+      "owner" : "DragSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DragSession.id",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "id",
+      "overloads" : [
+
+      ],
+      "owner" : "DragSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DragSession.location",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "DragSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DragSession.phase",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "phase",
+      "overloads" : [
+
+      ],
+      "owner" : "DragSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropConfiguration.operation",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "operation",
+      "overloads" : [
+
+      ],
+      "owner" : "DropConfiguration",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropInfo.hasItemsConforming",
+      "kind" : "member",
+      "name" : "hasItemsConforming",
+      "overloads" : [
+        {
+          "labels" : [
+            "to"
+          ],
+          "member" : "method",
+          "signature" : "to:any"
+        }
+      ],
+      "owner" : "DropInfo",
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropInfo.itemProviders",
+      "kind" : "member",
+      "name" : "itemProviders",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "method",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "DropInfo",
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropInfo.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "DropInfo",
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.LocalSession.draggedItemIDs",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "draggedItemIDs",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "method",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "DropSession.LocalSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.id",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "id",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.itemsCount",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "itemsCount",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.localSession",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "localSession",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.location",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.phase",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "phase",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:DropSession.size",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "size",
+      "overloads" : [
+
+      ],
+      "owner" : "DropSession",
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Concurrency",
       "id" : "member:Duration.components",
       "kind" : "member",
@@ -16749,9 +17653,52 @@
     },
     {
       "family" : "Files",
+      "id" : "member:FileWrapper.addRegularFile",
+      "kind" : "member",
+      "name" : "addRegularFile",
+      "overloads" : [
+        {
+          "labels" : [
+            "withContents",
+            "preferredFilename"
+          ],
+          "member" : "method",
+          "signature" : "withContents:Data preferredFilename:string"
+        }
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.fileWrappers",
+      "kind" : "member",
+      "name" : "fileWrappers",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:FileWrapper.filename",
       "kind" : "member",
       "name" : "filename",
+      "overloads" : [
+
+      ],
+      "owner" : "FileWrapper",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:FileWrapper.isDirectory",
+      "kind" : "member",
+      "name" : "isDirectory",
       "overloads" : [
 
       ],
@@ -23767,6 +24714,228 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.canLoadObject",
+      "kind" : "member",
+      "name" : "canLoadObject",
+      "overloads" : [
+        {
+          "labels" : [
+            "ofClass"
+          ],
+          "member" : "method",
+          "signature" : "ofClass:any"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.hasItemConformingToTypeIdentifier",
+      "kind" : "member",
+      "name" : "hasItemConformingToTypeIdentifier",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:string"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.hasRepresentationConforming",
+      "kind" : "member",
+      "name" : "hasRepresentationConforming",
+      "overloads" : [
+        {
+          "labels" : [
+            "toTypeIdentifier",
+            "fileOptions"
+          ],
+          "member" : "method",
+          "signature" : "toTypeIdentifier:string fileOptions:any?"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.loadDataRepresentation",
+      "kind" : "member",
+      "name" : "loadDataRepresentation",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "for:UTType completionHandler:closure"
+        },
+        {
+          "labels" : [
+            "forTypeIdentifier",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "forTypeIdentifier:string completionHandler:closure"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.loadFileRepresentation",
+      "kind" : "member",
+      "name" : "loadFileRepresentation",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "for:UTType completionHandler:closure"
+        },
+        {
+          "labels" : [
+            "forTypeIdentifier",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "forTypeIdentifier:string completionHandler:closure"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.loadItem",
+      "kind" : "member",
+      "name" : "loadItem",
+      "overloads" : [
+        {
+          "labels" : [
+            "forTypeIdentifier",
+            "options",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "forTypeIdentifier:string options:any? completionHandler:closure"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.loadObject",
+      "kind" : "member",
+      "name" : "loadObject",
+      "overloads" : [
+        {
+          "labels" : [
+            "ofClass",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "ofClass:any completionHandler:closure"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.loadTransferable",
+      "kind" : "member",
+      "name" : "loadTransferable",
+      "overloads" : [
+        {
+          "labels" : [
+            "type",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "type:any completionHandler:closure"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.registerObject",
+      "kind" : "member",
+      "name" : "registerObject",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "visibility"
+          ],
+          "member" : "method",
+          "signature" : "_:any visibility:any"
+        }
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.registeredContentTypes",
+      "kind" : "member",
+      "name" : "registeredContentTypes",
+      "overloads" : [
+
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.registeredTypeIdentifiers",
+      "kind" : "member",
+      "name" : "registeredTypeIdentifiers",
+      "overloads" : [
+
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:NSItemProvider.suggestedName",
+      "kind" : "member",
+      "name" : "suggestedName",
+      "overloads" : [
+
+      ],
+      "owner" : "NSItemProvider",
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:NSMutableAttributedString.addAttribute",
       "kind" : "member",
@@ -25474,6 +26643,392 @@
       "support" : "full"
     },
     {
+      "family" : "Photos",
+      "id" : "member:PHAssetChangeRequest.creationRequestForAsset",
+      "kind" : "member",
+      "name" : "creationRequestForAsset",
+      "overloads" : [
+        {
+          "labels" : [
+            "from"
+          ],
+          "member" : "static",
+          "signature" : "from:any"
+        }
+      ],
+      "owner" : "PHAssetChangeRequest",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHAssetChangeRequest.creationRequestForAssetFromImage",
+      "kind" : "member",
+      "name" : "creationRequestForAssetFromImage",
+      "overloads" : [
+        {
+          "labels" : [
+            "atFileURL"
+          ],
+          "member" : "static",
+          "signature" : "atFileURL:URL"
+        }
+      ],
+      "owner" : "PHAssetChangeRequest",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHAssetChangeRequest.creationRequestForAssetFromVideo",
+      "kind" : "member",
+      "name" : "creationRequestForAssetFromVideo",
+      "overloads" : [
+        {
+          "labels" : [
+            "atFileURL"
+          ],
+          "member" : "static",
+          "signature" : "atFileURL:URL"
+        }
+      ],
+      "owner" : "PHAssetChangeRequest",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHAssetChangeRequest.placeholderForCreatedAsset",
+      "kind" : "member",
+      "name" : "placeholderForCreatedAsset",
+      "overloads" : [
+
+      ],
+      "owner" : "PHAssetChangeRequest",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPhotoLibrary.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "PHPhotoLibrary",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPhotoLibrary.performChanges",
+      "kind" : "member",
+      "name" : "performChanges",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "_:closure completionHandler:closure?"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:closure"
+        }
+      ],
+      "owner" : "PHPhotoLibrary",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPhotoLibrary.requestAuthorization",
+      "kind" : "member",
+      "name" : "requestAuthorization",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "static",
+          "signature" : "_:closure"
+        },
+        {
+          "labels" : [
+            "for",
+            "handler"
+          ],
+          "member" : "static",
+          "signature" : "for:any handler:closure"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "PHPhotoLibrary",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPhotoLibrary.shared",
+      "kind" : "member",
+      "name" : "shared",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "PHPhotoLibrary",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.all",
+      "kind" : "member",
+      "name" : "all",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ],
+          "member" : "static",
+          "signature" : "of:any"
+        }
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.any",
+      "kind" : "member",
+      "name" : "any",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ],
+          "member" : "static",
+          "signature" : "of:any"
+        }
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.bursts",
+      "kind" : "member",
+      "name" : "bursts",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.cinematicVideos",
+      "kind" : "member",
+      "name" : "cinematicVideos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.depthEffectPhotos",
+      "kind" : "member",
+      "name" : "depthEffectPhotos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.images",
+      "kind" : "member",
+      "name" : "images",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.livePhotos",
+      "kind" : "member",
+      "name" : "livePhotos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.not",
+      "kind" : "member",
+      "name" : "not",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "static",
+          "signature" : "_:PHPickerFilter"
+        }
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.panoramas",
+      "kind" : "member",
+      "name" : "panoramas",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.playbackStyle",
+      "kind" : "member",
+      "name" : "playbackStyle",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "static",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.screenRecordings",
+      "kind" : "member",
+      "name" : "screenRecordings",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.screenshots",
+      "kind" : "member",
+      "name" : "screenshots",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.slomoVideos",
+      "kind" : "member",
+      "name" : "slomoVideos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.spatialMedia",
+      "kind" : "member",
+      "name" : "spatialMedia",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.timelapseVideos",
+      "kind" : "member",
+      "name" : "timelapseVideos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PHPickerFilter.videos",
+      "kind" : "member",
+      "name" : "videos",
+      "overloads" : [
+
+      ],
+      "owner" : "PHPickerFilter",
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Concurrency",
       "id" : "member:PassthroughSubject.send",
       "kind" : "member",
@@ -25758,6 +27313,57 @@
       ],
       "owner" : "PersonNameComponentsFormatter",
       "source" : "Sources/Kiln/FormatStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PhotosPickerItem.itemIdentifier",
+      "kind" : "member",
+      "name" : "itemIdentifier",
+      "overloads" : [
+
+      ],
+      "owner" : "PhotosPickerItem",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PhotosPickerItem.loadTransferable",
+      "kind" : "member",
+      "name" : "loadTransferable",
+      "overloads" : [
+        {
+          "labels" : [
+            "type",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "type:any completionHandler:closure"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "type"
+          ],
+          "member" : "method",
+          "signature" : "type:any"
+        }
+      ],
+      "owner" : "PhotosPickerItem",
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:PhotosPickerItem.supportedContentTypes",
+      "kind" : "member",
+      "name" : "supportedContentTypes",
+      "overloads" : [
+
+      ],
+      "owner" : "PhotosPickerItem",
+      "source" : "Sources/Kiln/Items.swift",
       "support" : "full"
     },
     {
@@ -26944,6 +28550,30 @@
       ],
       "owner" : "Range",
       "source" : "Sources/Kiln/Collections.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "member:ReceivedTransferredFile.file",
+      "kind" : "member",
+      "name" : "file",
+      "overloads" : [
+
+      ],
+      "owner" : "ReceivedTransferredFile",
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "member:ReceivedTransferredFile.isOriginalFile",
+      "kind" : "member",
+      "name" : "isOriginalFile",
+      "overloads" : [
+
+      ],
+      "owner" : "ReceivedTransferredFile",
+      "source" : "Sources/Kiln/Transferable.swift",
       "support" : "full"
     },
     {
@@ -28759,6 +30389,18 @@
       ],
       "owner" : "SensoryFeedback",
       "source" : "Sources/Kiln/Haptics.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "member:SentTransferredFile.file",
+      "kind" : "member",
+      "name" : "file",
+      "overloads" : [
+
+      ],
+      "owner" : "SentTransferredFile",
+      "source" : "Sources/Kiln/Transferable.swift",
       "support" : "full"
     },
     {
@@ -33413,6 +35055,60 @@
     },
     {
       "family" : "Camera",
+      "id" : "member:UIImagePickerController.availableMediaTypes",
+      "kind" : "member",
+      "name" : "availableMediaTypes",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:UIImagePickerController.SourceType"
+        }
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.cameraCaptureMode",
+      "kind" : "member",
+      "name" : "cameraCaptureMode",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.cameraDevice",
+      "kind" : "member",
+      "name" : "cameraDevice",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.cameraFlashMode",
+      "kind" : "member",
+      "name" : "cameraFlashMode",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
       "id" : "member:UIImagePickerController.delegate",
       "kind" : "member",
       "name" : "delegate",
@@ -33440,7 +35136,43 @@
       ],
       "owner" : "UIImagePickerController",
       "source" : "Sources/Kiln/Camera.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.isCameraDeviceAvailable",
+      "kind" : "member",
+      "name" : "isCameraDeviceAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "static",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.isFlashAvailable",
+      "kind" : "member",
+      "name" : "isFlashAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
     },
     {
       "family" : "Camera",
@@ -33458,7 +35190,7 @@
       ],
       "owner" : "UIImagePickerController",
       "source" : "Sources/Kiln/Camera.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Camera",
@@ -33474,9 +35206,45 @@
     },
     {
       "family" : "Camera",
+      "id" : "member:UIImagePickerController.showsCameraControls",
+      "kind" : "member",
+      "name" : "showsCameraControls",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
       "id" : "member:UIImagePickerController.sourceType",
       "kind" : "member",
       "name" : "sourceType",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.videoMaximumDuration",
+      "kind" : "member",
+      "name" : "videoMaximumDuration",
+      "overloads" : [
+
+      ],
+      "owner" : "UIImagePickerController",
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "member:UIImagePickerController.videoQuality",
+      "kind" : "member",
+      "name" : "videoQuality",
       "overloads" : [
 
       ],
@@ -33600,6 +35368,64 @@
       ],
       "owner" : "UIImpactFeedbackGenerator",
       "source" : "Sources/Kiln/Haptics.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:UIKit.UIImageWriteToSavedPhotosAlbum",
+      "kind" : "member",
+      "name" : "UIImageWriteToSavedPhotosAlbum",
+      "notes" : "Asks first (Shelf's sheet, then iOS's). With a target, its `image(_:didFinishSavingWithError:contextInfo:)` hears how it went.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_",
+            "_",
+            "_"
+          ],
+          "signature" : "_:any _:any _:any _:any"
+        }
+      ],
+      "owner" : "UIKit",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:UIKit.UISaveVideoAtPathToSavedPhotosAlbum",
+      "kind" : "member",
+      "name" : "UISaveVideoAtPathToSavedPhotosAlbum",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_",
+            "_",
+            "_"
+          ],
+          "signature" : "_:string _:any _:any _:any"
+        }
+      ],
+      "owner" : "UIKit",
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "member:UIKit.UIVideoAtPathIsCompatibleWithSavedPhotosAlbum",
+      "kind" : "member",
+      "name" : "UIVideoAtPathIsCompatibleWithSavedPhotosAlbum",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:string"
+        }
+      ],
+      "owner" : "UIKit",
+      "source" : "Sources/Kiln/Saving.swift",
       "support" : "full"
     },
     {
@@ -35846,6 +37672,24 @@
     },
     {
       "family" : "Foundation",
+      "id" : "member:URL.resourceValues",
+      "kind" : "member",
+      "name" : "resourceValues",
+      "overloads" : [
+        {
+          "labels" : [
+            "forKeys"
+          ],
+          "member" : "method",
+          "signature" : "forKeys:any"
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
       "id" : "member:URL.scheme",
       "kind" : "member",
       "name" : "scheme",
@@ -35867,6 +37711,42 @@
       "owner" : "URL",
       "source" : "Sources/Kiln/Foundation.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.startAccessingSecurityScopedResource",
+      "kind" : "member",
+      "name" : "startAccessingSecurityScopedResource",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:URL.stopAccessingSecurityScopedResource",
+      "kind" : "member",
+      "name" : "stopAccessingSecurityScopedResource",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "URL",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "partial"
     },
     {
       "family" : "Foundation",
@@ -35997,6 +37877,138 @@
       ],
       "owner" : "URLRequest",
       "source" : "Sources/Kiln/Networking.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.contentModificationDate",
+      "kind" : "member",
+      "name" : "contentModificationDate",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.contentType",
+      "kind" : "member",
+      "name" : "contentType",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.creationDate",
+      "kind" : "member",
+      "name" : "creationDate",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.fileAllocatedSize",
+      "kind" : "member",
+      "name" : "fileAllocatedSize",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.fileSize",
+      "kind" : "member",
+      "name" : "fileSize",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.isDirectory",
+      "kind" : "member",
+      "name" : "isDirectory",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.isHidden",
+      "kind" : "member",
+      "name" : "isHidden",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.isRegularFile",
+      "kind" : "member",
+      "name" : "isRegularFile",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.localizedName",
+      "kind" : "member",
+      "name" : "localizedName",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.name",
+      "kind" : "member",
+      "name" : "name",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:URLResourceValues.totalFileSize",
+      "kind" : "member",
+      "name" : "totalFileSize",
+      "overloads" : [
+
+      ],
+      "owner" : "URLResourceValues",
+      "source" : "Sources/Kiln/Files.swift",
       "support" : "full"
     },
     {
@@ -36344,6 +38356,186 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTTagClass.filenameExtension",
+      "kind" : "member",
+      "name" : "filenameExtension",
+      "overloads" : [
+
+      ],
+      "owner" : "UTTagClass",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTTagClass.mimeType",
+      "kind" : "member",
+      "name" : "mimeType",
+      "overloads" : [
+
+      ],
+      "owner" : "UTTagClass",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.ahap",
+      "kind" : "member",
+      "name" : "ahap",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.aiff",
+      "kind" : "member",
+      "name" : "aiff",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.aliasFile",
+      "kind" : "member",
+      "name" : "aliasFile",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.appleArchive",
+      "kind" : "member",
+      "name" : "appleArchive",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.appleProtectedMPEG4Audio",
+      "kind" : "member",
+      "name" : "appleProtectedMPEG4Audio",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.appleProtectedMPEG4Video",
+      "kind" : "member",
+      "name" : "appleProtectedMPEG4Video",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.appleScript",
+      "kind" : "member",
+      "name" : "appleScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.application",
+      "kind" : "member",
+      "name" : "application",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.applicationBundle",
+      "kind" : "member",
+      "name" : "applicationBundle",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.applicationExtension",
+      "kind" : "member",
+      "name" : "applicationExtension",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.arReferenceObject",
+      "kind" : "member",
+      "name" : "arReferenceObject",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.archive",
+      "kind" : "member",
+      "name" : "archive",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.assemblyLanguageSource",
+      "kind" : "member",
+      "name" : "assemblyLanguageSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.audio",
       "kind" : "member",
       "name" : "audio",
@@ -36356,9 +38548,165 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.audiovisualContent",
+      "kind" : "member",
+      "name" : "audiovisualContent",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.avi",
+      "kind" : "member",
+      "name" : "avi",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.binaryPropertyList",
+      "kind" : "member",
+      "name" : "binaryPropertyList",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.bmp",
+      "kind" : "member",
+      "name" : "bmp",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.bookmark",
+      "kind" : "member",
+      "name" : "bookmark",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.bundle",
+      "kind" : "member",
+      "name" : "bundle",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.bz2",
+      "kind" : "member",
+      "name" : "bz2",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.cHeader",
+      "kind" : "member",
+      "name" : "cHeader",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.cPlusPlusHeader",
+      "kind" : "member",
+      "name" : "cPlusPlusHeader",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.cPlusPlusSource",
+      "kind" : "member",
+      "name" : "cPlusPlusSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.cSource",
+      "kind" : "member",
+      "name" : "cSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.calendarEvent",
+      "kind" : "member",
+      "name" : "calendarEvent",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.commaSeparatedText",
       "kind" : "member",
       "name" : "commaSeparatedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.compositeContent",
+      "kind" : "member",
+      "name" : "compositeContent",
       "overloads" : [
 
       ],
@@ -36382,13 +38730,37 @@
       ],
       "owner" : "UTType",
       "source" : "Sources/Kiln/Files.swift",
-      "support" : "partial"
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.contact",
+      "kind" : "member",
+      "name" : "contact",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
     },
     {
       "family" : "Files",
       "id" : "member:UTType.content",
       "kind" : "member",
       "name" : "content",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.css",
+      "kind" : "member",
+      "name" : "css",
       "overloads" : [
 
       ],
@@ -36410,9 +38782,153 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.database",
+      "kind" : "member",
+      "name" : "database",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.delimitedText",
+      "kind" : "member",
+      "name" : "delimitedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.description",
+      "kind" : "member",
+      "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.directory",
+      "kind" : "member",
+      "name" : "directory",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.diskImage",
+      "kind" : "member",
+      "name" : "diskImage",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.dng",
+      "kind" : "member",
+      "name" : "dng",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.emailMessage",
+      "kind" : "member",
+      "name" : "emailMessage",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.epub",
+      "kind" : "member",
+      "name" : "epub",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.exe",
+      "kind" : "member",
+      "name" : "exe",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.executable",
+      "kind" : "member",
+      "name" : "executable",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.exr",
+      "kind" : "member",
+      "name" : "exr",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.fileURL",
       "kind" : "member",
       "name" : "fileURL",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.flatRTFD",
+      "kind" : "member",
+      "name" : "flatRTFD",
       "overloads" : [
 
       ],
@@ -36434,6 +38950,66 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.font",
+      "kind" : "member",
+      "name" : "font",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.framework",
+      "kind" : "member",
+      "name" : "framework",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.geoJSON",
+      "kind" : "member",
+      "name" : "geoJSON",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.gif",
+      "kind" : "member",
+      "name" : "gif",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.gzip",
+      "kind" : "member",
+      "name" : "gzip",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.heic",
       "kind" : "member",
       "name" : "heic",
@@ -36446,9 +39022,57 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.heics",
+      "kind" : "member",
+      "name" : "heics",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.heif",
+      "kind" : "member",
+      "name" : "heif",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.html",
       "kind" : "member",
       "name" : "html",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.icns",
+      "kind" : "member",
+      "name" : "icns",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.ico",
+      "kind" : "member",
+      "name" : "ico",
       "overloads" : [
 
       ],
@@ -36482,9 +39106,117 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.internetLocation",
+      "kind" : "member",
+      "name" : "internetLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.internetShortcut",
+      "kind" : "member",
+      "name" : "internetShortcut",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.isDeclared",
+      "kind" : "member",
+      "name" : "isDeclared",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.isDynamic",
+      "kind" : "member",
+      "name" : "isDynamic",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.isPublic",
+      "kind" : "member",
+      "name" : "isPublic",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.isSubtype",
+      "kind" : "member",
+      "name" : "isSubtype",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ],
+          "member" : "method",
+          "signature" : "of:UTType"
+        }
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.isSupertype",
+      "kind" : "member",
+      "name" : "isSupertype",
+      "overloads" : [
+        {
+          "labels" : [
+            "of"
+          ],
+          "member" : "method",
+          "signature" : "of:UTType"
+        }
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.item",
       "kind" : "member",
       "name" : "item",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.javaScript",
+      "kind" : "member",
+      "name" : "javaScript",
       "overloads" : [
 
       ],
@@ -36506,9 +39238,93 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.jpegxl",
+      "kind" : "member",
+      "name" : "jpegxl",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.json",
       "kind" : "member",
       "name" : "json",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.linkPresentationMetadata",
+      "kind" : "member",
+      "name" : "linkPresentationMetadata",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.livePhoto",
+      "kind" : "member",
+      "name" : "livePhoto",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.localizedDescription",
+      "kind" : "member",
+      "name" : "localizedDescription",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.log",
+      "kind" : "member",
+      "name" : "log",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.m3uPlaylist",
+      "kind" : "member",
+      "name" : "m3uPlaylist",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.makefile",
+      "kind" : "member",
+      "name" : "makefile",
       "overloads" : [
 
       ],
@@ -36530,9 +39346,177 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.message",
+      "kind" : "member",
+      "name" : "message",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.midi",
+      "kind" : "member",
+      "name" : "midi",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mountPoint",
+      "kind" : "member",
+      "name" : "mountPoint",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.movie",
       "kind" : "member",
       "name" : "movie",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mp3",
+      "kind" : "member",
+      "name" : "mp3",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mpeg",
+      "kind" : "member",
+      "name" : "mpeg",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mpeg2TransportStream",
+      "kind" : "member",
+      "name" : "mpeg2TransportStream",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mpeg2Video",
+      "kind" : "member",
+      "name" : "mpeg2Video",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mpeg4Audio",
+      "kind" : "member",
+      "name" : "mpeg4Audio",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.mpeg4Movie",
+      "kind" : "member",
+      "name" : "mpeg4Movie",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.objectiveCPlusPlusSource",
+      "kind" : "member",
+      "name" : "objectiveCPlusPlusSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.objectiveCSource",
+      "kind" : "member",
+      "name" : "objectiveCSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.osaScript",
+      "kind" : "member",
+      "name" : "osaScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.osaScriptBundle",
+      "kind" : "member",
+      "name" : "osaScriptBundle",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.package",
+      "kind" : "member",
+      "name" : "package",
       "overloads" : [
 
       ],
@@ -36554,9 +39538,69 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.perlScript",
+      "kind" : "member",
+      "name" : "perlScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.phpScript",
+      "kind" : "member",
+      "name" : "phpScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.pkcs12",
+      "kind" : "member",
+      "name" : "pkcs12",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.plainText",
       "kind" : "member",
       "name" : "plainText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.playlist",
+      "kind" : "member",
+      "name" : "playlist",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.pluginBundle",
+      "kind" : "member",
+      "name" : "pluginBundle",
       "overloads" : [
 
       ],
@@ -36602,9 +39646,105 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.presentation",
+      "kind" : "member",
+      "name" : "presentation",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.propertyList",
       "kind" : "member",
       "name" : "propertyList",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.pythonScript",
+      "kind" : "member",
+      "name" : "pythonScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.quickLookGenerator",
+      "kind" : "member",
+      "name" : "quickLookGenerator",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.quickTimeMovie",
+      "kind" : "member",
+      "name" : "quickTimeMovie",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.rawImage",
+      "kind" : "member",
+      "name" : "rawImage",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.realityFile",
+      "kind" : "member",
+      "name" : "realityFile",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.referenceURL",
+      "kind" : "member",
+      "name" : "referenceURL",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.resolvable",
+      "kind" : "member",
+      "name" : "resolvable",
       "overloads" : [
 
       ],
@@ -36626,9 +39766,189 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.rtfd",
+      "kind" : "member",
+      "name" : "rtfd",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.rubyScript",
+      "kind" : "member",
+      "name" : "rubyScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.sceneKitScene",
+      "kind" : "member",
+      "name" : "sceneKitScene",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.script",
+      "kind" : "member",
+      "name" : "script",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.shellScript",
+      "kind" : "member",
+      "name" : "shellScript",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.sourceCode",
+      "kind" : "member",
+      "name" : "sourceCode",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.spotlightImporter",
+      "kind" : "member",
+      "name" : "spotlightImporter",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.spreadsheet",
+      "kind" : "member",
+      "name" : "spreadsheet",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.supertypes",
+      "kind" : "member",
+      "name" : "supertypes",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.svg",
+      "kind" : "member",
+      "name" : "svg",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.swiftSource",
+      "kind" : "member",
+      "name" : "swiftSource",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.symbolicLink",
+      "kind" : "member",
+      "name" : "symbolicLink",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.systemPreferencesPane",
+      "kind" : "member",
+      "name" : "systemPreferencesPane",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.tabSeparatedText",
       "kind" : "member",
       "name" : "tabSeparatedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.tags",
+      "kind" : "member",
+      "name" : "tags",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.tarArchive",
+      "kind" : "member",
+      "name" : "tarArchive",
       "overloads" : [
 
       ],
@@ -36650,9 +39970,125 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.tiff",
+      "kind" : "member",
+      "name" : "tiff",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.toDoItem",
+      "kind" : "member",
+      "name" : "toDoItem",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.types",
+      "kind" : "member",
+      "name" : "types",
+      "overloads" : [
+        {
+          "labels" : [
+            "tag",
+            "tagClass",
+            "conformingTo"
+          ],
+          "member" : "static",
+          "signature" : "tag:string tagClass:UTTagClass conformingTo:UTType?"
+        }
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.unixExecutable",
+      "kind" : "member",
+      "name" : "unixExecutable",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.url",
       "kind" : "member",
       "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.urlBookmarkData",
+      "kind" : "member",
+      "name" : "urlBookmarkData",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.usd",
+      "kind" : "member",
+      "name" : "usd",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.usdz",
+      "kind" : "member",
+      "name" : "usdz",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.utf16ExternalPlainText",
+      "kind" : "member",
+      "name" : "utf16ExternalPlainText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.utf16PlainText",
+      "kind" : "member",
+      "name" : "utf16PlainText",
       "overloads" : [
 
       ],
@@ -36674,9 +40110,153 @@
     },
     {
       "family" : "Files",
+      "id" : "member:UTType.utf8TabSeparatedText",
+      "kind" : "member",
+      "name" : "utf8TabSeparatedText",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.vCard",
+      "kind" : "member",
+      "name" : "vCard",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.version",
+      "kind" : "member",
+      "name" : "version",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.video",
+      "kind" : "member",
+      "name" : "video",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.volume",
+      "kind" : "member",
+      "name" : "volume",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.wav",
+      "kind" : "member",
+      "name" : "wav",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.webArchive",
+      "kind" : "member",
+      "name" : "webArchive",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.webP",
+      "kind" : "member",
+      "name" : "webP",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.x509Certificate",
+      "kind" : "member",
+      "name" : "x509Certificate",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "member:UTType.xml",
       "kind" : "member",
       "name" : "xml",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.xmlPropertyList",
+      "kind" : "member",
+      "name" : "xmlPropertyList",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.xpcService",
+      "kind" : "member",
+      "name" : "xpcService",
+      "overloads" : [
+
+      ],
+      "owner" : "UTType",
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "member:UTType.yaml",
+      "kind" : "member",
+      "name" : "yaml",
       "overloads" : [
 
       ],
@@ -42834,6 +46414,47 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "modifier:TabContent.draggable",
+      "kind" : "modifier",
+      "name" : "draggable",
+      "notes" : "A `String`, `URL`, `Data`, `Image` or your `Transferable`, with `preview:`; in iOS 27's drag containers, `draggable(containerItemID:)` or `draggable(Item.self, item:)`.",
+      "overloads" : [
+        {
+          "introduced" : "18.1",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:TabContent.dropDestination",
+      "kind" : "modifier",
+      "name" : "dropDestination",
+      "notes" : "`for: String.self` (or `URL`, `Data`, `Image`, your `Transferable`): `{ items, location in … return true }` with `isTargeted:`, iOS 26's `{ items, session in … }`, or on a `ForEach` `{ items, index in … }`. A dropped file arrives copied into the app's temporary folder.",
+      "overloads" : [
+        {
+          "introduced" : "18.0",
+          "labels" : [
+            "for",
+            "action"
+          ],
+          "receiver" : "TabContent",
+          "signature" : "for:any? action:closure"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "modifier:TabContent.help",
       "kind" : "modifier",
@@ -42910,6 +46531,25 @@
       ],
       "owner" : "TabContent",
       "source" : "Sources/Kiln/Tabs.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:TabContent.springLoadingBehavior",
+      "kind" : "modifier",
+      "name" : "springLoadingBehavior",
+      "overloads" : [
+        {
+          "introduced" : "18.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "TabContent",
+          "signature" : "_:SpringLoadingBehavior"
+        }
+      ],
+      "owner" : "TabContent",
+      "source" : "Sources/Kiln/DragDrop.swift",
       "support" : "full"
     },
     {
@@ -46184,6 +49824,146 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "modifier:dragConfiguration",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "dragConfiguration",
+      "notes" : "`DragConfiguration(allowMove:)` or `(operationsWithinApp:operationsOutsideApp:)`.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:DragConfiguration"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:dragContainer",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "dragContainer",
+      "notes" : "iOS 27's multi-item drag: `.dragContainer(for: Item.self) { ids in items }` on the container, `.draggable(containerItemID: item.id)` on each item.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "for",
+            "in",
+            "_"
+          ],
+          "signature" : "for:any? in:any? _:closure"
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "for",
+            "itemID",
+            "in",
+            "_"
+          ],
+          "signature" : "for:any? itemID:any in:any? _:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:dragContainerSelection",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "dragContainerSelection",
+      "notes" : "The ids dragged together when one of them is.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_",
+            "containerNamespace"
+          ],
+          "signature" : "_:any containerNamespace:any?"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:draggable",
+      "kind" : "modifier",
+      "name" : "draggable",
+      "notes" : "A `String`, `URL`, `Data`, `Image` or your `Transferable`, with `preview:`; in iOS 27's drag containers, `draggable(containerItemID:)` or `draggable(Item.self, item:)`.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_",
+            "containerNamespace",
+            "_"
+          ],
+          "signature" : "_:any? containerNamespace:any? _:closure"
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_",
+            "id",
+            "containerNamespace",
+            "_"
+          ],
+          "signature" : "_:any? id:any containerNamespace:any? _:closure"
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_",
+            "id",
+            "item",
+            "containerNamespace"
+          ],
+          "signature" : "_:any? id:any item:any containerNamespace:any?"
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_",
+            "item",
+            "containerNamespace"
+          ],
+          "signature" : "_:any? item:any containerNamespace:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "preview"
+          ],
+          "signature" : "_:any preview:content"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:any"
+        },
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "containerItemID",
+            "containerNamespace"
+          ],
+          "signature" : "containerItemID:any containerNamespace:any?"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "modifier:drawingGroup",
       "kind" : "modifier",
@@ -46198,6 +49978,53 @@
         }
       ],
       "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:dropConfiguration",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "dropConfiguration",
+      "notes" : "`{ session in DropConfiguration(operation: .move) }`.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:dropDestination",
+      "kind" : "modifier",
+      "name" : "dropDestination",
+      "notes" : "`for: String.self` (or `URL`, `Data`, `Image`, your `Transferable`): `{ items, location in … return true }` with `isTargeted:`, iOS 26's `{ items, session in … }`, or on a `ForEach` `{ items, index in … }`. A dropped file arrives copied into the app's temporary folder.",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "action",
+            "isTargeted"
+          ],
+          "signature" : "for:any? action:closure isTargeted:closure?"
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "for",
+            "isEnabled",
+            "action"
+          ],
+          "signature" : "for:any? isEnabled:bool? action:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
       "support" : "full"
     },
     {
@@ -46271,6 +50098,274 @@
         }
       ],
       "source" : "Sources/Kiln/Environment.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogBrowserOptions",
+      "kind" : "modifier",
+      "name" : "fileDialogBrowserOptions",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:FileDialogBrowserOptions"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogConfirmationLabel",
+      "kind" : "modifier",
+      "name" : "fileDialogConfirmationLabel",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:any"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogCustomizationID",
+      "kind" : "modifier",
+      "name" : "fileDialogCustomizationID",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:string"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogDefaultDirectory",
+      "kind" : "modifier",
+      "name" : "fileDialogDefaultDirectory",
+      "notes" : "A folder in the app's own folder, or one the person picked.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:URL?"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogImportsUnresolvedAliases",
+      "kind" : "modifier",
+      "name" : "fileDialogImportsUnresolvedAliases",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:bool"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileDialogMessage",
+      "kind" : "modifier",
+      "name" : "fileDialogMessage",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:any"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileExporter",
+      "kind" : "modifier",
+      "name" : "fileExporter",
+      "notes" : "`document:` your `FileDocument` with `contentType:`; or `item:` `Data` or a `String` with `contentTypes: [.png]`, or your `Transferable`; `documents:`/`items:` for several.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "document",
+            "contentType",
+            "defaultFilename",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding document:any contentType:UTType defaultFilename:string? onCompletion:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "document",
+            "contentTypes",
+            "defaultFilename",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding document:any contentTypes:any? defaultFilename:string? onCompletion:closure onCancellation:closure?"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "documents",
+            "contentType",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding documents:any contentType:UTType onCompletion:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "documents",
+            "contentTypes",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding documents:any contentTypes:any? onCompletion:closure onCancellation:closure?"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "item",
+            "contentTypes",
+            "defaultFilename",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding item:any contentTypes:any? defaultFilename:string? onCompletion:closure onCancellation:closure?"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "items",
+            "contentTypes",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding items:any contentTypes:any? onCompletion:closure onCancellation:closure?"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileExporterFilenameLabel",
+      "kind" : "modifier",
+      "name" : "fileExporterFilenameLabel",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:any"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileImporter",
+      "kind" : "modifier",
+      "name" : "fileImporter",
+      "notes" : "The URLs it returns are the app's to read while it's open: `Data(contentsOf:)`, `String(contentsOf:)`, or `FileManager.default.copyItem(at:to:)` into `URL.documentsDirectory` to keep one.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "allowedContentTypes",
+            "allowsMultipleSelection",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding allowedContentTypes:any allowsMultipleSelection:bool onCompletion:closure onCancellation:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "allowedContentTypes",
+            "allowsMultipleSelection",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding allowedContentTypes:any allowsMultipleSelection:bool onCompletion:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "allowedContentTypes",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding allowedContentTypes:any onCompletion:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:fileMover",
+      "kind" : "modifier",
+      "name" : "fileMover",
+      "notes" : "Moves files out of the app's folder to where the person puts them.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "file",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding file:any onCompletion:closure onCancellation:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "file",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding file:any onCompletion:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "files",
+            "onCompletion",
+            "onCancellation"
+          ],
+          "signature" : "isPresented:binding files:any onCompletion:closure onCancellation:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "files",
+            "onCompletion"
+          ],
+          "signature" : "isPresented:binding files:any onCompletion:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
       "support" : "full"
     },
     {
@@ -47236,6 +51331,22 @@
         }
       ],
       "source" : "Sources/Kiln/Text.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:itemProvider",
+      "kind" : "modifier",
+      "name" : "itemProvider",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:closure?"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
       "support" : "full"
     },
     {
@@ -48416,6 +52527,92 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "modifier:onDrag",
+      "kind" : "modifier",
+      "name" : "onDrag",
+      "notes" : "Returns an `NSItemProvider`; `.draggable` is simpler.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "preview"
+          ],
+          "signature" : "_:closure preview:content"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:onDragSessionUpdated",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "onDragSessionUpdated",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:onDrop",
+      "kind" : "modifier",
+      "name" : "onDrop",
+      "notes" : "`NSItemProvider`s, read with `loadObject(ofClass:)` or `loadDataRepresentation(for:)`; or your `DropDelegate`. `.dropDestination` is simpler.",
+      "overloads" : [
+        {
+          "labels" : [
+            "of",
+            "delegate"
+          ],
+          "signature" : "of:any delegate:any"
+        },
+        {
+          "labels" : [
+            "of",
+            "isTargeted",
+            "perform"
+          ],
+          "signature" : "of:any isTargeted:binding? perform:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:onDropSessionUpdated",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "onDropSessionUpdated",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:closure"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "modifier:onGeometryChange",
       "kind" : "modifier",
@@ -48964,6 +53161,167 @@
       "support" : "full"
     },
     {
+      "family" : "Photos",
+      "id" : "modifier:photosPicker",
+      "kind" : "modifier",
+      "name" : "photosPicker",
+      "notes" : "Shows the picker while `isPresented` is true.",
+      "overloads" : [
+        {
+          "labels" : [
+            "isPresented",
+            "selection",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary"
+          ],
+          "signature" : "isPresented:binding selection:binding matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "selection",
+            "matching",
+            "preferredItemEncoding"
+          ],
+          "signature" : "isPresented:binding selection:binding matching:PHPickerFilter? preferredItemEncoding:any?"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary"
+          ],
+          "signature" : "isPresented:binding selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding"
+          ],
+          "signature" : "isPresented:binding selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any?"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosPickerAccessoryVisibility",
+      "kind" : "modifier",
+      "name" : "photosPickerAccessoryVisibility",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "edges"
+          ],
+          "signature" : "_:Visibility edges:Edge.Set?"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosPickerDisabledCapabilities",
+      "kind" : "modifier",
+      "name" : "photosPickerDisabledCapabilities",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:PHPickerCapabilities"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosPickerMetadataOptions",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "photosPickerMetadataOptions",
+      "notes" : "`.removeLocation`, `.removeCaptions`: what the picked items leave out.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:PHPickerMetadataOptions"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosPickerSearchText",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "photosPickerSearchText",
+      "notes" : "Starts the picker's search with this text.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:any"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosPickerStyle",
+      "kind" : "modifier",
+      "name" : "photosPickerStyle",
+      "notes" : "`.inline` puts the picker in the app's layout; `.compact` is one row.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:PhotosPickerStyle"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "modifier:photosReferenceImageViewer",
+      "introduced" : "27.0",
+      "kind" : "modifier",
+      "name" : "photosReferenceImageViewer",
+      "notes" : "The `fileURL:` form, for an image in the app's folder; the `asset:`, `pickerItem:` and `pickerResult:` forms read the photo library, which apps on Shelf can't.",
+      "overloads" : [
+        {
+          "introduced" : "27.0",
+          "labels" : [
+            "fileURL",
+            "onProcessingCompletion"
+          ],
+          "signature" : "fileURL:binding onProcessingCompletion:closure?"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Controls",
       "id" : "modifier:pickerStyle",
       "kind" : "modifier",
@@ -49308,6 +53666,30 @@
       ],
       "source" : "Sources/Kiln/Glass.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:quickLookPreview",
+      "kind" : "modifier",
+      "name" : "quickLookPreview",
+      "notes" : "A file in the app's folder (or one the person picked); `$url`, or `$selection, in: urls`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "in"
+          ],
+          "signature" : "_:binding in:any"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:binding"
+        }
+      ],
+      "source" : "Sources/Kiln/Pickers.swift",
+      "support" : "full"
     },
     {
       "family" : "Environment",
@@ -50620,6 +55002,22 @@
         }
       ],
       "source" : "Sources/Kiln/Subviews.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "modifier:springLoadingBehavior",
+      "kind" : "modifier",
+      "name" : "springLoadingBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:SpringLoadingBehavior"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
       "support" : "full"
     },
     {
@@ -52150,6 +56548,19 @@
     },
     {
       "family" : "Audio",
+      "id" : "protocol:AVAudioRecorderDelegate",
+      "kind" : "protocol",
+      "name" : "AVAudioRecorderDelegate",
+      "proxy" : true,
+      "requirements" : [
+        "audioRecorderDidFinishRecording(_:successfully:)?",
+        "audioRecorderEncodeErrorDidOccur(_:error:)?"
+      ],
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
       "id" : "protocol:AVSpeechSynthesizerDelegate",
       "kind" : "protocol",
       "name" : "AVSpeechSynthesizerDelegate",
@@ -52360,6 +56771,23 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "protocol:DropDelegate",
+      "kind" : "protocol",
+      "name" : "DropDelegate",
+      "notes" : "For `.onDrop(of:delegate:)`: `info.location`, `info.hasItemsConforming(to:)`, `info.itemProviders(for:)`.",
+      "proxy" : true,
+      "requirements" : [
+        "performDrop(info:)",
+        "validateDrop(info:)?",
+        "dropEntered(info:)?",
+        "dropUpdated(info:)?",
+        "dropExited(info:)?"
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Core",
       "id" : "protocol:DynamicProperty",
       "kind" : "protocol",
@@ -52413,7 +56841,7 @@
       "id" : "protocol:FileDocument",
       "kind" : "protocol",
       "name" : "FileDocument",
-      "notes" : "Declared, for the file pickers to come; nothing shows it yet.",
+      "notes" : "For `.fileExporter(isPresented:document:contentType:)` and `.fileImporter`: `init(configuration:)` reads `configuration.file.regularFileContents`.",
       "proxy" : true,
       "requirements" : [
         "static readableContentTypes",
@@ -52422,7 +56850,7 @@
         "static writableContentTypes?"
       ],
       "source" : "Sources/Kiln/Files.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Focus & Keyboard",
@@ -52681,6 +57109,23 @@
         "next()"
       ],
       "source" : "Sources/Kiln/Integers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "protocol:ReferenceFileDocument",
+      "kind" : "protocol",
+      "name" : "ReferenceFileDocument",
+      "notes" : "A class document: `snapshot(contentType:)`, then `fileWrapper(snapshot:configuration:)`.",
+      "proxy" : true,
+      "requirements" : [
+        "static readableContentTypes",
+        "init(configuration:)",
+        "snapshot(contentType:)",
+        "fileWrapper(snapshot:configuration:)",
+        "static writableContentTypes?"
+      ],
+      "source" : "Sources/Kiln/Files.swift",
       "support" : "full"
     },
     {
@@ -53785,6 +58230,18 @@
     },
     {
       "family" : "Audio",
+      "id" : "type:AVAudioApplication",
+      "kind" : "type",
+      "name" : "AVAudioApplication",
+      "notes" : "`AVAudioApplication.shared.recordPermission`, and `await AVAudioApplication.requestRecordPermission()`: the app's own answer, asked through Shelf first.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
       "id" : "type:AVAudioPlayer",
       "kind" : "type",
       "name" : "AVAudioPlayer",
@@ -53808,6 +58265,60 @@
       ],
       "source" : "Sources/Kiln/Audio.swift",
       "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVAudioQuality",
+      "kind" : "type",
+      "name" : "AVAudioQuality",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVAudioRecorder",
+      "kind" : "type",
+      "name" : "AVAudioRecorder",
+      "notes" : "Into a file in the app's folder (`URL.documentsDirectory`); `record()` asks for the microphone first. `isMeteringEnabled`, `updateMeters()`, `averagePower(forChannel:)` for a level meter. Stops when the app closes.",
+      "overloads" : [
+        {
+          "labels" : [
+            "url",
+            "settings"
+          ],
+          "member" : "init",
+          "signature" : "url:URL settings:any"
+        }
+      ],
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Audio",
+      "id" : "type:AVAudioSession",
+      "kind" : "type",
+      "name" : "AVAudioSession",
+      "notes" : "Shelf owns the audio session: it plays (mixing with other audio) and records while a recorder records. These calls are accepted and change nothing.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Recording.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:AVCaptureDevice",
+      "kind" : "type",
+      "name" : "AVCaptureDevice",
+      "notes" : "Only its permission checks: `authorizationStatus(for: .video)` and `await requestAccess(for: .video)`. Take photos with `UIImagePickerController`; custom `AVCaptureSession` cameras aren't supported.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/CameraGate.swift",
+      "support" : "partial"
     },
     {
       "family" : "Audio",
@@ -54281,6 +58792,15 @@
         }
       ],
       "source" : "Sources/Kiln/AttributedText.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:AudioFormatID",
+      "kind" : "type",
+      "name" : "AudioFormatID",
+      "notes" : "The same as `Int` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
       "support" : "full"
     },
     {
@@ -56143,6 +60663,158 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "type:DragConfiguration",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DragConfiguration",
+      "overloads" : [
+        {
+          "labels" : [
+            "allowMove"
+          ],
+          "member" : "init",
+          "signature" : "allowMove:bool"
+        },
+        {
+          "labels" : [
+            "operationsWithinApp",
+            "operationsOutsideApp"
+          ],
+          "member" : "init",
+          "signature" : "operationsWithinApp:any? operationsOutsideApp:any?"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DragConfiguration.OperationsOutsideApp",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DragConfiguration.OperationsOutsideApp",
+      "overloads" : [
+        {
+          "labels" : [
+            "allowCopy"
+          ],
+          "member" : "init",
+          "signature" : "allowCopy:bool?"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DragConfiguration.OperationsWithinApp",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DragConfiguration.OperationsWithinApp",
+      "overloads" : [
+        {
+          "labels" : [
+            "allowMove"
+          ],
+          "member" : "init",
+          "signature" : "allowMove:bool?"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DragSession",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DragSession",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DropConfiguration",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DropConfiguration",
+      "overloads" : [
+        {
+          "labels" : [
+            "operation"
+          ],
+          "member" : "init",
+          "signature" : "operation:DropOperation"
+        }
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DropInfo",
+      "kind" : "type",
+      "name" : "DropInfo",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DropProposal",
+      "kind" : "type",
+      "name" : "DropProposal",
+      "overloads" : [
+        {
+          "labels" : [
+            "operation"
+          ],
+          "member" : "init",
+          "signature" : "operation:DropOperation"
+        },
+        {
+          "labels" : [
+            "withinApplication",
+            "outsideApplication"
+          ],
+          "member" : "init",
+          "signature" : "withinApplication:DropOperation outsideApplication:DropOperation"
+        }
+      ],
+      "source" : "Sources/Kiln/DragDrop.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DropSession",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DropSession",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
+      "id" : "type:DropSession.LocalSession",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "DropSession.LocalSession",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Containers.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Concurrency",
       "id" : "type:Duration",
       "kind" : "type",
@@ -56317,7 +60989,7 @@
       "id" : "type:FileRepresentation",
       "kind" : "type",
       "name" : "FileRepresentation",
-      "notes" : "Accepted; files are Round 3's (§4.1).",
+      "notes" : "`exporting:` returns `SentTransferredFile(url)` for a file in the app's folder; `importing:` gets `received.file`, in the app's temporary folder: copy it to keep it.",
       "overloads" : [
         {
           "labels" : [
@@ -56346,7 +61018,7 @@
         }
       ],
       "source" : "Sources/Kiln/Transferable.swift",
-      "support" : "stub"
+      "support" : "full"
     },
     {
       "family" : "Files",
@@ -56356,6 +61028,13 @@
       "overloads" : [
         {
           "labels" : [
+            "directoryWithFileWrappers"
+          ],
+          "member" : "init",
+          "signature" : "directoryWithFileWrappers:any"
+        },
+        {
+          "labels" : [
             "regularFileWithContents"
           ],
           "member" : "init",
@@ -56363,7 +61042,7 @@
         }
       ],
       "source" : "Sources/Kiln/Files.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -57806,6 +62485,46 @@
       "support" : "full"
     },
     {
+      "family" : "Files",
+      "id" : "type:NSItemProvider",
+      "kind" : "type",
+      "name" : "NSItemProvider",
+      "notes" : "`NSItemProvider(object:)` for a `String`, `URL` or `UIImage`; `loadObject(ofClass:)`, `loadDataRepresentation(for:)`, `loadFileRepresentation(for:)`, `loadTransferable(type:)`; the handler runs on the main thread.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "contentsOf"
+          ],
+          "member" : "init",
+          "signature" : "contentsOf:URL"
+        },
+        {
+          "labels" : [
+            "item",
+            "typeIdentifier"
+          ],
+          "member" : "init",
+          "signature" : "item:any typeIdentifier:string?"
+        },
+        {
+          "labels" : [
+            "object"
+          ],
+          "member" : "init",
+          "signature" : "object:any"
+        }
+      ],
+      "source" : "Sources/Kiln/ItemProviders.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:NSMutableAttributedString",
       "kind" : "type",
@@ -58329,6 +63048,60 @@
       "support" : "full"
     },
     {
+      "family" : "Photos",
+      "id" : "type:PHAssetChangeRequest",
+      "kind" : "type",
+      "name" : "PHAssetChangeRequest",
+      "notes" : "Inside `PHPhotoLibrary.shared().performChanges { … }`: adding photos and videos.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Saving.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "type:PHPhotoLibrary",
+      "kind" : "type",
+      "name" : "PHPhotoLibrary",
+      "notes" : "`PHPhotoLibrary.shared()` for `photoLibrary:` and saving with `performChanges`; an app can add to the library, not read it.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Items.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Photos",
+      "id" : "type:PHPickerFilter",
+      "kind" : "type",
+      "name" : "PHPickerFilter",
+      "notes" : "`.images`, `.videos`, `.livePhotos`, `.screenshots` and the other kinds; `.any(of:)`, `.all(of:)`, `.not(_:)`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "type:PHPickerSearchText",
+      "introduced" : "27.0",
+      "kind" : "type",
+      "name" : "PHPickerSearchText",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "init",
+          "signature" : "_:string"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Concurrency",
       "id" : "type:PassthroughSubject",
       "kind" : "type",
@@ -58384,6 +63157,24 @@
         }
       ],
       "source" : "Sources/Kiln/FormatStyles.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Photos",
+      "id" : "type:PhotosPickerItem",
+      "kind" : "type",
+      "name" : "PhotosPickerItem",
+      "notes" : "`try await item.loadTransferable(type: Data.self)` (or `Image.self`, or your `Transferable`, such as a movie with `FileRepresentation`); `itemIdentifier`, `supportedContentTypes`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "itemIdentifier"
+          ],
+          "member" : "init",
+          "signature" : "itemIdentifier:string"
+        }
+      ],
+      "source" : "Sources/Kiln/Items.swift",
       "support" : "full"
     },
     {
@@ -58639,6 +63430,17 @@
       ],
       "source" : "Sources/Kiln/Collections.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "type:ReceivedTransferredFile",
+      "kind" : "type",
+      "name" : "ReceivedTransferredFile",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
+      "support" : "full"
     },
     {
       "anyLabels" : true,
@@ -59237,6 +64039,31 @@
 
       ],
       "source" : "Sources/Kiln/Haptics.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Sharing",
+      "id" : "type:SentTransferredFile",
+      "kind" : "type",
+      "name" : "SentTransferredFile",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "allowAccessingOriginalFile"
+          ],
+          "member" : "init",
+          "signature" : "_:URL allowAccessingOriginalFile:bool"
+        },
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "init",
+          "signature" : "_:URL"
+        }
+      ],
+      "source" : "Sources/Kiln/Transferable.swift",
       "support" : "full"
     },
     {
@@ -59966,7 +64793,7 @@
       "id" : "type:UIImagePickerController",
       "kind" : "type",
       "name" : "UIImagePickerController",
-      "notes" : "`.photoLibrary` only, in a representable, `delegate = context.coordinator`.",
+      "notes" : "In a `UIViewControllerRepresentable`, with `delegate = context.coordinator`: `.camera` (check `isSourceTypeAvailable(.camera)`) or `.photoLibrary`; `info[.originalImage] as? UIImage`.",
       "overloads" : [
         {
           "labels" : [
@@ -59977,6 +64804,39 @@
         }
       ],
       "source" : "Sources/Kiln/Camera.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.CameraCaptureMode",
+      "kind" : "type",
+      "name" : "UIImagePickerController.CameraCaptureMode",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.CameraDevice",
+      "kind" : "type",
+      "name" : "UIImagePickerController.CameraDevice",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.CameraFlashMode",
+      "kind" : "type",
+      "name" : "UIImagePickerController.CameraFlashMode",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
       "support" : "partial"
     },
     {
@@ -59984,6 +64844,17 @@
       "id" : "type:UIImagePickerController.InfoKey",
       "kind" : "type",
       "name" : "UIImagePickerController.InfoKey",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Camera.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Camera",
+      "id" : "type:UIImagePickerController.QualityType",
+      "kind" : "type",
+      "name" : "UIImagePickerController.QualityType",
       "overloads" : [
 
       ],
@@ -60461,6 +65332,18 @@
       "support" : "partial"
     },
     {
+      "family" : "Files",
+      "id" : "type:URLResourceValues",
+      "kind" : "type",
+      "name" : "URLResourceValues",
+      "notes" : "`fileSize`, `totalFileSize`, `isDirectory`, `creationDate`, `contentModificationDate`, `contentType`, `name`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Networking",
       "id" : "type:URLSession",
       "kind" : "type",
@@ -60542,9 +65425,21 @@
     },
     {
       "family" : "Files",
+      "id" : "type:UTTagClass",
+      "kind" : "type",
+      "name" : "UTTagClass",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Files.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Files",
       "id" : "type:UTType",
       "kind" : "type",
       "name" : "UTType",
+      "notes" : "Every static type (`.plainText`, `.json`, `.png`, `.pdf`, `.movie`…), `UTType(filenameExtension:)`, `UTType(mimeType:)`, `conforms(to:)`, `preferredFilenameExtension`.",
       "overloads" : [
         {
           "labels" : [
@@ -60555,10 +65450,26 @@
         },
         {
           "labels" : [
+            "exportedAs",
+            "conformingTo"
+          ],
+          "member" : "init",
+          "signature" : "exportedAs:string conformingTo:UTType"
+        },
+        {
+          "labels" : [
             "exportedAs"
           ],
           "member" : "init",
           "signature" : "exportedAs:string"
+        },
+        {
+          "labels" : [
+            "filenameExtension",
+            "conformingTo"
+          ],
+          "member" : "init",
+          "signature" : "filenameExtension:string conformingTo:UTType"
         },
         {
           "labels" : [
@@ -60569,14 +65480,46 @@
         },
         {
           "labels" : [
+            "importedAs",
+            "conformingTo"
+          ],
+          "member" : "init",
+          "signature" : "importedAs:string conformingTo:UTType"
+        },
+        {
+          "labels" : [
             "importedAs"
           ],
           "member" : "init",
           "signature" : "importedAs:string"
+        },
+        {
+          "labels" : [
+            "mimeType",
+            "conformingTo"
+          ],
+          "member" : "init",
+          "signature" : "mimeType:string conformingTo:UTType"
+        },
+        {
+          "labels" : [
+            "mimeType"
+          ],
+          "member" : "init",
+          "signature" : "mimeType:string"
+        },
+        {
+          "labels" : [
+            "tag",
+            "tagClass",
+            "conformingTo"
+          ],
+          "member" : "init",
+          "signature" : "tag:string tagClass:UTTagClass conformingTo:UTType?"
         }
       ],
       "source" : "Sources/Kiln/Files.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "anyLabels" : true,
@@ -63426,6 +68369,101 @@
       "support" : "full"
     },
     {
+      "family" : "Photos",
+      "id" : "view:PhotosPicker",
+      "kind" : "view",
+      "name" : "PhotosPicker",
+      "notes" : "One item (`PhotosPickerItem?`) or several (`[PhotosPickerItem]`, `maxSelectionCount:`), `matching: .images` (or `.videos`, `.any(of:)`, `.not(_:)`…); load with `try await item.loadTransferable(type: Data.self)`. Needs no permission.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "selection",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary"
+          ],
+          "signature" : "_:title selection:binding matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any"
+        },
+        {
+          "labels" : [
+            "_",
+            "selection",
+            "matching",
+            "preferredItemEncoding"
+          ],
+          "signature" : "_:title selection:binding matching:PHPickerFilter? preferredItemEncoding:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary"
+          ],
+          "signature" : "_:title selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any"
+        },
+        {
+          "labels" : [
+            "_",
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding"
+          ],
+          "signature" : "_:title selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any?"
+        },
+        {
+          "labels" : [
+            "selection",
+            "matching",
+            "preferredItemEncoding",
+            "label"
+          ],
+          "signature" : "selection:binding matching:PHPickerFilter? preferredItemEncoding:any? label:content"
+        },
+        {
+          "labels" : [
+            "selection",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary",
+            "label"
+          ],
+          "signature" : "selection:binding matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any label:content"
+        },
+        {
+          "labels" : [
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding",
+            "label"
+          ],
+          "signature" : "selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any? label:content"
+        },
+        {
+          "labels" : [
+            "selection",
+            "maxSelectionCount",
+            "selectionBehavior",
+            "matching",
+            "preferredItemEncoding",
+            "photoLibrary",
+            "label"
+          ],
+          "signature" : "selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any? photoLibrary:any label:content"
+        }
+      ],
+      "source" : "Sources/Kiln/Photos.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "view:Picker",
       "kind" : "view",
@@ -64921,6 +69959,24 @@
       "reason" : "`publisher(for:)` with `.onReceive`, and `addObserver(forName:object:queue:using:)`, cover it.",
       "status" : "later",
       "what" : "`NotificationCenter.notifications(named:)`"
+    },
+    {
+      "id" : "document-browser",
+      "reason" : "It customizes `DocumentGroup`'s document browser; a Shelf app is one screen, not a document-based app. The file pickers open and save files (§4.1).",
+      "status" : "wontDo",
+      "what" : "`.documentBrowserContextMenu`"
+    },
+    {
+      "id" : "file-dialog-predicate",
+      "reason" : "It takes a Foundation `#Predicate`, which the compiler builds from a macro that Kiln doesn't expand. `allowedContentTypes:` filters what the picker offers.",
+      "status" : "wontDo",
+      "what" : "`.fileDialogURLEnabled(_:)`"
+    },
+    {
+      "id" : "photos-shared-albums",
+      "reason" : "They create and post to the person's iCloud Shared Albums through `PHPhotoLibrary`, which a Shelf app can't read: it can only add photos (§4.2).",
+      "status" : "wontDo",
+      "what" : "iCloud Shared Album sheets (`.photosSharedAlbumCreationSheet`, `…CustomizationSheet`, `…PostingSheet`, `.postToPhotosSharedAlbumSheet`)"
     },
     {
       "id" : "location-monitoring",

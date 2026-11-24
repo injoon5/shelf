@@ -75,6 +75,8 @@ Use `@AppStorage("key")` only for small preferences that wouldn't matter if lost
 
 Use `DB` for everything else. Shelf provides it, so don't declare your own `DB`. Values are JSON `Data`. DB data syncs to the user's other devices and works offline. Calls return immediately.
 
+Files the app writes (`URL.documentsDirectory`, `FileManager`) stay on this iPhone in the app's own folder, and go when it's deleted. Only `DB` syncs, so keep what the user would miss in `DB`, and use files for things like recordings and exports.
+
 ```swift
 DB.load("todos") -> Data?          // nil if the key was never saved
 DB.save("todos", data)             // data: Data

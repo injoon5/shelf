@@ -27,6 +27,11 @@ import UIKit
 enum KRepresentables {
     static var controllers: [String: AnyClass] = [:]
     static var views: [String: AnyClass] = [:]
+    #if os(iOS) || os(visionOS)
+    /// A family's own host for a controller it allows, shown in its place:
+    /// the camera's gate (Camera/CameraGate.swift).
+    static var hosts: [String: @MainActor (UIViewController, KInterpreter) -> UIViewController] = [:]
+    #endif
 
     static func allowed(_ names: [String: AnyClass]) -> String {
         KInterpreter.list(names.keys.sorted())
@@ -223,6 +228,12 @@ extension KCall {
 }
 
 #if os(iOS) || os(visionOS)
+/// A controller shown in place of the app's (`KRepresentables.hosts`): the
+/// app's own controller is `hosted`, which its update method gets.
+protocol KHostingController: UIViewController {
+    var hosted: UIViewController { get }
+}
+
 /// The app's `UIViewControllerRepresentable`, shown.
 struct KControllerRepresentable: UIViewControllerRepresentable {
     let app: KAppValue
@@ -236,7 +247,7 @@ struct KControllerRepresentable: UIViewControllerRepresentable {
         var a = app.withEnvironment(dismiss: { [dismiss] in dismiss() })
         let v = a.callReporting("makeUIViewController", [a.representableContext(context.coordinator, context.transaction)], labels: ["context"], fallback: .nilValue)
         if case .native(.object(let name, let ref)) = v, KRepresentables.controllers[name] != nil, let vc = ref.value as? UIViewController {
-            return vc
+            return KRepresentables.hosts[name]?(vc, a.interp) ?? vc
         }
         a.interp.report(a.interp.fail("\(app.type.name).makeUIViewController(context:) must return a controller Kiln allows (\(KRepresentables.allowed(KRepresentables.controllers))), not \(v.typeName)", app.type.line))
         return UIHostingController(rootView: KErrorView(message: "\(app.type.name) can't be shown"))
@@ -245,7 +256,8 @@ struct KControllerRepresentable: UIViewControllerRepresentable {
     func updateUIViewController(_ vc: UIViewController, context: Context) {
         guard app.implements("updateUIViewController", labels: [nil, "context"]) else { return }
         var a = app.withEnvironment(dismiss: { [dismiss] in dismiss() })
-        _ = a.callReporting("updateUIViewController", [KNativeValues.kv(from: vc), a.representableContext(context.coordinator, context.transaction)],
+        let own = (vc as? KHostingController)?.hosted ?? vc
+        _ = a.callReporting("updateUIViewController", [KNativeValues.kv(from: own), a.representableContext(context.coordinator, context.transaction)],
                             labels: [nil, "context"])
     }
 }

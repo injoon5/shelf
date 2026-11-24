@@ -422,6 +422,11 @@ enum Exclusions {
         ("tag: V, selection: Binding<V?>", nil, "the deprecated programmatic link: Kiln navigates with `NavigationStack(path:)` and `.navigationDestination(isPresented:)`"),
         ("payloadAction: @escaping ([NSItemProvider])", nil, "`NSItemProvider` payloads: Kiln's `PasteButton` takes `payloadType:`"),
         ("sources: C", nil, "a control over a collection's key paths (mixed state)"),
+        ("D : WritableDocument", nil, "iOS 27's `WritableDocument`, part of the `Document` protocol (won't do): `FileDocument` and `ReferenceFileDocument` export"),
+        ("asset: Binding<PHAsset?>", nil, "a `PHAsset` reads the person's photo library, which an app on Shelf can't (`fileURL:` works)"),
+        ("pickerItem: Binding<PhotosPickerItem?>", nil, "it returns a `PHAsset` from the person's photo library, which an app on Shelf can't read (`fileURL:` works)"),
+        ("pickerResult: Binding<PHPickerResult?>", nil, "`PHPickerResult` is UIKit's picker's; Kiln's picker is `PhotosPicker` (`fileURL:` works)"),
+        ("containerNamespace: Namespace.ID? = nil, _ item: @escaping () -> Item?", ", { ", "the item closure in parentheses binds as `preview:`, and the bridge sees the item type first: the same drag as Swift's (`draggable(Item.self) { item }` binds as written)"),
     ]
 
     static func reason(_ f: CallFormsAudit.Finding, _ c: SDKCall, support: String) -> String? {

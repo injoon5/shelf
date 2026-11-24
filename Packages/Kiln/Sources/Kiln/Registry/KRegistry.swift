@@ -91,11 +91,11 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .haptics: return "haptic feedback"
         case .sharing: return "the share sheet and the clipboard"
         case .units: return "measurements and unit conversion"
-        case .audio: return "playing sounds"
+        case .audio: return "playing and recording sounds"
         case .web: return "web views and web pages"
         case .chart3D: return "3D charts"
-        case .files: return "importing and exporting files"
-        case .photos: return "the photo picker"
+        case .files: return "the app's files, the file pickers, and drag and drop"
+        case .photos: return "the photo picker, and saving to Photos"
         case .camera: return "taking photos with the camera"
         case .motion: return "Core Motion: the accelerometer, the gyroscope and the pedometer"
         case .location: return "the user's location and geocoding"
@@ -124,7 +124,13 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .navigation:
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
         case .audio:
-            return "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`. Sound stops when the app closes"
+            return "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`; `AVAudioRecorder` into the app's folder, with metering (`record()` asks for the microphone). Sound and recording stop when the app closes"
+        case .files:
+            return "files in the app's folder stay on this device (`DB` is what syncs); `.fileImporter` (read its URLs while open, or copy them in), `.fileExporter` with your `FileDocument`, `Data` or `Transferable`, `.fileMover`, `.quickLookPreview`, `.draggable`, `.dropDestination`, `UTType`"
+        case .photos:
+            return "`PhotosPicker` (one item, or `maxSelectionCount:`; `matching: .images`; `.photosPickerStyle(.inline)`) and `.photosPicker`; then `try await item.loadTransferable(type: Data.self)` and `UIImage(data:)`. Save with `UIImageWriteToSavedPhotosAlbum`, which asks first"
+        case .camera:
+            return "`UIImagePickerController` with `.camera` in a `UIViewControllerRepresentable` whose `Coordinator` is the delegate; check `isSourceTypeAvailable(.camera)` first. Shelf asks for the camera"
         case .networking:
             return "`try await URLSession.shared.data(from:)` or `data(for:)` a `URLRequest`, then `JSONDecoder`; `URLComponents`; `bytes(from:)` with `for try await line in bytes.lines`; WebSockets: `webSocketTask(with:)`, `resume()`, `try await send(.string(text))` and `receive()` (`.string`/`.data`) in a loop. Use `await` in `.task`, not completion handlers"
         case .chart3D:

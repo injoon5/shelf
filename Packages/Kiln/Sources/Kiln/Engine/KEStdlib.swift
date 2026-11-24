@@ -257,6 +257,8 @@ extension KInterpreter {
             if case .selfRef = base, let ctx = env.nearestSelf, !ctx.isStatic { return ctx.type.propertyType(name) }
             if let t = peekUserType(base, env) { return t.propertyType(name) }
             if name == "first" || name == "last", peekIsCollection(base, env) { return .optional(any) }
+            // Native properties that are optional collections: `.map` on them is Optional's.
+            if name == "regularFileContents" || name == "fileWrappers" { return .optional(any) }
             return nil
         case .call(.member(let base, let name, _), let args, _):
             if containsOptionalChain(base) { return .optional(any) }

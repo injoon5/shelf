@@ -25,8 +25,8 @@ extension FoundationBridges {
         guard let v = c[ref], !v.isNil else { throw c.fail("\(ref.description) is missing") }
         do {
             switch v {
-            case .native(.url(let u)): return try c.context.files.resolve(u)
-            case .string(let s): return try c.context.files.resolve(path: s)
+            case .native(.url(let u)): return try c.context.resolveFile(u)
+            case .string(let s): return try c.context.resolveFile(s.hasPrefix("/") ? URL(fileURLWithPath: s) : c.context.files.root.appending(path: s))
             default: throw c.fail("\(ref.description) should be a file URL, not \(v.typeName)")
             }
         } catch let refusal as KilnFiles.Refusal {
@@ -88,6 +88,18 @@ extension FoundationBridges {
             t.property("scheme") { c in u(c)?.scheme.map { .string($0) } ?? .nilValue }
             t.property("standardizedFileURL") { c in url(u(c)?.standardizedFileURL) }
             t.property("hasDirectoryPath") { c in .bool(u(c)?.hasDirectoryPath ?? false) }
+            // A picked file's (Files/Grants.swift): Kiln started its access when the
+            // picker handed it over, and stops it when the app closes.
+            t.method("startAccessingSecurityScopedResource", "") { c in
+                guard let url = u(c) else { return .bool(false) }
+                return .bool(c.context.provided(KFileGrants.self)?.allows(url) != nil)
+            }
+            t.method("stopAccessingSecurityScopedResource", "") { _ in .void }
+            t.method("resourceValues", "forKeys:any") { c in
+                guard let url = u(c) else { return .nilValue }
+                let file = try file(c, .receiver)
+                return KResourceValues.read(file, as: url)
+            }
         }
     }
 

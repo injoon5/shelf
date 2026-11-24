@@ -15,6 +15,10 @@
 //  - `didStop` runs when the run's screen closes, after every player,
 //    synthesizer and stream the run made has been stopped, and only if
 //    `willPlay` ran.
+//  - `willRecord` runs before an `AVAudioRecorder` starts (the host makes
+//    the session one that records: `.playAndRecord`), and `didStopRecording`
+//    when the run's last recorder has stopped (back to playing only). A
+//    recorder stops when the screen closes, before `didStop`.
 //
 //  Without a hook (Kiln Lab, tests), nothing touches the session: iOS's
 //  default category applies.
@@ -26,10 +30,15 @@ import Foundation
 public final class KilnAudioSession {
     let willPlay: @MainActor () -> Void
     let didStop: @MainActor () -> Void
+    let willRecord: @MainActor () -> Void
+    let didStopRecording: @MainActor () -> Void
 
-    public init(willPlay: @escaping @MainActor () -> Void, didStop: @escaping @MainActor () -> Void) {
+    public init(willPlay: @escaping @MainActor () -> Void, didStop: @escaping @MainActor () -> Void,
+                willRecord: @escaping @MainActor () -> Void = {}, didStopRecording: @escaping @MainActor () -> Void = {}) {
         self.willPlay = willPlay
         self.didStop = didStop
+        self.willRecord = willRecord
+        self.didStopRecording = didStopRecording
     }
 }
 
@@ -55,6 +64,23 @@ final class KAudioRun {
     /// Stops `object` when the screen closes. Tracking it again replaces the stopper.
     func track(_ object: AnyObject, stop: @escaping @MainActor () -> Void) {
         stoppers[ObjectIdentifier(object)] = stop
+    }
+
+    /// Recorders recording now.
+    private(set) var recording = 0
+
+    /// A recorder is about to start: the host's hook, when it's the first.
+    func willRecord() {
+        guard let context, !context.isTornDown else { return }
+        recording += 1
+        if recording == 1 { context.provided(KilnAudioSession.self)?.willRecord() }
+    }
+
+    /// A recorder stopped: the host's hook, when it was the last.
+    func didStopRecording() {
+        guard recording > 0 else { return }
+        recording -= 1
+        if recording == 0 { context?.provided(KilnAudioSession.self)?.didStopRecording() }
     }
 
     /// Before any sound: the host's hook, once.

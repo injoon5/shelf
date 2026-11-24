@@ -66,9 +66,20 @@ enum RunContext {
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
-        provideSensors(context)
+        provideFakes(context)
         context.openURL = { URLPolicy.open($0) }
         return context
+    }
+
+    /// The simulator has no camera and no motion sensors: apps get Kiln's
+    /// fakes there, behind the same permission sheets (plan §4.3, §4.5): a
+    /// camera, and a phone held while walking. Its location is the
+    /// simulator's own (`xcrun simctl location`). A phone gets the real ones.
+    static func provideFakes(_ context: KilnContext) {
+        #if targetEnvironment(simulator)
+        context.provide(KilnFakeCamera())
+        context.provide(KilnFakeMotion.walking())
+        #endif
     }
 
     /// A try-out (the New App preview): the real capabilities, after the same
@@ -83,25 +94,15 @@ enum RunContext {
                                   files: KilnFiles(root: folder), capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        provideFakes(context)
         // Its web pages' cookies and storage go with it.
         context.provide(KilnEphemeralWebsiteData())
-        provideSensors(context)
         context.openURL = { URLPolicy.open($0) }
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: folder)
         }
         return context
-    }
-
-    /// The simulator has no motion sensors (plan §4.5): its apps get Kiln's
-    /// fake, a phone held while walking, so they can be tried there. Its
-    /// location is the simulator's own (`xcrun simctl location`). A phone
-    /// gets its real sensors.
-    static func provideSensors(_ context: KilnContext) {
-        #if targetEnvironment(simulator)
-        context.provide(KilnFakeMotion.walking())
-        #endif
     }
 
     /// A check (`Kiln.validate`): Kiln's stub context, with a session for
