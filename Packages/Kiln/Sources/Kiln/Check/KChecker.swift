@@ -1317,11 +1317,12 @@ final class KChecker {
         let syntax = args.map { KArgSyntax($0.value) }
         var chosen: (KOverload, [Int])?
         var unavailable: KOverload?
+        // As `pick`: the first that takes each closure on a closure parameter, else the first that takes the call.
         for o in overloads {
             guard let b = o.bind(labels, syntax) else { continue }
             if let a = o.availability, !a.isAvailable { unavailable = unavailable ?? o; continue }
-            chosen = (o, b)
-            break
+            if o.closuresFit(b, { syntax[$0] }) { chosen = (o, b); break }
+            if chosen == nil { chosen = (o, b) }
         }
         guard let (o, binding) = chosen else {
             if let u = unavailable {

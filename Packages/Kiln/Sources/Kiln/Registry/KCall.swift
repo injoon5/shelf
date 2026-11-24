@@ -250,6 +250,15 @@ struct KCall {
         return param(ofKind: .content) ?? a.lastFunction
     }
 
+    /// How many parameters a closure literal takes (`{ item in … }` one,
+    /// `{ Text("Hi") }` none); nil for anything else. Where Swift tells two
+    /// forms with the same labels apart by the closure's type, a bridge asks
+    /// this: `Slider(value: $v) { Text("Volume") }` is a label, not `onEditingChanged:`.
+    func closureArity(_ v: KV?) -> Int? {
+        guard let v, case .function(let fn) = v, case .closure = fn.kind else { return nil }
+        return r.closureParamCount(v)
+    }
+
     /// Runs the closure on an event, with its own step budget.
     func action(_ ref: KArgRef) -> () -> Void { r.action(self[ref]) }
 

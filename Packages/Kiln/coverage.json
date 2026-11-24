@@ -242,7 +242,7 @@
     },
     {
       "family" : "Accessibility",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -612,7 +612,7 @@
     {
       "family" : "Charts",
       "notes" : "A function's plot is sampled at 200 points of `domain:` (or the x scale's).",
-      "overloadsCovered" : 10,
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -830,7 +830,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 6,
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -1049,7 +1049,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 3,
+      "overloadsCovered" : 9,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -1580,7 +1580,7 @@
             "labels" : [
               "_",
               "isExpanded",
-              "Value"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Value>(_ value: Value, isExpanded: Binding<Bool>? = nil, @TableRowBuilder<Value> content: @escaping () -> Content) where Label == TableRow<Value>, Value == Content.TableRowValue"
@@ -2936,7 +2936,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 13,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -3519,7 +3519,7 @@
     {
       "family" : "Controls",
       "notes" : "In a `Slider`'s `ticks:`: one `SliderTick` per element.",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -3536,7 +3536,7 @@
             "introduced" : "26.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, @SliderTickBuilder<V> content: @escaping (Data.Element) -> Content) where ID == V.ID, V : Identifiable, V == Data.Element, Data.Element == Content.Value"
@@ -3547,7 +3547,7 @@
             "labels" : [
               "_",
               "id",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, id: KeyPath<Data.Element, ID>, @SliderTickBuilder<V> content: @escaping (Data.Element) -> Content) where V == Data.Element, Data.Element == Content.Value"
@@ -3557,7 +3557,7 @@
             "introduced" : "26.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Range<Int>, @SliderTickBuilder<V> content: @escaping (Range<Int>.Element) -> Content) where Data == Range<Int>, V == Content.Value"
@@ -4246,7 +4246,7 @@
     {
       "family" : "Navigation",
       "notes" : "Groups tabs in the iPad sidebar; on iPhone its tabs are in the tab bar.",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 14,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -4262,7 +4262,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "SelectionValue"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(@TabContentBuilder<SelectionValue> content: () -> Content) where Header == EmptyView, Footer == EmptyView"
@@ -4271,7 +4271,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "SelectionValue",
+              "content",
               "header"
             ],
             "module" : "SwiftUI",
@@ -4282,7 +4282,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "SelectionValue"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(_ titleKey: LocalizedStringKey, @TabContentBuilder<SelectionValue> content: () -> Content) where Header == Text, Footer == EmptyView"
@@ -4292,7 +4292,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "SelectionValue"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(_ titleResource: LocalizedStringResource, @TabContentBuilder<SelectionValue> content: () -> Content) where Header == Text, Footer == EmptyView"
@@ -4302,7 +4302,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "SelectionValue"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<S>(_ title: S, @TabContentBuilder<SelectionValue> content: () -> Content) where Header == Text, Footer == EmptyView, S : StringProtocol"
@@ -4312,7 +4312,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V, S>(_ title: S, @TabContentBuilder<V?> content: () -> Content) where Header == Text, Footer == EmptyView, SelectionValue == V?, V : Hashable, S : StringProtocol"
@@ -4322,7 +4322,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V, S>(_ title: S, @TabContentBuilder<V?> liftedContent content: () -> Content) where Header == Text, Footer == EmptyView, SelectionValue == V?, V : Hashable, S : StringProtocol"
@@ -4331,7 +4331,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(@TabContentBuilder<V?> content: () -> Content) where Header == EmptyView, Footer == EmptyView, SelectionValue == V?, V : Hashable"
@@ -4340,7 +4340,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V",
+              "content",
               "header"
             ],
             "module" : "SwiftUI",
@@ -4350,7 +4350,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(@TabContentBuilder<V?> liftedContent content: () -> Content) where Header == EmptyView, Footer == EmptyView, SelectionValue == V?, V : Hashable"
@@ -4359,7 +4359,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V",
+              "liftedContent",
               "header"
             ],
             "module" : "SwiftUI",
@@ -4370,7 +4370,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleKey: LocalizedStringKey, @TabContentBuilder<V?> content: () -> Content) where Header == Text, Footer == EmptyView, SelectionValue == V?, V : Hashable"
@@ -4380,7 +4380,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleKey: LocalizedStringKey, @TabContentBuilder<V?> liftedContent content: () -> Content) where Header == Text, Footer == EmptyView, SelectionValue == V?, V : Hashable"
@@ -4390,7 +4390,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleResource: LocalizedStringResource, @TabContentBuilder<V?> content: () -> Content) where Header == Text, Footer == EmptyView, SelectionValue == V?, V : Hashable"
@@ -6109,7 +6109,7 @@
             "introduced" : "17.4",
             "labels" : [
               "_",
-              "TableColumnForEach"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(_ data: Data, @TableColumnBuilder<TableColumnForEach<Data, ID, RowValue, Sort, Content>.TableRowValue, TableColumnForEach<Data, ID, RowValue, Sort, Content>.TableColumnSortComparator> content: @escaping (Data.Element) -> Content) where ID == Data.Element.ID, Data.Element : Identifiable"
@@ -6120,7 +6120,7 @@
             "labels" : [
               "_",
               "id",
-              "TableColumnForEach"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(_ data: Data, id: KeyPath<Data.Element, ID>, @TableColumnBuilder<TableColumnForEach<Data, ID, RowValue, Sort, Content>.TableRowValue, TableColumnForEach<Data, ID, RowValue, Sort, Content>.TableColumnSortComparator> content: @escaping (Data.Element) -> Content)"
@@ -6130,7 +6130,7 @@
             "introduced" : "17.4",
             "labels" : [
               "_",
-              "TableColumnForEach"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init(_ data: Range<Int>, @TableColumnBuilder<TableColumnForEach<Range<Int>, Int, RowValue, Sort, Content>.TableRowValue, TableColumnForEach<Range<Int>, Int, RowValue, Sort, Content>.TableColumnSortComparator> content: @escaping (Int) -> Content) where Data == Range<Int>, ID == Int"
@@ -6740,7 +6740,7 @@
     {
       "family" : "Scenes",
       "notes" : "Its content, in the app's card.",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 19,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -10535,7 +10535,7 @@
     },
     {
       "family" : "Gestures",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -10871,7 +10871,7 @@
     {
       "family" : "Gestures",
       "notes" : "Its value has `location`.",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -23307,7 +23307,7 @@
     {
       "family" : "Navigation",
       "notes" : "Buttons and a message; or the old `Alert(title:message:dismissButton:)`, shown with one OK button.",
-      "overloadsCovered" : 14,
+      "overloadsCovered" : 20,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -24326,7 +24326,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 6,
+      "overloadsCovered" : 8,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -25059,7 +25059,7 @@
     {
       "family" : "Charts",
       "notes" : "A dictionary literal's order isn't kept: use `domain:` and `range:` to fix the legend's order.",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 7,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -25227,7 +25227,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 4,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -25467,7 +25467,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 9,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -25576,7 +25576,7 @@
     },
     {
       "family" : "Charts",
-      "overloadsCovered" : 4,
+      "overloadsCovered" : 7,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -26544,7 +26544,7 @@
     },
     {
       "family" : "Navigation",
-      "overloadsCovered" : 12,
+      "overloadsCovered" : 16,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -27244,7 +27244,7 @@
     {
       "family" : "Controls",
       "notes" : "Its menu items; `preview:` isn't shown.",
-      "overloadsCovered" : 2,
+      "overloadsCovered" : 3,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -31420,7 +31420,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -31438,7 +31438,7 @@
               "initialValue",
               "repeating",
               "content",
-              "Value"
+              "keyframes"
             ],
             "module" : "SwiftUICore",
             "receiver" : "View",
@@ -31451,7 +31451,7 @@
               "initialValue",
               "trigger",
               "content",
-              "Value"
+              "keyframes"
             ],
             "module" : "SwiftUICore",
             "receiver" : "View",
@@ -32395,7 +32395,7 @@
             "introduced" : "17.0",
             "labels" : [
               "trigger",
-              "MapCamera"
+              "keyframes"
             ],
             "module" : "_MapKit_SwiftUI",
             "receiver" : "View",
@@ -32687,7 +32687,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -35260,7 +35260,7 @@
     {
       "family" : "Gestures",
       "notes" : "With a `CGPoint` parameter, the tap's location.",
-      "overloadsCovered" : 3,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -35350,7 +35350,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 3,
+      "overloadsCovered" : 4,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -38476,7 +38476,7 @@
     {
       "family" : "Navigation",
       "notes" : "`text:` with `placement:`, `prompt:` and `isPresented:`; `tokens:` (with `token:`) and `suggestions:`.",
-      "overloadsCovered" : 27,
+      "overloadsCovered" : 35,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -47242,7 +47242,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 1,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -47258,7 +47258,7 @@
             "introduced" : "17.0",
             "labels" : [
               "initialValue",
-              "Value"
+              "content"
             ],
             "module" : "SwiftUICore",
             "signature" : "init(initialValue: Value, @KeyframesBuilder<Value> content: () -> some Keyframes<Value>)"
@@ -48417,10 +48417,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Colors only: `stops:` aren't placed.",
-      "overloadsCovered" : 3,
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
+      "overloadsCovered" : 6,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:AngularGradient",
@@ -48553,7 +48553,7 @@
     },
     {
       "family" : "Layout",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -48708,7 +48708,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 3,
+      "overloadsCovered" : 6,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -48899,7 +48899,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 18,
+      "overloadsCovered" : 19,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -49847,7 +49847,7 @@
     {
       "family" : "Drawing",
       "notes" : "Follows its container's corners, as SwiftUI's does.",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 9,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -51548,10 +51548,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Colors only: `stops:` aren't placed.",
-      "overloadsCovered" : 2,
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:EllipticalGradient",
@@ -51680,7 +51680,7 @@
     {
       "family" : "Layout",
       "notes" : "Over arrays, ranges and bindings (`ForEach($items) { $item in }`), by `id:` or `Identifiable`.",
-      "overloadsCovered" : 21,
+      "overloadsCovered" : 33,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -51905,7 +51905,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, @TabContentBuilder<V> content: @escaping (Data.Element) -> Content) where V == Content.TabValue"
@@ -51915,7 +51915,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, @TabContentBuilder<V?> content: @escaping (Data.Element) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -51925,7 +51925,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, @TabContentBuilder<V?> liftedContent content: @escaping (Data.Element) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -51935,7 +51935,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, @TableRowBuilder<V> content: @escaping (Data.Element) -> Content) where ID == Data.Element.ID, V == Content.TableRowValue, Data.Element : Identifiable"
@@ -51946,7 +51946,7 @@
             "labels" : [
               "_",
               "id",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, id: KeyPath<Data.Element, ID>, @TabContentBuilder<V> content: @escaping (Data.Element) -> Content) where V == Content.TabValue"
@@ -51957,7 +51957,7 @@
             "labels" : [
               "_",
               "id",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, id: KeyPath<Data.Element, ID>, @TabContentBuilder<V?> content: @escaping (Data.Element) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -51968,7 +51968,7 @@
             "labels" : [
               "_",
               "id",
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, id: KeyPath<Data.Element, ID>, @TabContentBuilder<V?> liftedContent content: @escaping (Data.Element) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -51979,7 +51979,7 @@
             "labels" : [
               "_",
               "id",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Data, id: KeyPath<Data.Element, ID>, @TableRowBuilder<V> content: @escaping (Data.Element) -> Content) where V == Content.TableRowValue"
@@ -51989,7 +51989,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Range<Int>, @TabContentBuilder<V> content: @escaping (Int) -> Content) where V == Content.TabValue"
@@ -51999,7 +51999,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Range<Int>, @TabContentBuilder<V?> content: @escaping (Int) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -52009,7 +52009,7 @@
             "introduced" : "18.0",
             "labels" : [
               "_",
-              "V"
+              "liftedContent"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Range<Int>, @TabContentBuilder<V?> liftedContent content: @escaping (Int) -> Content) where V : Hashable, Content.TabValue == V?"
@@ -52019,7 +52019,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ data: Range<Int>, @TableRowBuilder<V> content: @escaping (Int) -> Content) where Data == Range<Int>, ID == Int, V == Content.TableRowValue"
@@ -52270,7 +52270,7 @@
     },
     {
       "family" : "Layout",
-      "overloadsCovered" : 10,
+      "overloadsCovered" : 14,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -52386,7 +52386,7 @@
             "deprecated" : false,
             "introduced" : "16.0",
             "labels" : [
-              "R"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<R, C>(@TableColumnBuilder<R, C> content: () -> Content) where R == Content.TableRowValue, C == Content.TableColumnSortComparator"
@@ -52395,7 +52395,7 @@
             "deprecated" : false,
             "introduced" : "16.0",
             "labels" : [
-              "R"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<R>(@TableRowBuilder<R> content: () -> Content) where R == Content.TableRowValue"
@@ -52404,7 +52404,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(@TabContentBuilder<V> content: () -> Content) where V == Content.TabValue"
@@ -52413,7 +52413,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(@TabContentBuilder<V?> content: () -> Content) where V : Hashable, Content.TabValue == V?"
@@ -52789,7 +52789,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 0,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -52807,7 +52807,7 @@
               "initialValue",
               "repeating",
               "content",
-              "Value"
+              "keyframes"
             ],
             "module" : "SwiftUICore",
             "signature" : "init(initialValue: Value, repeating: Bool = true, @ContentBuilder content: @escaping (Value) -> Content, @KeyframesBuilder<Value> keyframes: @escaping (Value) -> KeyframePath)"
@@ -52819,7 +52819,7 @@
               "initialValue",
               "trigger",
               "content",
-              "Value"
+              "keyframes"
             ],
             "module" : "SwiftUICore",
             "signature" : "init(initialValue: Value, trigger: some Equatable, @ContentBuilder content: @escaping (Value) -> Content, @KeyframesBuilder<Value> keyframes: @escaping (Value) -> KeyframePath)"
@@ -53228,10 +53228,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Colors only: `stops:` aren't placed.",
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
       "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:LinearGradient",
@@ -55850,7 +55850,7 @@
     {
       "family" : "Lists",
       "notes" : "Over a tree: `OutlineGroup(items, children: \\.children) { item in … }`, with `id:` or `Identifiable` items.",
-      "overloadsCovered" : 8,
+      "overloadsCovered" : 12,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -55934,7 +55934,7 @@
             "labels" : [
               "_",
               "children",
-              "DataElement"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<DataElement>(_ data: Data, children: KeyPath<DataElement, Data?>, @TableRowBuilder<DataElement> content: @escaping (DataElement) -> Leaf) where ID == DataElement.ID, DataElement == Data.Element"
@@ -55958,7 +55958,7 @@
               "_",
               "id",
               "children",
-              "DataElement"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<DataElement>(_ data: Data, id: KeyPath<DataElement, ID>, children: KeyPath<DataElement, Data?>, @TableRowBuilder<DataElement> content: @escaping (DataElement) -> Leaf) where ID == DataElement.ID, DataElement == Data.Element"
@@ -55990,7 +55990,7 @@
             "labels" : [
               "_",
               "children",
-              "DataElement"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<DataElement>(_ root: DataElement, children: KeyPath<DataElement, Data?>, @TableRowBuilder<DataElement> content: @escaping (DataElement) -> Leaf) where ID == DataElement.ID, DataElement == Data.Element"
@@ -56014,7 +56014,7 @@
               "_",
               "id",
               "children",
-              "DataElement"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<DataElement>(_ root: DataElement, id: KeyPath<DataElement, ID>, children: KeyPath<DataElement, Data?>, @TableRowBuilder<DataElement> content: @escaping (DataElement) -> Leaf) where ID == DataElement.ID, DataElement == Data.Element"
@@ -56565,7 +56565,7 @@
     {
       "family" : "Controls",
       "notes" : "Rows are tagged with `.tag`, or by their `ForEach` id.",
-      "overloadsCovered" : 8,
+      "overloadsCovered" : 15,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -57422,10 +57422,10 @@
     },
     {
       "family" : "Drawing",
-      "notes" : "Colors only: `stops:` aren't placed.",
-      "overloadsCovered" : 2,
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
+      "overloadsCovered" : 3,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:RadialGradient",
@@ -57761,7 +57761,7 @@
     },
     {
       "family" : "Lists",
-      "overloadsCovered" : 13,
+      "overloadsCovered" : 20,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -57973,7 +57973,7 @@
             "deprecated" : false,
             "introduced" : "16.0",
             "labels" : [
-              "V",
+              "content",
               "header"
             ],
             "module" : "SwiftUI",
@@ -57984,7 +57984,7 @@
             "introduced" : "17.0",
             "labels" : [
               "isExpanded",
-              "V",
+              "content",
               "header"
             ],
             "module" : "SwiftUI",
@@ -57995,7 +57995,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V, S>(_ title: S, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue, S : StringProtocol"
@@ -58006,7 +58006,7 @@
             "labels" : [
               "_",
               "isExpanded",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V, S>(_ title: S, isExpanded: Binding<Bool>, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue, S : StringProtocol"
@@ -58015,7 +58015,7 @@
             "deprecated" : false,
             "introduced" : "16.0",
             "labels" : [
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(@TableRowBuilder<V> content: () -> Content) where Parent == EmptyTableRowContent<V>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue"
@@ -58025,7 +58025,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleKey: LocalizedStringKey, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue"
@@ -58036,7 +58036,7 @@
             "labels" : [
               "_",
               "isExpanded",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleKey: LocalizedStringKey, isExpanded: Binding<Bool>, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue"
@@ -58046,7 +58046,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleResource: LocalizedStringResource, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue"
@@ -58057,7 +58057,7 @@
             "labels" : [
               "_",
               "isExpanded",
-              "V"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<V>(_ titleResource: LocalizedStringResource, isExpanded: Binding<Bool>, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue"
@@ -58698,7 +58698,7 @@
     {
       "family" : "Controls",
       "notes" : "Labels, `step:`, `neutralValue:`, `enabledBounds:`, and tick marks (`ticks: { SliderTick(0.5) }`, iOS 26).",
-      "overloadsCovered" : 5,
+      "overloadsCovered" : 6,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -58747,7 +58747,7 @@
               "currentValueLabel",
               "minimumValueLabel",
               "maximumValueLabel",
-              "V",
+              "ticks",
               "onEditingChanged"
             ],
             "module" : "SwiftUI",
@@ -58980,7 +58980,7 @@
     },
     {
       "family" : "Controls",
-      "overloadsCovered" : 7,
+      "overloadsCovered" : 10,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -59906,7 +59906,7 @@
     {
       "family" : "Navigation",
       "notes" : "`Tab`s (with `value:`, `role: .search`) and `TabSection`s, or views with `.tabItem`; `selection:` is the tab's value.",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -59940,7 +59940,7 @@
             "deprecated" : false,
             "introduced" : "18.0",
             "labels" : [
-              "Never"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<C>(@TabContentBuilder<Never> content: () -> C) where SelectionValue == Never, Content == TabContentBuilder<Never>.Content<C>, C : TabContent"
@@ -59950,7 +59950,7 @@
             "introduced" : "18.0",
             "labels" : [
               "selection",
-              "SelectionValue"
+              "content"
             ],
             "module" : "SwiftUI",
             "signature" : "init<C>(selection: Binding<SelectionValue>, @TabContentBuilder<SelectionValue> content: () -> C) where Content == TabContentBuilder<SelectionValue>.Content<C>, C : TabContent"
@@ -59974,8 +59974,8 @@
             "deprecated" : false,
             "introduced" : "16.0",
             "labels" : [
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(@TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -59985,8 +59985,8 @@
             "introduced" : "16.0",
             "labels" : [
               "of",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -59997,8 +59997,8 @@
             "labels" : [
               "of",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60009,8 +60009,8 @@
             "labels" : [
               "of",
               "selection",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, selection: Binding<Set<Value.ID>>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60022,8 +60022,8 @@
               "of",
               "selection",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, selection: Binding<Set<Value.ID>>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60034,8 +60034,8 @@
             "labels" : [
               "of",
               "selection",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, selection: Binding<Value.ID?>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60047,8 +60047,8 @@
               "of",
               "selection",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(of valueType: Value.Type, selection: Binding<Value.ID?>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60058,8 +60058,8 @@
             "introduced" : "16.0",
             "labels" : [
               "selection",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(selection: Binding<Set<Value.ID>>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60069,8 +60069,8 @@
             "introduced" : "16.0",
             "labels" : [
               "selection",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init(selection: Binding<Value.ID?>, @TableColumnBuilder<Value, Never> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows)"
@@ -60084,7 +60084,7 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, children: KeyPath<Data.Element, Data?>, selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60098,7 +60098,7 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, children: KeyPath<Data.Element, Data?>, selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60111,7 +60111,7 @@
               "children",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, children: KeyPath<Data.Element, Data?>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60123,7 +60123,7 @@
               "_",
               "selection",
               "sortOrder",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60136,7 +60136,7 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60148,7 +60148,7 @@
               "_",
               "selection",
               "sortOrder",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60161,7 +60161,7 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60172,7 +60172,7 @@
             "labels" : [
               "_",
               "sortOrder",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60184,7 +60184,7 @@
               "_",
               "sortOrder",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data, Sort>(_ data: Data, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Sort : SortComparator, Columns.TableRowValue == Data.Element, Data.Element == Sort.Compared"
@@ -60194,7 +60194,7 @@
             "introduced" : "16.0",
             "labels" : [
               "_",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60207,7 +60207,7 @@
               "children",
               "selection",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, children: KeyPath<Data.Element, Data?>, selection: Binding<Set<Value.ID>>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60220,7 +60220,7 @@
               "children",
               "selection",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, children: KeyPath<Data.Element, Data?>, selection: Binding<Value.ID?>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60232,7 +60232,7 @@
               "_",
               "children",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, children: KeyPath<Value, Data?>, columnCustomization: Binding<TableColumnCustomization<Value>>? = nil, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableOutlineGroupContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60243,7 +60243,7 @@
             "labels" : [
               "_",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60254,7 +60254,7 @@
             "labels" : [
               "_",
               "selection",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, selection: Binding<Set<Value.ID>>, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60266,7 +60266,7 @@
               "_",
               "selection",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, selection: Binding<Set<Value.ID>>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60277,7 +60277,7 @@
             "labels" : [
               "_",
               "selection",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, selection: Binding<Value.ID?>, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60289,7 +60289,7 @@
               "_",
               "selection",
               "columnCustomization",
-              "Value"
+              "columns"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Data>(_ data: Data, selection: Binding<Value.ID?>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Never> columns: () -> Columns) where Rows == TableForEachContent<Data>, Data : RandomAccessCollection, Columns.TableRowValue == Data.Element"
@@ -60302,8 +60302,8 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type = Value.self, selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60316,8 +60316,8 @@
               "selection",
               "sortOrder",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type = Value.self, selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60329,8 +60329,8 @@
               "of",
               "sortOrder",
               "columnCustomization",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type = Value.self, sortOrder: Binding<[Sort]>, columnCustomization: Binding<TableColumnCustomization<Value>>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60342,8 +60342,8 @@
               "of",
               "selection",
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type, selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60355,8 +60355,8 @@
               "of",
               "selection",
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type, selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60367,8 +60367,8 @@
             "labels" : [
               "of",
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(of valueType: Value.Type, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60379,8 +60379,8 @@
             "labels" : [
               "selection",
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(selection: Binding<Set<Value.ID>>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60391,8 +60391,8 @@
             "labels" : [
               "selection",
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(selection: Binding<Value.ID?>, sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60402,8 +60402,8 @@
             "introduced" : "16.0",
             "labels" : [
               "sortOrder",
-              "Value",
-              "Value"
+              "columns",
+              "rows"
             ],
             "module" : "SwiftUI",
             "signature" : "init<Sort>(sortOrder: Binding<[Sort]>, @TableColumnBuilder<Value, Sort> columns: () -> Columns, @TableRowBuilder<Value> rows: () -> Rows) where Sort : SortComparator, Columns.TableRowValue == Sort.Compared"
@@ -60415,7 +60415,7 @@
     {
       "family" : "Text",
       "notes" : "Strings, `verbatim:`, `format:`, and dates with `style:`. A literal's numbers are formatted as SwiftUI does.",
-      "overloadsCovered" : 13,
+      "overloadsCovered" : 16,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -60635,7 +60635,7 @@
     {
       "family" : "Controls",
       "notes" : "`text:`, or `value:format:` with `.number`, `.currency(code:)` or `.percent`; `axis: .vertical` grows.",
-      "overloadsCovered" : 23,
+      "overloadsCovered" : 24,
       "round" : 1,
       "status" : "partial",
       "symbol" : {
@@ -61606,7 +61606,7 @@
     },
     {
       "family" : "Drawing",
-      "overloadsCovered" : 1,
+      "overloadsCovered" : 2,
       "round" : 1,
       "status" : "supported",
       "symbol" : {
@@ -65552,6 +65552,7 @@
     "type:FloatingPoint",
     "type:FormatStyle",
     "type:Future",
+    "type:Gradient.Stop",
     "type:GridLayout",
     "type:HStackLayout",
     "type:HTTPURLResponse",
@@ -65642,6 +65643,7 @@
     "type:Publisher",
     "type:Publishers.Sequence",
     "type:Range",
+    "type:RectangleCornerRadii",
     "type:Reference",
     "type:RefreshAction",
     "type:Regex",
@@ -66096,7 +66098,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 3733
+    "symbols" : 3735
   },
   "schemaVersion" : 1,
   "sdk" : {

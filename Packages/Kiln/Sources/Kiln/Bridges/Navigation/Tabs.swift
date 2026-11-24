@@ -188,7 +188,9 @@ extension NavigationBridges {
         }
         r.view("TabSection", .navigation, introduced: "18.0", notes: "Groups tabs in the iPad sidebar; on iPhone its tabs are in the tab bar.") { v in
             v.manifestKind = "content"
-            v.forms(["_:title content:content", "content:content", "content:content header:content"]) { c in c.r.renderContent(c["content"] ?? c.a.firstFunction) }
+            // `liftedContent:` is iOS 18's name for content whose tabs keep their own selection values.
+            v.forms(["_:title content:content", "content:content", "content:content header:content",
+                     "_:title liftedContent:content", "liftedContent:content", "liftedContent:content header:content"]) { c in c.r.renderContent(c["content"] ?? c.a.firstFunction) }
         }
         r.view("AnyTabContent", .navigation, introduced: "18.0") { v in
             v.manifestKind = "content"

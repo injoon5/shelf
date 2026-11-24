@@ -24,12 +24,27 @@ extension NavigationBridges {
         r.modifier("alert", .navigation, support: .partial, notes: "Buttons and a message; or the old `Alert(title:message:dismissButton:)`, shown with one OK button.") { m in
             m.forms(["_:title isPresented:binding actions:content", "_:title isPresented:binding actions:content message:content",
                      "_:title isPresented:binding presenting:any? actions:content message:content?",
-                     "isPresented:binding content:closure", "item:binding content:closure"]) { c, view in alert(c, view) }
+                     "isPresented:binding content:closure", "item:binding content:closure",
+                     // Shown while `item` isn't nil, which the closures are given (iOS 15, from the iOS 27 SDK);
+                     // or for an error (iOS 27), titled with its description.
+                     "_:title item:binding actions:content message:content?", "error:binding actions:content message:content?",
+                     "isPresented:binding error:any actions:content message:content?"]) { c, view in alert(c, view) }
         }
         r.modifier("confirmationDialog", .navigation, support: .partial) { m in
             m.forms(["_:title isPresented:binding titleVisibility:any? actions:content", "_:title isPresented:binding titleVisibility:any? actions:content message:content",
-                     "_:title isPresented:binding titleVisibility:any? presenting:any? actions:content message:content?"]) { c, view in
-                if let b = c.kbinding("isPresented") {
+                     "_:title isPresented:binding titleVisibility:any? presenting:any? actions:content message:content?",
+                     "_:title item:binding titleVisibility:any? actions:content message:content?"]) { c, view in
+                if let b = c.kbinding("item") {
+                    let item = b.get(), r = c.r
+                    let shown = Binding<Bool>(get: { !b.get().isNil }, set: { if !$0 { b.set(.nilValue) } })
+                    let actions = r.renderContent(c["actions"], [item])
+                    let title = c.string(0) ?? ""
+                    if let message = c["message"].map({ r.renderContent($0, [item]) }) {
+                        AnyView(view.confirmationDialog(title, isPresented: shown, titleVisibility: .visible) { actions } message: { message })
+                    } else {
+                        AnyView(view.confirmationDialog(title, isPresented: shown, titleVisibility: .visible) { actions })
+                    }
+                } else if let b = c.kbinding("isPresented") {
                     let actions = c.r.renderContent(c["actions"] ?? c.a.unlabeledFunction(0))
                     let title = c.string(0) ?? ""
                     if let message = c["message"].map({ c.r.renderContent($0) }) {
@@ -54,6 +69,14 @@ extension NavigationBridges {
                 view.contextMenu { content }
             }
             m.form("menuItems:content", receiver: "TabContent") { _, view in view }
+            // In a `List(selection:)`: the menu for the rows a long press picks, given their ids.
+            m.form("forSelectionType:any menu:content primaryAction:closure?") { c, view in
+                let r = c.r, interp = c.interp
+                let menu = c["menu"], primary = c["primaryAction"]
+                AnyView(view.contextMenu(forSelectionType: KV.self) { ids in r.renderContent(menu, [.set(ids)]) } primaryAction: { ids in
+                    if case .function(let f)? = primary { interp.perform(f, [.set(ids)]) }
+                })
+            }
         }
     }
 
@@ -116,6 +139,33 @@ extension NavigationBridges {
 
     @MainActor static func alert(_ c: KCall, _ view: AnyView) -> AnyView {
         let interp = c.interp, r = c.r
+        // `.alert(error: $error) { … }` or `.alert(isPresented:error:)`: titled with the error's description.
+        if c["error"] != nil {
+            let error: () -> KV = { c.kbinding("error")?.get() ?? c["error"] ?? .nilValue }
+            let shown: Binding<Bool>
+            if let pb = c.kbinding("isPresented") { shown = r.boolBinding(pb) }
+            else if let eb = c.kbinding("error") { shown = Binding(get: { !eb.get().isNil }, set: { if !$0 { eb.set(.nilValue) } }) }
+            else { return view }
+            let e = error()
+            let title = e.isNil ? "" : ((try? interp.member(e, "localizedDescription", line: c.line)).flatMap { r.string($0) } ?? interp.describe(e))
+            let args: [KV] = e.isNil ? [] : [e]
+            let actions = r.renderContent(c["actions"], args)
+            if let message = c["message"].map({ r.renderContent($0, args) }) {
+                return AnyView(view.alert(title, isPresented: shown) { actions } message: { message })
+            }
+            return AnyView(view.alert(title, isPresented: shown) { actions })
+        }
+        // `.alert("Delete?", item: $selected) { item in … } message: { item in … }`.
+        if c.has("actions"), let ib = c.kbinding("item") {
+            let item = ib.get()
+            let shown = Binding<Bool>(get: { !ib.get().isNil }, set: { if !$0 { ib.set(.nilValue) } })
+            let title = r.string(c.first) ?? ""
+            let actions = r.renderContent(c["actions"], [item])
+            if let message = c["message"].map({ r.renderContent($0, [item]) }) {
+                return AnyView(view.alert(title, isPresented: shown) { actions } message: { message })
+            }
+            return AnyView(view.alert(title, isPresented: shown) { actions })
+        }
         guard let b = c.kbinding("isPresented") ?? c.kbinding("item") else { return view }
         let shown = Binding<Bool>(get: { let v = b.get(); return v.isNil ? false : interp.truthy(v) },
                                   set: { if !$0 { b.set(b.get().asBool != nil ? .bool(false) : .nilValue) } })

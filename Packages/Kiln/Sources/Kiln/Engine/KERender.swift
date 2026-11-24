@@ -132,25 +132,36 @@ struct KRenderer {
     func gradient(_ v: KView) -> AnyShapeStyle? {
         guard case .primitive(let name, let args, let labels, _) = v.kind else { return nil }
         let a = KArgs(args: args, labels: labels)
-        let colors = (a["colors"]?.asArray ?? gradientColors(a["gradient"]) ?? []).compactMap { color($0) }
-        let stops = colors.isEmpty ? [Color.blue, .purple] : colors
+        let g = gradient(a)
+        let center = unitPoint(a["center"]) ?? .center
         switch name {
         case "LinearGradient":
-            return AnyShapeStyle(LinearGradient(colors: stops, startPoint: unitPoint(a["startPoint"]) ?? .top, endPoint: unitPoint(a["endPoint"]) ?? .bottom))
+            return AnyShapeStyle(LinearGradient(gradient: g, startPoint: unitPoint(a["startPoint"]) ?? .top, endPoint: unitPoint(a["endPoint"]) ?? .bottom))
         case "RadialGradient":
-            return AnyShapeStyle(RadialGradient(colors: stops, center: unitPoint(a["center"]) ?? .center,
-                                                startRadius: a["startRadius"]?.asDouble ?? 0, endRadius: a["endRadius"]?.asDouble ?? 200))
+            return AnyShapeStyle(RadialGradient(gradient: g, center: center, startRadius: a["startRadius"]?.asDouble ?? 0, endRadius: a["endRadius"]?.asDouble ?? 200))
         case "AngularGradient":
-            return AnyShapeStyle(AngularGradient(colors: stops, center: unitPoint(a["center"]) ?? .center))
+            if let turn = a["angle"] { return AnyShapeStyle(AngularGradient(gradient: g, center: center, angle: angle(turn))) }
+            return AnyShapeStyle(AngularGradient(gradient: g, center: center, startAngle: a["startAngle"].map { angle($0) } ?? .zero,
+                                                 endAngle: a["endAngle"].map { angle($0) } ?? .degrees(360)))
         case "EllipticalGradient":
-            return AnyShapeStyle(EllipticalGradient(colors: stops))
+            return AnyShapeStyle(EllipticalGradient(gradient: g, center: center, startRadiusFraction: a["startRadiusFraction"]?.asDouble ?? 0,
+                                                    endRadiusFraction: a["endRadiusFraction"]?.asDouble ?? 0.5))
         default: return nil
         }
     }
 
-    func gradientColors(_ v: KV?) -> [KV]? {
-        if case .native(.implicit(_, let args))? = v { return args.first?.asArray }
-        return nil
+    /// A gradient view's colors: `colors:`, `stops:` placed where they say, or a `gradient:`.
+    func gradient(_ a: KArgs) -> Gradient {
+        if let stops = a["stops"]?.asArray { return Gradient(stops: stops.compactMap { gradientStop($0) }) }
+        if let g = a["gradient"] { return KCanvas.gradient(g, self) }
+        let colors = (a["colors"]?.asArray ?? []).compactMap { color($0) }
+        return Gradient(colors: colors.isEmpty ? [.blue, .purple] : colors)
+    }
+
+    /// `Gradient.Stop(color: .red, location: 0.2)`.
+    func gradientStop(_ v: KV) -> Gradient.Stop? {
+        guard case .native(.implicit("stop", let a)) = v, let c = color(a.first) else { return nil }
+        return Gradient.Stop(color: c, location: a.count > 1 ? a[1].asDouble ?? 0 : 0)
     }
 
     func unitPoint(_ v: KV?) -> SwiftUI.UnitPoint? {
@@ -298,6 +309,12 @@ struct KRenderer {
         if let t = attributedText(a) { return t }
         guard let first = a.first else { return Text("") }
         if let style = a["format"] { return Text(verbatim: KFormatting.formatted(first, style, interp)) }
+        // `Text(date, formatter: dateFormatter)`: a `DateFormatter` or `NumberFormatter`.
+        if case .native(.object(_, let ref))? = a["formatter"] {
+            if let f = ref.value as? DateFormatter, let d = KDates.date(first) { return Text(verbatim: f.string(from: d)) }
+            if let f = ref.value as? NumberFormatter, let n = first.asDouble { return Text(verbatim: f.string(from: NSNumber(value: n)) ?? "") }
+            if let f = ref.value as? Formatter { return Text(verbatim: f.string(for: first.asDouble ?? 0) ?? "") }
+        }
         if case .native(.date(let d)) = first, case .native(.implicit(let s, _))? = a["style"] {
             switch s {
             case "time": return Text(d, style: .time)

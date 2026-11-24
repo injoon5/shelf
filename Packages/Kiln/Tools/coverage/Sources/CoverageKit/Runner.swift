@@ -15,6 +15,8 @@ public struct Options: Sendable {
     public init(kilnRoot: URL) { self.kilnRoot = kilnRoot }
 
     var toolDir: URL { kilnRoot.appendingPathComponent("Tools/coverage") }
+    /// The SDK's calls, for Kiln's call-forms audit (CallForms.swift).
+    public var callForms: URL { kilnRoot.appendingPathComponent("Tests/SDKCalls/sdk-calls.json") }
     /// Where §1.4's registry writes its export.
     public var registryManifest: URL { kilnRoot.appendingPathComponent("kiln-manifest.json") }
 }
@@ -106,6 +108,8 @@ public enum Runner {
         if !o.dryRun {
             try Data((md + "\n").utf8).write(to: o.kilnRoot.appendingPathComponent("COVERAGE.md"))
             try json.write(to: o.kilnRoot.appendingPathComponent("coverage.json"))
+            try FileManager.default.createDirectory(at: o.callForms.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try CallForms.json(CallForms.forms(catalog), sdk: "iOS \(sdkVersion)").write(to: o.callForms)
         }
         return Output(result: result, markdown: md, json: json, manifestPath: manifestPath)
     }

@@ -210,7 +210,9 @@ final class AccessibilityBridges: KBridgeFamily {
             m.form("_:bool?") { c, view in view.accessibilityIgnoresInvertColors(c.bool(0, default: true)) }
         }
         r.modifier("accessibilityRespondsToUserInteraction", .accessibility) { m in
-            m.form("_:bool?") { c, view in view.accessibilityRespondsToUserInteraction(c.bool(0, default: true)) }
+            m.form("_:bool? isEnabled:bool?") { c, view in
+                if c.bool("isEnabled", default: true) { AnyView(view.accessibilityRespondsToUserInteraction(c.bool(0, default: true))) } else { view }
+            }
         }
         r.modifier("accessibilityShowsLargeContentViewer", .accessibility) { m in
             m.form("") { _, view in view.accessibilityShowsLargeContentViewer() }
@@ -220,18 +222,20 @@ final class AccessibilityBridges: KBridgeFamily {
             }
         }
         r.modifier("accessibilityActivationPoint", .accessibility) { m in
-            m.form("_:any") { c, view in
-                if case .native(.point(let x, let y))? = c[0] { AnyView(view.accessibilityActivationPoint(CGPoint(x: x, y: y))) }
+            m.form("_:any isEnabled:bool?") { c, view in
+                if !c.bool("isEnabled", default: true) { view }
+                else if case .native(.point(let x, let y))? = c[0] { AnyView(view.accessibilityActivationPoint(CGPoint(x: x, y: y))) }
                 else { AnyView(view.accessibilityActivationPoint(c.r.unitPoint(c[0]) ?? .center)) }
             }
         }
         for name in ["accessibilityDragPoint", "accessibilityDropPoint"] {
             r.modifier(name, .accessibility) { m in
-                m.form("_:any description:any") { c, view in
+                m.form("_:any description:any isEnabled:bool?") { c, view in
+                    if !c.bool("isEnabled", default: true) { return view }
                     let point = c.r.unitPoint(c[0]) ?? .center
                     let text = Text(c.string("description") ?? "")
-                    if name == "accessibilityDragPoint" { AnyView(view.accessibilityDragPoint(point, description: text)) }
-                    else { AnyView(view.accessibilityDropPoint(point, description: text)) }
+                    if name == "accessibilityDragPoint" { return AnyView(view.accessibilityDragPoint(point, description: text)) }
+                    return AnyView(view.accessibilityDropPoint(point, description: text))
                 }
             }
         }
@@ -364,8 +368,9 @@ final class AccessibilityBridges: KBridgeFamily {
         }
         r.view("AccessibilityRotorEntry", .accessibility) { v in
             v.manifestKind = "content"
+            // A `String` title's form has the id unlabeled: `AccessibilityRotorEntry(title, id, in: namespace)`.
             v.forms(["_:any id:any in:any? textRange:any? prepare:closure?", "_:any id:any in:any? prepare:closure?",
-                     "_:any textRange:any prepare:closure?"]) { _ in EmptyView() }
+                     "_:any _:any in:any textRange:any? prepare:closure?", "_:any? textRange:any prepare:closure?"]) { _ in EmptyView() }
         }
         r.modifier("accessibilityRotor", .accessibility, notes: "Entries with `id:` find views with the same `.id`, or `.accessibilityRotorEntry(id:in:)`.") { m in
             m.form("_:any entries:content") { c, view in rotor(c, view) }
@@ -401,7 +406,7 @@ final class AccessibilityBridges: KBridgeFamily {
                 guard case .primitive("AccessibilityRotorEntry", let args, let labels, _) = row.kind else { continue }
                 let a = KArgs(args: args, labels: labels)
                 let label: Text = { if case .view(let tv)? = a.first, let t = c.r.text(tv) { return t }; return Text(c.r.string(a.first) ?? "") }()
-                entries.append(RotorEntry(id: entries.count, label: label, target: a["id"] ?? .nilValue, namespace: c.interp.namespace(a["in"])))
+                entries.append(RotorEntry(id: entries.count, label: label, target: a["id"] ?? (labels.count > 1 && labels[1] == nil ? args[1] : .nilValue), namespace: c.interp.namespace(a["in"])))
             }
         }
         let system: [String: AccessibilitySystemRotor] = ["headings": .headings, "links": .links, "boldText": .boldText, "italicText": .italicText,
