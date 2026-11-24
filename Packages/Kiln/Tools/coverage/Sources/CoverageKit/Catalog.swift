@@ -38,6 +38,21 @@ public struct SymbolOverload: Codable, Equatable, Sendable {
     public var introduced: String?
     public var deprecated: Bool
     public var signature: String
+    /// The parameters as a call sees them (CallForms.swift); not in coverage.json.
+    public var call: [CallParam] = []
+
+    enum CodingKeys: String, CodingKey { case labels, receiver, module, introduced, deprecated, signature }
+
+    public init(labels: [String], receiver: String?, module: String, introduced: String?, deprecated: Bool, signature: String,
+                call: [CallParam] = []) {
+        self.labels = labels
+        self.receiver = receiver
+        self.module = module
+        self.introduced = introduced
+        self.deprecated = deprecated
+        self.signature = signature
+        self.call = call
+    }
 }
 
 public struct SDKSymbol: Codable, Equatable, Sendable {
@@ -216,7 +231,8 @@ public struct Catalog: Sendable {
             var sig = m.decl.signature
             if !m.whereClause.isEmpty && !sig.contains(" where ") { sig += "  /* extension where \(m.whereClause) */" }
             return SymbolOverload(labels: m.decl.labels, receiver: receiver, module: m.module,
-                                  introduced: a.introduced?.description, deprecated: a.isDeprecated, signature: sig)
+                                  introduced: a.introduced?.description, deprecated: a.isDeprecated, signature: sig,
+                                  call: m.decl.params.map(CallParam.init))
         }
 
         func isPublicName(_ n: String) -> Bool { !n.isEmpty && !n.hasPrefix("_") && (n.first!.isLetter) }

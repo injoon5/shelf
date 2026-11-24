@@ -452,19 +452,18 @@ final class KOverload {
             while j < params.count {
                 let param = params[j]
                 // A trailing closure (unlabeled) binds a labeled closure parameter;
-                // one with a default is passed over when a later closure parameter
-                // needs an argument (Swift's forward scan, SE-0286).
-                // The skip only happens when the arguments still to come can't
-                // fill that later parameter: `ShareLink(items:) { preview } label: { … }`
-                // gives `preview:` the unlabeled closure because `label:` follows.
-                let laterNeedsIt = params[(j + 1)...].contains { later in
-                    later.kind.isClosure && !later.optional
-                        && !labels[(i + 1)...].contains(later.label)
-                        && !labels.indices.dropFirst(i + 1).contains { labels[$0] == nil && syntaxOf($0) == .closureLiteral }
-                }
-                let trailing = label == nil && syntax == .closureLiteral && param.kind.isClosure && param.label != nil
-                    && !(param.optional && laterNeedsIt)
-                let labelMatches = param.label == label || trailing
+                // one with a default is passed over when a later parameter needs
+                // an argument the next one won't give it (Swift's forward scan,
+                // SE-0286): `ShareLink(items:) { preview } label: { … }` gives
+                // `preview:` the closure, `.sheet(isPresented:) { … }` `content:`.
+                let trailing = label == nil && syntax == .closureLiteral && param.kind.isClosure
+                // A closure passes over an unlabeled parameter with a default that
+                // isn't one when a later one is: `.accessibilityAction { … }`'s
+                // closure is the handler, not `_ actionKind:`.
+                let notForClosures = label == nil && syntax == .closureLiteral && param.label == nil && param.optional
+                    && !param.kind.isClosure && params[(j + 1)...].contains { $0.kind.isClosure }
+                let labelMatches = (param.label == label || trailing) && !notForClosures
+                    && !(trailing && param.optional && laterNeedsOne(after: j, nextArgument: i + 1, labels, syntaxOf))
                 if labelMatches && param.kind.accepts(syntax) { found = j; break }
                 // Only a parameter with a default can be skipped.
                 if !param.optional { return nil }
@@ -480,6 +479,31 @@ final class KOverload {
         return out
     }
 
+    /// Whether a parameter after `j` needs an argument, looking as far as the
+    /// one the next argument is for: a labeled trailing closure's, or (Kiln
+    /// takes closures in parentheses as trailing ones) another closure's.
+    private func laterNeedsOne(after j: Int, nextArgument n: Int, _ labels: [String?], _ syntaxOf: (Int) -> KArgSyntax) -> Bool {
+        let hasNext = n < labels.count
+        let nextLabel = hasNext ? labels[n] : nil
+        let nextIsClosure = hasNext && nextLabel == nil && syntaxOf(n) == .closureLiteral
+        for later in params[(j + 1)...] {
+            if hasNext {
+                if let l = nextLabel, later.label == l { return false }
+                if nextLabel == nil && (later.label == nil || (nextIsClosure && later.kind.isClosure)) { return false }
+            }
+            if !later.optional { return true }
+        }
+        return false
+    }
+
+    /// Whether each closure literal in the call binds a closure parameter.
+    /// `pick` prefers an overload where they do: `.chartXAxisLabel { Text("Day") }`
+    /// is `content:`'s, though `_:any` (a title) takes a closure too.
+    func closuresFit(_ binding: [Int], _ syntaxOf: (Int) -> KArgSyntax) -> Bool {
+        if lenient { return true }
+        for (i, p) in binding.enumerated() where !params[p].kind.isClosure && syntaxOf(i) == .closureLiteral { return false }
+        return true
+    }
 }
 
 /// An overload picked for a call, kept on the view or modifier it made so the

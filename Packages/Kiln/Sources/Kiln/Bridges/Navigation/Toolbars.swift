@@ -176,7 +176,8 @@ extension NavigationBridges {
     static func toolbarItems(_ r: KRegistry) {
         r.view("ToolbarItem", .navigation, notes: "In `.toolbar { }`, by placement.") { v in
             v.manifestKind = "content"
-            v.forms(["placement:ToolbarItemPlacement? content:content", "id:string placement:ToolbarItemPlacement? content:content"]) { c in c.r.renderContent(c.a.lastFunction) }
+            // `showsByDefault:` is for a toolbar people customize, which a Kiln app's isn't.
+            v.forms(["placement:ToolbarItemPlacement? content:content", "id:string placement:ToolbarItemPlacement? showsByDefault:bool? content:content"]) { c in c.r.renderContent(c.a.lastFunction) }
         }
         r.view("ToolbarItemGroup", .navigation, notes: "In `.toolbar { }`: several items at one placement.") { v in
             v.manifestKind = "content"

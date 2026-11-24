@@ -35,6 +35,9 @@ final class KTextBridges: KBridgeFamily {
     static func text(_ r: KRegistry) {
         r.view("Text", .text, support: .partial, notes: "Strings, `verbatim:`, `format:`, and dates with `style:`. A literal's numbers are formatted as SwiftUI does.") { v in
             v.form("_:title") { c in c.r.textOf(c.a) }
+            // A string table's key: Kiln apps have no tables, so the key is the text.
+            v.form("_:title tableName:string? bundle:any? comment:any?") { c in c.r.textOf(c.a) }
+            v.form("_:any formatter:any") { c in c.r.textOf(c.a) }
             v.form("verbatim:string") { c in c.r.textOf(c.a) }
             v.form("_:any format:any") { c in c.r.textOf(c.a) }
             v.form("_:any style:Text.DateStyle") { c in c.r.textOf(c.a) }

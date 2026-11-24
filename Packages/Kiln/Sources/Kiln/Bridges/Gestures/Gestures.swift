@@ -41,13 +41,15 @@ final class GesturesBridges: KBridgeFamily {
     // MARK: Gesture kinds
 
     static func gestures(_ r: KRegistry) {
+        // `inputKinds:` (iOS 27) picks the input devices that start one; on an
+        // iPhone that's touch, so it's taken and the gesture is the same.
         let kinds: [(String, [String], String?)] = [
-            ("TapGesture", ["count:number?"], nil),
-            ("SpatialTapGesture", ["count:number? coordinateSpace:any?"], "Its value has `location`."),
-            ("LongPressGesture", ["minimumDuration:number? maximumDistance:number?"], nil),
-            ("DragGesture", ["minimumDistance:number? coordinateSpace:any?"], nil),
-            ("MagnifyGesture", ["minimumScaleDelta:number?"], nil),
-            ("RotateGesture", ["minimumAngleDelta:Angle?"], nil),
+            ("TapGesture", ["count:number? inputKinds:any?"], nil),
+            ("SpatialTapGesture", ["count:number? coordinateSpace:any? inputKinds:any?"], "Its value has `location`."),
+            ("LongPressGesture", ["minimumDuration:number? maximumDistance:number? inputKinds:any?"], nil),
+            ("DragGesture", ["minimumDistance:number? coordinateSpace:any? inputKinds:any?"], nil),
+            ("MagnifyGesture", ["minimumScaleDelta:number? inputKinds:any?"], nil),
+            ("RotateGesture", ["minimumAngleDelta:Angle? inputKinds:any?"], nil),
             ("MagnificationGesture", ["minimumScaleDelta:number?"], nil),
             ("RotationGesture", ["minimumAngleDelta:Angle?"], nil),
             ("SpatialEventGesture", ["coordinateSpace:any?"], "Each touch in `events`: `id`, `location`, `phase` and `kind`."),
@@ -229,7 +231,7 @@ final class GesturesBridges: KBridgeFamily {
 
     static func conveniences(_ r: KRegistry) {
         r.modifier("onTapGesture", .gestures, notes: "With a `CGPoint` parameter, the tap's location.") { m in
-            m.forms(["count:number? perform:action", "count:number? coordinateSpace:any? perform:action"]) { c, view in
+            m.forms(["count:number? perform:action", "count:number? coordinateSpace:any? inputKinds:any? perform:action"]) { c, view in
                 tap(c, view)
             }
             m.probe { _, a, interp in
@@ -239,7 +241,7 @@ final class GesturesBridges: KBridgeFamily {
             }
         }
         r.modifier("onLongPressGesture", .gestures) { m in
-            m.forms(["minimumDuration:number? maximumDistance:number? perform:action onPressingChanged:closure?",
+            m.forms(["minimumDuration:number? maximumDistance:number? inputKinds:any? perform:action onPressingChanged:closure?",
                      "minimumDuration:number? maximumDistance:number? pressing:closure? perform:action",
                      "minimumDuration:number? perform:action onPressingChanged:closure?"]) { c, view in
                 let interp = c.interp

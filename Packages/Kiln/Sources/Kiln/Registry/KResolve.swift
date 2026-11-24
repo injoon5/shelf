@@ -11,15 +11,19 @@ import SwiftUI
 
 extension KInterpreter {
 
-    /// Picks one of `overloads` for these arguments. Throws when none takes
-    /// them, naming the ones there are.
+    /// Picks one of `overloads` for these arguments: the first that takes
+    /// them with each closure on a closure parameter, else the first that
+    /// takes them. Throws when none does, naming the ones there are.
     func pick(_ overloads: [KOverload], _ name: String, labels: [String?], syntax: [KArgSyntax], line: Int) throws -> (Int, [Int]) {
         var unavailable: KOverload?
+        var loose: (Int, [Int])?
         for (i, o) in overloads.enumerated() {
             guard let binding = o.bind(labels, syntax) else { continue }
             if let a = o.availability, !a.isAvailable { unavailable = unavailable ?? o; continue }
-            return (i, binding)
+            if o.closuresFit(binding, { syntax[$0] }) { return (i, binding) }
+            if loose == nil { loose = (i, binding) }
         }
+        if let loose { return loose }
         if let u = unavailable {
             throw fail("\(u.display(name)) needs iOS \(u.availability?.iOSString ?? "later")", line)
         }

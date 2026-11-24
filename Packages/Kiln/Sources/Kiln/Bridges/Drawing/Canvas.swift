@@ -228,6 +228,7 @@ enum KCanvas {
     static func gradient(_ v: KV?, _ r: KRenderer) -> Gradient {
         if let g = v?.boxed(Gradient.self) { return g }
         if case .native(.implicit("gradient", let a))? = v, let colors = a.first?.asArray { return Gradient(colors: colors.compactMap { r.color($0) }) }
+        if case .native(.implicit("gradientStops", let a))? = v, let stops = a.first?.asArray { return Gradient(stops: stops.compactMap { r.gradientStop($0) }) }
         if case .native(.color(let c))? = v { return Gradient(colors: [c, c]) }
         if let colors = v?.asArray { return Gradient(colors: colors.compactMap { r.color($0) }) }
         return Gradient(colors: [.primary, .secondary])

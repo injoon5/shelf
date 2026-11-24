@@ -290,6 +290,10 @@ struct KChartBuilder {
         let x = value(a["x"], X.self), y = value(a["y"], Y.self)
         let xs = value(a["xStart"], X.self), xe = value(a["xEnd"], X.self)
         let ys = value(a["yStart"], Y.self), ye = value(a["yEnd"], Y.self)
+        // Start and end in points, where they're numbers: `RuleMark(xStart: 0, xEnd: 120, y: .value(…))`.
+        let pxs = xs == nil ? a["xStart"]?.cg : nil, pxe = xe == nil ? a["xEnd"]?.cg : nil
+        let pys = ys == nil ? a["yStart"]?.cg : nil, pye = ye == nil ? a["yEnd"]?.cg : nil
+        let pointsX = pxs != nil || pxe != nil, pointsY = pys != nil || pye != nil
         var out: AnyChartContent
         switch s.name {
         case "LineMark":
@@ -315,6 +319,8 @@ struct KChartBuilder {
         case "RuleMark":
             if let x, let ys, let ye { out = AnyChartContent(erasing: RuleMark(x: x, yStart: ys, yEnd: ye)) }
             else if let xs, let xe, let y { out = AnyChartContent(erasing: RuleMark(xStart: xs, xEnd: xe, y: y)) }
+            else if let y, pointsX { out = AnyChartContent(erasing: RuleMark(xStart: pxs, xEnd: pxe, y: y)) }
+            else if let x, pointsY { out = AnyChartContent(erasing: RuleMark(x: x, yStart: pys, yEnd: pye)) }
             else if let x { out = AnyChartContent(erasing: RuleMark(x: x)) }
             else if let y { out = AnyChartContent(erasing: RuleMark(y: y)) }
             else { out = AnyChartContent(erasing: RuleMark(y: .value("y", 0))) }
@@ -322,6 +328,11 @@ struct KChartBuilder {
             if let xs, let xe, let ys, let ye { out = AnyChartContent(erasing: RectangleMark(xStart: xs, xEnd: xe, yStart: ys, yEnd: ye)) }
             else if let xs, let xe, let y { out = AnyChartContent(erasing: RectangleMark(xStart: xs, xEnd: xe, y: y, height: dimension(a["height"]))) }
             else if let x, let ys, let ye { out = AnyChartContent(erasing: RectangleMark(x: x, yStart: ys, yEnd: ye, width: dimension(a["width"]))) }
+            else if let xs, let xe, pointsY { out = AnyChartContent(erasing: RectangleMark(xStart: xs, xEnd: xe, yStart: pys, yEnd: pye)) }
+            else if let ys, let ye, pointsX { out = AnyChartContent(erasing: RectangleMark(xStart: pxs, xEnd: pxe, yStart: ys, yEnd: ye)) }
+            else if let x, pointsY { out = AnyChartContent(erasing: RectangleMark(x: x, yStart: pys, yEnd: pye, width: dimension(a["width"]))) }
+            else if let y, pointsX { out = AnyChartContent(erasing: RectangleMark(xStart: pxs, xEnd: pxe, y: y, height: dimension(a["height"]))) }
+            else if pointsX || pointsY { out = AnyChartContent(erasing: RectangleMark(xStart: pxs, xEnd: pxe, yStart: pys, yEnd: pye)) }
             else if let x, let y { out = AnyChartContent(erasing: RectangleMark(x: x, y: y, width: dimension(a["width"]), height: dimension(a["height"]))) }
             else { out = AnyChartContent(erasing: RectangleMark(x: .value("x", 0), y: .value("y", 0))) }
         case "SectorMark":
@@ -332,6 +343,10 @@ struct KChartBuilder {
             if let xs, let xe, let ys, let ye { out = AnyChartContent(erasing: RectangleMark(xStart: xs, xEnd: xe, yStart: ys, yEnd: ye)) }
             else if let xs, let xe, let y { out = AnyChartContent(erasing: BarMark(xStart: xs, xEnd: xe, y: y, height: dimension(a["height"]))) }
             else if let x, let ys, let ye { out = AnyChartContent(erasing: BarMark(x: x, yStart: ys, yEnd: ye, width: dimension(a["width"]))) }
+            else if let xs, let xe, pointsY { out = AnyChartContent(erasing: BarMark(xStart: xs, xEnd: xe, yStart: pys, yEnd: pye)) }
+            else if let ys, let ye, pointsX { out = AnyChartContent(erasing: BarMark(xStart: pxs, xEnd: pxe, yStart: ys, yEnd: ye)) }
+            else if let x, pointsY { out = AnyChartContent(erasing: BarMark(x: x, yStart: pys, yEnd: pye, width: dimension(a["width"]), stacking: stacking(a["stacking"]))) }
+            else if let y, pointsX { out = AnyChartContent(erasing: BarMark(xStart: pxs, xEnd: pxe, y: y, height: dimension(a["height"]), stacking: stacking(a["stacking"]))) }
             else if let x, let y { out = AnyChartContent(erasing: BarMark(x: x, y: y, width: dimension(a["width"]), height: dimension(a["height"]), stacking: stacking(a["stacking"]))) }
             else if let x { out = AnyChartContent(erasing: BarMark(x: x)) }
             else if let y { out = AnyChartContent(erasing: BarMark(y: y)) }
@@ -526,13 +541,20 @@ struct KChartBuilder {
         }()
         let interp = self.interp
         let fn = a["content"]
+        let format = a["format"]
         let make: (AxisValue) -> KAxisMarkList = { value in
             MainActor.assumeIsolated {
+                // `AxisMarks(format: .dateTime.month())`: the default marks, labels formatted.
+                if fn == nil, let format {
+                    let text = KFormatting.formatted(Self.axisValue(value, as: .type(.builtin(Self.axisTypeName(kind)))), format, interp)
+                    return KAxisMarkList(items: [AnyAxisMark(erasing: AxisGridLine()), AnyAxisMark(erasing: AxisTick()),
+                                                 AnyAxisMark(erasing: AxisValueLabel { Text(text) })])
+                }
                 let views = KRenderer(interp: interp).content(fn, [.native(.object("AxisValue", KRef(KAxisValueBox(value))))]).flatMap(\.flattened)
                 return KAxisMarkList(items: views.map { KChartBuilder(interp: interp).axisMark($0, kind, value) })
             }
         }
-        if fn == nil {
+        if fn == nil && format == nil {
             return AnyAxisContent(erasing: AxisMarks(preset: preset, position: position, values: axisValues(a["values"])))
         }
         if let list = a["values"]?.asArray {
@@ -543,6 +565,10 @@ struct KChartBuilder {
             }
         }
         return AnyAxisContent(erasing: AxisMarks(preset: preset, position: position, values: axisValues(a["values"])) { make($0).body })
+    }
+
+    static func axisTypeName(_ kind: KPlotKind) -> String {
+        switch kind { case .text: return "String"; case .whole: return "Int"; case .date: return "Date"; case .number: return "Double" }
     }
 
     func axisValues(_ v: KV?) -> AxisMarkValues {
@@ -589,8 +615,7 @@ struct KChartBuilder {
         case "AxisValueLabel":
             let anchor = a["anchor"].flatMap { r.unitPoint($0) }
             if let fmt = a["format"] {
-                let typeName: String = { switch kind { case .text: return "String"; case .whole: return "Int"; case .date: return "Date"; case .number: return "Double" } }()
-                let text = KFormatting.formatted(Self.axisValue(value, as: .type(.builtin(typeName))), fmt, interp)
+                let text = KFormatting.formatted(Self.axisValue(value, as: .type(.builtin(Self.axisTypeName(kind)))), fmt, interp)
                 out = AnyAxisMark(erasing: AxisValueLabel(centered: centered, anchor: anchor) { Text(text) })
             } else if case .function = a["content"] ?? .nilValue {
                 let content = r.renderContent(a["content"])
@@ -661,7 +686,31 @@ struct KChartBuilder {
         }
     }
 
+    /// A scale's `domain:` as text (`["A", "B"]`) or a number range (`0...100`).
+    enum ScaleDomain { case values([String]), numbers(ClosedRange<Double>) }
+
+    static func scaleDomain(_ c: KCall) -> ScaleDomain? {
+        if case .range(let lo, let hi, _)? = c["domain"], let a = lo.asDouble, let b = hi.asDouble { return .numbers(a...b) }
+        return c["domain"]?.asArray.map { .values($0.map { c.r.string($0) ?? "" }) }
+    }
+
+    /// A scale's `mapping:` closure, called with each value (as text).
+    static func scaleMapping(_ c: KCall) -> ((String) -> KV)? {
+        guard case .function(let fn)? = c["mapping"] ?? c[0] else { return nil }
+        let interp = c.interp
+        return { value in MainActor.assumeIsolated { (try? interp.entry { try interp.call(fn, [.string(value)], [nil]) }) ?? .nilValue } }
+    }
+
     static func styleScale(_ c: KCall, _ view: AnyView) -> AnyView {
+        if c["range"] == nil, let domain = scaleDomain(c) {
+            let r = c.r
+            switch (domain, scaleMapping(c)) {
+            case (.values(let d), let map?):
+                return AnyView(view.chartForegroundStyleScale(domain: d) { (v: String) in MainActor.assumeIsolated { r.shapeStyle(map(v)) ?? AnyShapeStyle(.foreground) } })
+            case (.values(let d), nil): return AnyView(view.chartForegroundStyleScale(domain: d))
+            case (.numbers(let d), _): return AnyView(view.chartForegroundStyleScale(domain: d))
+            }
+        }
         if case .dict(let d)? = c[0] {
             let pairs = d.map { (c.r.string($0.key) ?? "", c.r.shapeStyle($0.value) ?? AnyShapeStyle(.foreground)) }.sorted { $0.0 < $1.0 }
             return AnyView(view.chartForegroundStyleScale(domain: pairs.map(\.0), range: pairs.map(\.1)))
@@ -691,6 +740,13 @@ struct KChartBuilder {
             return AnyView(view.chartLineStyleScale(domain: domain.map { c.r.string($0) ?? "" }, range: range.map { KCanvas.strokeStyle($0, c.r) }))
         }
         if let range = c["range"]?.asArray { return AnyView(view.chartLineStyleScale(range: range.map { KCanvas.strokeStyle($0, c.r) })) }
+        let r = c.r
+        if let map = scaleMapping(c) {
+            let style: (String) -> StrokeStyle = { v in MainActor.assumeIsolated { KCanvas.strokeStyle(map(v), r) } }
+            if case .values(let d)? = scaleDomain(c) { return AnyView(view.chartLineStyleScale(domain: d, mapping: style)) }
+            return AnyView(view.chartLineStyleScale(mapping: style))
+        }
+        if case .values(let d)? = scaleDomain(c) { return AnyView(view.chartLineStyleScale(domain: d)) }
         return view
     }
 
@@ -704,6 +760,13 @@ struct KChartBuilder {
             return AnyView(view.chartSymbolScale(domain: domain.map { c.r.string($0) ?? "" }, range: range.map(shape)))
         }
         if let range = c["range"]?.asArray { return AnyView(view.chartSymbolScale(range: range.map(shape))) }
+        let r = c.r
+        if let map = scaleMapping(c) {
+            let symbol: (String) -> BasicChartSymbolShape = { v in MainActor.assumeIsolated { symbolShape(r.symbolName(map(v)) ?? "circle") } }
+            if case .values(let d)? = scaleDomain(c) { return AnyView(view.chartSymbolScale(domain: d, mapping: symbol)) }
+            return AnyView(view.chartSymbolScale(mapping: symbol))
+        }
+        if case .values(let d)? = scaleDomain(c) { return AnyView(view.chartSymbolScale(domain: d)) }
         return view
     }
 
@@ -714,7 +777,16 @@ struct KChartBuilder {
             }
             return AnyView(view.chartSymbolSizeScale(range: l...h))
         }
-        return view
+        if let map = scaleMapping(c) {
+            let size: (String) -> CGFloat = { v in map(v).cg ?? 30 }
+            if case .values(let d)? = scaleDomain(c) { return AnyView(view.chartSymbolSizeScale(domain: d, mapping: size)) }
+            return AnyView(view.chartSymbolSizeScale(mapping: size))
+        }
+        switch scaleDomain(c) {
+        case .values(let d)?: return AnyView(view.chartSymbolSizeScale(domain: d))
+        case .numbers(let d)?: return AnyView(view.chartSymbolSizeScale(domain: d))
+        case nil: return view
+        }
     }
 
     // MARK: Selection and scrolling
