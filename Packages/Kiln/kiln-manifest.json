@@ -52236,7 +52236,7 @@
             "importing"
           ],
           "member" : "init",
-          "signature" : "exporting:any importing:closure?"
+          "signature" : "exporting:closure importing:closure?"
         },
         {
           "labels" : [

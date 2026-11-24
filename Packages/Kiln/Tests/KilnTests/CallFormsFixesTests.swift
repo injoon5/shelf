@@ -47,6 +47,53 @@ final class CallFormsFixesTests: XCTestCase {
         XCTAssertEqual(o.bind([nil], [.closureLiteral]), [1])
     }
 
+    // MARK: Type bridges
+
+    /// Initializers and methods of type bridges that take closures, written
+    /// as models write them (trailing closures), and the parameters Swift
+    /// binds. Most of the standard library's take their arguments by label
+    /// (lenient overloads); these are the typed ones.
+    func testTypeBridgeClosureForms() throws {
+        let interp = try KInterpreter(program: try KEParser.parse("let x = 1"), headless: true)
+        let r = KRegistry.shared
+        typealias Call = (type: String, member: String, labels: [String?], syntax: [KArgSyntax], swift: [String?])
+        let c = KArgSyntax.closureLiteral, v = KArgSyntax.other
+        let calls: [Call] = [
+            ("ProxyRepresentation", "init", [nil], [c], ["exporting"]),                       // ProxyRepresentation { $0.text }
+            ("ProxyRepresentation", "init", ["exporting"], [v], ["exporting"]),               // (exporting: \.text)
+            ("ProxyRepresentation", "init", ["exporting", nil], [v, c], ["exporting", "importing"]),
+            ("DataRepresentation", "init", ["exportedContentType", nil], [v, c], ["exportedContentType", "exporting"]),
+            ("Dictionary", "init", [nil, nil], [v, c], [nil, "uniquingKeysWith"]),            // Dictionary(pairs) { a, _ in a }
+            ("Dictionary", "merging", [nil, nil], [v, c], [nil, "uniquingKeysWith"]),
+            ("NotificationCenter", "addObserver", ["forName", "object", "queue", nil], [v, v, v, c], ["forName", "object", "queue", "using"]),
+            ("DispatchGroup", "notify", ["queue", nil], [v, c], ["queue", "execute"]),
+            ("Calendar", "enumerateDates", ["startingAfter", "matching", "matchingPolicy", nil], [v, v, v, c],
+             ["startingAfter", "matching", "matchingPolicy", "using"]),
+            ("Publisher", "sink", [nil], [c], ["receiveValue"]),                              // .sink { value in }
+            ("Publisher", "sink", [nil, "receiveValue"], [c, c], ["receiveCompletion", "receiveValue"]),
+            ("String", "split", [nil], [c], ["whereSeparator"]),
+            ("String", "replacing", [nil, nil], [v, c], [nil, "with"]),
+            ("Repeat", "init", [nil, nil], [v, c], [nil, "content"]),                         // Repeat(1...3) { "a" }
+            ("Repeat", "init", ["count", nil], [v, c], ["count", "content"]),
+            ("Capture", "init", ["as", nil, "transform"], [v, c, c], ["as", "content", "transform"]),
+            ("OneOrMore", "init", [nil, nil], [v, c], [nil, "content"]),                      // OneOrMore(.reluctant) { … }
+            ("KeyframeTimeline", "init", ["initialValue", nil], [v, c], ["initialValue", "content"]),
+            ("UIImagePickerController", "dismiss", ["animated", nil], [v, c], ["animated", "completion"]),
+            ("UndoManager", "registerUndo", ["withTarget", nil], [v, c], ["withTarget", "handler"]),
+        ]
+        for call in calls {
+            guard let t = r.type(call.type) else { XCTFail("no \(call.type)"); continue }
+            let methods = call.member == "init" ? t.inits : (t.methods[call.member] ?? t.staticMethods[call.member] ?? [])
+            let overloads = methods.map(\.overload)
+            let name = call.type + "." + call.member
+            guard let (i, b) = try? interp.pick(overloads, name, labels: call.labels, syntax: call.syntax, line: 0) else {
+                XCTFail("\(name)(\(call.labels.map { ($0 ?? "_") + ":" }.joined())) isn't taken"); continue
+            }
+            if overloads[i].lenient { continue }
+            XCTAssertEqual(b.map { overloads[i].params[$0].label }, call.swift, name)
+        }
+    }
+
     // MARK: Registrations, end to end
 
     func testFormsTheAuditFound() throws {
