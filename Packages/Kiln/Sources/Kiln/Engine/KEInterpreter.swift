@@ -164,6 +164,17 @@ final class KInterpreter {
     var readTracker: KReadTracker?
     /// A global variable changed: re-render everything.
     var onGlobalChange: (() -> Void)?
+    /// Nonzero while app code runs the way a framework calls it mid-draw
+    /// (SurfacePlot's function): its global writes don't re-render.
+    var globalRedrawsHeld = 0
+
+    /// Runs `body` with global writes kept from re-rendering, as compiled
+    /// Swift's globals never do.
+    func holdingGlobalRedraws<T>(_ body: () throws -> T) rethrows -> T {
+        globalRedrawsHeld += 1
+        defer { globalRedrawsHeld -= 1 }
+        return try body()
+    }
     /// A headless run (`validate`, the transcript): nothing really waits, and
     /// tasks run when the probe drains them (KEAsync).
     var headless: Bool
@@ -390,7 +401,7 @@ final class KInterpreter {
         let value = try decl.initial.map { try eval($0, globalEnv, decl.type) } ?? .nilValue
         try bindPattern(decl.pattern, value, in: globalEnv, isLet: decl.isLet, type: decl.type)
         if case .binding(let n, _) = decl.pattern, let box = globalEnv.vars[n] {
-            box.onChange = { [weak self] in self?.onGlobalChange?() }
+            box.onChange = { [weak self] in if self?.globalRedrawsHeld == 0 { self?.onGlobalChange?() } }
         }
     }
 
@@ -1058,7 +1069,7 @@ final class KInterpreter {
         }
         let value = try decl.initial.map { try eval($0, KEnv(parent: globalEnv, selfContext: ctx), decl.type) } ?? .nilValue
         let box = KBox(coerce(value, to: decl.type), type: decl.type)
-        box.onChange = { [weak self] in self?.onGlobalChange?() }
+        box.onChange = { [weak self] in if self?.globalRedrawsHeld == 0 { self?.onGlobalChange?() } }
         t.staticBoxes[name] = box
         return box.value
     }

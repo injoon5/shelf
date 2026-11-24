@@ -269,3 +269,17 @@ PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transi
 - **No input is more than 10% slower.** The worst are the model replies, 6 to 7% slower at about 0.3 ms each (a few hundredths of a millisecond); the example apps and fixtures are within 5%, and the compute workloads within 5%. Before the merge, against `after-1.6-language.json`, the worst was 4.4%.
 - **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
 - **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.
+
+## §3.7: SurfacePlot
+
+`SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.
+
+- **The input.** The function a model writes for a surface, `{ x, z in sin(frequency * x) * cos(frequency * z) }`, called over a `side` × `side` grid in `onAppear`, timed with `Tools/bench.py --runs 7` (release KilnBench). Apple M2 Pro. Date: 24 November 2026.
+
+| Grid | Calls | validate (min) | Per call |
+|---|---:|---:|---:|
+| 48 × 48 | 2,304 | 17.13 ms | 7.4 µs |
+| 256 × 256 | 65,536 | 502.55 ms | 7.7 µs |
+
+- **Uncapped, a chart's first draw would take about a second** of the main thread on this Mac (two 256 × 256 passes), and again whenever the app's state gives the chart a new function. So the sample count is capped: Kiln runs the app's function on a 48 × 48 grid over the domain Swift Charts asks about, and Swift Charts' 256 × 256 calls interpolate it natively (`KSurfaceSampler`, Bridges/Chart3D). A sampling costs 17 ms here; the grid is redrawn only when the function or the domain changes.
+- **Not measured on an iPhone yet.** The per-call cost scales with the closure; a function with more arithmetic samples proportionally slower.

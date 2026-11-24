@@ -51,7 +51,7 @@
       "name" : "Drawing",
       "stubs" : 11,
       "summary" : "shapes, paths, colors, gradients, images, effects and animation",
-      "supported" : 211
+      "supported" : 214
     },
     {
       "name" : "Focus & Keyboard",
@@ -73,9 +73,9 @@
     },
     {
       "name" : "Charts",
-      "stubs" : 10,
+      "stubs" : 11,
       "summary" : "Swift Charts",
-      "supported" : 12
+      "supported" : 13
     },
     {
       "name" : "Scenes",
@@ -119,7 +119,7 @@
       "name" : "Chart3D",
       "stubs" : 0,
       "summary" : "3D charts",
-      "supported" : 0
+      "supported" : 22
     },
     {
       "name" : "Files",
@@ -329,6 +329,14 @@
             "height",
             "stacking"
           ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -352,6 +360,14 @@
             "height",
             "stacking"
           ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -371,6 +387,14 @@
             "y",
             "yStart",
             "yEnd"
+          ]
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "x",
+            "y",
+            "z"
           ]
         }
       ],
@@ -445,6 +469,25 @@
         }
       ],
       "source" : "Sources/Kiln/ControlModifiers.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "content:SurfacePlot",
+      "introduced" : "26.0",
+      "kind" : "content",
+      "name" : "SurfacePlot",
+      "overloads" : [
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z",
+            "function"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "full"
     },
     {
@@ -1836,6 +1879,38 @@
       "support" : "full"
     },
     {
+      "family" : "Chart3D",
+      "id" : "member:Angle2D.degrees",
+      "kind" : "member",
+      "name" : "degrees",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Angle2D",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Angle2D.radians",
+      "kind" : "member",
+      "name" : "radians",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "owner" : "Angle2D",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "member:Animation.bouncy",
       "kind" : "member",
@@ -2996,6 +3071,32 @@
       "owner" : "Calendar",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Chart3DPose.azimuth",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "azimuth",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DPose",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Chart3DPose.inclination",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "inclination",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DPose",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Concurrency",
@@ -6730,6 +6831,18 @@
       "owner" : "RelativeDateTimeFormatter",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "member:Rotation3D.identity",
+      "kind" : "member",
+      "name" : "identity",
+      "overloads" : [
+
+      ],
+      "owner" : "Rotation3D",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -11099,6 +11212,121 @@
       "support" : "full"
     },
     {
+      "family" : "Drawing",
+      "id" : "modifier:Chart3DContent.foregroundStyle",
+      "kind" : "modifier",
+      "name" : "foregroundStyle",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "by"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.metalness",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "metalness",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.roughness",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "roughness",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Charts",
+      "id" : "modifier:Chart3DContent.symbol",
+      "kind" : "modifier",
+      "name" : "symbol",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Charts.swift",
+      "support" : "stub"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:Chart3DContent.symbolRotation",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "symbolRotation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Charts",
+      "id" : "modifier:Chart3DContent.symbolSize",
+      "kind" : "modifier",
+      "name" : "symbolSize",
+      "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        }
+      ],
+      "owner" : "Chart3DContent",
+      "source" : "Sources/Kiln/Charts.swift",
+      "support" : "stub"
+    },
+    {
       "family" : "Charts",
       "id" : "modifier:ChartContent.annotation",
       "kind" : "modifier",
@@ -11213,6 +11441,13 @@
       "name" : "symbol",
       "overloads" : [
         {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
+        {
           "labels" : [
             "_"
           ],
@@ -11235,6 +11470,13 @@
       "kind" : "modifier",
       "name" : "symbolSize",
       "overloads" : [
+        {
+          "introduced" : "26.0",
+          "labels" : [
+            "_"
+          ],
+          "receiver" : "Chart3DContent"
+        },
         {
           "labels" : [
             "_"
@@ -12294,6 +12536,38 @@
       "support" : "full"
     },
     {
+      "family" : "Chart3D",
+      "id" : "modifier:chart3DCameraProjection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chart3DCameraProjection",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chart3DPose",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chart3DPose",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "modifier:chartBackground",
       "kind" : "modifier",
@@ -12426,6 +12700,7 @@
       "id" : "modifier:chartXScale",
       "kind" : "modifier",
       "name" : "chartXScale",
+      "notes" : "`domain:` as a numeric range.",
       "overloads" : [
         {
           "labels" : [
@@ -12441,7 +12716,7 @@
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
-      "support" : "stub"
+      "support" : "partial"
     },
     {
       "family" : "Charts",
@@ -12488,6 +12763,94 @@
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZAxis",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZAxis",
+      "notes" : "`.hidden` hides it; its marks aren't customized yet.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZAxisLabel",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZAxisLabel",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "position",
+            "alignment",
+            "spacing"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZScale",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZScale",
+      "notes" : "`domain:` as a numeric range.",
+      "overloads" : [
+        {
+          "labels" : [
+            "domain",
+            "range",
+            "type"
+          ]
+        },
+        {
+          "labels" : [
+            "range",
+            "type"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "modifier:chartZSelection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "chartZSelection",
+      "notes" : "A number's `value:` binding.",
+      "overloads" : [
+        {
+          "labels" : [
+            "range"
+          ]
+        },
+        {
+          "labels" : [
+            "value"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
       "support" : "partial"
     },
     {
@@ -18308,6 +18671,30 @@
       "support" : "full"
     },
     {
+      "family" : "Drawing",
+      "id" : "style:Chart3DSurfaceStyle.heightBased",
+      "kind" : "style",
+      "name" : "heightBased",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DSurfaceStyle",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Drawing",
+      "id" : "style:Chart3DSurfaceStyle.normalBased",
+      "kind" : "style",
+      "name" : "normalBased",
+      "overloads" : [
+
+      ],
+      "owner" : "Chart3DSurfaceStyle",
+      "source" : "Sources/Kiln/Effects.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "style:ControlGroupStyle.automatic",
       "kind" : "style",
@@ -19279,6 +19666,26 @@
       "support" : "partial"
     },
     {
+      "family" : "Chart3D",
+      "id" : "type:Angle2D",
+      "kind" : "type",
+      "name" : "Angle2D",
+      "overloads" : [
+        {
+          "labels" : [
+            "degrees"
+          ]
+        },
+        {
+          "labels" : [
+            "radians"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:AnimatablePair",
       "kind" : "type",
@@ -19417,6 +19824,18 @@
       "support" : "partial"
     },
     {
+      "family" : "Chart3D",
+      "id" : "type:BasicChart3DSymbolShape",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "BasicChart3DSymbolShape",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Environment",
       "id" : "type:Binding",
       "kind" : "type",
@@ -19505,6 +19924,35 @@
       "notes" : "The same as `String` in Kiln.",
       "source" : "Sources/Kiln/Strings.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Chart3DCameraProjection",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "Chart3DCameraProjection",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Chart3DPose",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "Chart3DPose",
+      "overloads" : [
+        {
+          "labels" : [
+            "azimuth",
+            "inclination"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Concurrency",
@@ -20323,6 +20771,39 @@
       "name" : "RelativeDateTimeFormatter",
       "source" : "Sources/Kiln/Dates.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:Rotation3D",
+      "kind" : "type",
+      "name" : "Rotation3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "angle",
+            "axis"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "type:RotationAxis3D",
+      "kind" : "type",
+      "name" : "RotationAxis3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Layout",
@@ -21410,6 +21891,35 @@
       ],
       "source" : "Sources/Kiln/Charts.swift",
       "support" : "partial"
+    },
+    {
+      "family" : "Chart3D",
+      "id" : "view:Chart3D",
+      "introduced" : "26.0",
+      "kind" : "view",
+      "name" : "Chart3D",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "content"
+          ]
+        },
+        {
+          "labels" : [
+            "content"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Chart3D.swift",
+      "support" : "full"
     },
     {
       "family" : "Drawing",

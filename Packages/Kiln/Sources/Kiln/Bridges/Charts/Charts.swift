@@ -51,7 +51,14 @@ final class ChartsBridges: KBridgeFamily {
                 if case .range(let lo, let hi, _)? = c["domain"], let l = lo.asDouble, let h = hi.asDouble { AnyView(view.chartYScale(domain: l...h)) } else { view }
             }
         }
-        for name in ["chartXScale", "chartForegroundStyleScale", "chartPlotStyle", "chartBackground", "chartOverlay"] {
+        // Chart3D's `SurfacePlot` takes its domain from it (§3.7).
+        r.modifier("chartXScale", .charts, support: .partial, notes: "`domain:` as a numeric range.") { m in
+            m.form("domain:any? range:any? type:any?") { c, view in
+                if case .range(let lo, let hi, _)? = c["domain"], let l = lo.asDouble, let h = hi.asDouble { AnyView(view.chartXScale(domain: l...h)) } else { view }
+            }
+            m.form("_:any") { _, view in view }
+        }
+        for name in ["chartForegroundStyleScale", "chartPlotStyle", "chartBackground", "chartOverlay"] {
             r.modifier(name, .charts, support: .stub) { m in
                 m.stub(name == "chartPlotStyle" || name == "chartBackground" || name == "chartOverlay"
                        ? ["alignment:any? content:closure"] : ["domain:any? range:any? type:any?", "_:any"])
