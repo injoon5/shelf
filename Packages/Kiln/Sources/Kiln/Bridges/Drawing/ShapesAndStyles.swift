@@ -66,7 +66,10 @@ extension DrawingBridges {
         r.view("ConcentricRectangle", .drawing, introduced: "26.0", notes: "Follows its container's corners, as SwiftUI's does.") { v in
             v.forms(["", "corners:any isUniform:bool?",
                      "topLeadingCorner:any? topTrailingCorner:any? bottomLeadingCorner:any? bottomTrailingCorner:any?",
-                     "uniformTopCorners:any? uniformBottomCorners:any?", "uniformLeadingCorners:any? uniformTrailingCorners:any?"]) { c in
+                     "uniformTopCorners:any? uniformBottomCorners:any?", "uniformLeadingCorners:any? uniformTrailingCorners:any?",
+                     // One uniform side and the other side's two corners.
+                     "uniformTopCorners:any? bottomLeadingCorner:any? bottomTrailingCorner:any?", "uniformBottomCorners:any? topLeadingCorner:any? topTrailingCorner:any?",
+                     "uniformLeadingCorners:any? topTrailingCorner:any? bottomTrailingCorner:any?", "uniformTrailingCorners:any? topLeadingCorner:any? bottomLeadingCorner:any?"]) { c in
                 KShapeKind("ConcentricRectangle", c.a).anyShape
             }
         }

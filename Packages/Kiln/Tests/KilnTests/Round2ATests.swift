@@ -87,6 +87,11 @@ final class Round2ATests: XCTestCase {
                 ShareLink(item: Data("x".utf8), preview: SharePreview("Data"))
                 ShareLink(items: notes) { note in SharePreview(note.text, icon: Image(systemName: "note")) }
                 ShareLink("One", item: notes[0], preview: SharePreview("Note"))
+                ShareLink(items: ["One", "Two"]) { item in
+                    SharePreview(item)
+                } label: {
+                    Label("Three", systemImage: "square.stack")
+                }
             }
             """#, state: "let notes = [Note(text: \"a\"), Note(text: \"b\")]", extra: """
             struct Note: Codable, Transferable {
@@ -99,7 +104,7 @@ final class Round2ATests: XCTestCase {
             """)
         XCTAssertEqual(BridgeTest.problems(src), [])
         let bound = try BridgeTest.bound(src)
-        XCTAssertEqual(bound.filter { $0.hasPrefix("ShareLink") }.count, 7, "\(bound)")
+        XCTAssertEqual(bound.filter { $0.hasPrefix("ShareLink") }.count, 8, "\(bound)")
         XCTAssertTrue(bound.contains("ShareLink(items:subject:message:preview:label:)"))
     }
 

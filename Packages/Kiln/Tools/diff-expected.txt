@@ -66,3 +66,4 @@ fixtures/apps/camera.swift Round 3A's Camera fixture: before, `.camera` was refu
 fixtures/apps/recorder.swift Round 3A's recording fixture: before, `AVAudioRecorder` and `AVAudioApplication` weren't bridged.
 tests/Round3ATests-1.swift Round 3A: before, the file pickers and `FileDocument`'s exporter weren't bridged.
 tests/Round3ATests-4.swift Round 3A: before, drag and drop and iOS 27's drag containers weren't bridged.
+Packages/Kiln/Examples/Apps/Scrapbook.swift Round 3A's Lab example: before, `resourceValues`, `.draggable` and `.dropDestination` weren't bridged.

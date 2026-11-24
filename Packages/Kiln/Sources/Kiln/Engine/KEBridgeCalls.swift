@@ -299,7 +299,10 @@ extension KInterpreter {
         // slow path only to say why none does.
         for (i, item) in items.enumerated() {
             let o = overload(item)
-            if let b = o.bind(labels, syntax), o.availability?.isAvailable ?? true { return (i, b) }
+            if let b = o.bind(labels, syntax), o.availability?.isAvailable ?? true {
+                if o.closuresFit(b, syntax) { return (i, b) }
+                break  // a closure on a parameter that isn't one: see if a later overload fits better
+            }
         }
         return try pick(items.map(overload), name, labels: labels, syntax: labels.indices.map(syntax), line: line)
     }

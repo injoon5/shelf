@@ -73,7 +73,8 @@ extension SharingBridges {
             }
         }
         r.type("ProxyRepresentation", .sharing) { t in
-            t.initializer("exporting:any importing:closure?") { c in rep(.proxy(exporting: c.args[0], importing: c.function("importing"))) }
+            // `exporting:` is a function (a key path works as one), so `ProxyRepresentation { $0.text }` exports.
+            t.initializer("exporting:closure importing:closure?") { c in rep(.proxy(exporting: c.args[0], importing: c.function("importing"))) }
             t.initializer("importing:closure") { c in rep(.proxy(exporting: nil, importing: c.function("importing"))) }
         }
         r.type("FileRepresentation", .sharing, support: .full,

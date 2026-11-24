@@ -86,6 +86,8 @@ extension FilesBridges {
     }
 
     @MainActor static func draggable(_ c: KCall, _ view: AnyView) -> AnyView {
+        // `draggable(Item.self, { item })`: a drag container's item, not a preview.
+        if case .type? = c[0] { return containerDraggable(c, view) }
         guard let payload = KDragPayload.make(c[0] ?? .nilValue, c) else {
             c.interp.report(c.fail("drags a String, URL, Data, an Image or your Transferable type, not \((c[0] ?? .nilValue).typeName)"))
             return view

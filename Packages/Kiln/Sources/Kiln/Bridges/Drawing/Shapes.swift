@@ -19,8 +19,17 @@ extension DrawingBridges {
             "Circle": [""], "Rectangle": [""], "Ellipse": [""], "ContainerRelativeShape": [""],
             "Capsule": ["style:RoundedCornerStyle?"],
             "RoundedRectangle": ["cornerRadius:number style:RoundedCornerStyle?", "cornerSize:CGSize style:RoundedCornerStyle?"],
-            "UnevenRoundedRectangle": ["topLeadingRadius:number? bottomLeadingRadius:number? bottomTrailingRadius:number? topTrailingRadius:number? style:RoundedCornerStyle?"],
+            "UnevenRoundedRectangle": ["topLeadingRadius:number? bottomLeadingRadius:number? bottomTrailingRadius:number? topTrailingRadius:number? style:RoundedCornerStyle?",
+                                       "cornerRadii:RectangleCornerRadii style:RoundedCornerStyle?"],
         ]
+        r.type("RectangleCornerRadii", .drawing) { t in
+            t.initializer { c in
+                let all = c.first.flatMap { c.labels.first == .some(nil) ? $0.asDouble : nil }
+                return .native(.implicit("cornerRadii", ["topLeading", "bottomLeading", "bottomTrailing", "topTrailing"].map {
+                    .double(c.arg($0)?.asDouble ?? all ?? 0)
+                }))
+            }
+        }
         for name in shapeNames {
             r.view(name, .drawing) { v in
                 v.forms(signatures[name] ?? [""]) { c in KShapeKind(name, c.a).anyShape }
@@ -36,16 +45,20 @@ extension DrawingBridges {
         // Gradients, as views and as styles (`.fill(LinearGradient(…))`).
         let gradients: [String: [String]] = [
             "LinearGradient": ["colors:[Color] startPoint:UnitPoint? endPoint:UnitPoint?", "gradient:any startPoint:UnitPoint endPoint:UnitPoint",
-                               "stops:any startPoint:UnitPoint endPoint:UnitPoint"],
+                               "stops:[Gradient.Stop] startPoint:UnitPoint endPoint:UnitPoint"],
             "RadialGradient": ["colors:[Color] center:UnitPoint startRadius:number endRadius:number",
-                               "gradient:any center:UnitPoint startRadius:number endRadius:number"],
+                               "gradient:any center:UnitPoint startRadius:number endRadius:number",
+                               "stops:[Gradient.Stop] center:UnitPoint startRadius:number endRadius:number"],
             "AngularGradient": ["colors:[Color] center:UnitPoint startAngle:Angle? endAngle:Angle?", "gradient:any center:UnitPoint startAngle:Angle? endAngle:Angle?",
-                                "colors:[Color] center:UnitPoint angle:Angle"],
+                                "stops:[Gradient.Stop] center:UnitPoint startAngle:Angle endAngle:Angle",
+                                "colors:[Color] center:UnitPoint angle:Angle", "gradient:any center:UnitPoint angle:Angle?",
+                                "stops:[Gradient.Stop] center:UnitPoint angle:Angle?"],
             "EllipticalGradient": ["colors:[Color] center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?",
-                                   "gradient:any center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?"],
+                                   "gradient:any center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?",
+                                   "stops:[Gradient.Stop] center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?"],
         ]
         for (name, sigs) in gradients {
-            r.view(name, .drawing, support: .partial, notes: "Colors only: `stops:` aren't placed.") { v in
+            r.view(name, .drawing, notes: "`colors:`, `stops:` or a `gradient:`.") { v in
                 v.forms(sigs) { c in
                     if let g = c.r.gradient(KView.primitive(name, c.args, c.labels, line: c.line)) { Rectangle().fill(g) } else { EmptyView() }
                 }
@@ -302,6 +315,10 @@ enum KShapeKind {
             else if case .native(.size(let w, _))? = a["cornerSize"] { self = .rounded(w, style) }
             else { self = .rounded(8, style) }
         case "UnevenRoundedRectangle":
+            if case .native(.implicit("cornerRadii", let radii))? = a["cornerRadii"], radii.count == 4 {
+                self = .uneven(radii[0].asDouble ?? 0, radii[1].asDouble ?? 0, radii[2].asDouble ?? 0, radii[3].asDouble ?? 0)
+                return
+            }
             self = .uneven(a["topLeadingRadius"]?.asDouble ?? 0, a["bottomLeadingRadius"]?.asDouble ?? 0,
                            a["bottomTrailingRadius"]?.asDouble ?? 0, a["topTrailingRadius"]?.asDouble ?? 0)
         default: self = .rectangle

@@ -266,7 +266,7 @@
       "name" : "Drawing",
       "stubs" : 0,
       "summary" : "shapes, paths, colors, gradients, images, effects and animation",
-      "supported" : 428
+      "supported" : 430
     },
     {
       "line" : "`@FocusState` (a `Bool`, or an enum of fields) with `.focused`, `.defaultFocus`, `.onSubmit` and `.submitLabel`; keyboard and text content types, `.scrollDismissesKeyboard`, `@FocusedValue`, `.keyboardShortcut` and `.onKeyPress`",
@@ -442,6 +442,16 @@
         {
           "labels" : [
             "_",
+            "_",
+            "in",
+            "textRange",
+            "prepare"
+          ],
+          "signature" : "_:any _:any in:any textRange:any? prepare:closure?"
+        },
+        {
+          "labels" : [
+            "_",
             "id",
             "in",
             "prepare"
@@ -464,7 +474,7 @@
             "textRange",
             "prepare"
           ],
-          "signature" : "_:any textRange:any prepare:closure?"
+          "signature" : "_:any? textRange:any prepare:closure?"
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
@@ -589,6 +599,16 @@
             "_",
             "x",
             "y",
+            "series",
+            "stacking"
+          ],
+          "signature" : "_:any x:any y:any series:any? stacking:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "x",
+            "y",
             "stacking"
           ],
           "signature" : "_:any x:any y:any stacking:any?"
@@ -598,9 +618,20 @@
             "_",
             "x",
             "yStart",
-            "yEnd"
+            "yEnd",
+            "series"
           ],
-          "signature" : "_:any x:any yStart:any yEnd:any"
+          "signature" : "_:any x:any yStart:any yEnd:any series:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "xStart",
+            "xEnd",
+            "y",
+            "series"
+          ],
+          "signature" : "_:any xStart:any xEnd:any y:any series:any?"
         },
         {
           "labels" : [
@@ -648,6 +679,16 @@
       "kind" : "content",
       "name" : "AxisMarks",
       "overloads" : [
+        {
+          "labels" : [
+            "format",
+            "preset",
+            "position",
+            "values",
+            "stroke"
+          ],
+          "signature" : "format:any preset:any? position:any? values:any? stroke:any?"
+        },
         {
           "labels" : [
             "preset",
@@ -774,18 +815,20 @@
             "x",
             "yStart",
             "yEnd",
-            "width"
+            "width",
+            "stacking"
           ],
-          "signature" : "x:any? yStart:any yEnd:any width:any?"
+          "signature" : "x:any? yStart:any? yEnd:any? width:any? stacking:any?"
         },
         {
           "labels" : [
             "xStart",
             "xEnd",
             "y",
-            "height"
+            "height",
+            "stacking"
           ],
-          "signature" : "xStart:any xEnd:any y:any? height:any?"
+          "signature" : "xStart:any? xEnd:any? y:any? height:any? stacking:any?"
         },
         {
           "labels" : [
@@ -794,7 +837,7 @@
             "yStart",
             "yEnd"
           ],
-          "signature" : "xStart:any xEnd:any yStart:any yEnd:any"
+          "signature" : "xStart:any? xEnd:any? yStart:any? yEnd:any?"
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -824,9 +867,10 @@
             "x",
             "yStart",
             "yEnd",
-            "width"
+            "width",
+            "stacking"
           ],
-          "signature" : "_:any x:any? yStart:any yEnd:any width:any?"
+          "signature" : "_:any x:any? yStart:any? yEnd:any? width:any? stacking:any?"
         },
         {
           "labels" : [
@@ -834,9 +878,20 @@
             "xStart",
             "xEnd",
             "y",
-            "height"
+            "height",
+            "stacking"
           ],
-          "signature" : "_:any xStart:any xEnd:any y:any? height:any?"
+          "signature" : "_:any xStart:any? xEnd:any? y:any? height:any? stacking:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "xStart",
+            "xEnd",
+            "yStart",
+            "yEnd"
+          ],
+          "signature" : "_:any xStart:any? xEnd:any? yStart:any? yEnd:any?"
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -1087,7 +1142,7 @@
             "yEnd",
             "width"
           ],
-          "signature" : "x:any? yStart:any yEnd:any width:any?"
+          "signature" : "x:any? yStart:any? yEnd:any? width:any?"
         },
         {
           "labels" : [
@@ -1096,7 +1151,7 @@
             "y",
             "height"
           ],
-          "signature" : "xStart:any xEnd:any y:any? height:any?"
+          "signature" : "xStart:any? xEnd:any? y:any? height:any?"
         },
         {
           "labels" : [
@@ -1105,7 +1160,7 @@
             "yStart",
             "yEnd"
           ],
-          "signature" : "xStart:any xEnd:any yStart:any yEnd:any"
+          "signature" : "xStart:any? xEnd:any? yStart:any? yEnd:any?"
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -1131,12 +1186,32 @@
         {
           "labels" : [
             "_",
+            "x",
+            "yStart",
+            "yEnd",
+            "width"
+          ],
+          "signature" : "_:any x:any? yStart:any? yEnd:any? width:any?"
+        },
+        {
+          "labels" : [
+            "_",
+            "xStart",
+            "xEnd",
+            "y",
+            "height"
+          ],
+          "signature" : "_:any xStart:any? xEnd:any? y:any? height:any?"
+        },
+        {
+          "labels" : [
+            "_",
             "xStart",
             "xEnd",
             "yStart",
             "yEnd"
           ],
-          "signature" : "_:any xStart:any xEnd:any yStart:any yEnd:any"
+          "signature" : "_:any xStart:any? xEnd:any? yStart:any? yEnd:any?"
         }
       ],
       "source" : "Sources/Kiln/Charts.swift",
@@ -1171,7 +1246,7 @@
             "xEnd",
             "y"
           ],
-          "signature" : "xStart:any xEnd:any y:any"
+          "signature" : "xStart:any? xEnd:any? y:any"
         },
         {
           "labels" : [
@@ -1208,7 +1283,7 @@
             "xEnd",
             "y"
           ],
-          "signature" : "_:any xStart:any xEnd:any y:any?"
+          "signature" : "_:any xStart:any? xEnd:any? y:any"
         },
         {
           "labels" : [
@@ -1469,6 +1544,13 @@
         },
         {
           "labels" : [
+            "_",
+            "liftedContent"
+          ],
+          "signature" : "_:title liftedContent:content"
+        },
+        {
+          "labels" : [
             "content",
             "header"
           ],
@@ -1479,6 +1561,19 @@
             "content"
           ],
           "signature" : "content:content"
+        },
+        {
+          "labels" : [
+            "liftedContent",
+            "header"
+          ],
+          "signature" : "liftedContent:content header:content"
+        },
+        {
+          "labels" : [
+            "liftedContent"
+          ],
+          "signature" : "liftedContent:content"
         }
       ],
       "source" : "Sources/Kiln/Tabs.swift",
@@ -1495,9 +1590,10 @@
           "labels" : [
             "id",
             "placement",
+            "showsByDefault",
             "content"
           ],
-          "signature" : "id:string placement:ToolbarItemPlacement? content:content"
+          "signature" : "id:string placement:ToolbarItemPlacement? showsByDefault:bool? content:content"
         },
         {
           "labels" : [
@@ -1612,6 +1708,29 @@
         },
         {
           "labels" : [
+            "_",
+            "id",
+            "content"
+          ],
+          "signature" : "_:title id:string content:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "makeContent"
+          ],
+          "signature" : "_:title id:string makeContent:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "makeContent"
+          ],
+          "signature" : "_:title makeContent:content"
+        },
+        {
+          "labels" : [
             "content"
           ],
           "signature" : "content:content"
@@ -1622,6 +1741,27 @@
             "content"
           ],
           "signature" : "id:string content:content"
+        },
+        {
+          "labels" : [
+            "id",
+            "makeContent"
+          ],
+          "signature" : "id:string makeContent:content"
+        },
+        {
+          "labels" : [
+            "id",
+            "title",
+            "lazyContent"
+          ],
+          "signature" : "id:string? title:any? lazyContent:content"
+        },
+        {
+          "labels" : [
+            "makeContent"
+          ],
+          "signature" : "makeContent:content"
         }
       ],
       "source" : "Sources/Kiln/Scenes.swift",
@@ -2983,9 +3123,10 @@
         {
           "labels" : [
             "minimumDistance",
-            "coordinateSpace"
+            "coordinateSpace",
+            "inputKinds"
           ],
-          "signature" : "minimumDistance:number? coordinateSpace:any?"
+          "signature" : "minimumDistance:number? coordinateSpace:any? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -3017,9 +3158,10 @@
         {
           "labels" : [
             "minimumDuration",
-            "maximumDistance"
+            "maximumDistance",
+            "inputKinds"
           ],
-          "signature" : "minimumDuration:number? maximumDistance:number?"
+          "signature" : "minimumDuration:number? maximumDistance:number? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -3049,9 +3191,10 @@
       "overloads" : [
         {
           "labels" : [
-            "minimumScaleDelta"
+            "minimumScaleDelta",
+            "inputKinds"
           ],
-          "signature" : "minimumScaleDelta:number?"
+          "signature" : "minimumScaleDelta:number? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -3065,9 +3208,10 @@
       "overloads" : [
         {
           "labels" : [
-            "minimumAngleDelta"
+            "minimumAngleDelta",
+            "inputKinds"
           ],
-          "signature" : "minimumAngleDelta:Angle?"
+          "signature" : "minimumAngleDelta:Angle? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -3150,9 +3294,10 @@
         {
           "labels" : [
             "count",
-            "coordinateSpace"
+            "coordinateSpace",
+            "inputKinds"
           ],
-          "signature" : "count:number? coordinateSpace:any?"
+          "signature" : "count:number? coordinateSpace:any? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -3166,9 +3311,10 @@
       "overloads" : [
         {
           "labels" : [
-            "count"
+            "count",
+            "inputKinds"
           ],
-          "signature" : "count:number?"
+          "signature" : "count:number? inputKinds:any?"
         }
       ],
       "source" : "Sources/Kiln/Gestures.swift",
@@ -41337,9 +41483,10 @@
       "overloads" : [
         {
           "labels" : [
-            "_"
+            "_",
+            "isEnabled"
           ],
-          "signature" : "_:any"
+          "signature" : "_:any isEnabled:bool?"
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
@@ -41455,9 +41602,10 @@
         {
           "labels" : [
             "_",
-            "description"
+            "description",
+            "isEnabled"
           ],
-          "signature" : "_:any description:any"
+          "signature" : "_:any description:any isEnabled:bool?"
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
@@ -41472,9 +41620,10 @@
         {
           "labels" : [
             "_",
-            "description"
+            "description",
+            "isEnabled"
           ],
-          "signature" : "_:any description:any"
+          "signature" : "_:any description:any isEnabled:bool?"
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
@@ -41740,9 +41889,10 @@
       "overloads" : [
         {
           "labels" : [
-            "_"
+            "_",
+            "isEnabled"
           ],
-          "signature" : "_:bool?"
+          "signature" : "_:bool? isEnabled:bool?"
         }
       ],
       "source" : "Sources/Kiln/Accessibility.swift",
@@ -41971,10 +42121,36 @@
         },
         {
           "labels" : [
+            "_",
+            "item",
+            "actions",
+            "message"
+          ],
+          "signature" : "_:title item:binding actions:content message:content?"
+        },
+        {
+          "labels" : [
+            "error",
+            "actions",
+            "message"
+          ],
+          "signature" : "error:binding actions:content message:content?"
+        },
+        {
+          "labels" : [
             "isPresented",
             "content"
           ],
           "signature" : "isPresented:binding content:closure"
+        },
+        {
+          "labels" : [
+            "isPresented",
+            "error",
+            "actions",
+            "message"
+          ],
+          "signature" : "isPresented:binding error:any actions:content message:content?"
         },
         {
           "labels" : [
@@ -42278,6 +42454,13 @@
             "ignoresSafeAreaEdges"
           ],
           "signature" : "ignoresSafeAreaEdges:any?"
+        },
+        {
+          "labels" : [
+            "in",
+            "fillStyle"
+          ],
+          "signature" : "in:any fillStyle:any?"
         }
       ],
       "source" : "Sources/Kiln/Effects.swift",
@@ -42624,10 +42807,24 @@
         {
           "labels" : [
             "domain",
+            "mapping"
+          ],
+          "signature" : "domain:any mapping:closure"
+        },
+        {
+          "labels" : [
+            "domain",
             "range",
             "type"
           ],
           "signature" : "domain:any range:any type:any?"
+        },
+        {
+          "labels" : [
+            "domain",
+            "type"
+          ],
+          "signature" : "domain:any type:any?"
         },
         {
           "labels" : [
@@ -42717,10 +42914,23 @@
         {
           "labels" : [
             "domain",
+            "mapping"
+          ],
+          "signature" : "domain:any mapping:closure"
+        },
+        {
+          "labels" : [
+            "domain",
             "range",
             "type"
           ],
           "signature" : "domain:any range:any type:any?"
+        },
+        {
+          "labels" : [
+            "domain"
+          ],
+          "signature" : "domain:any"
         },
         {
           "labels" : [
@@ -42857,9 +43067,22 @@
         {
           "labels" : [
             "domain",
+            "mapping"
+          ],
+          "signature" : "domain:any mapping:closure"
+        },
+        {
+          "labels" : [
+            "domain",
             "range"
           ],
           "signature" : "domain:any range:any"
+        },
+        {
+          "labels" : [
+            "domain"
+          ],
+          "signature" : "domain:any"
         },
         {
           "labels" : [
@@ -42892,10 +43115,30 @@
         {
           "labels" : [
             "domain",
+            "mapping"
+          ],
+          "signature" : "domain:any mapping:closure"
+        },
+        {
+          "labels" : [
+            "domain",
             "range",
             "type"
           ],
           "signature" : "domain:any range:any type:any?"
+        },
+        {
+          "labels" : [
+            "domain",
+            "type"
+          ],
+          "signature" : "domain:any type:any?"
+        },
+        {
+          "labels" : [
+            "mapping"
+          ],
+          "signature" : "mapping:closure"
         },
         {
           "labels" : [
@@ -43438,6 +43681,16 @@
             "message"
           ],
           "signature" : "_:title isPresented:binding titleVisibility:any? presenting:any? actions:content message:content?"
+        },
+        {
+          "labels" : [
+            "_",
+            "item",
+            "titleVisibility",
+            "actions",
+            "message"
+          ],
+          "signature" : "_:title item:binding titleVisibility:any? actions:content message:content?"
         }
       ],
       "source" : "Sources/Kiln/Presentations.swift",
@@ -43642,6 +43895,14 @@
       "name" : "contextMenu",
       "notes" : "Its menu items; `preview:` isn't shown.",
       "overloads" : [
+        {
+          "labels" : [
+            "forSelectionType",
+            "menu",
+            "primaryAction"
+          ],
+          "signature" : "forSelectionType:any menu:content primaryAction:closure?"
+        },
         {
           "labels" : [
             "menuItems",
@@ -46255,9 +46516,9 @@
         {
           "labels" : [
             "alignment",
-            "mask"
+            "_"
           ],
-          "signature" : "alignment:Alignment? mask:content"
+          "signature" : "alignment:Alignment? _:content"
         }
       ],
       "source" : "Sources/Kiln/Effects.swift",
@@ -47074,10 +47335,11 @@
           "labels" : [
             "minimumDuration",
             "maximumDistance",
+            "inputKinds",
             "perform",
             "onPressingChanged"
           ],
-          "signature" : "minimumDuration:number? maximumDistance:number? perform:action onPressingChanged:closure?"
+          "signature" : "minimumDuration:number? maximumDistance:number? inputKinds:any? perform:action onPressingChanged:closure?"
         },
         {
           "labels" : [
@@ -47299,9 +47561,10 @@
           "labels" : [
             "count",
             "coordinateSpace",
+            "inputKinds",
             "perform"
           ],
-          "signature" : "count:number? coordinateSpace:any? perform:action"
+          "signature" : "count:number? coordinateSpace:any? inputKinds:any? perform:action"
         },
         {
           "labels" : [
@@ -47342,6 +47605,13 @@
             "alignment"
           ],
           "signature" : "_:any alignment:Alignment?"
+        },
+        {
+          "labels" : [
+            "_",
+            "ignoresSafeAreaEdges"
+          ],
+          "signature" : "_:ColorOrStyle ignoresSafeAreaEdges:any"
         },
         {
           "labels" : [
@@ -48881,6 +49151,17 @@
           "labels" : [
             "text",
             "editableTokens",
+            "isPresented",
+            "placement",
+            "prompt",
+            "token"
+          ],
+          "signature" : "text:binding editableTokens:binding isPresented:binding placement:any? prompt:title? token:content"
+        },
+        {
+          "labels" : [
+            "text",
+            "editableTokens",
             "placement",
             "prompt",
             "token"
@@ -48933,6 +49214,18 @@
             "token"
           ],
           "signature" : "text:binding tokens:binding placement:any? prompt:title? token:content"
+        },
+        {
+          "labels" : [
+            "text",
+            "tokens",
+            "suggestedTokens",
+            "isPresented",
+            "placement",
+            "prompt",
+            "token"
+          ],
+          "signature" : "text:binding tokens:binding suggestedTokens:binding isPresented:binding placement:any? prompt:title? token:content"
         },
         {
           "labels" : [
@@ -49870,17 +50163,19 @@
         {
           "labels" : [
             "id",
+            "name",
             "priority",
             "_"
           ],
-          "signature" : "id:any priority:any? _:action"
+          "signature" : "id:any name:string? priority:any? _:action"
         },
         {
           "labels" : [
+            "name",
             "priority",
             "_"
           ],
-          "signature" : "priority:any? _:action"
+          "signature" : "name:string? priority:any? _:action"
         }
       ],
       "source" : "Sources/Kiln/Core.swift",
@@ -54701,6 +54996,15 @@
       "support" : "partial"
     },
     {
+      "anyLabels" : true,
+      "family" : "Drawing",
+      "id" : "type:Gradient.Stop",
+      "kind" : "type",
+      "name" : "Gradient.Stop",
+      "source" : "Sources/Kiln/Drawing.swift",
+      "support" : "partial"
+    },
+    {
       "family" : "Drawing",
       "id" : "type:GraphicsContext",
       "kind" : "type",
@@ -56723,7 +57027,7 @@
             "importing"
           ],
           "member" : "init",
-          "signature" : "exporting:any importing:closure?"
+          "signature" : "exporting:closure importing:closure?"
         },
         {
           "labels" : [
@@ -56816,6 +57120,15 @@
       ],
       "source" : "Sources/Kiln/Transferable.swift",
       "support" : "full"
+    },
+    {
+      "anyLabels" : true,
+      "family" : "Drawing",
+      "id" : "type:RectangleCornerRadii",
+      "kind" : "type",
+      "name" : "RectangleCornerRadii",
+      "source" : "Sources/Kiln/Shapes.swift",
+      "support" : "partial"
     },
     {
       "family" : "Text",
@@ -59732,7 +60045,7 @@
       "id" : "view:AngularGradient",
       "kind" : "view",
       "name" : "AngularGradient",
-      "notes" : "Colors only: `stops:` aren't placed.",
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
       "overloads" : [
         {
           "labels" : [
@@ -59755,14 +60068,39 @@
           "labels" : [
             "gradient",
             "center",
+            "angle"
+          ],
+          "signature" : "gradient:any center:UnitPoint angle:Angle?"
+        },
+        {
+          "labels" : [
+            "gradient",
+            "center",
             "startAngle",
             "endAngle"
           ],
           "signature" : "gradient:any center:UnitPoint startAngle:Angle? endAngle:Angle?"
+        },
+        {
+          "labels" : [
+            "stops",
+            "center",
+            "angle"
+          ],
+          "signature" : "stops:[Gradient.Stop] center:UnitPoint angle:Angle?"
+        },
+        {
+          "labels" : [
+            "stops",
+            "center",
+            "startAngle",
+            "endAngle"
+          ],
+          "signature" : "stops:[Gradient.Stop] center:UnitPoint startAngle:Angle endAngle:Angle"
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -59791,6 +60129,12 @@
             "_"
           ],
           "signature" : "_:any"
+        },
+        {
+          "labels" : [
+            "erasing"
+          ],
+          "signature" : "erasing:any"
         }
       ],
       "source" : "Sources/Kiln/Core.swift",
@@ -59821,6 +60165,31 @@
       "kind" : "view",
       "name" : "AsyncImage",
       "overloads" : [
+        {
+          "labels" : [
+            "request",
+            "scale",
+            "content",
+            "placeholder"
+          ],
+          "signature" : "request:any scale:number? content:content placeholder:content"
+        },
+        {
+          "labels" : [
+            "request",
+            "scale",
+            "transaction",
+            "content"
+          ],
+          "signature" : "request:any scale:number? transaction:any? content:content"
+        },
+        {
+          "labels" : [
+            "request",
+            "scale"
+          ],
+          "signature" : "request:any scale:number?"
+        },
         {
           "labels" : [
             "url",
@@ -59932,6 +60301,13 @@
             "label"
           ],
           "signature" : "role:ButtonRole? action:action label:content"
+        },
+        {
+          "labels" : [
+            "role",
+            "action"
+          ],
+          "signature" : "role:ButtonRole action:action"
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
@@ -60211,6 +60587,22 @@
         },
         {
           "labels" : [
+            "uniformBottomCorners",
+            "topLeadingCorner",
+            "topTrailingCorner"
+          ],
+          "signature" : "uniformBottomCorners:any? topLeadingCorner:any? topTrailingCorner:any?"
+        },
+        {
+          "labels" : [
+            "uniformLeadingCorners",
+            "topTrailingCorner",
+            "bottomTrailingCorner"
+          ],
+          "signature" : "uniformLeadingCorners:any? topTrailingCorner:any? bottomTrailingCorner:any?"
+        },
+        {
+          "labels" : [
             "uniformLeadingCorners",
             "uniformTrailingCorners"
           ],
@@ -60219,9 +60611,25 @@
         {
           "labels" : [
             "uniformTopCorners",
+            "bottomLeadingCorner",
+            "bottomTrailingCorner"
+          ],
+          "signature" : "uniformTopCorners:any? bottomLeadingCorner:any? bottomTrailingCorner:any?"
+        },
+        {
+          "labels" : [
+            "uniformTopCorners",
             "uniformBottomCorners"
           ],
           "signature" : "uniformTopCorners:any? uniformBottomCorners:any?"
+        },
+        {
+          "labels" : [
+            "uniformTrailingCorners",
+            "topLeadingCorner",
+            "bottomLeadingCorner"
+          ],
+          "signature" : "uniformTrailingCorners:any? topLeadingCorner:any? bottomLeadingCorner:any?"
         }
       ],
       "source" : "Sources/Kiln/ShapesAndStyles.swift",
@@ -60479,7 +60887,7 @@
       "id" : "view:EllipticalGradient",
       "kind" : "view",
       "name" : "EllipticalGradient",
-      "notes" : "Colors only: `stops:` aren't placed.",
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
       "overloads" : [
         {
           "labels" : [
@@ -60498,10 +60906,19 @@
             "endRadiusFraction"
           ],
           "signature" : "gradient:any center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?"
+        },
+        {
+          "labels" : [
+            "stops",
+            "center",
+            "startRadiusFraction",
+            "endRadiusFraction"
+          ],
+          "signature" : "stops:[Gradient.Stop] center:UnitPoint? startRadiusFraction:number? endRadiusFraction:number?"
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Core",
@@ -60574,6 +60991,21 @@
             "content"
           ],
           "signature" : "_:any id:any editActions:any content:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "id",
+            "liftedContent"
+          ],
+          "signature" : "_:any id:any liftedContent:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "liftedContent"
+          ],
+          "signature" : "_:any liftedContent:content"
         },
         {
           "labels" : [
@@ -61098,7 +61530,7 @@
       "id" : "view:LinearGradient",
       "kind" : "view",
       "name" : "LinearGradient",
-      "notes" : "Colors only: `stops:` aren't placed.",
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
       "overloads" : [
         {
           "labels" : [
@@ -61122,11 +61554,11 @@
             "startPoint",
             "endPoint"
           ],
-          "signature" : "stops:any startPoint:UnitPoint endPoint:UnitPoint"
+          "signature" : "stops:[Gradient.Stop] startPoint:UnitPoint endPoint:UnitPoint"
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Controls",
@@ -61697,6 +62129,15 @@
           "labels" : [
             "_",
             "selection",
+            "content",
+            "currentValueLabel"
+          ],
+          "signature" : "_:title selection:binding content:content currentValueLabel:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "selection",
             "content"
           ],
           "signature" : "_:title selection:binding content:content"
@@ -61706,9 +62147,28 @@
             "_",
             "systemImage",
             "selection",
+            "content",
+            "currentValueLabel"
+          ],
+          "signature" : "_:title systemImage:string selection:binding content:content currentValueLabel:content"
+        },
+        {
+          "labels" : [
+            "_",
+            "systemImage",
+            "selection",
             "content"
           ],
           "signature" : "_:title systemImage:string selection:binding content:content"
+        },
+        {
+          "labels" : [
+            "selection",
+            "content",
+            "label",
+            "currentValueLabel"
+          ],
+          "signature" : "selection:binding content:content label:content currentValueLabel:content"
         },
         {
           "labels" : [
@@ -61804,7 +62264,7 @@
       "id" : "view:RadialGradient",
       "kind" : "view",
       "name" : "RadialGradient",
-      "notes" : "Colors only: `stops:` aren't placed.",
+      "notes" : "`colors:`, `stops:` or a `gradient:`.",
       "overloads" : [
         {
           "labels" : [
@@ -61823,10 +62283,19 @@
             "endRadius"
           ],
           "signature" : "gradient:any center:UnitPoint startRadius:number endRadius:number"
+        },
+        {
+          "labels" : [
+            "stops",
+            "center",
+            "startRadius",
+            "endRadius"
+          ],
+          "signature" : "stops:[Gradient.Stop] center:UnitPoint startRadius:number endRadius:number"
         }
       ],
       "source" : "Sources/Kiln/Shapes.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Drawing",
@@ -62045,7 +62514,7 @@
             "preview",
             "label"
           ],
-          "signature" : "item:any subject:any? message:any? preview:any? label:content"
+          "signature" : "item:any subject:any? message:any? preview:closure label:content"
         },
         {
           "labels" : [
@@ -62064,7 +62533,7 @@
             "preview",
             "label"
           ],
-          "signature" : "items:any subject:any? message:any? preview:any? label:content"
+          "signature" : "items:any subject:any? message:any? preview:closure label:content"
         },
         {
           "labels" : [
@@ -62096,7 +62565,32 @@
             "maximumValueLabel",
             "onEditingChanged"
           ],
-          "signature" : "value:binding in:any? step:number? label:content minimumValueLabel:content? maximumValueLabel:content? onEditingChanged:closure?"
+          "signature" : "value:binding in:any? step:number? label:content minimumValueLabel:content maximumValueLabel:content onEditingChanged:closure?"
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "label",
+            "onEditingChanged"
+          ],
+          "signature" : "value:binding in:any? step:number? label:content onEditingChanged:closure?"
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "neutralValue",
+            "enabledBounds",
+            "label",
+            "currentValueLabel",
+            "minimumValueLabel",
+            "maximumValueLabel",
+            "onEditingChanged"
+          ],
+          "signature" : "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? onEditingChanged:closure?"
         },
         {
           "labels" : [
@@ -62112,7 +62606,7 @@
             "tick",
             "onEditingChanged"
           ],
-          "signature" : "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? tick:closure? onEditingChanged:closure?"
+          "signature" : "value:binding in:any step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? tick:closure? onEditingChanged:closure?"
         },
         {
           "labels" : [
@@ -62212,27 +62706,49 @@
             "value",
             "in",
             "step",
+            "format",
             "onEditingChanged"
           ],
-          "signature" : "_:title value:binding in:any? step:number? onEditingChanged:closure?"
+          "signature" : "_:title value:binding in:any? step:number? format:any? onEditingChanged:closure?"
+        },
+        {
+          "labels" : [
+            "label",
+            "onIncrement",
+            "onDecrement",
+            "onEditingChanged"
+          ],
+          "signature" : "label:content onIncrement:action? onDecrement:action? onEditingChanged:closure?"
         },
         {
           "labels" : [
             "onIncrement",
             "onDecrement",
+            "onEditingChanged",
             "label"
           ],
-          "signature" : "onIncrement:action? onDecrement:action? label:content"
+          "signature" : "onIncrement:action? onDecrement:action? onEditingChanged:closure? label:content"
         },
         {
           "labels" : [
             "value",
             "in",
             "step",
+            "format",
             "label",
             "onEditingChanged"
           ],
-          "signature" : "value:binding in:any? step:number? label:content onEditingChanged:closure?"
+          "signature" : "value:binding in:any? step:number? format:any? label:content onEditingChanged:closure?"
+        },
+        {
+          "labels" : [
+            "value",
+            "in",
+            "step",
+            "onEditingChanged",
+            "label"
+          ],
+          "signature" : "value:binding in:any? step:number? onEditingChanged:closure? label:content"
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
@@ -62309,9 +62825,25 @@
         {
           "labels" : [
             "_",
+            "formatter"
+          ],
+          "signature" : "_:any formatter:any"
+        },
+        {
+          "labels" : [
+            "_",
             "style"
           ],
           "signature" : "_:any style:Text.DateStyle"
+        },
+        {
+          "labels" : [
+            "_",
+            "tableName",
+            "bundle",
+            "comment"
+          ],
+          "signature" : "_:title tableName:string? bundle:any? comment:any?"
         },
         {
           "labels" : [
@@ -62453,6 +62985,15 @@
             "label"
           ],
           "signature" : "value:binding format:any prompt:any? label:content"
+        },
+        {
+          "labels" : [
+            "value",
+            "formatter",
+            "prompt",
+            "label"
+          ],
+          "signature" : "value:binding formatter:any prompt:any? label:content"
         }
       ],
       "source" : "Sources/Kiln/Controls.swift",
@@ -62546,6 +63087,13 @@
       "kind" : "view",
       "name" : "UnevenRoundedRectangle",
       "overloads" : [
+        {
+          "labels" : [
+            "cornerRadii",
+            "style"
+          ],
+          "signature" : "cornerRadii:RectangleCornerRadii style:RoundedCornerStyle?"
+        },
         {
           "labels" : [
             "topLeadingRadius",

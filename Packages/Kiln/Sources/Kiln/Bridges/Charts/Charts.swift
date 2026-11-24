@@ -48,16 +48,17 @@ final class ChartsBridges: KBridgeFamily {
 
     static func content(_ r: KRegistry) {
         let markSigs: [String: [String]] = [
-            "BarMark": ["x:any? y:any? width:any? height:any? stacking:any?", "xStart:any xEnd:any y:any? height:any?",
-                        "x:any? yStart:any yEnd:any width:any?", "xStart:any xEnd:any yStart:any yEnd:any"],
+            // A start or end that's a number is in points, and can be left out (`BarMark(x: .value(…), yStart: 10)`).
+            "BarMark": ["x:any? y:any? width:any? height:any? stacking:any?", "xStart:any? xEnd:any? y:any? height:any? stacking:any?",
+                        "x:any? yStart:any? yEnd:any? width:any? stacking:any?", "xStart:any? xEnd:any? yStart:any? yEnd:any?"],
             "LineMark": ["x:any y:any series:any?"],
             "PointMark": ["x:any? y:any?"],
             "AreaMark": ["x:any y:any stacking:any?", "x:any yStart:any yEnd:any series:any?", "xStart:any xEnd:any y:any series:any?",
                          "x:any y:any series:any? stacking:any?"],
             "SectorMark": ["angle:any innerRadius:any? outerRadius:any? angularInset:any?"],
-            "RuleMark": ["x:any? yStart:any? yEnd:any?", "y:any? xStart:any? xEnd:any?", "xStart:any xEnd:any y:any", "x:any yStart:any yEnd:any"],
-            "RectangleMark": ["x:any? y:any? width:any? height:any?", "xStart:any xEnd:any y:any? height:any?", "x:any? yStart:any yEnd:any width:any?",
-                              "xStart:any xEnd:any yStart:any yEnd:any"],
+            "RuleMark": ["x:any? yStart:any? yEnd:any?", "y:any? xStart:any? xEnd:any?", "xStart:any? xEnd:any? y:any", "x:any yStart:any? yEnd:any?"],
+            "RectangleMark": ["x:any? y:any? width:any? height:any?", "xStart:any? xEnd:any? y:any? height:any?", "x:any? yStart:any? yEnd:any? width:any?",
+                              "xStart:any? xEnd:any? yStart:any? yEnd:any?"],
         ]
         for name in marks {
             r.view(name, .charts) { v in
@@ -65,16 +66,15 @@ final class ChartsBridges: KBridgeFamily {
                 v.forms(markSigs[name] ?? []) { _ in EmptyView() }
             }
         }
+        // A vectorized plot takes its data first, then its mark's labels.
+        func perElement(_ mark: String) -> [String] { (markSigs[mark] ?? []).map { "_:any " + $0 } }
         let plotSigs: [String: [String]] = [
             "LinePlot": ["x:any y:any domain:any? function:closure", "x:any y:any t:any domain:any function:closure", "_:any x:any y:any series:any?"],
-            "AreaPlot": ["x:any y:any domain:any? function:closure", "x:any yStart:any yEnd:any domain:any? function:closure",
-                         "_:any x:any y:any stacking:any?", "_:any x:any yStart:any yEnd:any"],
-            "BarPlot": ["_:any x:any? y:any? width:any? height:any? stacking:any?", "_:any xStart:any xEnd:any y:any? height:any?",
-                        "_:any x:any? yStart:any yEnd:any width:any?"],
+            "AreaPlot": ["x:any y:any domain:any? function:closure", "x:any yStart:any yEnd:any domain:any? function:closure"] + perElement("AreaMark"),
+            "BarPlot": perElement("BarMark"),
             "PointPlot": ["_:any x:any? y:any?"],
-            "RulePlot": ["_:any x:any? yStart:any? yEnd:any?", "_:any y:any? xStart:any? xEnd:any?", "_:any xStart:any xEnd:any y:any?",
-                         "_:any x:any? yStart:any yEnd:any"],
-            "RectanglePlot": ["_:any x:any? y:any? width:any? height:any?", "_:any xStart:any xEnd:any yStart:any yEnd:any"],
+            "RulePlot": perElement("RuleMark"),
+            "RectanglePlot": perElement("RectangleMark"),
             "SectorPlot": ["_:any angle:any innerRadius:any? outerRadius:any? angularInset:any?"],
         ]
         for name in plots {
@@ -160,7 +160,8 @@ final class ChartsBridges: KBridgeFamily {
         }
         r.view("AxisMarks", .charts) { v in
             v.manifestKind = "content"
-            v.forms(["preset:any? position:any? values:any? content:closure", "preset:any? position:any? values:any? stroke:any?"]) { _ in EmptyView() }
+            v.forms(["preset:any? position:any? values:any? content:closure", "preset:any? position:any? values:any? stroke:any?",
+                     "format:any preset:any? position:any? values:any? stroke:any?"]) { _ in EmptyView() }
             v.probe { _, a, _ in
                 guard case .function(let fn)? = a["content"] else { return [] }
                 return [KProbeCall(fn: fn, args: [KChartBuilder.axisValueSample])]
@@ -238,24 +239,27 @@ final class ChartsBridges: KBridgeFamily {
             m.form("domain:any range:any type:any?") { c, view in KChartBuilder.styleScale(c, view) }
             m.form("range:any type:any?") { c, view in KChartBuilder.styleScale(c, view) }
             m.form("mapping:closure") { c, view in KChartBuilder.styleScale(c, view) }
+            m.form("domain:any mapping:closure") { c, view in KChartBuilder.styleScale(c, view) }
+            m.form("domain:any type:any?") { c, view in KChartBuilder.styleScale(c, view) }
             m.form("type:any?") { _, view in view }
         }
         r.modifier("chartLineStyleScale", .charts) { m in
             m.form("_:any") { c, view in KChartBuilder.lineStyleScale(c, view) }
             m.form("domain:any range:any type:any?") { c, view in KChartBuilder.lineStyleScale(c, view) }
             m.form("range:any type:any?") { c, view in KChartBuilder.lineStyleScale(c, view) }
-            m.form("mapping:closure") { _, view in view }
+            m.forms(["mapping:closure", "domain:any mapping:closure", "domain:any"]) { c, view in KChartBuilder.lineStyleScale(c, view) }
         }
         r.modifier("chartSymbolScale", .charts) { m in
             m.form("_:any") { c, view in KChartBuilder.symbolScale(c, view) }
             m.form("domain:any range:any") { c, view in KChartBuilder.symbolScale(c, view) }
             m.form("range:any") { c, view in KChartBuilder.symbolScale(c, view) }
-            m.form("mapping:closure") { _, view in view }
+            m.forms(["mapping:closure", "domain:any mapping:closure", "domain:any"]) { c, view in KChartBuilder.symbolScale(c, view) }
         }
         r.modifier("chartSymbolSizeScale", .charts) { m in
             m.form("_:any") { c, view in KChartBuilder.symbolSizeScale(c, view) }
             m.form("domain:any range:any type:any?") { c, view in KChartBuilder.symbolSizeScale(c, view) }
             m.form("range:any type:any?") { c, view in KChartBuilder.symbolSizeScale(c, view) }
+            m.forms(["mapping:closure", "domain:any mapping:closure", "domain:any type:any?"]) { c, view in KChartBuilder.symbolSizeScale(c, view) }
             m.form("type:any?") { _, view in view }
         }
         r.modifier("chartLegend", .charts) { m in

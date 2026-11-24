@@ -25,7 +25,9 @@ extension NavigationBridges {
                      "text:binding tokens:binding placement:any? prompt:title? token:content",
                      "text:binding tokens:binding isPresented:binding placement:any? prompt:title? token:content",
                      "text:binding tokens:binding suggestedTokens:binding placement:any? prompt:title? token:content",
-                     "text:binding editableTokens:binding placement:any? prompt:title? token:content"]) { c, view in searchable(c, view) }
+                     "text:binding tokens:binding suggestedTokens:binding isPresented:binding placement:any? prompt:title? token:content",
+                     "text:binding editableTokens:binding placement:any? prompt:title? token:content",
+                     "text:binding editableTokens:binding isPresented:binding placement:any? prompt:title? token:content"]) { c, view in searchable(c, view) }
         }
         // iOS 26: the selection in the search field, a `TextSelection?` over the `.searchable` text (Sharing).
         r.modifier("searchSelection", .navigation, introduced: "26.0") { m in
@@ -139,6 +141,10 @@ extension NavigationBridges {
                 let suggested = Binding<[KSearchToken]>(get: {
                     ((try? c.interp.sequence(sb.get())) ?? []).map { KSearchToken(id: r.rowID($0, nil) ?? $0, value: $0) }
                 }, set: { sb.set(.array($0.map(\.value))) })
+                if let pb = c.kbinding("isPresented") {
+                    return AnyView(view.searchable(text: text, tokens: tokens, suggestedTokens: suggested, isPresented: r.boolBinding(pb), placement: placement,
+                                                   prompt: prompt) { token in r.renderContent(tokenFn, [token.value]) })
+                }
                 return AnyView(view.searchable(text: text, tokens: tokens, suggestedTokens: suggested, placement: placement, prompt: prompt) { token in
                     r.renderContent(tokenFn, [token.value])
                 })

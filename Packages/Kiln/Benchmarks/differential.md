@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**143 inputs: 78 identical, 65 different as expected, 0 different otherwise.**
+**144 inputs: 78 identical, 66 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -17,6 +17,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/PlantCare.swift | 1455 | 13 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
+| Packages/Kiln/Examples/Apps/Scrapbook.swift | 297 | 14 | expected (Round 3A's Lab example: before, `resourceValues`, `.draggable` and `.dropDestination` weren't bridged.) |
 | Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
 | Packages/Kiln/Examples/Apps/Terrain.swift | 29 | 1 | expected (Round 2 §3.7's Lab example: before, Chart3D and SurfacePlot weren't bridged.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
@@ -399,6 +400,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +        LabeledContent("Range", value: "$3.75 – $88.38")
 +        LabeledContent("Share of food", value: "1.0%")
 +        LabeledContent("Yearly", value: "4.4K")
+…
+```
+
+## Packages/Kiln/Examples/Apps/Scrapbook.swift
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,3 @@
+ == start
+-ContentView {entries=[], sizes=[], starred=[], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
++ContentView {entries=[], sizes=[], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
+   NavigationStack({fn})
+@@ -12,4 +12,4 @@
+         LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
++        LabeledContent("JSON extension", value: "json")
++        LabeledContent("PNG MIME type", value: "image/png")
+         LabeledContent("Total", value: "0 bytes in 0 files")
+@@ -22,17 +22,52 @@
+ == appeared (List.onAppear@60)
+-error: Line 81: Can't loop over .default.contentsOfDirectory.map.sorted((Function))
+-ContentView {entries=.default.contentsOfDirectory.map.sorted({fn}), sizes=[], starred=[nil], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Files", {fn})
+-        ForEach(.default.contentsOfDirectory.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Starred", {fn})
+-        Text("nil")
+-          .dropDestination(for: String, {fn})
+-      Section("Kinds", {fn})
+-        LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
+-        LabeledContent("Total", value: "0 bytes in .default.contentsOfDirectory.map.sorted.count((Function)) files")
++ContentView {entries=[Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Groceries.txt)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], sizes=["Groceries.txt": 15, "Ideas.md": 27, "Trip.json": 26], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
++  NavigationStack({fn})
++    List({fn})
++      Section("Files", {fn})
++        ForEach([Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Groceries.txt)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], {fn})
++          row "Groceries.txt"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Groceries")
++                  .font(Font)
++                Text("public.plain-text")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "15 B")
++                .monospacedDigit()
++              .draggable("Groceries")
++          row "Ideas.md"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Ideas")
++                  .font(Font)
++                Text("net.daringfireball.markdown")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "27 B")
++                .monospacedDigit()
++              .draggable("Ideas")
++          row "Trip.json"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Trip")
++                  .font(Font)
++                Text("public.json")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "26 B")
++                .monospacedDigit()
++              .draggable("Trip")
++          .onDelete(perform: {fn})
++      Section("Starred", {fn})
++        Text("Drop a file here")
++          .dropDestination(for: String, {fn})
++      Section("Kinds", {fn})
++        LabeledContent("Text is data", value: "yes")
++        LabeledContent("JSON extension", value: "json")
++        LabeledContent("PNG MIME type", value: "image/png")
++        LabeledContent("Total", value: "68 bytes in 3 files")
+       Section({fn})
+@@ -44,17 +79,85 @@
+ == after ForEach.onDelete@38
+-error: Line 101: Can't loop over IndexSet
+-ContentView {entries=.default.contentsOfDirectory.map.sorted({fn}), sizes=[], starred=[nil, nil], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Files", {fn})
+-        ForEach(.default.contentsOfDirectory.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Starred", {fn})
+-        Text("nil, nil")
+-          .dropDestination(for: String, {fn})
+-      Section("Kinds", {fn})
+-        LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
+-        LabeledContent("Total", value: "0 bytes in .default.contentsOfDirectory.map.sorted.count((Function)) files")
++ContentView {entries=[Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], sizes=["Ideas.md": 27, "Trip.json": 26], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
++  NavigationStack({fn})
++    List({fn})
++      Section("Files", {fn})
++        ForEach([Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], {fn})
++          row "Ideas.md"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Ideas")
++                  .font(Font)
++                Text("net.daringfireball.markdown")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "27 B")
++                .monospacedDigit()
++              .draggable("Ideas")
++          row "Trip.json"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Trip")
 …
 ```
 
@@ -1680,8 +1807,8 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -        If false
 +      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: UTType, defaultFilename: "Note", {fn})
        .quickLookPreview($nil)
-@@ -30,19 +29,37 @@
- == appeared (List.onAppear@104)
+@@ -30,19 +29,39 @@
+ == appeared (List.onAppear@105)
 -ContentView {notes=.default.contentsOfDirectory.filter.map.sorted({fn}), draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[nil], status="Ready"}
 -  NavigationStack({fn})
 -    List({fn})
@@ -1717,6 +1844,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +                .labelStyle(.iconOnly)
 +              Button("Export", systemImage: "square.and.arrow.up", {fn})
 +                .labelStyle(.iconOnly)
++              .buttonStyle(.borderless)
 +          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)
 +            HStack({fn})
 +              Label("copy", systemImage: "doc.text")
@@ -1726,6 +1854,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +                .labelStyle(.iconOnly)
 +              Button("Export", systemImage: "square.and.arrow.up", {fn})
 +                .labelStyle(.iconOnly)
++              .buttonStyle(.borderless)
 +          .onDelete(perform: {fn})
 +      Section("Pinned (drop a note here)", {fn})
 +        Text("Nothing yet")
@@ -1735,7 +1864,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +        LabeledContent("Kind", value: "text")
 +        LabeledContent("Extension", value: "txt")
          Text("Ready")
-@@ -54,354 +71,583 @@
+@@ -54,354 +73,610 @@
        .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
 -      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
 -        If false
@@ -1783,8 +1912,6 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)
 +            HStack({fn})
 +              Label("Note", systemImage: "doc.text")
-+                .draggable("Note")
-+              Spacer()
 …
 ```
 

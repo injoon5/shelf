@@ -26,9 +26,14 @@ final class SharingBridges: KBridgeFamily {
         r.view("ShareLink", .sharing,
                notes: "A `String`, `URL`, `Image`, `Data` or your `Transferable`, or `items:` an array of one of them; `preview:` a `SharePreview` or a closure per item.") { v in
             for items in ["item:any", "items:any"] {
-                v.forms(["\(items) subject:any? message:any? preview:any?", "_:title \(items) subject:any? message:any? preview:any?",
+                // A preview closure as the first trailing closure, then `label:`:
+                // `ShareLink(items: notes) { note in SharePreview(…) } label: { … }`.
+                v.forms(["\(items) subject:any? message:any? preview:closure label:content",
+                         "\(items) subject:any? message:any? preview:any?", "_:title \(items) subject:any? message:any? preview:any?",
                          "\(items) subject:any? message:any? preview:any? label:content"]) { c in shareLink(c) }
             }
+            // `ShareLink("Share", items: notes) { note in SharePreview(note.text) }`.
+            v.form("_:title items:any subject:any? message:any? preview:closure") { c in shareLink(c) }
         }
         r.view("PasteButton", .sharing,
                notes: "`PasteButton(payloadType: String.self) { strings in … }`: `String`, `URL`, `Data`, `Image` or your `Transferable` type.") { v in
@@ -49,11 +54,14 @@ final class SharingBridges: KBridgeFamily {
         let subject = c["subject"].flatMap { KShare.text($0, c) }
         let message = c["message"].flatMap { KShare.text($0, c) }
         let values: [KV] = c["item"].map { [$0] } ?? (c["items"].map { (try? c.interp.sequence($0)) ?? [] } ?? [])
-        let label: AnyView? = c.has("label") ? c.content("label") : nil
+        // `ShareLink(items: notes) { note in SharePreview(note.text) }`: Swift's
+        // types make a closure that takes the item the preview, not the label.
+        let labelIsPreview = c["preview"] == nil && c["items"] != nil && (c.closureArity(c["label"]) ?? 0) > 0
+        let label: AnyView? = c.has("label") && !labelIsPreview ? c.content("label") : nil
         let links = KShare.Links(title: title, subject: subject, message: message, label: label)
 
         // One `SharePreview`, or a closure that makes one for each item.
-        let previewArg = c["preview"]
+        let previewArg = labelIsPreview ? c["label"] : c["preview"]
         var previews: [KSharePreview?]
         if case .function(let f)? = previewArg {
             previews = values.map { v in KHaptics.ask(c.interp, f, [v]).flatMap { KCall.objectValue($0) as? KSharePreview } }

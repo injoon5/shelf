@@ -33,7 +33,7 @@ final class CoreBridges: KBridgeFamily {
             v.form("") { _ in EmptyView() }
         }
         r.view("AnyView", .core) { v in
-            v.form("_:any") { c in c.r.renderList(KBuiltins.asViews(c[0] ?? .void, c.interp)) }
+            v.forms(["_:any", "erasing:any"]) { c in c.r.renderList(KBuiltins.asViews(c.first ?? .void, c.interp)) }
         }
     }
 
@@ -47,7 +47,8 @@ final class CoreBridges: KBridgeFamily {
             m.form("perform:action?") { c, view in view.onDisappear(perform: c.action("perform")) }
         }
         r.modifier("task", .core, notes: "Cancelled when the view goes away, and restarted when `id` changes.") { m in
-            m.forms(["priority:any? _:action", "id:any priority:any? _:action"]) { c, view in
+            // `name:` (iOS 27) names the task for debugging; the task is the same.
+            m.forms(["name:string? priority:any? _:action", "id:any name:string? priority:any? _:action"]) { c, view in
                 if case .function(let fn)? = c.last {
                     let interp = c.interp
                     if let id = c["id"] {

@@ -35,7 +35,9 @@ final class ControlsBridges: KBridgeFamily {
         r.view("Button", .controls) { v in
             v.forms(["_:title action:action", "_:title systemImage:string action:action", "_:title role:ButtonRole? action:action",
                      "_:title systemImage:string role:ButtonRole? action:action", "_:title image:any action:action",
-                     "action:action label:content", "role:ButtonRole? action:action label:content"]) { c in button(c) }
+                     "action:action label:content", "role:ButtonRole? action:action label:content",
+                     // iOS 26: `Button(role: .close) { dismiss() }` draws the role's own symbol.
+                     "role:ButtonRole action:action"]) { c in button(c) }
             // Inside a `PrimitiveButtonStyle`'s `makeBody`.
             v.form("_:any") { c in
                 if let conf = KStyles.configuration(c[0], "PrimitiveButtonStyle"), let native = conf.native as? PrimitiveButtonStyleConfiguration { Button(native) }
@@ -120,6 +122,9 @@ final class ControlsBridges: KBridgeFamily {
             return AnyView(Button(title, role: role, action: run))
         }
         if let lf = labelFn { return AnyView(Button(role: role, action: run) { r.renderContent(lf) }) }
+        if let role, a.labels.first == "role", #available(iOS 26.0, macOS 26.0, *) {
+            return AnyView(Button(role: role, action: run))
+        }
         return AnyView(Button(role: role, action: run) { Text(r.string(a.first) ?? "Button") })
     }
 
@@ -146,20 +151,32 @@ final class ControlsBridges: KBridgeFamily {
 
     static func values(_ r: KRegistry) {
         r.view("Slider", .controls, notes: "Labels, `step:`, `neutralValue:`, `enabledBounds:`, and tick marks (`ticks: { SliderTick(0.5) }`, iOS 26).") { v in
+            // SwiftUI's orders. A closure with no parameter where `onEditingChanged:`
+            // takes one is a view, as Swift's types decide: `Slider(value: $v) { Text("Volume") }`
+            // is the label, `Slider(value: $v, label: { … }) { Text("\(v)") }` the current value's (`slider`).
             v.forms(["value:binding in:any? step:number? onEditingChanged:closure?",
-                     "value:binding in:any? step:number? label:content minimumValueLabel:content? maximumValueLabel:content? onEditingChanged:closure?",
+                     "value:binding in:any? step:number? label:content minimumValueLabel:content maximumValueLabel:content onEditingChanged:closure?",
+                     "value:binding in:any? step:number? label:content onEditingChanged:closure?",
                      "value:binding in:any? step:number? onEditingChanged:closure? label:content",
                      "value:binding in:any? step:number? onEditingChanged:closure? minimumValueLabel:content maximumValueLabel:content label:content",
-                     "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? ticks:content onEditingChanged:closure?",
-                     "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? tick:closure? onEditingChanged:closure?"]) { c in
+                     // iOS 26: without tick marks first, so a trailing closure after `label:` goes where SwiftUI's
+                     // form without them puts it; `tick:` (a closure per step) needs `in:`.
+                     "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? onEditingChanged:closure?",
+                     "value:binding in:any step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? tick:closure? onEditingChanged:closure?",
+                     "value:binding in:any? step:number? neutralValue:number? enabledBounds:any? label:content currentValueLabel:content? minimumValueLabel:content? maximumValueLabel:content? ticks:content onEditingChanged:closure?"]) { c in
                 slider(c)
             }
         }
         r.view("Stepper", .controls) { v in
-            v.forms(["_:title value:binding in:any? step:number? onEditingChanged:closure?",
-                     "value:binding in:any? step:number? label:content onEditingChanged:closure?",
+            // SwiftUI's orders: `label:` before `onEditingChanged:` with `format:`,
+            // after it without; first or last with `onIncrement:`. `format:` is
+            // what VoiceOver reads the value as; the stepper looks the same.
+            v.forms(["_:title value:binding in:any? step:number? format:any? onEditingChanged:closure?",
+                     "value:binding in:any? step:number? format:any? label:content onEditingChanged:closure?",
+                     "value:binding in:any? step:number? onEditingChanged:closure? label:content",
                      "_:title onIncrement:action? onDecrement:action? onEditingChanged:closure?",
-                     "onIncrement:action? onDecrement:action? label:content"]) { c in stepper(c) }
+                     "onIncrement:action? onDecrement:action? onEditingChanged:closure? label:content",
+                     "label:content onIncrement:action? onDecrement:action? onEditingChanged:closure?"]) { c in stepper(c) }
             // Not SwiftUI's, but models write it.
             v.form("_:title value:binding in:any? increment:number", notes: "`increment:` is read as `step:`.") { c in stepper(c) }
         }
@@ -184,15 +201,19 @@ final class ControlsBridges: KBridgeFamily {
         let range = c.optional("in", ClosedRange<Double>.self) ?? 0...1
         let value = c.binding("value", Double.self)
         let step = c.double("step")
+        // `{ Text("Volume") }` where `onEditingChanged:` binds: a label, or with one, the current value's.
+        let viewClosure = c.closureArity(c["onEditingChanged"]) == 0 ? c["onEditingChanged"] : nil
         let edit: (Bool) -> Void = { [interp = c.interp] editing in
-            if case .function(let f)? = c["onEditingChanged"] { interp.perform(f, [.bool(editing)]) }
+            if viewClosure == nil, case .function(let f)? = c["onEditingChanged"] { interp.perform(f, [.bool(editing)]) }
         }
-        let label = c["label"].map { c.r.renderContent($0) } ?? AnyView(EmptyView())
+        let labelValue = c["label"] ?? viewClosure
+        let currentValue = c["currentValueLabel"] ?? (c["label"] != nil ? viewClosure : nil)
+        let label = labelValue.map { c.r.renderContent($0) } ?? AnyView(EmptyView())
         let minLabel = c["minimumValueLabel"].map { c.r.renderContent($0) } ?? AnyView(EmptyView())
         let maxLabel = c["maximumValueLabel"].map { c.r.renderContent($0) } ?? AnyView(EmptyView())
-        if #available(iOS 26.0, macOS 26.0, *), c["ticks"] != nil || c["tick"] != nil || c["neutralValue"] != nil || c["enabledBounds"] != nil || c["currentValueLabel"] != nil {
+        if #available(iOS 26.0, macOS 26.0, *), c["ticks"] != nil || c["tick"] != nil || c["neutralValue"] != nil || c["enabledBounds"] != nil || currentValue != nil {
             let marks = sliderTicks(c, range: range, step: step)
-            let current = c["currentValueLabel"].map { c.r.renderContent($0) } ?? AnyView(EmptyView())
+            let current = currentValue.map { c.r.renderContent($0) } ?? AnyView(EmptyView())
             let enabled = c.optional("enabledBounds", ClosedRange<Double>.self)
             return AnyView(Slider(value: value, in: range, neutralValue: c.double("neutralValue"), enabledBounds: enabled,
                                   label: { label }, currentValueLabel: { current }, minimumValueLabel: { minLabel }, maximumValueLabel: { maxLabel },
@@ -286,24 +307,29 @@ final class ControlsBridges: KBridgeFamily {
     }
 
     @MainActor static func stepper(_ c: KCall) -> AnyView {
-        let a = c.a, r = c.r
+        let r = c.r
         let title = stringTitle(c)
-        if let inc = a["onIncrement"] {
-            return AnyView(Stepper(title ?? "", onIncrement: r.action(inc), onDecrement: r.action(a["onDecrement"])))
+        // By the parameter each argument bound to: a trailing closure is `label:` or `onIncrement:`.
+        let label: AnyView = title.map { AnyView(Text($0)) } ?? c["label"].map { r.renderContent($0) } ?? AnyView(EmptyView())
+        let edit: (Bool) -> Void = { [interp = c.interp] editing in
+            if case .function(let f)? = c["onEditingChanged"] { interp.perform(f, [.bool(editing)]) }
         }
-        let b = r.binding(a["value"]) ?? .constant(.int(0))
-        let step = (a["step"] ?? a["increment"])?.asDouble ?? 1
+        if c["onIncrement"] != nil || c["onDecrement"] != nil {
+            let inc = c["onIncrement"].map { r.action($0) }, dec = c["onDecrement"].map { r.action($0) }
+            return AnyView(Stepper(onIncrement: inc, onDecrement: dec, onEditingChanged: edit) { label })
+        }
+        let b = r.binding(c["value"]) ?? .constant(.int(0))
+        let step = (c["step"] ?? c["increment"])?.asDouble ?? 1
         let isInt: Bool = { if case .int = b.get() { return true }; return false }()
-        let range = r.range(a["in"])
-        let label: AnyView = title.map { AnyView(Text($0)) } ?? r.renderContent(a.lastFunction)
+        let range = r.range(c["in"])
         if isInt {
             let ib = Binding<Int>(get: { b.get().asInt ?? 0 }, set: { b.set(.int($0)) })
-            if let range { return AnyView(Stepper(value: ib, in: Int(range.lowerBound)...Int(range.upperBound), step: Int(step)) { label }) }
-            return AnyView(Stepper(value: ib, step: Int(step)) { label })
+            if let range { return AnyView(Stepper(value: ib, in: Int(range.lowerBound)...Int(range.upperBound), step: Int(step), onEditingChanged: edit) { label }) }
+            return AnyView(Stepper(value: ib, step: Int(step), onEditingChanged: edit) { label })
         }
         let db = r.doubleBinding(b)
-        if let range { return AnyView(Stepper(value: db, in: range, step: step) { label }) }
-        return AnyView(Stepper(value: db, step: step) { label })
+        if let range { return AnyView(Stepper(value: db, in: range, step: step, onEditingChanged: edit) { label }) }
+        return AnyView(Stepper(value: db, step: step, onEditingChanged: edit) { label })
     }
 
     // MARK: Text fields
@@ -315,7 +341,7 @@ final class ControlsBridges: KBridgeFamily {
                      "_:title value:binding format:any prompt:any?", "_:title value:binding formatter:any prompt:any?",
                      "_:title value:binding formatter:any onEditingChanged:closure? onCommit:action?",
                      "text:binding prompt:any? axis:Axis? label:content", "text:binding selection:binding prompt:any? axis:Axis? label:content",
-                     "value:binding format:any prompt:any? label:content"]) { c in textField(c, secure: false) }
+                     "value:binding format:any prompt:any? label:content", "value:binding formatter:any prompt:any? label:content"]) { c in textField(c, secure: false) }
         }
         r.view("SecureField", .controls) { v in
             v.forms(["_:title text:binding prompt:any?", "_:title text:binding onCommit:action", "text:binding prompt:any? label:content"]) { c in textField(c, secure: true) }
@@ -376,9 +402,16 @@ final class ControlsBridges: KBridgeFamily {
             if let label { return AnyView(SecureField(text: text, prompt: prompt) { label }) }
             return AnyView(SecureField(placeholder, text: text, prompt: prompt))
         }
-        if case .function(let fn)? = c["onEditingChanged"] {
+        if c["onEditingChanged"] != nil || c["onCommit"] != nil {
+            // `TextField("Name", text: $name) { save() }`: a closure that takes no
+            // argument is `onCommit:`, as Swift's types decide.
+            let commitOnly = c["onCommit"] == nil && c.closureArity(c["onEditingChanged"]) == 0
+            let commit = commitOnly ? c["onEditingChanged"] : c["onCommit"]
             let interp = c.interp
-            return AnyView(TextField(placeholder, text: text, onEditingChanged: { interp.perform(fn, [.bool($0)]) }, onCommit: r.action(a["onCommit"])))
+            let editing: (Bool) -> Void = { changed in
+                if !commitOnly, case .function(let fn)? = c["onEditingChanged"] { interp.perform(fn, [.bool(changed)]) }
+            }
+            return AnyView(TextField(placeholder, text: text, onEditingChanged: editing, onCommit: r.action(commit)))
         }
         let vertical = c.symbol("axis") == "vertical"
         var field: AnyView
@@ -404,7 +437,11 @@ final class ControlsBridges: KBridgeFamily {
     static func pickers(_ r: KRegistry) {
         r.view("Picker", .controls, support: .partial, notes: "Rows are tagged with `.tag`, or by their `ForEach` id.") { v in
             v.forms(["_:title selection:binding content:content", "_:title systemImage:string selection:binding content:content",
-                     "selection:binding content:content label:content", "selection:binding label:any content:content"]) { c in picker(c) }
+                     "selection:binding content:content label:content", "selection:binding label:any content:content",
+                     // iOS 18: what a menu picker shows for the selection.
+                     "_:title selection:binding content:content currentValueLabel:content",
+                     "_:title systemImage:string selection:binding content:content currentValueLabel:content",
+                     "selection:binding content:content label:content currentValueLabel:content"]) { c in picker(c) }
         }
         r.view("DatePicker", .controls, notes: "`displayedComponents` `.date`, `.hourAndMinute` or both, with an `in:` range (`date...`, `...date` or `a...b`); every style, `.graphical` included.") { v in
             v.forms(["_:title selection:binding displayedComponents:any?", "_:title selection:binding in:any displayedComponents:any?",
@@ -431,14 +468,25 @@ final class ControlsBridges: KBridgeFamily {
     @MainActor static func picker(_ c: KCall) -> AnyView {
         let a = c.a, r = c.r
         let b = r.binding(a["selection"]) ?? .constant(.nilValue)
-        let rows = pickerRows(c, r.content(a.lastFunction ?? a["content"]))
+        // `content:` as bound: `Picker(selection:) { rows } label: { … }` ends with the label.
+        let rows = pickerRows(c, r.content(c["content"]))
         let sel = Binding<KV>(get: {
             let v = b.get()
             return rows.first(where: { $0.0 == v })?.0 ?? v
         }, set: { b.set($0) })
         let title = r.string(a.first.flatMap { if case .string = $0 { return $0 }; return nil }) ?? ""
         let items = ForEach(Array(rows.enumerated()), id: \.offset) { _, row in r.render(row.1).tag(row.0) }
-        if let lf = a["label"] { return AnyView(Picker(selection: sel) { items } label: { r.renderContent(lf) }) }
+        let current = c["currentValueLabel"].map { r.renderContent($0) }
+        if let lf = c["label"] {
+            let label = r.isFunction(lf) ? r.renderContent(lf) : r.renderList(KBuiltins.asViews(lf, c.interp))
+            if let current, #available(iOS 18, macOS 15, *) {
+                return AnyView(Picker(selection: sel) { items } label: { label } currentValueLabel: { current })
+            }
+            return AnyView(Picker(selection: sel) { items } label: { label })
+        }
+        if let current, #available(iOS 18, macOS 15, *) {
+            return AnyView(Picker(title, selection: sel) { items } currentValueLabel: { current })
+        }
         return AnyView(Picker(title, selection: sel) { items })
     }
 
