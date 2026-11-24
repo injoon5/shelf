@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**133 inputs: 79 identical, 54 different as expected, 0 different otherwise.**
+**143 inputs: 78 identical, 65 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -12,6 +12,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/Apps/ExpenseTracker.swift | 1654 | 13 | identical |
 | Packages/Kiln/Examples/Apps/FocusTimer.swift | 910 | 13 | identical |
 | Packages/Kiln/Examples/Apps/HabitTracker.swift | 1105 | 13 | identical |
+| Packages/Kiln/Examples/Apps/Ledger.swift | 2 | 1 | expected (Round 2C's Lab example: before, a generic subscript (`subscript<T>(dynamicMember:)`) didn't parse.) |
 | Packages/Kiln/Examples/Apps/LineFeed.swift | 156 | 13 | identical |
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/PlantCare.swift | 1455 | 13 | identical |
@@ -31,10 +32,13 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/accessibility-motion.swift | 2 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/async.swift | 283 | 14 | identical |
 | fixtures/apps/audio.swift | 2 | 1 | expected (Round 2 §3.5's fixture: before, AVAudioPlayer, AVSpeechSynthesizer and VideoPlayer weren't bridged.) |
+| fixtures/apps/camera.swift | 253 | 14 | expected (Round 3A's Camera fixture: before, `.camera` was refused and `AVCaptureDevice` wasn't bridged.) |
 | fixtures/apps/chart3d.swift | 29 | 1 | expected (Round 2 §3.7's fixture: before, Chart3D and SurfacePlot weren't bridged.) |
 | fixtures/apps/charts.swift | 81 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/controls-styles.swift | 508 | 13 | expected (Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.) |
+| fixtures/apps/files.swift | 407 | 14 | expected (Round 3A's Files fixture: before, the file pickers, `.quickLookPreview` and drag and drop weren't bridged.) |
 | fixtures/apps/focus-environment.swift | 703 | 13 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
+| fixtures/apps/foundation-stdlib.swift | 2 | 1 | expected (Round 2C's fixture: before, `Logger`, Combine's operators and most of what it uses didn't exist.) |
 | fixtures/apps/gestures-canvas.swift | 6 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/haptics.swift | 2 | 1 | expected (Round 2A's Haptics fixture: before, `SensoryFeedback`'s values and `.sensoryFeedback(trigger:_:)` weren't bridged (the modifier was a stub).) |
 | fixtures/apps/images.swift | 663 | 13 | identical |
@@ -42,13 +46,15 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/lists-selection.swift | 59 | 1 | expected (Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.) |
 | fixtures/apps/navigation-tabs.swift | 1431 | 13 | expected (Round 1A's Navigation fixture: before, Tab, ToolbarSpacer, zoom transitions and search scopes weren't bridged.) |
 | fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
+| fixtures/apps/photos.swift | 15 | 1 | expected (Round 3A's Photos fixture: before, `PhotosPicker` and saving to Photos weren't bridged.) |
+| fixtures/apps/recorder.swift | 310 | 14 | expected (Round 3A's recording fixture: before, `AVAudioRecorder` and `AVAudioApplication` weren't bridged.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
 | fixtures/apps/sharing.swift | 30 | 1 | expected (Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.) |
 | fixtures/apps/state.swift | 599 | 13 | identical |
 | fixtures/apps/streams.swift | 363 | 14 | expected (Round 2 §3.8's fixture: before, webSocketTask and bytes(from:) weren't bridged.) |
 | fixtures/apps/swift-builders.swift | 339 | 13 | expected (§1.6's fixture: before, the Card's @ViewBuilder content and the @Entry tint were missing and the steps builder stopped the body.) |
 | fixtures/apps/swift-codable.swift | 2 | 1 | expected (§1.6's fixture: before, the regex literal didn't parse.) |
-| fixtures/apps/swift-language.swift | 1213 | 13 | identical |
+| fixtures/apps/swift-language.swift | 1213 | 13 | expected (Round 2C: `.dateTime.weekday(.wide)` is Foundation's own style, replayed with its argument ("Wednesday"); before, the argument was dropped ("Wed").) |
 | fixtures/apps/swift-protocols.swift | 2 | 1 | expected (§1.6's fixture: before, `case 500...:` didn't parse.) |
 | fixtures/apps/text-parsing.swift | 2 | 1 | expected (Round 2A's text-parsing fixture: before, RegexBuilder, NSDataDetector, NaturalLanguage and Decimal weren't bridged.) |
 | fixtures/apps/time.swift | 372 | 13 | identical |
@@ -126,9 +132,13 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/RestOfSwiftUITests-16.swift | 5 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/RestOfSwiftUITests-19.swift | 2 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/RestOfSwiftUITests-2.swift | 5 | 1 | identical |
-| tests/RestOfSwiftUITests-20.swift | 9 | 1 | identical |
+| tests/RestOfSwiftUITests-20.swift | 9 | 1 | expected (Round 2C: a `Date` in an interpolation prints as Swift prints it ("1970-01-01 00:00:00 +0000"); before, Kiln formatted it ("Jan 1, 1970 at 12:00 AM").) |
 | tests/RestOfSwiftUITests-3.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/RestOfSwiftUITests-6.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/Round2CTests-0.swift | 2 | 1 | expected (Round 2C's test: before, Combine's `PassthroughSubject` didn't exist.) |
+| tests/Round3ATests-1.swift | 24 | 1 | expected (Round 3A: before, the file pickers and `FileDocument`'s exporter weren't bridged.) |
+| tests/Round3ATests-10.swift | 3 | 1 | identical |
+| tests/Round3ATests-4.swift | 5 | 1 | expected (Round 3A: before, drag and drop and iOS 27's drag containers weren't bridged.) |
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
@@ -263,6 +273,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +    HStack({fn})
 +      Button("Clear", {fn})
 +      Button("Save", {fn})
+…
+```
+
+## Packages/Kiln/Examples/Apps/Ledger.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,650 @@
+-compile error: Line 51: expected '(' to start the parameters, found '<'
+-  51 | subscript<T>(dynamicMember path: WritableKeyPath<Settings, T>) -> T {
++== start
++ContentView {expenses=[Expense(id: 0, title: "Groceries", amount: Decimal, category: .travel, day: 1), Expense(id: 1, title: "Train", amount: Decimal, category: .fun, day: 4), Expense(id: 2, title: "Lamp", amount: Decimal, category: .travel, day: 7), Expense(id: 3, title: "Cinema", amount: Decimal, category: .fun, day: 10), Expense(id: 4, title: "Coffee", amount: Decimal, category: .travel, day: 13), Expense(id: 5, title: "Hotel", amount: Decimal, category: .fun, day: 16), Expense(id: 6, title: "Plants", amount: Decimal, category: .travel, day: 19), Expense(id: 7, title: "Concert", amount: Decimal, category: .fun, day: 22)], monthOffset=0, previous=[], lastChange="No changes yet", prefs=Preferences(settings: Settings(currency: "USD", showCents: true)), activity=Activity{changes: 0}, edits=PassthroughSubject}
++  NavigationStack({fn})
++    List({fn})
++      Section("March 2026", {fn})
++        LabeledContent("Days", value: "31, starting Sun")
++        LabeledContent("Week of year", value: "10")
++        LabeledContent("Days left after the 10th", value: "21")
++        LabeledContent("Starts", value: "2026-03-01T00:<time>Z")
++      Section("Spending", {fn})
++        LabeledContent("Total", value: "$362.58")
++        LabeledContent("Left of 400", value: "$37.42")
++        LabeledContent("Range", value: "$19.87 – $88.38")
++        LabeledContent("Share of food", value: "0.0%")
++        LabeledContent("Yearly", value: "4.4K")
++        LabeledContent("Categories", value: "Fun and Travel")
++      Section("By category", {fn})
++        ForEach([.food, .travel, .home, .fun], {fn})
++          row .food
++            LabeledContent("Food", value: "$0.00")
++          row .travel
++            LabeledContent("Travel", value: "$180.33")
++          row .home
++            LabeledContent("Home", value: "$0.00")
++          row .fun
++            LabeledContent("Fun", value: "$182.25")
++      Section("Largest first", {fn})
++        ForEach([(1, Expense(id: 4, title: "Coffee", amount: Decimal, category: .travel, day: 13)), (2, Expense(id: 1, title: "Train", amount: Decimal, category: .fun, day: 4)), (3, Expense(id: 0, title: "Groceries", amount: Decimal, category: .travel, day: 1)), (4, Expense(id: 5, title: "Hotel", amount: Decimal, category: .fun, day: 16))], id: KeyPath, {fn})
++          row 4
++            LabeledContent("1. Coffee", value: "$88.38")
++          row 1
++            LabeledContent("2. Train", value: "$81.88")
++          row 0
++            LabeledContent("3. Groceries", value: "$45.91")
++          row 5
++            LabeledContent("4. Hotel", value: "$39.59")
++      Section("Checks", {fn})
++        LabeledContent("Checksum", value: "252")
++        LabeledContent("Fingerprint", value: "ea58801d")
++        LabeledContent("Busiest", value: "day 1")
++        LabeledContent("Changes", value: "0: No changes yet")
++        LabeledContent("Latest", value: "Concert")
++        LabeledContent("Report size", value: "12 kB")
++      Section({fn})
++        Toggle("Show cents", isOn: $true)
++        Button("Next month", {fn})
++        Button("Add coffee", {fn})
++        Button("Reshuffle", {fn})
++      .navigationTitle("Ledger")
++      .onReceive(PassthroughSubject, {fn})
++== after Button[Next month]@207
++ContentView {expenses=[Expense(id: 0, title: "Groceries", amount: Decimal, category: .travel, day: 1), Expense(id: 1, title: "Train", amount: Decimal, category: .fun, day: 4), Expense(id: 2, title: "Lamp", amount: Decimal, category: .travel, day: 7), Expense(id: 3, title: "Cinema", amount: Decimal, category: .fun, day: 10), Expense(id: 4, title: "Coffee", amount: Decimal, category: .travel, day: 13), Expense(id: 5, title: "Hotel", amount: Decimal, category: .fun, day: 16), Expense(id: 6, title: "Plants", amount: Decimal, category: .travel, day: 19), Expense(id: 7, title: "Concert", amount: Decimal, category: .fun, day: 22)], monthOffset=1, previous=[], lastChange="No changes yet", prefs=Preferences(settings: Settings(currency: "USD", showCents: true)), activity=Activity{changes: 0}, edits=PassthroughSubject}
++  NavigationStack({fn})
++    List({fn})
++      Section("April 2026", {fn})
++        LabeledContent("Days", value: "30, starting Wed")
++        LabeledContent("Week of year", value: "14")
++        LabeledContent("Days left after the 10th", value: "20")
++        LabeledContent("Starts", value: "2026-04-01T00:<time>Z")
++      Section("Spending", {fn})
++        LabeledContent("Total", value: "$362.58")
++        LabeledContent("Left of 400", value: "$37.42")
++        LabeledContent("Range", value: "$19.87 – $88.38")
++        LabeledContent("Share of food", value: "0.0%")
++        LabeledContent("Yearly", value: "4.4K")
++        LabeledContent("Categories", value: "Fun and Travel")
++      Section("By category", {fn})
++        ForEach([.food, .travel, .home, .fun], {fn})
++          row .food
++            LabeledContent("Food", value: "$0.00")
++          row .travel
++            LabeledContent("Travel", value: "$180.33")
++          row .home
++            LabeledContent("Home", value: "$0.00")
++          row .fun
++            LabeledContent("Fun", value: "$182.25")
++      Section("Largest first", {fn})
++        ForEach([(1, Expense(id: 4, title: "Coffee", amount: Decimal, category: .travel, day: 13)), (2, Expense(id: 1, title: "Train", amount: Decimal, category: .fun, day: 4)), (3, Expense(id: 0, title: "Groceries", amount: Decimal, category: .travel, day: 1)), (4, Expense(id: 5, title: "Hotel", amount: Decimal, category: .fun, day: 16))], id: KeyPath, {fn})
++          row 4
++            LabeledContent("1. Coffee", value: "$88.38")
++          row 1
++            LabeledContent("2. Train", value: "$81.88")
++          row 0
++            LabeledContent("3. Groceries", value: "$45.91")
++          row 5
++            LabeledContent("4. Hotel", value: "$39.59")
++      Section("Checks", {fn})
++        LabeledContent("Checksum", value: "252")
++        LabeledContent("Fingerprint", value: "ea58801d")
++        LabeledContent("Busiest", value: "day 1")
++        LabeledContent("Changes", value: "0: No changes yet")
++        LabeledContent("Latest", value: "Concert")
++        LabeledContent("Report size", value: "12 kB")
++      Section({fn})
++        Toggle("Show cents", isOn: $true)
++        Button("Next month", {fn})
++        Button("Add coffee", {fn})
++        Button("Reshuffle", {fn})
++      .navigationTitle("Ledger")
++      .onReceive(PassthroughSubject, {fn})
++== after Button[Add coffee]@211
++ContentView {expenses=[Expense(id: 0, title: "Groceries", amount: Decimal, category: .travel, day: 1), Expense(id: 1, title: "Train", amount: Decimal, category: .fun, day: 4), Expense(id: 2, title: "Lamp", amount: Decimal, category: .travel, day: 7), Expense(id: 3, title: "Cinema", amount: Decimal, category: .fun, day: 10), Expense(id: 4, title: "Coffee", amount: Decimal, category: .travel, day: 13), Expense(id: 5, title: "Hotel", amount: Decimal, category: .fun, day: 16), Expense(id: 6, title: "Plants", amount: Decimal, category: .travel, day: 19), Expense(id: 7, title: "Concert", amount: Decimal, category: .fun, day: 22), Expense(id: 8, title: "Coffee 8", amount: Decimal, category: .food, day: 2)], monthOffset=1, previous=[0, 1, 2, 3, 4, 5, 6, 7], lastChange="No changes yet", prefs=Preferences(settings: Settings(currency: "USD", showCents: true)), activity=Activity{changes: 0}, edits=PassthroughSubject}
++  NavigationStack({fn})
++    List({fn})
++      Section("April 2026", {fn})
++        LabeledContent("Days", value: "30, starting Wed")
++        LabeledContent("Week of year", value: "14")
++        LabeledContent("Days left after the 10th", value: "20")
++        LabeledContent("Starts", value: "2026-04-01T00:<time>Z")
++      Section("Spending", {fn})
++        LabeledContent("Total", value: "$366.33")
++        LabeledContent("Left of 400", value: "$33.67")
++        LabeledContent("Range", value: "$3.75 – $88.38")
++        LabeledContent("Share of food", value: "1.0%")
++        LabeledContent("Yearly", value: "4.4K")
 …
 ```
 
@@ -1022,6 +1158,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/camera.swift
+
+```diff
+--- before
++++ after
+@@ -10,3 +10,3 @@
+       Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
++        Label("Choose Photo", systemImage: "camera.circle.fill")
+           .font(Font)
+@@ -16,16 +16,17 @@
+       .sheet(isPresented: $false, {fn})
+-        content failed
+-      .task({fn})
+-error: Line 88: Value of type 'CameraView' has no method 'ignoresSafeArea'
++        CameraView {source=.photoLibrary, onPhoto={fn}, dismiss=DismissAction}
++          (no body)
++          .ignoresSafeArea()
++      .task({fn})
+ == appeared (VStack.task@90)
+-ContentView {photos=[], showingCamera=false, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
++ContentView {photos=[], showingCamera=false, access="allowed"}
++  NavigationStack({fn})
++    VStack(spacing: 20, {fn})
++      If false
++        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
++          Text(_literal: "Take one with the button below.")
++      Text(_literal: "0 taken · camera allowed")
++        .foregroundStyle(Color)
++      Button({fn}, label: {fn})
++        Label("Choose Photo", systemImage: "camera.circle.fill")
+           .font(Font)
+@@ -35,219 +36,245 @@
+       .sheet(isPresented: $false, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+…
+```
+
 ## fixtures/apps/chart3d.swift
 
 ```diff
@@ -1294,7 +1556,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -      .navigationTitle("Coffee")
 -      .controlSize(.regular)
 -error: Line 74: Cannot find 'MultiDatePicker' in scope
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1315,7 +1577,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -67,3 +71,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1325,7 +1587,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -106,3 +115,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1335,7 +1597,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -145,3 +159,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1345,7 +1607,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -184,3 +203,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1355,7 +1617,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -223,3 +247,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1365,7 +1627,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -262,3 +291,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1375,7 +1637,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -301,3 +335,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1385,7 +1647,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -340,3 +379,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
 +        ColorPicker("Cup", selection: $Color, supportsOpacity: false)
 +        TextField("Note for the barista", text: $"", axis: .vertical)
@@ -1395,8 +1657,134 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 @@ -379,3 +423,8 @@
        Section("Pickup", {fn})
 -        content failed
-+        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
++        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
+…
+```
+
+## fixtures/apps/files.swift
+
+```diff
+--- before
++++ after
+@@ -16,4 +16,4 @@
+       Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
++        LabeledContent("Kind", value: "text")
++        LabeledContent("Extension", value: "txt")
+         Text("Ready")
+@@ -25,4 +25,3 @@
+       .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
++      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: UTType, defaultFilename: "Note", {fn})
+       .quickLookPreview($nil)
+@@ -30,19 +29,37 @@
+ == appeared (List.onAppear@104)
+-ContentView {notes=.default.contentsOfDirectory.filter.map.sorted({fn}), draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[nil], status="Ready"}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("New note", {fn})
+-        TextField("Write something", text: $"", axis: .vertical)
+-        Button("Save as a file", {fn})
+-          .disabled(true)
+-      Section("Notes", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Pinned (drop a note here)", {fn})
+-        Text("nil")
+-          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
+-          .dropDestination(for: String, {fn})
+-      Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
++ContentView {notes=[Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[], status="Ready"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New note", {fn})
++        TextField("Write something", text: $"", axis: .vertical)
++        Button("Save as a file", {fn})
++          .disabled(true)
++      Section("Notes", {fn})
++        ForEach([Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], {fn})
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)
++            HStack({fn})
++              Label("Sample", systemImage: "doc.text")
++                .draggable("Sample")
++              Spacer()
++              Button("Preview", systemImage: "eye", {fn})
++                .labelStyle(.iconOnly)
++              Button("Export", systemImage: "square.and.arrow.up", {fn})
++                .labelStyle(.iconOnly)
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)
++            HStack({fn})
++              Label("copy", systemImage: "doc.text")
++                .draggable("copy")
++              Spacer()
++              Button("Preview", systemImage: "eye", {fn})
++                .labelStyle(.iconOnly)
++              Button("Export", systemImage: "square.and.arrow.up", {fn})
++                .labelStyle(.iconOnly)
++          .onDelete(perform: {fn})
++      Section("Pinned (drop a note here)", {fn})
++        Text("Nothing yet")
++          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
++          .dropDestination(for: String, {fn})
++      Section({fn}, footer: {fn})
++        LabeledContent("Kind", value: "text")
++        LabeledContent("Extension", value: "txt")
+         Text("Ready")
+@@ -54,354 +71,583 @@
+       .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
+-      .quickLookPreview($nil)
++      .fileExporter(isPresented: $true, document: TextFile(text: ""), contentType: UTType, defaultFilename: "Note", {fn})
++      .quickLookPreview($URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))
+       .onAppear(perform: {fn})
+ == after Button[Save as a file]@51
+-ContentView {notes=.default.contentsOfDirectory.filter.map.sorted({fn}), draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[nil, nil], status="Value of type 'Array' has no method 'write'"}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("New note", {fn})
+-        TextField("Write something", text: $"", axis: .vertical)
+-        Button("Save as a file", {fn})
+-          .disabled(true)
+-      Section("Notes", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Pinned (drop a note here)", {fn})
+-        Text("nil, nil")
+-          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
+-          .dropDestination(for: String, {fn})
+-      Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
+-        Text("Value of type 'Array' has no method 'write'")
+-          .foregroundStyle(Color)
+-        Text(_literal: "Files stay on this iPhone.")
+-      .navigationTitle("Notebook")
+-      .toolbar({fn})
+-        Button("Open", systemImage: "folder", {fn})
+-      .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
+-      .quickLookPreview($nil)
++ContentView {notes=[Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], draft="", importing=true, exporting=true, exportText="Sample", preview=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), pinned=[], status="Saved Note.txt"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New note", {fn})
++        TextField("Write something", text: $"", axis: .vertical)
++        Button("Save as a file", {fn})
++          .disabled(true)
++      Section("Notes", {fn})
++        ForEach([Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], {fn})
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)
++            HStack({fn})
++              Label("Note", systemImage: "doc.text")
++                .draggable("Note")
++              Spacer()
 …
 ```
 
@@ -1523,6 +1911,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          VStack(alignment: .leading, spacing: 4, {fn})
 +            Text("Name")
 +              .font(Font)
+…
+```
+
+## fixtures/apps/foundation-stdlib.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,1030 @@
+ == start
+-error: Line 46: Cannot find 'Logger' in scope
++ContentView {planner=Planner{query: "", slots: [Slot(id: 0, title: "Standup", start: DateComponents, minutes: 15), Slot(id: 1, title: "Design review", start: DateComponents, minutes: 50), Slot(id: 2, title: "Lunch", start: DateComponents, minutes: 45), Slot(id: 3, title: "Focus time", start: DateComponents, minutes: 120)], bag: Set(AnyCancellable), log: Logger}, day=<date>, changes=0, group=DispatchGroup, loaded="Loading…", rounder=Rounder(step: 15), calendar=Calendar}
++  NavigationStack({fn})
++    List({fn})
++      Section({fn})
++        LabeledContent("Day", value: "Tuesday, November 24, 2026")
++        LabeledContent("Week", value: "Nov 22, 7 days")
++        LabeledContent("Booked", value: "4 hours")
++        LabeledContent("Tag", value: "10-bb87e3")
++        LabeledContent("Device", value: "Mac, 10 cores")
++        LabeledContent("Loaded", value: "Loading…")
++        LabeledContent("Changes", value: "0")
++      Section("Schedule", {fn})
++        ForEach([Slot(id: 0, title: "Standup", start: DateComponents, minutes: 15), Slot(id: 1, title: "Design review", start: DateComponents, minutes: 50), Slot(id: 2, title: "Lunch", start: DateComponents, minutes: 45), Slot(id: 3, title: "Focus time", start: DateComponents, minutes: 120)], {fn})
++          row 0
++            HStack({fn})
++              Text("Standup")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 1
++            HStack({fn})
++              Text("Design review")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 2
++            HStack({fn})
++              Text("Lunch")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 3
++            HStack({fn})
++              Text("Focus time")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++      Section({fn})
++        Button("Tomorrow", {fn})
++        Button("Add break", {fn})
++      .searchable(text: $"")
++      .navigationTitle("Day Planner")
++      .onReceive(NotificationCenter.Publisher, {fn})
++      .onAppear({fn})
++== appeared (List.onAppear@147)
++ContentView {planner=Planner{query: "", slots: [Slot(id: 0, title: "Standup", start: DateComponents, minutes: 15), Slot(id: 1, title: "Design review", start: DateComponents, minutes: 50), Slot(id: 2, title: "Lunch", start: DateComponents, minutes: 45), Slot(id: 3, title: "Focus time", start: DateComponents, minutes: 120)], bag: Set(AnyCancellable), log: Logger}, day=<date>, changes=0, group=DispatchGroup, loaded="Loading…", rounder=Rounder(step: 15), calendar=Calendar}
++  NavigationStack({fn})
++    List({fn})
++      Section({fn})
++        LabeledContent("Day", value: "Tuesday, November 24, 2026")
++        LabeledContent("Week", value: "Nov 22, 7 days")
++        LabeledContent("Booked", value: "4 hours")
++        LabeledContent("Tag", value: "10-bb87e3")
++        LabeledContent("Device", value: "Mac, 10 cores")
++        LabeledContent("Loaded", value: "Loading…")
++        LabeledContent("Changes", value: "0")
++      Section("Schedule", {fn})
++        ForEach([Slot(id: 0, title: "Standup", start: DateComponents, minutes: 15), Slot(id: 1, title: "Design review", start: DateComponents, minutes: 50), Slot(id: 2, title: "Lunch", start: DateComponents, minutes: 45), Slot(id: 3, title: "Focus time", start: DateComponents, minutes: 120)], {fn})
++          row 0
++            HStack({fn})
++              Text("Standup")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 1
++            HStack({fn})
++              Text("Design review")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 2
++            HStack({fn})
++              Text("Lunch")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++          row 3
++            HStack({fn})
++              Text("Focus time")
++              Spacer()
++              Text("<time>")
++                .monospacedDigit()
++              Text("<time>")
++                .foregroundStyle(Color)
++      Section({fn})
++        Button("Tomorrow", {fn})
++        Button("Add break", {fn})
++      .searchable(text: $"")
++      .navigationTitle("Day Planner")
++      .onReceive(NotificationCenter.Publisher, {fn})
++      .onAppear({fn})
++== after Button[Tomorrow]@133
++ContentView {planner=Planner{query: "", slots: [Slot(id: 0, title: "Standup", start: DateComponents, minutes: 15), Slot(id: 1, title: "Design review", start: DateComponents, minutes: 50), Slot(id: 2, title: "Lunch", start: DateComponents, minutes: 45), Slot(id: 3, title: "Focus time", start: DateComponents, minutes: 120)], bag: Set(AnyCancellable), log: Logger}, day=<date>, changes=0, group=DispatchGroup, loaded="Loading…", rounder=Rounder(step: 15), calendar=Calendar}
++  NavigationStack({fn})
++    List({fn})
++      Section({fn})
++        LabeledContent("Day", value: "Wednesday, November 25, 2026")
++        LabeledContent("Week", value: "Nov 22, 7 days")
++        LabeledContent("Booked", value: "4 hours")
++        LabeledContent("Tag", value: "10-bb87e3")
++        LabeledContent("Device", value: "Mac, 10 cores")
 …
 ```
 
@@ -2176,6 +2690,171 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/photos.swift
+
+```diff
+--- before
++++ after
+@@ -5,3 +5,27 @@
+       VStack(alignment: .leading, spacing: 16, {fn})
+-        content failed
++        PhotosPicker(selection: $nil, matching: .images, {fn})
++          Group({fn})
++            If false
++              Label("Choose a cover", systemImage: "photo.badge.plus")
++                .frame(maxWidth: inf, maxHeight: inf)
++                .background(.quaternary)
++            .frame(height: 180)
++            .clipShape(<view>)
++              RoundedRectangle(cornerRadius: 16)
++        HStack({fn})
++          PhotosPicker("Add to the board", selection: $[], maxSelectionCount: 6, selectionBehavior: .ordered, matching: .any([.images, .screenshots]))
++          Spacer()
++          Button("Save cover", systemImage: "square.and.arrow.down", {fn})
++            .disabled(true)
++        LazyVGrid(columns: [GridItem], spacing: 8, {fn})
++          ForEach(0..<0, id: KeyPath, {fn})
++        Text(_literal: "Recent")
++          .font(Font)
++        PhotosPicker(selection: $nil, matching: .not(.videos), {fn})
++          Text(_literal: "Photos")
++          .photosPickerStyle(.inline)
++          .photosPickerDisabledCapabilities(.selectionActions)
++          .photosPickerAccessoryVisibility(.hidden, edges: .all)
++          .frame(height: 260)
++        If false
+         .padding()
+@@ -14,2 +38 @@
+       .onChange(of: [], {fn})
+-error: Line 27: Cannot find 'PhotosPicker' in scope
+```
+
+## fixtures/apps/recorder.swift
+
+```diff
+--- before
++++ after
+@@ -23,288 +23,324 @@
+ == appeared (List.onAppear@65)
+-error: Line 85: Binary operator '+' can't be applied to .default.contentsOfDirectory.filter.sorted.count and Int
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-error: Line 59: Can't loop over IndexSet
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after List.onReceive@66
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after List.onReceive@66
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+…
+```
+
 ## fixtures/apps/sharing.swift
 
 ```diff
@@ -2677,6 +3356,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +            Text("Imported 2")
 +              .font(Font)
 +          row 1
+…
+```
+
+## fixtures/apps/swift-language.swift
+
+```diff
+--- before
++++ after
+@@ -156,3 +156,3 @@
+ == after Button[Run checks]@166
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 2, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 2.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 2, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 2.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -202,3 +202,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row "Eggs 12 3 2 2.4"
+@@ -215,4 +215,4 @@
+               .font(Font)
+-          row "Wed"
+-            Text("Wed")
++          row "Wednesday"
++            Text("Wednesday")
+               .font(Font)
+@@ -233,3 +233,3 @@
+ == after Button[Use one apple]@149
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -279,3 +279,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row "Eggs 12 3 2 2.4"
+@@ -292,4 +292,4 @@
+               .font(Font)
+-          row "Wed"
+-            Text("Wed")
++          row "Wednesday"
++            Text("Wednesday")
+               .font(Font)
+@@ -310,3 +310,3 @@
+ == after Button[Add empty item]@157
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -356,3 +356,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row "Eggs 12 3 2 2.4"
+@@ -369,4 +369,4 @@
+               .font(Font)
+-          row "Wed"
+-            Text("Wed")
++          row "Wednesday"
++            Text("Wednesday")
+               .font(Font)
+@@ -387,3 +387,3 @@
+ == after Button[Run checks]@166
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 1, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 5.0), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -433,3 +433,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row 0
+@@ -447,3 +447,3 @@
+           row 4
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -471,3 +471,3 @@
+           row 12
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -488,3 +488,3 @@
+ == after Button[Use one apple]@149
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -534,3 +534,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row 0
+@@ -548,3 +548,3 @@
+           row 4
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -572,3 +572,3 @@
+           row 12
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -589,3 +589,3 @@
+ == after Button[Add empty item]@157
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -635,3 +635,3 @@
+             .foregroundStyle(Color)
+-        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
++        ForEach(["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], id: KeyPath, {fn})
+           row 0
+@@ -649,3 +649,3 @@
+           row 4
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -673,3 +673,3 @@
+           row 12
+-            Text("Wed")
++            Text("Wednesday")
+               .font(Font)
+@@ -690,3 +690,3 @@
+ == after Button[Run checks]@166
+-ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wed", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
++ContentView {items=[Item(id: <uuid>, name: "Apples", aisle: .produce, quantity: 0, bought: <date>), Item(id: <uuid>, name: "Milk", aisle: .dairy, quantity: 1, bought: nil), Item(id: <uuid>, name: "Bread", aisle: .bakery, quantity: 2, bought: nil)], budget=Budget(limit: 40.0, spent: 7.5), message="Give the item a name.", log=["Eggs 12 3 2 2.4", "Apples", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done", "Eggs 12 3 2 2.4", "Bread", "nil", "Nov 24, 2026", "Wednesday", "many", "Taps 0", "Checks done"], counter=Counter{total: 0}}
+   NavigationStack({fn})
+@@ -736,3 +736,3 @@
+             .foregroundStyle(Color)
 …
 ```
 
@@ -4512,6 +5317,20 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## tests/RestOfSwiftUITests-20.swift
+
+```diff
+--- before
++++ after
+@@ -6,4 +6,4 @@
+     TimelineView(.periodic(<date>, 1), {fn})
+-      Text(_literal: "Jan 1, 1970 at <time>")
++      Text(_literal: "1970-01-01 <time> +0000")
+     TimelineView(.everyMinute, {fn})
+-      Text(_literal: "Jan 1, 1970 at <time>")
++      Text(_literal: "1970-01-01 <time> +0000")
+```
+
 ## tests/RestOfSwiftUITests-3.swift
 
 ```diff
@@ -4707,6 +5526,278 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +      .union(<view>)
 +        Rectangle()
 +          .offset(x: 20)
+…
+```
+
+## tests/Round2CTests-0.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,11 @@
+ == start
+-error: Line 5: Cannot find 'PassthroughSubject' in scope
++ContentView {text="", subject=PassthroughSubject}
++  Text("")
++    .onReceive(PassthroughSubject, {fn})
++    .onAppear({fn})
++== appeared (Text.onAppear@9)
++console: 2026-11-24 <time> +0000 1 8 1.0 app.shelf.app 2.0 seconds
++ContentView {text="", subject=PassthroughSubject}
++  Text("")
++    .onReceive(PassthroughSubject, {fn})
++    .onAppear({fn})
+```
+
+## tests/Round3ATests-1.swift
+
+```diff
+--- before
++++ after
+@@ -6,19 +6,302 @@
+     .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
+-    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: .plainText, defaultFilename: "Note", {fn})
+-    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: .plainText, {fn})
+-    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: .json, {fn})
+-    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
+-    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
+-    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
+-    .fileMover(isPresented: $false, file: .documentsDirectory.appending("copy.txt"), {fn})
+-      If false
+-    .fileMover(isPresented: $false, files: [.documentsDirectory.appending("copy.txt")], {fn}, onCancellation: {fn})
+-    .quickLookPreview($nil)
+-    .quickLookPreview($nil, in: [.documentsDirectory.appending("copy.txt")])
+-    .fileDialogMessage("Pick a note")
+-    .fileDialogConfirmationLabel("Open")
+-    .fileExporterFilenameLabel("Save as")
+-    .fileDialogCustomizationID("notes")
+-    .fileDialogDefaultDirectory(.documentsDirectory)
+-    .fileDialogImportsUnresolvedAliases(false)
+-    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@40
++console: access true
++console: read Sample
++error: Line 47: FileManager.fileExists(atPath:): /Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt is outside the app's folder
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@52
++console: many 1
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@52
++console: cancelled
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileExporter@57
++console: exported Note
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
+…
+```
+
+## tests/Round3ATests-4.swift
+
+```diff
+--- before
++++ after
+@@ -3,3 +3,205 @@
+   VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++        row 2
++          Text("Two")
++        .onDelete({fn})
++        .dropDestination(for: String, {fn})
++    Text(_literal: "Old")
++      .onDrop(of: [.plainText], isTargeted: $false, {fn})
++    Text(_literal: "Old with location")
++      .onDrop(of: ["public.text"], isTargeted: nil, {fn})
++    Text(_literal: "Delegate")
++      .onDrop(of: [.plainText], delegate: Dropper())
++    Text(_literal: "Provider")
++      .onDrag({fn})
++    Text(_literal: "Provider 2")
++      .itemProvider({fn})
++    Text(_literal: "Spring")
++      .springLoadingBehavior(.enabled)
++    HStack({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++            .draggable(containerItemID: 1, containerNamespace: ())
++        row 2
++          Text("Two")
++            .draggable(containerItemID: 2, containerNamespace: ())
++      .dragContainer(for: Card, in: (), {fn})
++      .dragContainerSelection([1], containerNamespace: ())
++      .dragConfiguration(DragConfiguration)
++      .onDragSessionUpdated({fn})
++      .onDropSessionUpdated({fn})
++      .dropConfiguration({fn})
++    Text(_literal: "Item")
++      .draggable(Card, item: Card(id: 2, title: "Two"), containerNamespace: ())
++== after Text.dropDestination@28
++console: strings ["Pasted"] 0.0
++ContentView {cards=[Card(id: 1, title: "One"), Card(id: 2, title: "Two")], over=false, space=()}
++  VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++        row 2
++          Text("Two")
++        .onDelete({fn})
++        .dropDestination(for: String, {fn})
++    Text(_literal: "Old")
++      .onDrop(of: [.plainText], isTargeted: $false, {fn})
++    Text(_literal: "Old with location")
++      .onDrop(of: ["public.text"], isTargeted: nil, {fn})
++    Text(_literal: "Delegate")
++      .onDrop(of: [.plainText], delegate: Dropper())
++    Text(_literal: "Provider")
++      .onDrag({fn})
++    Text(_literal: "Provider 2")
++      .itemProvider({fn})
++    Text(_literal: "Spring")
++      .springLoadingBehavior(.enabled)
++    HStack({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++            .draggable(containerItemID: 1, containerNamespace: ())
++        row 2
++          Text("Two")
++            .draggable(containerItemID: 2, containerNamespace: ())
++      .dragContainer(for: Card, in: (), {fn})
++      .dragContainerSelection([1], containerNamespace: ())
++      .dragConfiguration(DragConfiguration)
++      .onDragSessionUpdated({fn})
++      .onDropSessionUpdated({fn})
++      .dropConfiguration({fn})
++    Text(_literal: "Item")
++      .draggable(Card, item: Card(id: 2, title: "Two"), containerNamespace: ())
++== after Text.dropDestination@28
++ContentView {cards=[Card(id: 1, title: "One"), Card(id: 2, title: "Two")], over=true, space=()}
++  VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
 …
 ```
 

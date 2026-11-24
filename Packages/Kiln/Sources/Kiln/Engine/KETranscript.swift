@@ -46,7 +46,15 @@ final class KTranscript {
     static func run(_ code: String, steps: Int) -> String {
         let compiled: KilnEngine.Compiled
         do {
+            #if KILN_BASELINE
             compiled = try KilnEngine.compile(code)
+            #else
+            // No hardware in a transcript: the microphone and camera are fakes.
+            let context = KilnContext.standard()
+            context.provide(KilnFakeMicrophone())
+            context.provide(KilnFakeCamera())
+            compiled = try KilnEngine.compile(code, context: context)
+            #endif
         } catch let f as KilnEngine.Failure {
             switch f {
             case .syntax(let m), .noView(let m): return "compile error: \(m)\n"
