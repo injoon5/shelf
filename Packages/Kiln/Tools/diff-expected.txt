@@ -67,3 +67,11 @@ fixtures/apps/recorder.swift Round 3A's recording fixture: before, `AVAudioRecor
 tests/Round3ATests-1.swift Round 3A: before, the file pickers and `FileDocument`'s exporter weren't bridged.
 tests/Round3ATests-4.swift Round 3A: before, drag and drop and iOS 27's drag containers weren't bridged.
 Packages/Kiln/Examples/Apps/Scrapbook.swift Round 3A's Lab example: before, `resourceValues`, `.draggable` and `.dropDestination` weren't bridged.
+Packages/Kiln/Examples/Apps/Wayfinder.swift Round 3B's Lab example: before, Core Location and Core Motion weren't bridged.
+fixtures/apps/location.swift Round 3B's Location fixture: before, CLLocationManager, CLLocationUpdate, CLServiceSession, MapKit's geocoding and LocationButton weren't bridged.
+fixtures/apps/motion.swift Round 3B's Motion fixture: before, CMMotionManager, CMPedometer, CMAltimeter, CMMotionActivityManager and CMHeadphoneMotionManager weren't bridged.
+tests/MotionLocationTests-9.swift Round 3B: before, CMMotionManager and CMPedometer weren't bridged.
+tests/MotionLocationTests-17.swift Round 3B: before, Core Motion wasn't bridged.
+tests/MotionLocationTests-19.swift Round 3B: before, Core Location and MapKit's geocoding weren't bridged.
+tests/MotionLocationTests-20.swift Round 3B: before, Core Location wasn't bridged.
+tests/MotionLocationTests-21.swift Round 3B: before, Core Motion wasn't bridged.

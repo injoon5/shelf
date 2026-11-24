@@ -297,6 +297,22 @@
       "status": "wontDo",
       "source": "PLAN.md §4.2, Round 3A",
       "match": { "ids": ["modifier:photosSharedAlbumCreationSheet", "modifier:photosSharedAlbumCustomizationSheet", "modifier:photosSharedAlbumPostingSheet", "modifier:postToPhotosSharedAlbumSheet"] }
+    },
+    {
+      "id": "location-monitoring",
+      "what": "Region and visit monitoring, significant-change location, `CLMonitor`, `CLBackgroundActivitySession`, `allowsBackgroundLocationUpdates`",
+      "reason": "They wake or keep an app running in the background; a Shelf app runs only while it's open, and its location stops with it (§4.6).",
+      "status": "wontDo",
+      "source": "PLAN.md §4.6",
+      "outsideSDK": true
+    },
+    {
+      "id": "temporary-full-accuracy",
+      "what": "`requestTemporaryFullAccuracyAuthorization(withPurposeKey:)`",
+      "reason": "Its purpose strings are Info.plist keys an app can't add: the accuracy the person chose for Shelf stands, and the completion hears an error when it's approximate (§4.6).",
+      "status": "wontDo",
+      "source": "PLAN.md §4.6",
+      "outsideSDK": true
     }
   ]
 }

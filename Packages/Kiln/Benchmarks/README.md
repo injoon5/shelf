@@ -313,6 +313,17 @@ PLAN.md §4, Round 3A (files, photos, the camera and recording), against the bas
 - **Kiln Lab:** `Scrapbook` (files, `UTType`, `resourceValues`, drag and drop) matches native on every step.
 - **New inputs.** The fixtures `files`, `photos`, `camera` and `recorder`, and Lab's `Scrapbook`, with nothing to compare against.
 
+### after-4b-round3b.json
+
+PLAN.md §4.5 and §4.6, Round 3B (Core Motion and Core Location), with Round 3A and the call-form audit merged from `shelf-fixes`, against the bar `after-4a-round3a.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-4b-round3b.json --compare Benchmarks/after-4a-round3a.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is `apps/files.swift` at 6.5%, then `Apps/MemoryMatch.swift` at 5.4% and `apps/recorder.swift` at 5.2%. Before 3A was merged, the same branch against `after-3c-round2c.json` was 6.4% at worst.
+- **Noise.** Runs made while other worktrees benchmarked and tested on the same Mac (load 6 to 9) each flagged a different pair of sub-millisecond fixtures 11–13% slower (`views-custom-protocols`, `views-input`, then `gestures-canvas`, `text-parsing` with a 9.5 ms median against a 5.5 ms minimum); none repeated, and the quieter runs flag none.
+- **What it costs.** A member read checks first whether its base is a native suspension (`await` over a chain); a shorthand `if let`/`guard let` checks for `self`.
+- **Kiln Lab:** `Wayfinder` matches native on every step (labels and screens).
+- **New inputs.** The fixtures `motion` and `location` and Lab's `Wayfinder`, with nothing to compare against.
+
 ## §3.7: SurfacePlot
 
 `SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.

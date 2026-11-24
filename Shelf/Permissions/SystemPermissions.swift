@@ -51,12 +51,7 @@ final class DeviceSystemPermissions: NSObject, SystemPermissions {
             default: .notDetermined
             }
         case .motion:
-            switch CMMotionActivityManager.authorizationStatus() {
-            case .authorized: .allowed
-            case .denied: .denied
-            case .restricted: .restricted
-            default: .notDetermined
-            }
+            Self.motionStatus()
         case .location:
             // `.denied` also covers Location Services switched off for the whole phone.
             switch locationManager.authorizationStatus {
@@ -90,6 +85,19 @@ final class DeviceSystemPermissions: NSObject, SystemPermissions {
             _ = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         }
         return status(capability)
+    }
+
+    private static func motionStatus() -> SystemPermissionStatus {
+        #if targetEnvironment(simulator)
+        // No motion coprocessor, so iOS never asks; apps read Kiln's fake (RunContext.provideSensors).
+        if !CMMotionActivityManager.isActivityAvailable() { return .allowed }
+        #endif
+        return switch CMMotionActivityManager.authorizationStatus() {
+        case .authorized: .allowed
+        case .denied: .denied
+        case .restricted: .restricted
+        default: .notDetermined
+        }
     }
 
     private static func cameraStatus(_ status: AVAuthorizationStatus) -> SystemPermissionStatus {

@@ -342,6 +342,15 @@ Round 3A's are `KilnFakeCamera` and `KilnFakeMicrophone` (`Context/KilnFakeMedia
 
 **A bridge that hands the app a `Result`** (a completion handler with `Result<URL, Error>`) passes `FilesBridges.success(v, interp)` or `failure(error, interp)`: the prelude's `Result` when the app has it, so `try result.get()` works. Add the bridge's name to `KSwiftPrelude.alsoNeeded`, which brings `Result` into apps that use the bridge without naming `Result`.
 
+### Sensors (Round 3B)
+
+Core Motion and Core Location (`Bridges/Motion/`, `Bridges/Location/`) are the worked example of everything above:
+
+- **Fakes.** `KilnFakeMotion` and `KilnFakeLocation` (`Context/`) are public: a host or a test provides one (`context.provide(KilnFakeLocation.walkingTheRing())`), and a stub context without one gets `KilnFakeMotion.still()` and `KilnFakeLocation.applePark()`. A bridge reads `MotionBridges.fake(c)` / `LocationBridges.fake(c)`, nil meaning the device. Shelf provides `KilnFakeMotion.walking()` on the simulator, which has no motion sensors.
+- **Callback answers.** An API that answers through a handler or a delegate, not `await`, asks with `c.context.capabilities.answer(.motion, headless: c.interp.headless) { allowed in … }`: at once in a check or when the gate already knows, after the host's sheet otherwise. A refused app gets the device's refusal (`KMotionErrors.error(105)`, `KLocationErrors.error("denied")`).
+- **Kiln's own managers call the app's delegate.** `CLLocationManager` is Kiln's (`KLocationManager`), so its authorization is the gate's, not the device's; it calls the app's delegate with `KDelegates.send("locationManager(_:didUpdateLocations:)", to: delegate, [manager, locations], interp)`, which does what the forwarding proxy does (an `async` method runs as a task; nothing runs after teardown).
+- **Typed enums.** A native enum the app compares and switches over (`CLAuthorizationStatus`, `CLError.Code`) is `KNativeEnum.register(r, family, "CLAuthorizationStatus", [("denied", 2), …])`, and its values `KNativeEnum.value(type, name)`: `== .denied`, `switch` and `rawValue` work. Read an argument with `KNativeEnum.name(c["using"])`.
+
 ### Errors
 
 The host sets `context.onError`. It hears each error once, as a `KilnError` with its `phase` (`.check`: the code doesn't parse or has no view; `.body`: a view's `body` failed, so what shows is broken; `.runtime`: an action, a task, a global), `line` and `message`, on the main actor and never during a SwiftUI update. Shelf shows its error screen for `.check` and `.body`.

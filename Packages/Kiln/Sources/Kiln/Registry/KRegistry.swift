@@ -161,6 +161,10 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`"
         case .foundation:
             return "Foundation as compiled: `Date`, `Calendar`, `DateComponents`, `DateInterval`, `TimeZone`, `Locale`, every formatter and format style, `Data`, JSON and property lists, `UserDefaults`, files in the app's folder, `NotificationCenter`, `Logger`, Dispatch, `Bundle`/`ProcessInfo`/`UIDevice`, CryptoKit's hashes"
+        case .motion:
+            return "`CMMotionManager` (a handler on `.main`, or read `deviceMotion` in a `TimelineView`; 60 Hz at most), `CMPedometer`, `CMAltimeter`, `CMMotionActivityManager`, `CMHeadphoneMotionManager` (these four ask first: handle the error)"
+        case .location:
+            return "`CLLocationUpdate.liveUpdates()` with `CLServiceSession(authorization: .whenInUse)`, `CLLocationManager` and its delegate, `CLLocation`, `MKReverseGeocodingRequest`, `MKGeocodingRequest`, `LocationButton`; only while open; handle `.denied`"
         case .concurrency:
             return "`Task`, task groups, `AsyncStream`, continuations, `Duration` and the clocks; Combine: subjects, `Just`, `Future`, `@Published`'s `$name`, the usual operators, `sink`, `assign`, `AnyCancellable`"
         default:

@@ -71,11 +71,14 @@ enum RunContext {
         return context
     }
 
-    /// The simulator has no camera: apps get Kiln's fake one there, behind
-    /// the same permission sheet (plan §4.3).
+    /// The simulator has no camera and no motion sensors: apps get Kiln's
+    /// fakes there, behind the same permission sheets (plan §4.3, §4.5): a
+    /// camera, and a phone held while walking. Its location is the
+    /// simulator's own (`xcrun simctl location`). A phone gets the real ones.
     static func provideFakes(_ context: KilnContext) {
         #if targetEnvironment(simulator)
         context.provide(KilnFakeCamera())
+        context.provide(KilnFakeMotion.walking())
         #endif
     }
 

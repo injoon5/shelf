@@ -188,19 +188,19 @@ struct PromptsTests {
 
     @Test func aFamilyWithBridgesMovesToWhatWorks() throws {
         var m = try #require(PromptCatalog.manifest)
-        let i = try #require(m.families.firstIndex { $0.name == "Location" })
-        #expect(!PromptCatalog.whatWorks(m).contains("**Location:**"))
-        #expect(PromptCatalog.whatDoesntWork(m).contains("(Location)"))
-        // Round 3 registers its first bridge.
+        let i = try #require(m.families.firstIndex { $0.name == "Vision" })
+        #expect(!PromptCatalog.whatWorks(m).contains("**Vision:**"))
+        #expect(PromptCatalog.whatDoesntWork(m).contains("(Vision)"))
+        // Round 4 registers its first bridge.
         m.families[i].supported = 1
-        m.symbols.append(.init(id: "type:CLLocationManager", kind: "type", name: "CLLocationManager", owner: nil,
-                               family: "Location", support: "partial", notes: "Asks once, as Shelf asks for each app."))
-        m.symbols.append(.init(id: "modifier:onLocationChange", kind: "modifier", name: "onLocationChange", owner: nil,
-                               family: "Location", support: "full", notes: nil))
+        m.symbols.append(.init(id: "type:RecognizeTextRequest", kind: "type", name: "RecognizeTextRequest", owner: nil,
+                               family: "Vision", support: "partial", notes: "On an image the app has, not the camera."))
+        m.symbols.append(.init(id: "modifier:onTextRecognized", kind: "modifier", name: "onTextRecognized", owner: nil,
+                               family: "Vision", support: "full", notes: nil))
         let works = PromptCatalog.whatWorks(m)
-        #expect(works.contains("- **Location:** `CLLocationManager`; `.onLocationChange`."))
-        #expect(works.contains("  - `CLLocationManager`: Asks once, as Shelf asks for each app."))
-        #expect(!PromptCatalog.whatDoesntWork(m).contains("(Location)"))
+        #expect(works.contains("- **Vision:** `RecognizeTextRequest`; `.onTextRecognized`."))
+        #expect(works.contains("  - `RecognizeTextRequest`: On an image the app has, not the camera."))
+        #expect(!PromptCatalog.whatDoesntWork(m).contains("(Vision)"))
     }
 
     @Test func aGapKilnClosesLeavesThePrompt() throws {

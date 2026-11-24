@@ -140,6 +140,32 @@ enum KDelegates {
         return proxy
     }
 
+    /// Calls a delegate requirement (`"locationManager(_:didUpdateLocations:)"`)
+    /// on the app's object directly, as the forwarding proxy would: for a
+    /// bridge whose native side is Kiln's own (a fake sensor, or a manager
+    /// that answers through the capability gate). Nothing happens when the
+    /// value isn't an app object, doesn't implement it, or the run is over.
+    /// A requirement that waits runs as a task. Returns what the app returned.
+    @discardableResult
+    static func send(_ requirement: String, to delegate: KV?, _ args: [KV], _ interp: KInterpreter) -> KV? {
+        guard let delegate, case .object = delegate, !interp.context.isTornDown,
+              var app = KAppValue(delegate, interp) else { return nil }
+        let r = KRequirement(parsing: requirement)
+        guard app.implements(r.name, labels: r.labels) else { return nil }
+        let result = app.callReporting(r.name, args, labels: r.labels ?? [], fallback: .nilValue)
+        if let s = result.asSuspension {
+            interp.startTask(s, parent: nil, reportsErrors: true)
+            return .void
+        }
+        return result
+    }
+
+    /// Whether `v` is an app object whose class adopts `protocolName`.
+    static func adopts(_ v: KV, _ protocolName: String, _ interp: KInterpreter) -> Bool {
+        guard case .object = v, let app = KAppValue(v, interp) else { return false }
+        return app.type.conformances.contains(protocolName)
+    }
+
     /// Keeps `delegate` alive as long as `owner` (delegates are weak).
     static func retain(_ delegate: AnyObject?, by owner: AnyObject) {
         objc_setAssociatedObject(owner, &retainKey, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

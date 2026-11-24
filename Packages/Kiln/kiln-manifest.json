@@ -195,7 +195,7 @@
             "passing" : 142
           },
           {
-            "entries" : 110,
+            "entries" : 111,
             "failing" : [
 
             ],
@@ -204,7 +204,65 @@
             ],
             "ios" : 0,
             "name" : "Language",
-            "passing" : 110
+            "passing" : 111
+          }
+        ]
+      },
+      {
+        "name" : "Location",
+        "sections" : [
+          {
+            "entries" : 8,
+            "failing" : [
+
+            ],
+            "gaps" : [
+
+            ],
+            "ios" : 0,
+            "name" : "Coordinates",
+            "passing" : 8
+          },
+          {
+            "entries" : 8,
+            "failing" : [
+
+            ],
+            "gaps" : [
+
+            ],
+            "ios" : 0,
+            "name" : "Locations",
+            "passing" : 8
+          },
+          {
+            "entries" : 6,
+            "failing" : [
+
+            ],
+            "gaps" : [
+
+            ],
+            "ios" : 1,
+            "name" : "Constants",
+            "passing" : 5
+          }
+        ]
+      },
+      {
+        "name" : "Motion",
+        "sections" : [
+          {
+            "entries" : 10,
+            "failing" : [
+
+            ],
+            "gaps" : [
+
+            ],
+            "ios" : 0,
+            "name" : "Values",
+            "passing" : 10
           }
         ]
       }
@@ -366,16 +424,18 @@
       "supported" : 28
     },
     {
+      "line" : "`CMMotionManager` (a handler on `.main`, or read `deviceMotion` in a `TimelineView`; 60 Hz at most), `CMPedometer`, `CMAltimeter`, `CMMotionActivityManager`, `CMHeadphoneMotionManager` (these four ask first: handle the error)",
       "name" : "Motion",
       "stubs" : 0,
       "summary" : "Core Motion: the accelerometer, the gyroscope and the pedometer",
-      "supported" : 0
+      "supported" : 188
     },
     {
+      "line" : "`CLLocationUpdate.liveUpdates()` with `CLServiceSession(authorization: .whenInUse)`, `CLLocationManager` and its delegate, `CLLocation`, `MKReverseGeocodingRequest`, `MKGeocodingRequest`, `LocationButton`; only while open; handle `.denied`",
       "name" : "Location",
-      "stubs" : 1,
+      "stubs" : 0,
       "summary" : "the user's location and geocoding",
-      "supported" : 0
+      "supported" : 265
     },
     {
       "name" : "Vision",
@@ -399,14 +459,14 @@
       "name" : "Language",
       "stubs" : 0,
       "summary" : "Swift's standard library",
-      "supported" : 660
+      "supported" : 668
     },
     {
       "line" : "Foundation as compiled: `Date`, `Calendar`, `DateComponents`, `DateInterval`, `TimeZone`, `Locale`, every formatter and format style, `Data`, JSON and property lists, `UserDefaults`, files in the app's folder, `NotificationCenter`, `Logger`, Dispatch, `Bundle`/`ProcessInfo`/`UIDevice`, CryptoKit's hashes",
       "name" : "Foundation",
       "stubs" : 1,
       "summary" : "dates, formatters, JSON, files and settings",
-      "supported" : 578
+      "supported" : 581
     },
     {
       "line" : "`Task`, task groups, `AsyncStream`, continuations, `Duration` and the clocks; Combine: subjects, `Just`, `Future`, `@Published`'s `$name`, the usual operators, `sink`, `assign`, `AnyCancellable`",
@@ -6817,6 +6877,4566 @@
       "support" : "full"
     },
     {
+      "family" : "Location",
+      "id" : "member:CLAccuracyAuthorization.fullAccuracy",
+      "kind" : "member",
+      "name" : "fullAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAccuracyAuthorization",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAccuracyAuthorization.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAccuracyAuthorization",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAccuracyAuthorization.reducedAccuracy",
+      "kind" : "member",
+      "name" : "reducedAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAccuracyAuthorization",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.airborne",
+      "kind" : "member",
+      "name" : "airborne",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.automotiveNavigation",
+      "kind" : "member",
+      "name" : "automotiveNavigation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.fitness",
+      "kind" : "member",
+      "name" : "fitness",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.other",
+      "kind" : "member",
+      "name" : "other",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.otherNavigation",
+      "kind" : "member",
+      "name" : "otherNavigation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLActivityType.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CLActivityType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.authorized",
+      "kind" : "member",
+      "name" : "authorized",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.authorizedAlways",
+      "kind" : "member",
+      "name" : "authorizedAlways",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.authorizedWhenInUse",
+      "kind" : "member",
+      "name" : "authorizedWhenInUse",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.denied",
+      "kind" : "member",
+      "name" : "denied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.notDetermined",
+      "kind" : "member",
+      "name" : "notDetermined",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLAuthorizationStatus.restricted",
+      "kind" : "member",
+      "name" : "restricted",
+      "overloads" : [
+
+      ],
+      "owner" : "CLAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.faceDown",
+      "kind" : "member",
+      "name" : "faceDown",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.faceUp",
+      "kind" : "member",
+      "name" : "faceUp",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.landscapeLeft",
+      "kind" : "member",
+      "name" : "landscapeLeft",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.landscapeRight",
+      "kind" : "member",
+      "name" : "landscapeRight",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.portrait",
+      "kind" : "member",
+      "name" : "portrait",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.portraitUpsideDown",
+      "kind" : "member",
+      "name" : "portraitUpsideDown",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLDeviceOrientation.unknown",
+      "kind" : "member",
+      "name" : "unknown",
+      "overloads" : [
+
+      ],
+      "owner" : "CLDeviceOrientation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code",
+      "kind" : "member",
+      "name" : "Code",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.deferredAccuracyTooLow",
+      "kind" : "member",
+      "name" : "deferredAccuracyTooLow",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.deferredCanceled",
+      "kind" : "member",
+      "name" : "deferredCanceled",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.deferredDistanceFiltered",
+      "kind" : "member",
+      "name" : "deferredDistanceFiltered",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.deferredFailed",
+      "kind" : "member",
+      "name" : "deferredFailed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.deferredNotUpdatingLocation",
+      "kind" : "member",
+      "name" : "deferredNotUpdatingLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.denied",
+      "kind" : "member",
+      "name" : "denied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.geocodeCanceled",
+      "kind" : "member",
+      "name" : "geocodeCanceled",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.geocodeFoundNoResult",
+      "kind" : "member",
+      "name" : "geocodeFoundNoResult",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.geocodeFoundPartialResult",
+      "kind" : "member",
+      "name" : "geocodeFoundPartialResult",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.headingFailure",
+      "kind" : "member",
+      "name" : "headingFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.historicalLocationError",
+      "kind" : "member",
+      "name" : "historicalLocationError",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.locationUnknown",
+      "kind" : "member",
+      "name" : "locationUnknown",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.network",
+      "kind" : "member",
+      "name" : "network",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.promptDeclined",
+      "kind" : "member",
+      "name" : "promptDeclined",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.rangingFailure",
+      "kind" : "member",
+      "name" : "rangingFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.rangingUnavailable",
+      "kind" : "member",
+      "name" : "rangingUnavailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.regionMonitoringDenied",
+      "kind" : "member",
+      "name" : "regionMonitoringDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.regionMonitoringFailure",
+      "kind" : "member",
+      "name" : "regionMonitoringFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.regionMonitoringResponseDelayed",
+      "kind" : "member",
+      "name" : "regionMonitoringResponseDelayed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.Code.regionMonitoringSetupDelayed",
+      "kind" : "member",
+      "name" : "regionMonitoringSetupDelayed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.code",
+      "kind" : "member",
+      "name" : "code",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.deferredAccuracyTooLow",
+      "kind" : "member",
+      "name" : "deferredAccuracyTooLow",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.deferredCanceled",
+      "kind" : "member",
+      "name" : "deferredCanceled",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.deferredDistanceFiltered",
+      "kind" : "member",
+      "name" : "deferredDistanceFiltered",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.deferredFailed",
+      "kind" : "member",
+      "name" : "deferredFailed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.deferredNotUpdatingLocation",
+      "kind" : "member",
+      "name" : "deferredNotUpdatingLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.denied",
+      "kind" : "member",
+      "name" : "denied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.description",
+      "kind" : "member",
+      "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.errorCode",
+      "kind" : "member",
+      "name" : "errorCode",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.geocodeCanceled",
+      "kind" : "member",
+      "name" : "geocodeCanceled",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.geocodeFoundNoResult",
+      "kind" : "member",
+      "name" : "geocodeFoundNoResult",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.geocodeFoundPartialResult",
+      "kind" : "member",
+      "name" : "geocodeFoundPartialResult",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.headingFailure",
+      "kind" : "member",
+      "name" : "headingFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.historicalLocationError",
+      "kind" : "member",
+      "name" : "historicalLocationError",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.localizedDescription",
+      "kind" : "member",
+      "name" : "localizedDescription",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.locationUnknown",
+      "kind" : "member",
+      "name" : "locationUnknown",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.network",
+      "kind" : "member",
+      "name" : "network",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.promptDeclined",
+      "kind" : "member",
+      "name" : "promptDeclined",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.rangingFailure",
+      "kind" : "member",
+      "name" : "rangingFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.rangingUnavailable",
+      "kind" : "member",
+      "name" : "rangingUnavailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.regionMonitoringDenied",
+      "kind" : "member",
+      "name" : "regionMonitoringDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.regionMonitoringFailure",
+      "kind" : "member",
+      "name" : "regionMonitoringFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.regionMonitoringResponseDelayed",
+      "kind" : "member",
+      "name" : "regionMonitoringResponseDelayed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLError.regionMonitoringSetupDelayed",
+      "kind" : "member",
+      "name" : "regionMonitoringSetupDelayed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLError",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLFloor.level",
+      "kind" : "member",
+      "name" : "level",
+      "overloads" : [
+
+      ],
+      "owner" : "CLFloor",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLGeocoder.cancelGeocode",
+      "kind" : "member",
+      "name" : "cancelGeocode",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLGeocoder",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLGeocoder.geocodeAddressString",
+      "kind" : "member",
+      "name" : "geocodeAddressString",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "_:string completionHandler:closure"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:string"
+        }
+      ],
+      "owner" : "CLGeocoder",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLGeocoder.isGeocoding",
+      "kind" : "member",
+      "name" : "isGeocoding",
+      "overloads" : [
+
+      ],
+      "owner" : "CLGeocoder",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLGeocoder.reverseGeocodeLocation",
+      "kind" : "member",
+      "name" : "reverseGeocodeLocation",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "_:CLLocation completionHandler:closure"
+        },
+        {
+          "labels" : [
+            "_",
+            "preferredLocale",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "_:CLLocation preferredLocale:any? completionHandler:closure"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "_",
+            "preferredLocale"
+          ],
+          "member" : "method",
+          "signature" : "_:CLLocation preferredLocale:any?"
+        },
+        {
+          "async" : true,
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:CLLocation"
+        }
+      ],
+      "owner" : "CLGeocoder",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.headingAccuracy",
+      "kind" : "member",
+      "name" : "headingAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.magneticHeading",
+      "kind" : "member",
+      "name" : "magneticHeading",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.trueHeading",
+      "kind" : "member",
+      "name" : "trueHeading",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.x",
+      "kind" : "member",
+      "name" : "x",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.y",
+      "kind" : "member",
+      "name" : "y",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLHeading.z",
+      "kind" : "member",
+      "name" : "z",
+      "overloads" : [
+
+      ],
+      "owner" : "CLHeading",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.altitude",
+      "kind" : "member",
+      "name" : "altitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.coordinate",
+      "kind" : "member",
+      "name" : "coordinate",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.course",
+      "kind" : "member",
+      "name" : "course",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.courseAccuracy",
+      "kind" : "member",
+      "name" : "courseAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.description",
+      "kind" : "member",
+      "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.distance",
+      "kind" : "member",
+      "name" : "distance",
+      "overloads" : [
+        {
+          "labels" : [
+            "from"
+          ],
+          "member" : "method",
+          "signature" : "from:CLLocation"
+        }
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.ellipsoidalAltitude",
+      "kind" : "member",
+      "name" : "ellipsoidalAltitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.floor",
+      "kind" : "member",
+      "name" : "floor",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.horizontalAccuracy",
+      "kind" : "member",
+      "name" : "horizontalAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.sourceInformation",
+      "kind" : "member",
+      "name" : "sourceInformation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.speed",
+      "kind" : "member",
+      "name" : "speed",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.speedAccuracy",
+      "kind" : "member",
+      "name" : "speedAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocation.verticalAccuracy",
+      "kind" : "member",
+      "name" : "verticalAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationCoordinate2D.latitude",
+      "kind" : "member",
+      "name" : "latitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationCoordinate2D",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationCoordinate2D.longitude",
+      "kind" : "member",
+      "name" : "longitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationCoordinate2D",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.accuracyAuthorization",
+      "kind" : "member",
+      "name" : "accuracyAuthorization",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.activityType",
+      "kind" : "member",
+      "name" : "activityType",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "anyLabels" : true,
+      "family" : "Location",
+      "id" : "member:CLLocationManager.allowDeferredLocationUpdates",
+      "kind" : "member",
+      "name" : "allowDeferredLocationUpdates",
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.allowsBackgroundLocationUpdates",
+      "kind" : "member",
+      "name" : "allowsBackgroundLocationUpdates",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.desiredAccuracy",
+      "kind" : "member",
+      "name" : "desiredAccuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.dismissHeadingCalibrationDisplay",
+      "kind" : "member",
+      "name" : "dismissHeadingCalibrationDisplay",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.distanceFilter",
+      "kind" : "member",
+      "name" : "distanceFilter",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.heading",
+      "kind" : "member",
+      "name" : "heading",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.headingAvailable",
+      "kind" : "member",
+      "name" : "headingAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.headingFilter",
+      "kind" : "member",
+      "name" : "headingFilter",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.headingOrientation",
+      "kind" : "member",
+      "name" : "headingOrientation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.isMonitoringAvailable",
+      "kind" : "member",
+      "name" : "isMonitoringAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "static",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.isRangingAvailable",
+      "kind" : "member",
+      "name" : "isRangingAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.locationServicesEnabled",
+      "kind" : "member",
+      "name" : "locationServicesEnabled",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.pausesLocationUpdatesAutomatically",
+      "kind" : "member",
+      "name" : "pausesLocationUpdatesAutomatically",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.requestAlwaysAuthorization",
+      "kind" : "member",
+      "name" : "requestAlwaysAuthorization",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.requestLocation",
+      "kind" : "member",
+      "name" : "requestLocation",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.requestTemporaryFullAccuracyAuthorization",
+      "kind" : "member",
+      "name" : "requestTemporaryFullAccuracyAuthorization",
+      "overloads" : [
+        {
+          "labels" : [
+            "withPurposeKey",
+            "completion"
+          ],
+          "member" : "method",
+          "signature" : "withPurposeKey:string completion:closure?"
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.requestWhenInUseAuthorization",
+      "kind" : "member",
+      "name" : "requestWhenInUseAuthorization",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.showsBackgroundLocationIndicator",
+      "kind" : "member",
+      "name" : "showsBackgroundLocationIndicator",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.significantLocationChangeMonitoringAvailable",
+      "kind" : "member",
+      "name" : "significantLocationChangeMonitoringAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.startMonitoring",
+      "kind" : "member",
+      "name" : "startMonitoring",
+      "overloads" : [
+        {
+          "labels" : [
+            "for"
+          ],
+          "member" : "method",
+          "signature" : "for:any"
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "anyLabels" : true,
+      "family" : "Location",
+      "id" : "member:CLLocationManager.startMonitoringSignificantLocationChanges",
+      "kind" : "member",
+      "name" : "startMonitoringSignificantLocationChanges",
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "anyLabels" : true,
+      "family" : "Location",
+      "id" : "member:CLLocationManager.startMonitoringVisits",
+      "kind" : "member",
+      "name" : "startMonitoringVisits",
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.startUpdatingHeading",
+      "kind" : "member",
+      "name" : "startUpdatingHeading",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.startUpdatingLocation",
+      "kind" : "member",
+      "name" : "startUpdatingLocation",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.stopMonitoringSignificantLocationChanges",
+      "kind" : "member",
+      "name" : "stopMonitoringSignificantLocationChanges",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.stopMonitoringVisits",
+      "kind" : "member",
+      "name" : "stopMonitoringVisits",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.stopUpdatingHeading",
+      "kind" : "member",
+      "name" : "stopUpdatingHeading",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationManager.stopUpdatingLocation",
+      "kind" : "member",
+      "name" : "stopUpdatingLocation",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLLocationManager",
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationSourceInformation.isProducedByAccessory",
+      "kind" : "member",
+      "name" : "isProducedByAccessory",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationSourceInformation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationSourceInformation.isSimulatedBySoftware",
+      "kind" : "member",
+      "name" : "isSimulatedBySoftware",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationSourceInformation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration",
+      "kind" : "member",
+      "name" : "LiveConfiguration",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.airborne",
+      "kind" : "member",
+      "name" : "airborne",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.automotiveNavigation",
+      "kind" : "member",
+      "name" : "automotiveNavigation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.default",
+      "kind" : "member",
+      "name" : "default",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.fitness",
+      "kind" : "member",
+      "name" : "fitness",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.maritime",
+      "kind" : "member",
+      "name" : "maritime",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.LiveConfiguration.otherNavigation",
+      "kind" : "member",
+      "name" : "otherNavigation",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate.LiveConfiguration",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.accuracyLimited",
+      "kind" : "member",
+      "name" : "accuracyLimited",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.authorizationDenied",
+      "kind" : "member",
+      "name" : "authorizationDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.authorizationDeniedGlobally",
+      "kind" : "member",
+      "name" : "authorizationDeniedGlobally",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.authorizationRequestInProgress",
+      "kind" : "member",
+      "name" : "authorizationRequestInProgress",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.authorizationRestricted",
+      "kind" : "member",
+      "name" : "authorizationRestricted",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.insufficientlyInUse",
+      "kind" : "member",
+      "name" : "insufficientlyInUse",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.isStationary",
+      "kind" : "member",
+      "name" : "isStationary",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.liveUpdates",
+      "kind" : "member",
+      "name" : "liveUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "static",
+          "signature" : "_:CLLocationUpdate.LiveConfiguration?"
+        }
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.locationUnavailable",
+      "kind" : "member",
+      "name" : "locationUnavailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.serviceSessionRequired",
+      "kind" : "member",
+      "name" : "serviceSessionRequired",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLLocationUpdate.stationary",
+      "kind" : "member",
+      "name" : "stationary",
+      "overloads" : [
+
+      ],
+      "owner" : "CLLocationUpdate",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.administrativeArea",
+      "kind" : "member",
+      "name" : "administrativeArea",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.areasOfInterest",
+      "kind" : "member",
+      "name" : "areasOfInterest",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.country",
+      "kind" : "member",
+      "name" : "country",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.inlandWater",
+      "kind" : "member",
+      "name" : "inlandWater",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.isoCountryCode",
+      "kind" : "member",
+      "name" : "isoCountryCode",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.locality",
+      "kind" : "member",
+      "name" : "locality",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.name",
+      "kind" : "member",
+      "name" : "name",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.ocean",
+      "kind" : "member",
+      "name" : "ocean",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.postalCode",
+      "kind" : "member",
+      "name" : "postalCode",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.subAdministrativeArea",
+      "kind" : "member",
+      "name" : "subAdministrativeArea",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.subLocality",
+      "kind" : "member",
+      "name" : "subLocality",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.subThoroughfare",
+      "kind" : "member",
+      "name" : "subThoroughfare",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.thoroughfare",
+      "kind" : "member",
+      "name" : "thoroughfare",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLPlacemark.timeZone",
+      "kind" : "member",
+      "name" : "timeZone",
+      "overloads" : [
+
+      ],
+      "owner" : "CLPlacemark",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.AuthorizationRequirement",
+      "kind" : "member",
+      "name" : "AuthorizationRequirement",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.AuthorizationRequirement.always",
+      "kind" : "member",
+      "name" : "always",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.AuthorizationRequirement",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.AuthorizationRequirement.none",
+      "kind" : "member",
+      "name" : "none",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.AuthorizationRequirement",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.AuthorizationRequirement.whenInUse",
+      "kind" : "member",
+      "name" : "whenInUse",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.AuthorizationRequirement",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.alwaysAuthorizationDenied",
+      "kind" : "member",
+      "name" : "alwaysAuthorizationDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.authorizationDenied",
+      "kind" : "member",
+      "name" : "authorizationDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.authorizationDeniedGlobally",
+      "kind" : "member",
+      "name" : "authorizationDeniedGlobally",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.authorizationRequestInProgress",
+      "kind" : "member",
+      "name" : "authorizationRequestInProgress",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.authorizationRestricted",
+      "kind" : "member",
+      "name" : "authorizationRestricted",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.fullAccuracyDenied",
+      "kind" : "member",
+      "name" : "fullAccuracyDenied",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.insufficientlyInUse",
+      "kind" : "member",
+      "name" : "insufficientlyInUse",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.Diagnostic.serviceSessionRequired",
+      "kind" : "member",
+      "name" : "serviceSessionRequired",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession.Diagnostic",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.diagnostics",
+      "kind" : "member",
+      "name" : "diagnostics",
+      "overloads" : [
+
+      ],
+      "owner" : "CLServiceSession",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CLServiceSession.invalidate",
+      "kind" : "member",
+      "name" : "invalidate",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CLServiceSession",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAbsoluteAltitudeData.accuracy",
+      "kind" : "member",
+      "name" : "accuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAbsoluteAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAbsoluteAltitudeData.altitude",
+      "kind" : "member",
+      "name" : "altitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAbsoluteAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAbsoluteAltitudeData.precision",
+      "kind" : "member",
+      "name" : "precision",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAbsoluteAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAbsoluteAltitudeData.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAbsoluteAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAcceleration.x",
+      "kind" : "member",
+      "name" : "x",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAcceleration",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAcceleration.y",
+      "kind" : "member",
+      "name" : "y",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAcceleration",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAcceleration.z",
+      "kind" : "member",
+      "name" : "z",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAcceleration",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAccelerometerData.acceleration",
+      "kind" : "member",
+      "name" : "acceleration",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAccelerometerData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAccelerometerData.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAccelerometerData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.isAbsoluteAltitudeAvailable",
+      "kind" : "member",
+      "name" : "isAbsoluteAltitudeAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.isRelativeAltitudeAvailable",
+      "kind" : "member",
+      "name" : "isRelativeAltitudeAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.startAbsoluteAltitudeUpdates",
+      "kind" : "member",
+      "name" : "startAbsoluteAltitudeUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.startRelativeAltitudeUpdates",
+      "kind" : "member",
+      "name" : "startRelativeAltitudeUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.stopAbsoluteAltitudeUpdates",
+      "kind" : "member",
+      "name" : "stopAbsoluteAltitudeUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltimeter.stopRelativeAltitudeUpdates",
+      "kind" : "member",
+      "name" : "stopRelativeAltitudeUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAltimeter",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltitudeData.pressure",
+      "kind" : "member",
+      "name" : "pressure",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltitudeData.relativeAltitude",
+      "kind" : "member",
+      "name" : "relativeAltitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAltitudeData.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAltitudeData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.copy",
+      "kind" : "member",
+      "name" : "copy",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.multiply",
+      "kind" : "member",
+      "name" : "multiply",
+      "overloads" : [
+        {
+          "labels" : [
+            "byInverseOf"
+          ],
+          "member" : "method",
+          "signature" : "byInverseOf:CMAttitude"
+        }
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.pitch",
+      "kind" : "member",
+      "name" : "pitch",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.quaternion",
+      "kind" : "member",
+      "name" : "quaternion",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.roll",
+      "kind" : "member",
+      "name" : "roll",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.rotationMatrix",
+      "kind" : "member",
+      "name" : "rotationMatrix",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitude.yaw",
+      "kind" : "member",
+      "name" : "yaw",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitude",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitudeReferenceFrame.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitudeReferenceFrame",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitudeReferenceFrame.xArbitraryCorrectedZVertical",
+      "kind" : "member",
+      "name" : "xArbitraryCorrectedZVertical",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitudeReferenceFrame",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitudeReferenceFrame.xArbitraryZVertical",
+      "kind" : "member",
+      "name" : "xArbitraryZVertical",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitudeReferenceFrame",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitudeReferenceFrame.xMagneticNorthZVertical",
+      "kind" : "member",
+      "name" : "xMagneticNorthZVertical",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitudeReferenceFrame",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAttitudeReferenceFrame.xTrueNorthZVertical",
+      "kind" : "member",
+      "name" : "xTrueNorthZVertical",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAttitudeReferenceFrame",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAuthorizationStatus.authorized",
+      "kind" : "member",
+      "name" : "authorized",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAuthorizationStatus.denied",
+      "kind" : "member",
+      "name" : "denied",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAuthorizationStatus.notDetermined",
+      "kind" : "member",
+      "name" : "notDetermined",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAuthorizationStatus.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMAuthorizationStatus.restricted",
+      "kind" : "member",
+      "name" : "restricted",
+      "overloads" : [
+
+      ],
+      "owner" : "CMAuthorizationStatus",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMCalibratedMagneticField.accuracy",
+      "kind" : "member",
+      "name" : "accuracy",
+      "overloads" : [
+
+      ],
+      "owner" : "CMCalibratedMagneticField",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMCalibratedMagneticField.field",
+      "kind" : "member",
+      "name" : "field",
+      "overloads" : [
+
+      ],
+      "owner" : "CMCalibratedMagneticField",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.SensorLocation.default",
+      "kind" : "member",
+      "name" : "default",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion.SensorLocation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.SensorLocation.headphoneLeft",
+      "kind" : "member",
+      "name" : "headphoneLeft",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion.SensorLocation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.SensorLocation.headphoneRight",
+      "kind" : "member",
+      "name" : "headphoneRight",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion.SensorLocation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.SensorLocation.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion.SensorLocation",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.attitude",
+      "kind" : "member",
+      "name" : "attitude",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.gravity",
+      "kind" : "member",
+      "name" : "gravity",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.heading",
+      "kind" : "member",
+      "name" : "heading",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.magneticField",
+      "kind" : "member",
+      "name" : "magneticField",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.rotationRate",
+      "kind" : "member",
+      "name" : "rotationRate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.sensorLocation",
+      "kind" : "member",
+      "name" : "sensorLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMDeviceMotion.userAcceleration",
+      "kind" : "member",
+      "name" : "userAcceleration",
+      "overloads" : [
+
+      ],
+      "owner" : "CMDeviceMotion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMGyroData.rotationRate",
+      "kind" : "member",
+      "name" : "rotationRate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMGyroData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMGyroData.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMGyroData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.delegate",
+      "kind" : "member",
+      "name" : "delegate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.deviceMotion",
+      "kind" : "member",
+      "name" : "deviceMotion",
+      "overloads" : [
+
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.isConnectionStatusActive",
+      "kind" : "member",
+      "name" : "isConnectionStatusActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.isDeviceMotionActive",
+      "kind" : "member",
+      "name" : "isDeviceMotionActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.isDeviceMotionAvailable",
+      "kind" : "member",
+      "name" : "isDeviceMotionAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.startConnectionStatusUpdates",
+      "kind" : "member",
+      "name" : "startConnectionStatusUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.startDeviceMotionUpdates",
+      "kind" : "member",
+      "name" : "startDeviceMotionUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.stopConnectionStatusUpdates",
+      "kind" : "member",
+      "name" : "stopConnectionStatusUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMHeadphoneMotionManager.stopDeviceMotionUpdates",
+      "kind" : "member",
+      "name" : "stopDeviceMotionUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMHeadphoneMotionManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticField.x",
+      "kind" : "member",
+      "name" : "x",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticField",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticField.y",
+      "kind" : "member",
+      "name" : "y",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticField",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticField.z",
+      "kind" : "member",
+      "name" : "z",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticField",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticFieldCalibrationAccuracy.high",
+      "kind" : "member",
+      "name" : "high",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticFieldCalibrationAccuracy",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticFieldCalibrationAccuracy.low",
+      "kind" : "member",
+      "name" : "low",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticFieldCalibrationAccuracy",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticFieldCalibrationAccuracy.medium",
+      "kind" : "member",
+      "name" : "medium",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticFieldCalibrationAccuracy",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticFieldCalibrationAccuracy.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticFieldCalibrationAccuracy",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagneticFieldCalibrationAccuracy.uncalibrated",
+      "kind" : "member",
+      "name" : "uncalibrated",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagneticFieldCalibrationAccuracy",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagnetometerData.magneticField",
+      "kind" : "member",
+      "name" : "magneticField",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagnetometerData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMagnetometerData.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMagnetometerData",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.automotive",
+      "kind" : "member",
+      "name" : "automotive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.confidence",
+      "kind" : "member",
+      "name" : "confidence",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.cycling",
+      "kind" : "member",
+      "name" : "cycling",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.running",
+      "kind" : "member",
+      "name" : "running",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.startDate",
+      "kind" : "member",
+      "name" : "startDate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.stationary",
+      "kind" : "member",
+      "name" : "stationary",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.timestamp",
+      "kind" : "member",
+      "name" : "timestamp",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.unknown",
+      "kind" : "member",
+      "name" : "unknown",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivity.walking",
+      "kind" : "member",
+      "name" : "walking",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivity",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityConfidence.high",
+      "kind" : "member",
+      "name" : "high",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivityConfidence",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityConfidence.low",
+      "kind" : "member",
+      "name" : "low",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivityConfidence",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityConfidence.medium",
+      "kind" : "member",
+      "name" : "medium",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivityConfidence",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityConfidence.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionActivityConfidence",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityManager.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionActivityManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityManager.isActivityAvailable",
+      "kind" : "member",
+      "name" : "isActivityAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionActivityManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityManager.queryActivityStarting",
+      "kind" : "member",
+      "name" : "queryActivityStarting",
+      "overloads" : [
+        {
+          "labels" : [
+            "from",
+            "to",
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "from:Date to:Date to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMMotionActivityManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityManager.startActivityUpdates",
+      "kind" : "member",
+      "name" : "startActivityUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMMotionActivityManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionActivityManager.stopActivityUpdates",
+      "kind" : "member",
+      "name" : "stopActivityUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionActivityManager",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.accelerometerData",
+      "kind" : "member",
+      "name" : "accelerometerData",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.accelerometerUpdateInterval",
+      "kind" : "member",
+      "name" : "accelerometerUpdateInterval",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.attitudeReferenceFrame",
+      "kind" : "member",
+      "name" : "attitudeReferenceFrame",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.availableAttitudeReferenceFrames",
+      "kind" : "member",
+      "name" : "availableAttitudeReferenceFrames",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.deviceMotion",
+      "kind" : "member",
+      "name" : "deviceMotion",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.deviceMotionUpdateInterval",
+      "kind" : "member",
+      "name" : "deviceMotionUpdateInterval",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.gyroData",
+      "kind" : "member",
+      "name" : "gyroData",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.gyroUpdateInterval",
+      "kind" : "member",
+      "name" : "gyroUpdateInterval",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isAccelerometerActive",
+      "kind" : "member",
+      "name" : "isAccelerometerActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isAccelerometerAvailable",
+      "kind" : "member",
+      "name" : "isAccelerometerAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isDeviceMotionActive",
+      "kind" : "member",
+      "name" : "isDeviceMotionActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isDeviceMotionAvailable",
+      "kind" : "member",
+      "name" : "isDeviceMotionAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isGyroActive",
+      "kind" : "member",
+      "name" : "isGyroActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isGyroAvailable",
+      "kind" : "member",
+      "name" : "isGyroAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isMagnetometerActive",
+      "kind" : "member",
+      "name" : "isMagnetometerActive",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.isMagnetometerAvailable",
+      "kind" : "member",
+      "name" : "isMagnetometerAvailable",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.magnetometerData",
+      "kind" : "member",
+      "name" : "magnetometerData",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.magnetometerUpdateInterval",
+      "kind" : "member",
+      "name" : "magnetometerUpdateInterval",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.showsDeviceMovementDisplay",
+      "kind" : "member",
+      "name" : "showsDeviceMovementDisplay",
+      "overloads" : [
+
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.startAccelerometerUpdates",
+      "kind" : "member",
+      "name" : "startAccelerometerUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.startDeviceMotionUpdates",
+      "kind" : "member",
+      "name" : "startDeviceMotionUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        },
+        {
+          "labels" : [
+            "using",
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "using:CMAttitudeReferenceFrame to:any withHandler:closure"
+        },
+        {
+          "labels" : [
+            "using"
+          ],
+          "member" : "method",
+          "signature" : "using:CMAttitudeReferenceFrame"
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.startGyroUpdates",
+      "kind" : "member",
+      "name" : "startGyroUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.startMagnetometerUpdates",
+      "kind" : "member",
+      "name" : "startMagnetometerUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "to:any withHandler:closure"
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.stopAccelerometerUpdates",
+      "kind" : "member",
+      "name" : "stopAccelerometerUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.stopDeviceMotionUpdates",
+      "kind" : "member",
+      "name" : "stopDeviceMotionUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.stopGyroUpdates",
+      "kind" : "member",
+      "name" : "stopGyroUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMMotionManager.stopMagnetometerUpdates",
+      "kind" : "member",
+      "name" : "stopMagnetometerUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMMotionManager",
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.authorizationStatus",
+      "kind" : "member",
+      "name" : "authorizationStatus",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isCadenceAvailable",
+      "kind" : "member",
+      "name" : "isCadenceAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isDistanceAvailable",
+      "kind" : "member",
+      "name" : "isDistanceAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isFloorCountingAvailable",
+      "kind" : "member",
+      "name" : "isFloorCountingAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isPaceAvailable",
+      "kind" : "member",
+      "name" : "isPaceAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isPedometerEventTrackingAvailable",
+      "kind" : "member",
+      "name" : "isPedometerEventTrackingAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.isStepCountingAvailable",
+      "kind" : "member",
+      "name" : "isStepCountingAvailable",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "static",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.queryPedometerData",
+      "kind" : "member",
+      "name" : "queryPedometerData",
+      "overloads" : [
+        {
+          "labels" : [
+            "from",
+            "to",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "from:Date to:Date withHandler:closure"
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.startEventUpdates",
+      "kind" : "member",
+      "name" : "startEventUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "handler"
+          ],
+          "member" : "method",
+          "signature" : "handler:closure"
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.startUpdates",
+      "kind" : "member",
+      "name" : "startUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+            "from",
+            "withHandler"
+          ],
+          "member" : "method",
+          "signature" : "from:Date withHandler:closure"
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.stopEventUpdates",
+      "kind" : "member",
+      "name" : "stopEventUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometer.stopUpdates",
+      "kind" : "member",
+      "name" : "stopUpdates",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "CMPedometer",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.averageActivePace",
+      "kind" : "member",
+      "name" : "averageActivePace",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.currentCadence",
+      "kind" : "member",
+      "name" : "currentCadence",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.currentPace",
+      "kind" : "member",
+      "name" : "currentPace",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.distance",
+      "kind" : "member",
+      "name" : "distance",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.endDate",
+      "kind" : "member",
+      "name" : "endDate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.floorsAscended",
+      "kind" : "member",
+      "name" : "floorsAscended",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.floorsDescended",
+      "kind" : "member",
+      "name" : "floorsDescended",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.numberOfSteps",
+      "kind" : "member",
+      "name" : "numberOfSteps",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerData.startDate",
+      "kind" : "member",
+      "name" : "startDate",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerData",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerEvent.date",
+      "kind" : "member",
+      "name" : "date",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerEvent",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerEvent.type",
+      "kind" : "member",
+      "name" : "type",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerEvent",
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerEventType.pause",
+      "kind" : "member",
+      "name" : "pause",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerEventType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerEventType.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerEventType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMPedometerEventType.resume",
+      "kind" : "member",
+      "name" : "resume",
+      "overloads" : [
+
+      ],
+      "owner" : "CMPedometerEventType",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMQuaternion.w",
+      "kind" : "member",
+      "name" : "w",
+      "overloads" : [
+
+      ],
+      "owner" : "CMQuaternion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMQuaternion.x",
+      "kind" : "member",
+      "name" : "x",
+      "overloads" : [
+
+      ],
+      "owner" : "CMQuaternion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMQuaternion.y",
+      "kind" : "member",
+      "name" : "y",
+      "overloads" : [
+
+      ],
+      "owner" : "CMQuaternion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMQuaternion.z",
+      "kind" : "member",
+      "name" : "z",
+      "overloads" : [
+
+      ],
+      "owner" : "CMQuaternion",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m11",
+      "kind" : "member",
+      "name" : "m11",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m12",
+      "kind" : "member",
+      "name" : "m12",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m13",
+      "kind" : "member",
+      "name" : "m13",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m21",
+      "kind" : "member",
+      "name" : "m21",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m22",
+      "kind" : "member",
+      "name" : "m22",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m23",
+      "kind" : "member",
+      "name" : "m23",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m31",
+      "kind" : "member",
+      "name" : "m31",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m32",
+      "kind" : "member",
+      "name" : "m32",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationMatrix.m33",
+      "kind" : "member",
+      "name" : "m33",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationMatrix",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationRate.x",
+      "kind" : "member",
+      "name" : "x",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationRate",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationRate.y",
+      "kind" : "member",
+      "name" : "y",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationRate",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "member:CMRotationRate.z",
+      "kind" : "member",
+      "name" : "z",
+      "overloads" : [
+
+      ],
+      "owner" : "CMRotationRate",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Audio",
       "id" : "member:CMTime.indefinite",
       "kind" : "member",
@@ -9698,6 +14318,41 @@
       ],
       "owner" : "ContinuousClock",
       "source" : "Sources/Kiln/Clocks.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CoreLocation.CLLocationCoordinate2DIsValid",
+      "kind" : "member",
+      "name" : "CLLocationCoordinate2DIsValid",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "signature" : "_:CLLocationCoordinate2D"
+        }
+      ],
+      "owner" : "CoreLocation",
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:CoreLocation.CLLocationCoordinate2DMake",
+      "kind" : "member",
+      "name" : "CLLocationCoordinate2DMake",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "_"
+          ],
+          "signature" : "_:number _:number"
+        }
+      ],
+      "owner" : "CoreLocation",
+      "source" : "Sources/Kiln/Location.swift",
       "support" : "full"
     },
     {
@@ -12617,9 +17272,45 @@
     },
     {
       "family" : "Foundation",
+      "id" : "member:Error.code",
+      "kind" : "member",
+      "name" : "code",
+      "overloads" : [
+
+      ],
+      "owner" : "Error",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
       "id" : "member:Error.description",
       "kind" : "member",
       "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "Error",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Error.domain",
+      "kind" : "member",
+      "name" : "domain",
+      "overloads" : [
+
+      ],
+      "owner" : "Error",
+      "source" : "Sources/Kiln/Foundation.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Foundation",
+      "id" : "member:Error.errorCode",
+      "kind" : "member",
+      "name" : "errorCode",
       "overloads" : [
 
       ],
@@ -16933,6 +21624,66 @@
       "support" : "full"
     },
     {
+      "family" : "Location",
+      "id" : "member:LocationButton.Title.currentLocation",
+      "kind" : "member",
+      "name" : "currentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "LocationButton.Title",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:LocationButton.Title.sendCurrentLocation",
+      "kind" : "member",
+      "name" : "sendCurrentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "LocationButton.Title",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:LocationButton.Title.sendMyCurrentLocation",
+      "kind" : "member",
+      "name" : "sendMyCurrentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "LocationButton.Title",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:LocationButton.Title.shareCurrentLocation",
+      "kind" : "member",
+      "name" : "shareCurrentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "LocationButton.Title",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:LocationButton.Title.shareMyCurrentLocation",
+      "kind" : "member",
+      "name" : "shareMyCurrentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "LocationButton.Title",
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "member:Logger.critical",
       "kind" : "member",
@@ -17100,6 +21851,654 @@
       ],
       "owner" : "Logger",
       "source" : "Sources/Kiln/System.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddress.fullAddress",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "fullAddress",
+      "overloads" : [
+
+      ],
+      "owner" : "MKAddress",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddress.shortAddress",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "shortAddress",
+      "overloads" : [
+
+      ],
+      "owner" : "MKAddress",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddressRepresentations.cityName",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "cityName",
+      "overloads" : [
+
+      ],
+      "owner" : "MKAddressRepresentations",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddressRepresentations.cityWithContext",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "cityWithContext",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ],
+          "member" : "method",
+          "signature" : "_:any"
+        }
+      ],
+      "owner" : "MKAddressRepresentations",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddressRepresentations.fullAddress",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "fullAddress",
+      "overloads" : [
+        {
+          "labels" : [
+            "includingRegion",
+            "singleLine"
+          ],
+          "member" : "method",
+          "signature" : "includingRegion:bool singleLine:bool"
+        }
+      ],
+      "owner" : "MKAddressRepresentations",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddressRepresentations.regionCode",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "regionCode",
+      "overloads" : [
+
+      ],
+      "owner" : "MKAddressRepresentations",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKAddressRepresentations.regionName",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "regionName",
+      "overloads" : [
+
+      ],
+      "owner" : "MKAddressRepresentations",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.decodingFailed",
+      "kind" : "member",
+      "name" : "decodingFailed",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.directionsNotFound",
+      "kind" : "member",
+      "name" : "directionsNotFound",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.loadingThrottled",
+      "kind" : "member",
+      "name" : "loadingThrottled",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.placemarkNotFound",
+      "kind" : "member",
+      "name" : "placemarkNotFound",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.rawValue",
+      "kind" : "member",
+      "name" : "rawValue",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.serverFailure",
+      "kind" : "member",
+      "name" : "serverFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.Code.unknown",
+      "kind" : "member",
+      "name" : "unknown",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError.Code",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.code",
+      "kind" : "member",
+      "name" : "code",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.decodingFailed",
+      "kind" : "member",
+      "name" : "decodingFailed",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.description",
+      "kind" : "member",
+      "name" : "description",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.directionsNotFound",
+      "kind" : "member",
+      "name" : "directionsNotFound",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.loadingThrottled",
+      "kind" : "member",
+      "name" : "loadingThrottled",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.localizedDescription",
+      "kind" : "member",
+      "name" : "localizedDescription",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.placemarkNotFound",
+      "kind" : "member",
+      "name" : "placemarkNotFound",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.serverFailure",
+      "kind" : "member",
+      "name" : "serverFailure",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKError.unknown",
+      "kind" : "member",
+      "name" : "unknown",
+      "overloads" : [
+
+      ],
+      "owner" : "MKError",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.addressString",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "addressString",
+      "overloads" : [
+
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.cancel",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "cancel",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.getMapItems",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "getMapItems",
+      "overloads" : [
+        {
+          "labels" : [
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "completionHandler:closure"
+        }
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.isCancelled",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isCancelled",
+      "overloads" : [
+
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.isLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isLoading",
+      "overloads" : [
+
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.mapItems",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "mapItems",
+      "overloads" : [
+
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKGeocodingRequest.preferredLocale",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "preferredLocale",
+      "overloads" : [
+
+      ],
+      "owner" : "MKGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.address",
+      "kind" : "member",
+      "name" : "address",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.addressRepresentations",
+      "kind" : "member",
+      "name" : "addressRepresentations",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.isCurrentLocation",
+      "kind" : "member",
+      "name" : "isCurrentLocation",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.location",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.name",
+      "kind" : "member",
+      "name" : "name",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.openInMaps",
+      "kind" : "member",
+      "name" : "openInMaps",
+      "overloads" : [
+        {
+          "labels" : [
+            "launchOptions",
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "launchOptions:any? completionHandler:closure"
+        },
+        {
+          "labels" : [
+            "launchOptions"
+          ],
+          "member" : "method",
+          "signature" : "launchOptions:any?"
+        }
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.phoneNumber",
+      "kind" : "member",
+      "name" : "phoneNumber",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.placemark",
+      "kind" : "member",
+      "name" : "placemark",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.pointOfInterestCategory",
+      "kind" : "member",
+      "name" : "pointOfInterestCategory",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.timeZone",
+      "kind" : "member",
+      "name" : "timeZone",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKMapItem.url",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "MKMapItem",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.cancel",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "cancel",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "method",
+          "signature" : ""
+        }
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.getMapItems",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "getMapItems",
+      "overloads" : [
+        {
+          "labels" : [
+            "completionHandler"
+          ],
+          "member" : "method",
+          "signature" : "completionHandler:closure"
+        }
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.isCancelled",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isCancelled",
+      "overloads" : [
+
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.isLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isLoading",
+      "overloads" : [
+
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.location",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "location",
+      "overloads" : [
+
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.mapItems",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "mapItems",
+      "overloads" : [
+
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "member:MKReverseGeocodingRequest.preferredLocale",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "preferredLocale",
+      "overloads" : [
+
+      ],
+      "owner" : "MKReverseGeocodingRequest",
+      "source" : "Sources/Kiln/Geocoding.swift",
       "support" : "full"
     },
     {
@@ -51245,16 +56644,31 @@
       "id" : "protocol:CLLocationManagerDelegate",
       "kind" : "protocol",
       "name" : "CLLocationManagerDelegate",
-      "notes" : "Declared, with its proxy, but nothing calls it yet: `CLLocationManager` is Round 3's (§4.6).",
+      "notes" : "`manager.delegate = self` from an `NSObject` subclass; called on the main actor.",
       "proxy" : true,
       "requirements" : [
         "locationManager(_:didUpdateLocations:)?",
         "locationManager(_:didFailWithError:)?",
         "locationManagerDidChangeAuthorization(_:)?",
-        "locationManager(_:didUpdateHeading:)?"
+        "locationManager(_:didChangeAuthorization:)?",
+        "locationManager(_:didUpdateHeading:)?",
+        "locationManagerShouldDisplayHeadingCalibration(_:)?"
       ],
-      "source" : "Sources/Kiln/Location.swift",
-      "support" : "stub"
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "protocol:CMHeadphoneMotionManagerDelegate",
+      "kind" : "protocol",
+      "name" : "CMHeadphoneMotionManagerDelegate",
+      "proxy" : true,
+      "requirements" : [
+        "headphoneMotionManagerDidConnect(_:)?",
+        "headphoneMotionManagerDidDisconnect(_:)?"
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
     },
     {
       "family" : "Language",
@@ -53606,6 +59020,792 @@
       "support" : "partial"
     },
     {
+      "family" : "Location",
+      "id" : "type:CLAccuracyAuthorization",
+      "kind" : "type",
+      "name" : "CLAccuracyAuthorization",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLActivityType",
+      "kind" : "type",
+      "name" : "CLActivityType",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLAuthorizationStatus",
+      "kind" : "type",
+      "name" : "CLAuthorizationStatus",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLDeviceOrientation",
+      "kind" : "type",
+      "name" : "CLDeviceOrientation",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLError",
+      "kind" : "type",
+      "name" : "CLError",
+      "notes" : "`error as? CLError` then `.code`: `.denied`, `.locationUnknown`, `.network`, `.geocodeFoundNoResult`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLError.Code",
+      "kind" : "type",
+      "name" : "CLError.Code",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLFloor",
+      "kind" : "type",
+      "name" : "CLFloor",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLGeocoder",
+      "kind" : "type",
+      "name" : "CLGeocoder",
+      "notes" : "For older code; prefer `MKReverseGeocodingRequest`. With a handler or `await`.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLHeading",
+      "kind" : "type",
+      "name" : "CLHeading",
+      "notes" : "`magneticHeading`, `trueHeading` (-1 until location is allowed), `headingAccuracy`, and the raw `x`, `y`, `z`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLHeadingComponentValue",
+      "kind" : "type",
+      "name" : "CLHeadingComponentValue",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocation",
+      "kind" : "type",
+      "name" : "CLLocation",
+      "notes" : "`coordinate`, `altitude`, `speed`, `course` (-1 when unknown), accuracies, `timestamp`, `distance(from:)`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "coordinate",
+            "altitude",
+            "horizontalAccuracy",
+            "verticalAccuracy",
+            "course",
+            "courseAccuracy",
+            "speed",
+            "speedAccuracy",
+            "timestamp"
+          ],
+          "member" : "init",
+          "signature" : "coordinate:CLLocationCoordinate2D altitude:number horizontalAccuracy:number verticalAccuracy:number course:number courseAccuracy:number speed:number speedAccuracy:number timestamp:Date"
+        },
+        {
+          "labels" : [
+            "coordinate",
+            "altitude",
+            "horizontalAccuracy",
+            "verticalAccuracy",
+            "course",
+            "speed",
+            "timestamp"
+          ],
+          "member" : "init",
+          "signature" : "coordinate:CLLocationCoordinate2D altitude:number horizontalAccuracy:number verticalAccuracy:number course:number speed:number timestamp:Date"
+        },
+        {
+          "labels" : [
+            "coordinate",
+            "altitude",
+            "horizontalAccuracy",
+            "verticalAccuracy",
+            "timestamp"
+          ],
+          "member" : "init",
+          "signature" : "coordinate:CLLocationCoordinate2D altitude:number horizontalAccuracy:number verticalAccuracy:number timestamp:Date"
+        },
+        {
+          "labels" : [
+            "latitude",
+            "longitude"
+          ],
+          "member" : "init",
+          "signature" : "latitude:number longitude:number"
+        }
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationAccuracy",
+      "kind" : "type",
+      "name" : "CLLocationAccuracy",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocationCoordinate2D",
+      "kind" : "type",
+      "name" : "CLLocationCoordinate2D",
+      "notes" : "`latitude` and `longitude` in degrees; not `Equatable`, as in Swift.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "latitude",
+            "longitude"
+          ],
+          "member" : "init",
+          "signature" : "latitude:number longitude:number"
+        }
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationDegrees",
+      "kind" : "type",
+      "name" : "CLLocationDegrees",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationDirection",
+      "kind" : "type",
+      "name" : "CLLocationDirection",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationDirectionAccuracy",
+      "kind" : "type",
+      "name" : "CLLocationDirectionAccuracy",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationDistance",
+      "kind" : "type",
+      "name" : "CLLocationDistance",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocationManager",
+      "kind" : "type",
+      "name" : "CLLocationManager",
+      "notes" : "While the app is open: authorization (asks first), `startUpdatingLocation`, `requestLocation`, heading. No background updates or monitoring.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/LocationManager.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocationSourceInformation",
+      "kind" : "type",
+      "name" : "CLLocationSourceInformation",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Location.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationSpeed",
+      "kind" : "type",
+      "name" : "CLLocationSpeed",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Language",
+      "id" : "type:CLLocationSpeedAccuracy",
+      "kind" : "type",
+      "name" : "CLLocationSpeedAccuracy",
+      "notes" : "The same as `Double` in Kiln.",
+      "source" : "Sources/Kiln/Language.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocationUpdate",
+      "kind" : "type",
+      "name" : "CLLocationUpdate",
+      "notes" : "`for try await update in CLLocationUpdate.liveUpdates()`: `update.location`, `authorizationDenied`, `accuracyLimited`, `stationary`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLLocationUpdate.LiveConfiguration",
+      "kind" : "type",
+      "name" : "CLLocationUpdate.LiveConfiguration",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLPlacemark",
+      "kind" : "type",
+      "name" : "CLPlacemark",
+      "notes" : "`name`, `locality`, `administrativeArea`, `country`, `postalCode`, `thoroughfare`, `location`, `timeZone`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLServiceSession",
+      "kind" : "type",
+      "name" : "CLServiceSession",
+      "notes" : "`CLServiceSession(authorization: .whenInUse)`: asks first, and keeps location on while you hold it; `diagnostics` for `for try await`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "authorization",
+            "fullAccuracyPurposeKey"
+          ],
+          "member" : "init",
+          "signature" : "authorization:CLServiceSession.AuthorizationRequirement fullAccuracyPurposeKey:string"
+        },
+        {
+          "labels" : [
+            "authorization"
+          ],
+          "member" : "init",
+          "signature" : "authorization:CLServiceSession.AuthorizationRequirement"
+        }
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLServiceSession.AuthorizationRequirement",
+      "kind" : "type",
+      "name" : "CLServiceSession.AuthorizationRequirement",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:CLServiceSession.Diagnostic",
+      "kind" : "type",
+      "name" : "CLServiceSession.Diagnostic",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAbsoluteAltitudeData",
+      "kind" : "type",
+      "name" : "CMAbsoluteAltitudeData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAcceleration",
+      "kind" : "type",
+      "name" : "CMAcceleration",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ],
+          "member" : "init",
+          "signature" : "x:number y:number z:number"
+        }
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAccelerometerData",
+      "kind" : "type",
+      "name" : "CMAccelerometerData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAltimeter",
+      "kind" : "type",
+      "name" : "CMAltimeter",
+      "notes" : "Relative altitude and pressure (kPa), and absolute altitude; asks for Motion & Fitness first.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAltitudeData",
+      "kind" : "type",
+      "name" : "CMAltitudeData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAttitude",
+      "kind" : "type",
+      "name" : "CMAttitude",
+      "notes" : "`roll`, `pitch`, `yaw` (radians), `quaternion`, `rotationMatrix`; `multiply(byInverseOf:)` for an attitude relative to one you kept.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAttitudeReferenceFrame",
+      "kind" : "type",
+      "name" : "CMAttitudeReferenceFrame",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMAuthorizationStatus",
+      "kind" : "type",
+      "name" : "CMAuthorizationStatus",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMCalibratedMagneticField",
+      "kind" : "type",
+      "name" : "CMCalibratedMagneticField",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMCalibratedMagneticField.Accuracy",
+      "kind" : "type",
+      "name" : "CMCalibratedMagneticField.Accuracy",
+      "notes" : "The same as `CMMagneticFieldCalibrationAccuracy` in Kiln.",
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMDeviceMotion",
+      "kind" : "type",
+      "name" : "CMDeviceMotion",
+      "notes" : "`attitude`, `rotationRate`, `gravity`, `userAcceleration`, `magneticField`, `heading` (with a north reference frame), `timestamp`.",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMDeviceMotion.SensorLocation",
+      "kind" : "type",
+      "name" : "CMDeviceMotion.SensorLocation",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMGyroData",
+      "kind" : "type",
+      "name" : "CMGyroData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMHeadphoneMotionManager",
+      "kind" : "type",
+      "name" : "CMHeadphoneMotionManager",
+      "notes" : "AirPods' head motion as `CMDeviceMotion`; asks for Motion & Fitness first.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMagneticField",
+      "kind" : "type",
+      "name" : "CMMagneticField",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ],
+          "member" : "init",
+          "signature" : "x:number y:number z:number"
+        }
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMagneticFieldCalibrationAccuracy",
+      "kind" : "type",
+      "name" : "CMMagneticFieldCalibrationAccuracy",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMagnetometerData",
+      "kind" : "type",
+      "name" : "CMMagnetometerData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMotionActivity",
+      "kind" : "type",
+      "name" : "CMMotionActivity",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMotionActivityConfidence",
+      "kind" : "type",
+      "name" : "CMMotionActivityConfidence",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMotionActivityManager",
+      "kind" : "type",
+      "name" : "CMMotionActivityManager",
+      "notes" : "Walking, running, cycling, driving or still; asks for Motion & Fitness first.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMMotionManager",
+      "kind" : "type",
+      "name" : "CMMotionManager",
+      "notes" : "Handlers run on the main actor; update intervals are 1/60 s at the fastest. No permission needed.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Motion.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMPedometer",
+      "kind" : "type",
+      "name" : "CMPedometer",
+      "notes" : "Asks for Motion & Fitness first; a refused app's handler gets an error. The handler runs on the main actor.",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMPedometerData",
+      "kind" : "type",
+      "name" : "CMPedometerData",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMPedometerEvent",
+      "kind" : "type",
+      "name" : "CMPedometerEvent",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Fitness.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMPedometerEventType",
+      "kind" : "type",
+      "name" : "CMPedometerEventType",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMQuaternion",
+      "kind" : "type",
+      "name" : "CMQuaternion",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z",
+            "w"
+          ],
+          "member" : "init",
+          "signature" : "x:number y:number z:number w:number"
+        }
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMRotationMatrix",
+      "kind" : "type",
+      "name" : "CMRotationMatrix",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        }
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Motion",
+      "id" : "type:CMRotationRate",
+      "kind" : "type",
+      "name" : "CMRotationRate",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ],
+          "member" : "init",
+          "signature" : ""
+        },
+        {
+          "labels" : [
+            "x",
+            "y",
+            "z"
+          ],
+          "member" : "init",
+          "signature" : "x:number y:number z:number"
+        }
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Audio",
       "id" : "type:CMTime",
       "kind" : "type",
@@ -55770,6 +61970,17 @@
       "support" : "full"
     },
     {
+      "family" : "Location",
+      "id" : "type:LocationButton.Title",
+      "kind" : "type",
+      "name" : "LocationButton.Title",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Foundation",
       "id" : "type:Logger",
       "kind" : "type",
@@ -55818,6 +62029,116 @@
         }
       ],
       "source" : "Sources/Kiln/RegexBuilder.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKAddress",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "MKAddress",
+      "overloads" : [
+        {
+          "labels" : [
+            "fullAddress",
+            "shortAddress"
+          ],
+          "member" : "init",
+          "signature" : "fullAddress:string shortAddress:string?"
+        }
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKAddressRepresentations",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "MKAddressRepresentations",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKError",
+      "kind" : "type",
+      "name" : "MKError",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKError.Code",
+      "kind" : "type",
+      "name" : "MKError.Code",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/MotionValues.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKGeocodingRequest",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "MKGeocodingRequest",
+      "notes" : "`MKGeocodingRequest(addressString:)` (nil for an empty string), then `try await request.mapItems`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "addressString"
+          ],
+          "member" : "init",
+          "signature" : "addressString:string"
+        }
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKMapItem",
+      "kind" : "type",
+      "name" : "MKMapItem",
+      "notes" : "From geocoding: `name`, `location`, `address?.fullAddress`, `addressRepresentations?.cityWithContext`, `timeZone`; `openInMaps()` opens Maps. No map views.",
+      "overloads" : [
+        {
+          "labels" : [
+            "location",
+            "address"
+          ],
+          "member" : "init",
+          "signature" : "location:CLLocation address:MKAddress?"
+        }
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Location",
+      "id" : "type:MKReverseGeocodingRequest",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "MKReverseGeocodingRequest",
+      "notes" : "`MKReverseGeocodingRequest(location:)` (nil for an invalid location), then `try await request.mapItems`.",
+      "overloads" : [
+        {
+          "labels" : [
+            "location"
+          ],
+          "member" : "init",
+          "signature" : "location:CLLocation"
+        }
+      ],
+      "source" : "Sources/Kiln/Geocoding.swift",
       "support" : "full"
     },
     {
@@ -61632,6 +67953,30 @@
       "support" : "full"
     },
     {
+      "family" : "Location",
+      "id" : "view:LocationButton",
+      "kind" : "view",
+      "name" : "LocationButton",
+      "notes" : "Asks for location when tapped (the host's sheet the first time), then runs the action if allowed.",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "action"
+          ],
+          "signature" : "_:LocationButton.Title? action:action"
+        },
+        {
+          "labels" : [
+            "action"
+          ],
+          "signature" : "action:action"
+        }
+      ],
+      "source" : "Sources/Kiln/LiveUpdates.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Controls",
       "id" : "view:Menu",
       "kind" : "view",
@@ -63632,6 +69977,18 @@
       "reason" : "They create and post to the person's iCloud Shared Albums through `PHPhotoLibrary`, which a Shelf app can't read: it can only add photos (§4.2).",
       "status" : "wontDo",
       "what" : "iCloud Shared Album sheets (`.photosSharedAlbumCreationSheet`, `…CustomizationSheet`, `…PostingSheet`, `.postToPhotosSharedAlbumSheet`)"
+    },
+    {
+      "id" : "location-monitoring",
+      "reason" : "They wake or keep an app running in the background; a Shelf app runs only while it's open, and its location stops with it (§4.6).",
+      "status" : "wontDo",
+      "what" : "Region and visit monitoring, significant-change location, `CLMonitor`, `CLBackgroundActivitySession`, `allowsBackgroundLocationUpdates`"
+    },
+    {
+      "id" : "temporary-full-accuracy",
+      "reason" : "Its purpose strings are Info.plist keys an app can't add: the accuracy the person chose for Shelf stands, and the completion hears an error when it's approximate (§4.6).",
+      "status" : "wontDo",
+      "what" : "`requestTemporaryFullAccuracyAuthorization(withPurposeKey:)`"
     }
   ]
 }
