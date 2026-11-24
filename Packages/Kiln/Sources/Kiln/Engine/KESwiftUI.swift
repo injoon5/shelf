@@ -122,6 +122,7 @@ enum KNative: Hashable {
         case .point(let x, let y): return "(\(x), \(y))"
         case .angle(let d): return "\(d)°"
         case .object("Error", let ref): return (ref.value as? NSError)?.localizedDescription ?? "Error"
+        case .object("NSNumber", let ref): return (ref.value as? NSNumber)?.stringValue ?? "0"
         case .object(_, let ref) where ref.value is KDescribable: return (ref.value as! KDescribable).describe(interp)
         case .boxed(let b) where b.value.base is KDescribable: return (b.value.base as! KDescribable).describe(interp)
         default: return kindName

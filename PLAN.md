@@ -731,10 +731,14 @@ Needs §1.3 (`async`) and §1.4 (type bridges), but no Info.plist keys.
 - `Chart3D` with the 3D forms of `PointMark`, `RuleMark` and `RectangleMark`, plus `SurfacePlot`, `chart3DPose`, `chart3DCameraProjection`, and scales.
 - `SurfacePlot`'s function runs once per sample. Benchmark it, and cap the sample count if the VM is too slow.
 
+**Done.** `Bridges/Chart3D/`: `Chart3D` with `PointMark(x:y:z:)` and `SurfacePlot`, their style, material and symbol modifiers, `chart3DPose` (a pose or a binding), `chart3DCameraProjection`, `chartXScale`/`chartZScale`, `chartZAxis`, `chartZAxisLabel` and `chartZSelection`. Benchmarked (`Packages/Kiln/Benchmarks/README.md`, §3.7): 7.7 µs a call on an M2 Pro, so an uncapped first draw would take a second. The app's function is sampled on a 48 × 48 grid that Swift Charts' 256 × 256 calls interpolate, 24 × 24 while a slider is being dragged. `RuleMark` and `RectangleMark` in 3D, and text on an axis, are errors with the chart's line: Swift Charts would stop the app for them. An app's own `Chart3DSurfaceStyle` is won't-do (its requirement is private). Fixture `fixtures/apps/chart3d.swift`; Lab `Terrain`, matching native at every step.
+
 ### 3.8 Networking, completed
 - `URLSession.shared.data(from:)` and `data(for:)` become truly `async`, and the prompt stops steering apps to `dataTask`.
 - `bytes(from:)` and `.lines`, for streamed responses.
 - WebSockets: `webSocketTask(with:)`, `resume`, `send(.string)` and `send(.data)`, `receive()` in a loop, `sendPing`, and `cancel(with:reason:)`. Closed with the card.
+
+**Done.** `data(from:)` and `data(for:)` were already truly `async` (§1.3). The prompt's Networking line (`KilnFamily.promptLine`) now teaches `try await` and never mentions `dataTask`, which still works for older code. `Bridges/Networking/Streams.swift`: `bytes(from:)`/`bytes(for:)` with `for try await` over the bytes, `.lines` and `.characters`; `URLSessionWebSocketTask` with `resume`, `send` and `receive` (async, or with completion handlers), `sendPing`, `cancel(with:reason:)`, `state`, `closeCode` and `closeReason`. Every socket is cancelled with `.goingAway` when the card closes, and a stream stops reading with the app's tasks; a check fails both at once, as offline. Tested against a WebSocket echo server on the Mac (`StreamsBridgeTests`). Fixture `fixtures/apps/streams.swift`; Lab `LineFeed` (a `data:` URL, since the Lab has no server).
 
 **Done when:** fixtures and a Lab example for each section, the prompt regenerated, and a check on the phone for haptics, audio and the web.
 

@@ -125,7 +125,7 @@ public enum Coverage {
         ordered += counts.values.filter { !declared.contains($0.family) }.sorted { $0.family < $1.family }
 
         return CoverageResult(entries: entries, families: ordered, extras: extras.sorted { $0.id < $1.id },
-                              staleWontDo: wontDo.entries.map(\.id).filter { !used.contains($0) },
+                              staleWontDo: wontDo.entries.filter { !$0.outsideSDK }.map(\.id).filter { !used.contains($0) },
                               conflicts: conflicts, manifest: manifest)
     }
 }

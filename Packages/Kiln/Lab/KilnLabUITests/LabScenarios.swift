@@ -322,6 +322,47 @@ final class AppScenarios: LabCase {
     func testDoodlePadNative() { doodle("native") }
     func testDoodlePadKiln() { doodle("kiln") }
 
+    // MARK: Terrain (Round 2 §3.7: Chart3D)
+
+    func terrain(_ mode: String) {
+        launch("Terrain", mode)
+        snap("1 start")
+        tap("Front")
+        snap("2 turned to the front")
+        tap("Top")
+        snap("3 from the top")
+        for name in ["Perspective", "Peaks"] {
+            let toggle = app.switches[name]
+            if toggle.waitForExistence(timeout: 3) {
+                toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.94, dy: 0.5)).tap()
+            } else { note("missing switch: \(name)") }
+        }
+        snap("4 orthographic, no peaks")
+        app.swipeUp()
+        let slider = app.sliders.firstMatch
+        if slider.waitForExistence(timeout: 3) {
+            slider.adjust(toNormalizedSliderPosition: 0.9)
+        } else { note("missing slider") }
+        snap("5 more ripple")
+    }
+    func testTerrainNative() { terrain("native") }
+    func testTerrainKiln() { terrain("kiln") }
+
+    // MARK: Line feed (Round 2 §3.8: streamed responses)
+
+    func feed(_ mode: String) {
+        launch("LineFeed", mode)
+        snap("1 start")
+        tap("Load")
+        Thread.sleep(forTimeInterval: 1)
+        snap("2 loaded")
+        tap("Load")
+        Thread.sleep(forTimeInterval: 1)
+        snap("3 loaded again")
+    }
+    func testLineFeedNative() { feed("native") }
+    func testLineFeedKiln() { feed("kiln") }
+
     // MARK: Trip notes (Round 2A: text parsing, units, haptics, sharing)
 
     func trip(_ mode: String) {

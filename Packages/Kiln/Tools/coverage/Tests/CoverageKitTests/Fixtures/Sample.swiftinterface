@@ -81,6 +81,9 @@ extension SwiftUICore.View {
   public func helper() -> Swift.Int
 
   nonisolated public func _privateModifier() -> some SwiftUICore.View
+
+  @usableFromInline
+  @_Concurrency.MainActor @preconcurrency internal func inlinableHelper<M>(_ modifier: M) -> some SwiftUICore.View
 }
 @available(anyAppleOS 27, *)
 extension SwiftUICore::View {

@@ -201,6 +201,34 @@ enum KNativeValues {
         }
     }
 
+    /// What a number as `Any` from Objective-C (`NSNumber`) casts to.
+    static let numberTypes: Set<String> = ["Int", "Double", "CGFloat", "Float", "Bool", "NSNumber", "Int64", "Int32", "UInt", "TimeInterval"]
+
+    /// An `NSNumber` as `T`, the way `as? T` bridges it.
+    static func number(_ n: NSNumber?, as type: String) -> KV {
+        guard let n else { return .nilValue }
+        switch type {
+        case "Bool": return .bool(n.boolValue)
+        case "Double", "CGFloat", "Float", "TimeInterval": return .double(n.doubleValue)
+        case "NSNumber": return .native(.object("NSNumber", KRef(n)))
+        default: return .int(n.intValue)
+        }
+    }
+
+    /// A value from Objective-C given to the app as `Any` (`callJavaScript`'s
+    /// result): numbers stay `NSNumber`, so `as? Int` and `as? Double` both work.
+    static func any(_ value: Any?) -> KV {
+        switch value {
+        case let n as NSNumber where CFGetTypeID(n) != CFBooleanGetTypeID(): return .native(.object("NSNumber", KRef(n)))
+        case let a as [Any]: return .array(a.map { any($0) })
+        case let d as [String: Any]:
+            var out: [KV: KV] = [:]
+            for (k, v) in d { out[.string(k)] = any(v) }
+            return .dict(out)
+        default: return kv(from: value)
+        }
+    }
+
     /// The bridge's name for a native object's class: its own, or the
     /// nearest superclass's that's registered.
     static func typeName(of o: AnyObject) -> String {

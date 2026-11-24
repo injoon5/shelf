@@ -290,3 +290,17 @@ PLAN.md §3.1–§3.4, Round 2A (haptics, share and paste, text parsing, units),
 - **What it costs.** An operator on two values the engine doesn't know first asks the operand's type bridge (`t.operator`), after every built-in case; a member of a native type that names a nested type (`NSTextCheckingResult.CheckingType`) is one more dictionary lookup.
 - **Kiln Lab:** `TripNotes` matches native on every step, labels and screenshots.
 - **New inputs.** The four Round 2A fixtures (`haptics`, `sharing`, `text-parsing`, `units`) and Lab's `TripNotes`. `text-parsing` and `TripNotes` validate in about 4 ms: NaturalLanguage's taggers and the data detector load their models on first use.
+
+## §3.7: SurfacePlot
+
+`SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.
+
+- **The input.** The function a model writes for a surface, `{ x, z in sin(frequency * x) * cos(frequency * z) }`, called over a `side` × `side` grid in `onAppear`, timed with `Tools/bench.py --runs 7` (release KilnBench). Apple M2 Pro. Date: 24 November 2026.
+
+| Grid | Calls | validate (min) | Per call |
+|---|---:|---:|---:|
+| 48 × 48 | 2,304 | 17.13 ms | 7.4 µs |
+| 256 × 256 | 65,536 | 502.55 ms | 7.7 µs |
+
+- **Uncapped, a chart's first draw would take about a second** of the main thread on this Mac (two 256 × 256 passes), and again whenever the app's state gives the chart a new function. So the sample count is capped: Kiln runs the app's function on a 48 × 48 grid over the domain Swift Charts asks about, and Swift Charts' 256 × 256 calls interpolate it natively (`KSurfaceSampler`, Bridges/Chart3D). A sampling costs 17 ms here; the grid is redrawn only when the function or the domain changes.
+- **Not measured on an iPhone yet.** The per-call cost scales with the closure; a function with more arithmetic samples proportionally slower.

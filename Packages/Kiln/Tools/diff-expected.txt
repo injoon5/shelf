@@ -40,6 +40,16 @@ tests/RestOfSwiftUITests-16.swift Round 1 (rest of SwiftUI): before, what this t
 tests/RestOfSwiftUITests-19.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
 tests/RestOfSwiftUITests-3.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
 tests/RestOfSwiftUITests-6.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.
+fixtures/apps/audio.swift Round 2 §3.5's fixture: before, AVAudioPlayer, AVSpeechSynthesizer and VideoPlayer weren't bridged.
+tests/AudioBridgeTests-1.swift Round 2 §3.5: before, AVSpeechSynthesizer and AVPlayer weren't bridged.
+fixtures/apps/web.swift Round 2 §3.6's fixture: before, WebView and WebPage weren't bridged.
+tests/WebBridgeTests-0.swift Round 2 §3.6: before, WebView and WebPage weren't bridged.
+Packages/Kiln/Examples/Apps/Terrain.swift Round 2 §3.7's Lab example: before, Chart3D and SurfacePlot weren't bridged.
+fixtures/apps/chart3d.swift Round 2 §3.7's fixture: before, Chart3D and SurfacePlot weren't bridged.
+tests/Chart3DBridgeTests-0.swift Round 2 §3.7: before, Chart3D and SurfacePlot weren't bridged.
+fixtures/apps/streams.swift Round 2 §3.8's fixture: before, webSocketTask and bytes(from:) weren't bridged.
+tests/StreamsBridgeTests-5.swift Round 2 §3.8: before, webSocketTask wasn't bridged.
+tests/StreamsBridgeTests-6.swift Round 2 §3.8: before, webSocketTask wasn't bridged.
 Packages/Kiln/Examples/Apps/TripNotes.swift Round 2A's Lab example: before, RegexBuilder, NSDataDetector, NaturalLanguage, Decimal, Measurement, haptics and the pasteboard weren't bridged.
 fixtures/apps/haptics.swift Round 2A's Haptics fixture: before, `SensoryFeedback`'s values and `.sensoryFeedback(trigger:_:)` weren't bridged (the modifier was a stub).
 fixtures/apps/sharing.swift Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.

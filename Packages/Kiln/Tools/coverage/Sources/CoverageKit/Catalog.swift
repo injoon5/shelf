@@ -265,7 +265,9 @@ public struct Catalog: Sendable {
                 }
                 continue
             }
-            guard isPublicName(d.name) else { continue }
+            // An interface also prints `@usableFromInline internal` declarations
+            // for its inlinable code; no app can call them.
+            guard isPublicName(d.name), !d.modifiers.contains("internal") else { continue }
 
             if d.kind == .func, !d.isStatic, let cls = receiverClass(receiver, rt, conforms), qualifiesAsModifier(d, receiver: receiver, cls: cls) {
                 let owner = cls == "View" ? nil : cls

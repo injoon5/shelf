@@ -154,6 +154,13 @@ final class KAsyncSequence {
     }
 }
 
+/// A native value `for await` loops over itself (`URLSession.AsyncBytes`),
+/// which also has members of its own (`.lines`).
+@MainActor
+protocol KAsyncLoopable: AnyObject {
+    func makeAsyncIterator() -> KAsyncIterator
+}
+
 /// One loop over a sequence.
 @MainActor
 final class KAsyncIterator {
@@ -1659,6 +1666,8 @@ extension KInterpreter {
         case .native(.object("AsyncIterator", let ref)):
             guard let it = ref.value as? KAsyncIterator else { break }
             return it
+        case .native(.object(_, let ref)) where ref.value is KAsyncLoopable:
+            return (ref.value as! KAsyncLoopable).makeAsyncIterator()
         default:
             // A plain collection, as if it were an async sequence.
             var items = try sequence(v)[...]

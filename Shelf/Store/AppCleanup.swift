@@ -1,4 +1,5 @@
 import Foundation
+import Kiln
 
 /// Everything the phone keeps for one app, and the one way to remove it
 /// (plan §0.4). Delete App runs it, and so does a sync that finds an app gone
@@ -52,6 +53,8 @@ extension AppCleanup {
             .adding("source") { cache.removeSource(for: $0) }
             .adding("settings suite") { defaults.remove(slug: $0) }
             .adding("files folder") { files.remove($0) }
+            // Its cookies, local storage and caches (plan §3.6): its own WebKit store.
+            .adding("website data") { slug in try? await KilnWebsiteData.remove(for: slug) }
         if let data {
             // Pending writes go with it, unpushed: the server's copy is going too.
             cleanup = cleanup.adding("DB store") { await data.remove($0) }

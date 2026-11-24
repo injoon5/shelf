@@ -154,12 +154,15 @@ public struct WontDoList: Codable, Sendable {
         public var source: String?
         /// Any of these. The file may give one matcher or a list.
         public var match: [SymbolMatcher]
+        /// About an API that isn't SwiftUI's (`AVAudioSourceNode`): it reaches
+        /// the manifest and the prompt, and matches no SDK symbol.
+        public var outsideSDK = false
 
         public init(id: String, what: String, reason: String, status: Status, source: String? = nil, match: [SymbolMatcher]) {
             self.id = id; self.what = what; self.reason = reason; self.status = status; self.source = source; self.match = match
         }
 
-        enum CodingKeys: String, CodingKey { case id, what, reason, status, source, match }
+        enum CodingKeys: String, CodingKey { case id, what, reason, status, source, match, outsideSDK }
 
         public init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -168,7 +171,9 @@ public struct WontDoList: Codable, Sendable {
             reason = try c.decode(String.self, forKey: .reason)
             status = try c.decodeIfPresent(Status.self, forKey: .status) ?? .wontDo
             source = try c.decodeIfPresent(String.self, forKey: .source)
-            if let one = try? c.decode(SymbolMatcher.self, forKey: .match) { match = [one] }
+            outsideSDK = try c.decodeIfPresent(Bool.self, forKey: .outsideSDK) ?? false
+            if outsideSDK, !c.contains(.match) { match = [] }
+            else if let one = try? c.decode(SymbolMatcher.self, forKey: .match) { match = [one] }
             else { match = try c.decode([SymbolMatcher].self, forKey: .match) }
         }
 
@@ -196,7 +201,7 @@ public struct WontDoList: Codable, Sendable {
         var out: [String] = []
         for e in entries {
             if !seen.insert(e.id).inserted { out.append("duplicate id \(e.id)") }
-            if e.match.isEmpty || e.match.contains(where: \.isEmpty) { out.append("\(e.id) has an empty matcher") }
+            if !e.outsideSDK, e.match.isEmpty || e.match.contains(where: \.isEmpty) { out.append("\(e.id) has an empty matcher") }
         }
         return out
     }

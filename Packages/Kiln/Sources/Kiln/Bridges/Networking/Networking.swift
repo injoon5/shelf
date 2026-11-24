@@ -3,9 +3,10 @@
 //  Bridges: URLSession and requests
 //
 //  `try await URLSession.shared.data(from:)` (or `for:` a request) waits
-//  without blocking; `dataTask(with:) { data, response, error in }.resume()`
-//  calls back on the main thread, and is cancelled when the app's screen
-//  closes. `validate` (and any stub context) never touches the network: a
+//  without blocking, and `bytes(from:)` streams the body (Streams.swift, with
+//  WebSockets); `dataTask(with:) { data, response, error in }.resume()`, for
+//  older code, calls back on the main thread. All of it is cancelled when the
+//  app's screen closes. `validate` (and any stub context) never touches the network: a
 //  request fails at once, as offline.
 //
 
@@ -14,6 +15,7 @@ import SwiftUI
 @objc(KilnBridges_Networking)
 final class NetworkingBridges: KBridgeFamily {
     override class func register(into r: KRegistry) {
+        streams(r)
         r.type("URLSession", .networking, notes: "`shared` only.") { t in
             t.staticProperty("shared") { _ in .native(.object("URLSession", KRef(URLSession.shared))) }
             t.method("data", notes: "`try await`: waits without blocking.", async: true) { c in
@@ -26,6 +28,8 @@ final class NetworkingBridges: KBridgeFamily {
                 if case .function(let f)? = c.last { completion = f }
                 return .native(.object("URLSessionDataTask", KRef(KDataTask(request: req, completion: completion))))
             }
+            // Streamed responses and WebSockets (Streams.swift).
+            KStreams.sessionMethods(t)
         }
 
         r.type("URLSessionDataTask", .networking) { t in
