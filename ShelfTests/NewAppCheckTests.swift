@@ -74,9 +74,9 @@ struct NewAppCheckTests {
     }
 
     @Test func warningsAreShownAndDontBlock() async {
-        let (model, library) = await Self.pasted(Self.reply(#"Image(systemName: "star").symbolEffect(.bounce, value: count)"#))
+        let (model, library) = await Self.pasted(Self.reply(#"Image(systemName: "star").sensoryFeedback(.success, trigger: count)"#))
         #expect(model.checkError == nil)
-        #expect(model.warnings == ["Line 11: `.symbolEffect` is accepted but has no effect yet. Accepted; the symbol doesn't animate yet"])
+        #expect(model.warnings == ["Line 11: `.sensoryFeedback` is accepted but has no effect yet. Accepted; no feedback is played yet"])
         #expect(model.canInstall(in: library))
     }
 

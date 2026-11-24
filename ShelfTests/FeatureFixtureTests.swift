@@ -128,7 +128,6 @@ struct FeatureFixtureTests {
     /// prompt's "What doesn't work" section warns against it. If one starts
     /// passing, Kiln has improved and the prompt can say so.
     @Test(arguments: [
-        ("gesture", #"Text("x").gesture(DragGesture().onChanged { _ in })"#, "DragGesture"),
         ("tuple labels from the type", #"Text("\(bounds().max)")"#, "max"),
     ])
     func doesntWork(_ claim: String, _ body: String, _ mentioned: String) {
@@ -152,15 +151,16 @@ struct FeatureFixtureTests {
         #expect(console.contains(printed), "\(claim): \(console)")
     }
 
+    /// PLAN.md §2: what the prompt used to warn against, now drawn.
     @Test(arguments: [
-        ("Canvas", #"Canvas { context, size in }"#, "Canvas isn't supported"),
-        ("glassEffect", #"Text("x").glassEffect()"#, ".glassEffect()"),
-        ("matchedGeometryEffect", #"Text("x").matchedGeometryEffect(id: "x", in: space)"#, ".matchedGeometryEffect()"),
+        ("gesture", #"Text("x").gesture(DragGesture().onChanged { value in print(value.translation.width) })"#),
+        ("Canvas", #"Canvas { context, size in context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.blue)) }"#),
+        ("glassEffect", #"Text("x").glassEffect()"#),
+        ("matchedGeometryEffect", #"Text("x").matchedGeometryEffect(id: "x", in: space)"#),
     ])
-    func doesntDraw(_ claim: String, _ body: String, _ warning: String) throws {
+    func nowDraws(_ claim: String, _ body: String) throws {
         let rendered = try Self.render(Self.claimSource(body))
-        let all = rendered.warnings + rendered.errors
-        #expect(all.contains { $0.contains(warning) }, "\(claim) now works? \(all)")
+        #expect(rendered.errors.isEmpty && rendered.warnings.isEmpty, "\(claim): \(rendered)")
     }
 
     /// "What works": a `Path` drawn directly, as a shape (PLAN.md §1.4 made `Path` a value).

@@ -22,7 +22,7 @@ final class EnvironmentBridges: KBridgeFamily {
         r.wrapper("StateObject", .environment)
         r.wrapper("ObservedObject", .environment)
         r.wrapper("EnvironmentObject", .environment, notes: "Set with `.environmentObject(_:)`.")
-        r.wrapper("Environment", .environment, support: .partial, notes: "The key paths listed as environment values; not `@Environment(Model.self)`.")
+        r.wrapper("Environment", .environment, notes: "SwiftUI's environment values, your own `@Entry` values, and `@Environment(Model.self)`.")
         r.wrapper("Published", .environment)
         r.wrapper("AppStorage", .environment, notes: "Kept per app.")
         r.wrapper("SceneStorage", .environment, support: .partial, notes: "Kept while the app is open.")

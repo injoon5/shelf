@@ -147,7 +147,10 @@ final class DrawingBridges: KBridgeFamily {
             }
             t.property("description") { c in .string(col(c).description) }
             t.method("opacity") { c in .native(.color(col(c).opacity(c.first?.asDouble ?? 1))) }
-            t.method("mix", notes: "Returns the color unchanged.") { c in .native(.color(col(c))) }
+            t.method("mix", "with:Color by:number in:any?") { c in
+                guard #available(iOS 18, macOS 15, *), let other = c.color("with") else { return .native(.color(col(c))) }
+                return .native(.color(col(c).mix(with: other, by: c.double("by") ?? 0.5)))
+            }
         }
         r.alias("UIColor", to: "Color")
         r.alias("NSColor", to: "Color")

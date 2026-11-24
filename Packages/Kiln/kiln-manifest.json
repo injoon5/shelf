@@ -4553,7 +4553,15 @@
       "id" : "member:Color.mix",
       "kind" : "member",
       "name" : "mix",
-      "notes" : "Returns the color unchanged.",
+      "overloads" : [
+        {
+          "labels" : [
+            "with",
+            "by",
+            "in"
+          ]
+        }
+      ],
       "owner" : "Color",
       "source" : "Sources/Kiln/Drawing.swift",
       "support" : "partial"
@@ -29184,12 +29192,12 @@
       "id" : "wrapper:Environment",
       "kind" : "wrapper",
       "name" : "Environment",
-      "notes" : "The key paths listed as environment values; not `@Environment(Model.self)`.",
+      "notes" : "SwiftUI's environment values, your own `@Entry` values, and `@Environment(Model.self)`.",
       "overloads" : [
 
       ],
       "source" : "Sources/Kiln/Environment.swift",
-      "support" : "partial"
+      "support" : "full"
     },
     {
       "family" : "Environment",
