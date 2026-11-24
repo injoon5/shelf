@@ -86,7 +86,7 @@ final class KDispatchGroup {
 
 extension FoundationBridges {
     static func systemMore(_ r: KRegistry) {
-        r.type("Bundle", .foundation, support: .partial,
+        r.type("Bundle", .foundation, support: .full,
                notes: "`Bundle.main`: Shelf's bundle identifier with the app's name, its version, and `infoDictionary`; an app has no resources of its own.") { t in
             t.staticProperty("main") { _ in .native(.object("Bundle", KRef(Bundle.main))) }
             @MainActor func info(_ c: KCall) -> [String: Any] {

@@ -153,6 +153,10 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`ShareLink` (a `String`, `URL`, `Image`, `Data` or your `Transferable`; `items:`; `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `TextSelection`, `.copyable`, `.pasteDestination`"
         case .units:
             return "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`"
+        case .foundation:
+            return "Foundation as compiled: `Date`, `Calendar`, `DateComponents`, `DateInterval`, `TimeZone`, `Locale`, every formatter and format style, `Data`, JSON and property lists, `UserDefaults`, files in the app's folder, `NotificationCenter`, `Logger`, Dispatch, `Bundle`/`ProcessInfo`/`UIDevice`, CryptoKit's hashes"
+        case .concurrency:
+            return "`Task`, task groups, `AsyncStream`, continuations, `Duration` and the clocks; Combine: subjects, `Just`, `Future`, `@Published`'s `$name`, the usual operators, `sink`, `assign`, `AnyCancellable`"
         default:
             return nil
         }

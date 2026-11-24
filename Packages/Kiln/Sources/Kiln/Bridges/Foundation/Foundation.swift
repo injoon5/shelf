@@ -303,7 +303,7 @@ final class FoundationBridges: KBridgeFamily {
         r.addContextFree("percent") { _, _, _ in .native(.format(KFormat(kind: .percent))) }
         r.addContextFree("dateTime") { _, _, _ in .native(.format(KFormat(kind: .dateTime))) }
 
-        r.type("FormatStyle", .foundation, notes: "`.number`, `.percent`, `.currency(code:)` with `.precision(.fractionLength(n))`, and `.dateTime` with its parts.") { t in
+        r.type("FormatStyle", .foundation, support: .full) { t in
             // Each call is kept (`steps`) and replayed onto Foundation's style (FormatStyles.swift).
             t.anyProperty { c, name in
                 guard case .native(.format(var f)) = c.receiver else { return nil }

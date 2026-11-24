@@ -247,7 +247,7 @@ extension ConcurrencyBridges {
 
         // What every publisher has.
         r.type("Publisher", .concurrency, support: .partial,
-               notes: "Combine runs synchronously on the main actor: subjects, `Just`, `Future`, `@Published`'s `$name`, `.publisher` of a sequence and of `NotificationCenter`; `map`, `filter`, `compactMap`, `removeDuplicates`, `scan`, `debounce`, `throttle`, `delay`, `combineLatest`, `merge`, `sink`, `assign(to:on:)`, `store(in:)`; `.onReceive` takes them.") { t in
+               notes: "Combine runs on the main actor; `.onReceive` takes any publisher.") { t in
             t.namespace()
             @MainActor func up(_ c: KCall) throws -> KPub {
                 guard let p = KPub.from(c.receiver) else { throw c.fail("isn't a publisher") }

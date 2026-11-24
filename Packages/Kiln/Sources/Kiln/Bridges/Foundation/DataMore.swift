@@ -150,7 +150,7 @@ extension FoundationBridges {
             t.fallback("Sequence") { v, interp in .array(try interp.sequence(v)) }
         }
 
-        r.type("JSONSerialization", .foundation, support: .partial,
+        r.type("JSONSerialization", .foundation, support: .full,
                notes: "`jsonObject(with:options:)` gives Swift arrays and dictionaries (cast with `as? [String: Any]`); `data(withJSONObject:options:)`, `isValidJSONObject`.") { t in
             t.staticMethod("jsonObject", "with:any options:any?") { c in
                 guard let data = KBuiltins.dataValue(c["with"]) else { throw c.fail("needs Data") }

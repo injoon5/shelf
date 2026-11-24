@@ -148,7 +148,7 @@ extension FoundationBridges {
     // MARK: Date
 
     static func date(_ r: KRegistry) {
-        r.type("Date", .foundation, notes: "Dates, `Date.now`, arithmetic with seconds, `formatted(…)` with every style, `ISO8601Format()`.") { t in
+        r.type("Date", .foundation, support: .full) { t in
             t.initializer { c in
                 // `try Date("2026-11-24T09:30:00Z", strategy: .iso8601)` (Text/ParseStrategies.swift).
                 if c.arg("strategy") != nil { return try KParsing.date(c) }
