@@ -137,11 +137,11 @@
     },
     {
       "id": "private-style-protocols",
-      "what": "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle` or `IndexViewStyle`",
-      "reason": "SwiftUI keeps their requirements private (`_makeView`, `_body`), so no app can adopt them, compiled or not. The built-in styles all work.",
+      "what": "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle`, `IndexViewStyle` or `Chart3DSurfaceStyle`",
+      "reason": "SwiftUI and Swift Charts keep their requirements private (`_makeView`, `_body`, `_resolve`), so no app can adopt them, compiled or not. The built-in styles all work.",
       "status": "wontDo",
       "source": "Round 1 (Controls, Lists, Navigation)",
-      "match": { "ids": ["protocol:PickerStyle", "protocol:TextFieldStyle", "protocol:ListStyle", "protocol:TabViewStyle", "protocol:NavigationViewStyle", "protocol:IndexViewStyle"] }
+      "match": { "ids": ["protocol:PickerStyle", "protocol:TextFieldStyle", "protocol:ListStyle", "protocol:TabViewStyle", "protocol:NavigationViewStyle", "protocol:IndexViewStyle", "protocol:Chart3DSurfaceStyle"] }
     },
     {
       "id": "tables",

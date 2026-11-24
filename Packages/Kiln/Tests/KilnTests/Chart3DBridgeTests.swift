@@ -134,6 +134,28 @@ final class Chart3DBridgeTests: XCTestCase {
         XCTAssertEqual(sampler.value(8, 4), 20, accuracy: 1e-9)
     }
 
+    /// A slider being dragged: each new function is sampled coarsely, and
+    /// the full grid follows once they stop coming.
+    func testQuickChangesSampleCoarselyThenRefine() throws {
+        let c = try KilnEngine.compile("""
+        var calls = 0
+        func plane(_ x: Double, _ z: Double) -> Double { calls += 1; return 2 * x + z }
+        struct ContentView: View { var body: some View { Text("x") } }
+        """, headless: true)
+        let decl = try XCTUnwrap(c.interp.functions["plane"]?.first)
+        var redraws = 0
+        let sampler = KSurfaceSampler { redraws += 1 }
+        let full = KSurfaceSampler.side * KSurfaceSampler.side, coarse = KSurfaceSampler.coarse * KSurfaceSampler.coarse
+        sampler.use(KFunction(.user(decl, c.interp.globalEnv, nil)), c.interp, hint: (-1, 1, -1, 1))
+        XCTAssertEqual(c.interp.globalEnv.lookup("calls")?.value.asInt, full)
+        sampler.use(KFunction(.user(decl, c.interp.globalEnv, nil)), c.interp, hint: (-1, 1, -1, 1))
+        XCTAssertEqual(c.interp.globalEnv.lookup("calls")?.value.asInt, full + coarse, "a quick change samples coarsely")
+        XCTAssertEqual(sampler.value(0.5, 0.25), 1.25, accuracy: 1e-9)
+        RunLoop.main.run(until: Date().addingTimeInterval(KSurfaceSampler.settle + 0.2))
+        XCTAssertEqual(c.interp.globalEnv.lookup("calls")?.value.asInt, 2 * full + coarse, "then the full grid")
+        XCTAssertEqual(redraws, 1)
+    }
+
     /// What Swift Charts would stop the app for is an error with the chart's line.
     func testMarksSwiftChartsCantDrawAreErrorsNotCrashes() throws {
         guard #available(macOS 26.0, iOS 26.0, *) else { throw XCTSkip("Chart3D needs macOS 26") }

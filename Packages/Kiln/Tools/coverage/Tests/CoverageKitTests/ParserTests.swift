@@ -93,9 +93,9 @@ func find(_ decls: [Decl], _ kind: Decl.Kind, _ name: String) -> [Decl] {
     @Test func skipsInlinableBodies() throws {
         let f = try sampleFile()
         let ext = try #require(f.decls.first { $0.kind == .extension && $0.name == "View" })
-        // gadgetPadding ×2, macOnlyModifier, oldPadding, softDeprecated, inlined, helper, _privateModifier.
+        // gadgetPadding ×2, macOnlyModifier, oldPadding, softDeprecated, inlined, helper, _privateModifier, inlinableHelper.
         #expect(ext.children.map(\.name) == ["gadgetPadding", "gadgetPadding", "macOnlyModifier", "oldPadding", "softDeprecated",
-                                             "inlined", "helper", "_privateModifier"])
+                                             "inlined", "helper", "_privateModifier", "inlinableHelper"])
         // The style's static var has a `get { .init() }` body; the next declaration still parses.
         #expect(f.decls.contains { $0.kind == .struct && $0.name == "Animation" })
     }
@@ -178,6 +178,7 @@ func find(_ decls: [Decl], _ kind: Decl.Kind, _ name: String) -> [Decl] {
         #expect(c.symbol("modifier:macOnlyModifier") == nil)
         #expect(c.symbol("modifier:helper") == nil, "returns Int, not a view")
         #expect(c.symbol("modifier:_privateModifier") == nil)
+        #expect(c.symbol("modifier:inlinableHelper") == nil, "@usableFromInline internal: no app can call it")
         #expect(c.symbol("modifier:inlined") != nil, "ModifiedContent counts")
         #expect(c.symbol("modifier:oldPadding")?.deprecated == true)
         #expect(c.symbol("modifier:softDeprecated")?.deprecated == false, "100000 is a placeholder")

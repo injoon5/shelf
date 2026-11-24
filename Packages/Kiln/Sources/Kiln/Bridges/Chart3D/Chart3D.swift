@@ -58,6 +58,11 @@ final class Chart3DBridges: KBridgeFamily {
         r.view("SurfacePlot", .chart3D, introduced: iOS26) { v in
             v.manifestKind = "content"
             v.form("x:title y:title z:title function:closure") { _ in EmptyView() }
+            // A check calls the function once, as Swift Charts would, with a point: it returns a number, not views.
+            v.probe { _, a, _ in
+                guard case .function(let f)? = a["function"] ?? a.lastFunction else { return [] }
+                return [KProbeCall(fn: f, args: [.double(0.5), .double(0.5)], use: .action)]
+            }
         }
     }
 

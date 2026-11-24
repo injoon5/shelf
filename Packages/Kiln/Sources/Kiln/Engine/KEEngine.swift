@@ -308,11 +308,6 @@ final class KProbe {
                 if name == "AsyncImage" { sample = [.native(.asyncPhase("empty", KRef(nil)))] }
                 if name == "TimelineView" { sample = [.tuple([.native(.date(Date()))], ["date"])] }
                 if name == "ScrollViewReader" { continue }
-                // Chart3D's `SurfacePlot { x, z in … }` returns a number, not views.
-                if name == "SurfacePlot" {
-                    do { _ = try interp.entry { try interp.call(f, [.double(0.5), .double(0.5)], [nil, nil]) } } catch { interp.report(error) }
-                    continue
-                }
                 do {
                     let views = try interp.entry { try interp.callBuilder(f, sample) }
                     views.forEach { walk($0, depth: depth + 1) }

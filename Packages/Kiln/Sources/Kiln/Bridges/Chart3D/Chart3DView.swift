@@ -136,7 +136,8 @@ struct KChart3DView: View {
             ForEach(marks) { m in
                 K3DMarkContent(mark: m)
             }
-            ForEach(fitted, id: \.0.id) { surface, sampler in
+            // A new grid is new content, or Swift Charts keeps the surface it drew.
+            ForEach(fitted, id: \.1.identity) { surface, sampler in
                 K3DSurfaceContent(surface: surface, sampler: sampler)
             }
         }
@@ -278,20 +279,30 @@ extension K3DMark: KSurfaceDomainHint {
 /// other marks' extent, or −1…1, Swift Charts' own default), and when a
 /// call falls outside it, the calls' extent is sampled and the chart drawn
 /// again. A new function (the app's state changed) is sampled at once, on
-/// the main thread, in the chart's `body`.
+/// the main thread, in the chart's `body`. While new functions come quickly
+/// (a slider being dragged), the grid is `coarse` per side, a quarter of the
+/// calls, and the full grid follows once they stop.
 final class KSurfaceSampler: @unchecked Sendable {
     /// Points per side. 2,304 calls of the app's function per sampling:
     /// 17 ms for a line of trigonometry on an M2 Pro, where Swift Charts'
     /// own 256 × 256 would take 500 ms a pass (Benchmarks/README.md, §3.7).
     static let side = 48
+    /// Points per side while the function keeps changing.
+    static let coarse = 24
+    /// New functions this close together are "coming quickly".
+    static let settle: TimeInterval = 0.25
 
     struct Grid {
+        var n: Int                 // points per side
         var x0: Double, x1: Double, z0: Double, z1: Double
-        var values: [Double]       // side × side, row by row in z
+        var values: [Double]       // n × n, row by row in z
     }
 
     private let lock = NSLock()
     private var grid: Grid?
+    /// Bumped with each grid, so the chart draws the surface again.
+    @MainActor private(set) var generation = 0
+    @MainActor var identity: String { "\(ObjectIdentifier(self).hashValue)-\(generation)" }
     /// The extent of the calls since the grid was made, and whether one missed it.
     private var seen: (x0: Double, x1: Double, z0: Double, z1: Double)?
     private var missed = false
@@ -299,6 +310,8 @@ final class KSurfaceSampler: @unchecked Sendable {
     private let redraw: @MainActor () -> Void
     @MainActor private var function: KFunction?
     @MainActor private weak var interp: KInterpreter?
+    @MainActor private var lastNewFunction: TimeInterval = -.infinity
+    @MainActor private var refine: DispatchWorkItem?
 
     init(redraw: @escaping @MainActor () -> Void) { self.redraw = redraw }
 
@@ -317,7 +330,26 @@ final class KSurfaceSampler: @unchecked Sendable {
         function = f
         self.interp = interp
         let current = lock.withLock { grid.map { ($0.x0, $0.x1, $0.z0, $0.z1) } }
-        sample(over: current ?? hint)
+        let now = ProcessInfo.processInfo.systemUptime
+        let quick = now - lastNewFunction < Self.settle
+        lastNewFunction = now
+        sample(over: current ?? hint, side: quick ? Self.coarse : Self.side)
+        if quick { scheduleRefine() }
+    }
+
+    /// The full grid, once the function has stopped changing.
+    @MainActor
+    private func scheduleRefine() {
+        refine?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, let g = self.lock.withLock({ self.grid }), g.n < Self.side else { return }
+                self.sample(over: (g.x0, g.x1, g.z0, g.z1))
+                self.redraw()
+            }
+        }
+        refine = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.settle, execute: work)
     }
 
     /// Swift Charts' call: the grid, interpolated.
@@ -333,7 +365,7 @@ final class KSurfaceSampler: @unchecked Sendable {
     }
 
     static func interpolate(_ g: Grid, _ x: Double, _ z: Double) -> Double {
-        let n = side
+        let n = g.n
         let fx = min(max((x - g.x0) / max(g.x1 - g.x0, .ulpOfOne), 0), 1) * Double(n - 1)
         let fz = min(max((z - g.z0) / max(g.z1 - g.z0, .ulpOfOne), 0), 1) * Double(n - 1)
         let i = min(Int(fx), n - 2), j = min(Int(fz), n - 2)
@@ -363,9 +395,8 @@ final class KSurfaceSampler: @unchecked Sendable {
 
     /// The app's function on the grid, on the main thread.
     @MainActor
-    func sample(over d: (Double, Double, Double, Double)) {
+    func sample(over d: (Double, Double, Double, Double), side n: Int = KSurfaceSampler.side) {
         guard let function, let interp else { return }
-        let n = Self.side
         var values = [Double](repeating: 0, count: n * n)
         var failed = false
         // Swift Charts calls the function while it draws: a counter it bumps
@@ -386,8 +417,9 @@ final class KSurfaceSampler: @unchecked Sendable {
                 }
             }
         } }
+        generation += 1
         lock.withLock {
-            grid = Grid(x0: d.0, x1: d.1, z0: d.2, z1: d.3, values: values)
+            grid = Grid(n: n, x0: d.0, x1: d.1, z0: d.2, z1: d.3, values: values)
             seen = nil
             missed = false
         }
