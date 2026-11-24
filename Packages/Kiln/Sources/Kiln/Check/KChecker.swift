@@ -904,35 +904,8 @@ final class KChecker {
     static let swiftTypes: Set<String> = ["Any", "AnyObject", "Never", "Void", "Self", "Optional", "Error", "Element",
                                           "Key", "Value", "Index", "Wrapped", "Content", "Label", "Body"]
 
-    /// Type names written in bridges' signatures (`Edge.Set`, `HorizontalAlignment`):
-    /// SwiftUI's symbolic types, whose members the bridge reads.
-    private lazy var symbolicTypes: Set<String> = {
-        var out: Set<String> = []
-        func add(_ o: KOverload) {
-            for p in o.params { addKind(p.kind) }
-            for k in o.lenientKinds.values { addKind(k) }
-        }
-        func addKind(_ k: KArgKind) {
-            switch k {
-            case .typed(let n), .typedArray(let n):
-                out.insert(n)
-                if let first = n.split(separator: ".").first { out.insert(String(first)) }
-            default: break
-            }
-        }
-        for b in registry.views.values { b.forms.forEach { add($0.overload) } }
-        for b in registry.modifiers.values {
-            b.forms.forEach { add($0.overload) }
-            if let s = b.styles { out.insert(s.owner) }
-        }
-        for t in registry.types.values {
-            t.inits.forEach { add($0.overload) }
-            t.methods.values.forEach { $0.forEach { add($0.overload) } }
-            t.staticMethods.values.forEach { $0.forEach { add($0.overload) } }
-        }
-        for f in registry.functions.values { f.forms.forEach { add($0.overload) } }
-        return out
-    }()
+    /// Type names written in bridges' signatures (`Edge.Set`, `HorizontalAlignment`).
+    private var symbolicTypes: Set<String> { registry.symbolicTypeNames }
 
     private func reportUnknownType(_ name: String, _ line: Int) {
         var candidates = Array(registry.types.keys) + Array(registry.views.keys)

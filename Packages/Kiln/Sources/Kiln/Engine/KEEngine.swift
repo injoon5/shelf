@@ -99,7 +99,8 @@ enum KilnEngine {
             // Closing the app's screen stops its tasks and timers first.
             context.onTearDown { [weak interp] in interp?.tearDown() }
             let view = AnyView(KRootView(compiled: compiled))
-            var result = KilnResult(view: view, consoleOutput: interp.console, errors: [])
+            // Errors from the top-level code (its globals) are the run's too, not only `onError`'s.
+            var result = KilnResult(view: view, consoleOutput: interp.console, errors: interp.errors)
             result.interp = interp
             result.context = context
             return result

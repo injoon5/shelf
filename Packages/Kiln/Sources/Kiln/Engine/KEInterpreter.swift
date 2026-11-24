@@ -751,6 +751,11 @@ final class KInterpreter {
         }
         let current = try read(loc)
         let rhs = try eval(valueExpr, env, expected ?? typeRef(of: current))
+        if let f = current.userType?.staticMethods[op]?.first ?? functions[op]?.first {
+            let inout_ = KBinding.inOut(get: { [unowned self] in (try? self.read(loc)) ?? .nilValue }, set: { [unowned self] v in try? self.write(loc, v) })
+            _ = try invoke(f, args: [.binding(inout_), rhs], labels: [nil, nil], selfContext: nil, parent: globalEnv)
+            return
+        }
         let binOp = String(op.dropLast())
         let result: KV
         if binOp == "??" { result = current.isNil ? rhs : current }
@@ -799,6 +804,12 @@ final class KInterpreter {
             let baseLoc = try lvalue(base, env)
             guard let first = args.first else { throw fail("Subscript needs an index", line) }
             let idx = try eval(first.value, env)
+            if first.label == "keyPath", let loc = try keyPathLocation(baseLoc, idx) { return loc }
+            let baseValue = try read(baseLoc)
+            if baseValue.userType != nil || { if case .type(.user) = baseValue { return true }; return false }() {
+                let all = try [idx] + args.dropFirst().map { try eval($0.value, env) }
+                if let loc = try userSubscriptLocation(baseLoc, baseValue, all, args.map(\.label), line) { return loc }
+            }
             if let d = args.first(where: { $0.label == "default" }) {
                 let def = try eval(d.value, env)
                 return .computed(get: { [unowned self] in
@@ -851,9 +862,13 @@ final class KInterpreter {
         let value = try read(base)
         switch value {
         case .object(let o):
+            if o.fields[name] == nil, o.type.storedDecl(name) == nil, o.type.computed[name] == nil, !o.type.wrappedNames.contains(name),
+               let loc = dynamicMemberLocation(value, name, base) { return loc }
             return .objectField(o, name)
         case .structV(let s):
             if s.type.wrapper(of: name) == "Binding", case .binding(let b)? = s.fields[name] { return .binding(b) }
+            if s.fields[name] == nil, s.type.storedDecl(name) == nil, s.type.computed[name] == nil, !s.type.wrappedNames.contains(name),
+               let loc = dynamicMemberLocation(value, name, base) { return loc }
             return .member(base, name)
         case .binding(let b):
             return .member(.binding(b), name)
@@ -1030,7 +1045,12 @@ final class KInterpreter {
             return .dict(out)
         case (.array(let items), .named("Set", let args)):
             return .set(Set(items.map { coerce($0, to: args.first) }))
+        case (.tuple(let vals, let old), .tuple(let ts, let labels)) where vals.count == ts.count:
+            // `-> (min: Int, max: Int)` labels the `(1, 9)` it returns.
+            let named = labels.count == vals.count && labels.contains { $0 != nil } ? labels : old
+            return .tuple(zip(vals, ts).map { coerce($0.0, to: $0.1) }, named)
         default:
+            if let make = registry.literalCoercions[t.core.name ?? ""], let v2 = make(v) { return v2 }
             return v
         }
     }
@@ -1246,7 +1266,9 @@ final class KInterpreter {
                 else { env.declare("$\(i)", a) }
             }
             if args.count == 1, case .tuple(let vals, _) = args[0] {
-                for (i, a) in vals.enumerated() where i > 0 { env.declare("$\(i)", a) }
+                // `zip(a, b).map { "\($0)\($1)" }`: a closure that uses `$1` takes the tuple's halves.
+                let splat = KEClosureScan.maxAnonymous(c) >= 1
+                for (i, a) in vals.enumerated() where i > 0 || splat { env.declare("$\(i)", a) }
             }
         }
     }
@@ -1349,7 +1371,12 @@ final class KInterpreter {
             return (closed ? Array(l...h) : Array(l..<h)).map { .int($0) }
         case .string(let s): return s.map { .string(String($0)) }
         case .nilValue: return []
+        case .native(.object(_, let ref)) where ref.value is KNativeSequence:
+            return try (ref.value as! KNativeSequence).elements(self)
+        case .native(.boxed(let b)) where b.value.base is KNativeSequence:
+            return try (b.value.base as! KNativeSequence).elements(self)
         default:
+            if let xs = try userSequenceElements(v) { return xs }
             throw fail("Can't loop over \(describe(v))")
         }
     }
@@ -1407,7 +1434,8 @@ final class KInterpreter {
             return "\(s.type.name)(\(parts.joined(separator: ", ")))"
         case .enumV(let e):
             if e.payload.isEmpty { return e.caseName }
-            return "\(e.caseName)(\(e.payload.map { describe($0, quoted: true) }.joined(separator: ", ")))"
+            let declared = e.type.enumCase(e.caseName)?.associated.map(\.0) ?? []
+            return "\(e.caseName)(\(e.payload.enumerated().map { i, x in (i < declared.count ? declared[i].map { $0 + ": " } ?? "" : "") + describe(x, quoted: true) }.joined(separator: ", ")))"
         case .object(let o): return o.type.name
         case .function: return "(Function)"
         case .type(let t): return t.name

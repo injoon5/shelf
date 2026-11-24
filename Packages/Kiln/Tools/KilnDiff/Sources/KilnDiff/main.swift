@@ -71,8 +71,43 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
     override func stopLoading() {}
 }
 
+#if !KILN_BASELINE
+/// `KilnDiff --corpus Tests/Corpus [filter…]`: runs the Foundation and
+/// standard-library corpus (KilnCorpus.swift) and prints each entry that
+/// doesn't print what compiled Swift prints. `--all` prints passing ones too.
+@MainActor func corpus(_ args: [String]) {
+    guard let path = args.first else { return }
+    let all = args.contains("--all")
+    let filters = args.dropFirst().filter { $0 != "--all" }
+    let url = URL(fileURLWithPath: path)
+    var isDir: ObjCBool = false
+    FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+    var entries = isDir.boolValue ? KilnCorpus.load(url)
+        : KilnCorpus.parse((try? String(contentsOf: url, encoding: .utf8)) ?? "", family: url.deletingPathExtension().lastPathComponent)
+    if !filters.isEmpty { entries = entries.filter { e in filters.contains { e.id.contains($0) || e.section.contains($0) || e.family == $0 } } }
+    var failed = 0, gaps = 0
+    for e in entries {
+        let got = KilnCorpus.run(e)
+        let ok = got == e.expected
+        if e.isGap { gaps += 1 }
+        if !ok && !e.isGap { failed += 1 }
+        if !ok || all {
+            print("\(ok ? "PASS" : (e.isGap ? "GAP " : "FAIL")) \(e.family):\(e.line) \(e.id)")
+            if !ok {
+                print("   want: \(e.expected.joined(separator: " ⏎ "))")
+                print("    got: \(got.joined(separator: " ⏎ "))")
+            }
+        }
+    }
+    print("\(entries.count - failed - gaps) of \(entries.count) pass; \(failed) fail, \(gaps) known gaps")
+}
+#endif
+
 @MainActor func main() {
     var args = Array(CommandLine.arguments.dropFirst())
+    #if !KILN_BASELINE
+    if args.first == "--corpus" { corpus(Array(args.dropFirst())); return }
+    #endif
     var prelude: String?
     if args.first == "--prelude", args.count > 1 {
         prelude = try? String(contentsOfFile: args[1], encoding: .utf8)

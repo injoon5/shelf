@@ -17,7 +17,10 @@ extension KInterpreter {
         try tick()
         switch e {
         case .int(let i):
-            if let n = expected?.core.name, ["Double", "CGFloat", "Float", "TimeInterval"].contains(n) { return .double(Double(i)) }
+            if let n = expected?.core.name {
+                if ["Double", "CGFloat", "Float", "TimeInterval"].contains(n) { return .double(Double(i)) }
+                if let make = registry.literalCoercions[n], let v = make(.int(i)) { return v }
+            }
             return .int(i)
         case .double(let d): return .double(d)
         case .bool(let b): return .bool(b)
@@ -71,12 +74,20 @@ extension KInterpreter {
             case "-":
                 let v = try eval(x, env, expected)
                 switch v {
-                case .int(let i): return .int(-i)
+                case .int(let i):
+                    if i == .min { throw fail("Arithmetic overflow: -(\(i)) doesn't fit in an Int") }
+                    return .int(-i)
                 case .double(let d): return .double(-d)
-                default: throw fail("Can't negate \(describe(v))")
+                default:
+                    if let r = try prefixOperator("-", v, e.line) { return r }
+                    throw fail("Can't negate \(describe(v))")
                 }
             case "+": return try eval(x, env, expected)
-            case "~": if case .int(let i) = try eval(x, env) { return .int(~i) }; return .void
+            case "~":
+                let v = try eval(x, env, expected)
+                if case .int(let i) = v { return .int(~i) }
+                if let r = try prefixOperator("~", v, e.line) { return r }
+                throw fail("Unary operator '~' can't be applied to \(v.typeName)")
             case "&":
                 // inout: pass a binding to the storage.
                 let loc = try lvalue(x, env)
@@ -84,7 +95,9 @@ extension KInterpreter {
                                          set: { [unowned self] v in try? self.write(loc, v) }))
             case "..<": return .range(.nilValue, try eval(x, env), closed: false)
             case "...": return .range(.nilValue, try eval(x, env), closed: true)
-            default: throw fail("Unknown operator \(op)")
+            default:
+                if let r = try prefixOperator(op, try eval(x, env, expected), e.line) { return r }
+                throw fail("Unknown operator \(op)")
             }
         case .postfix(let op, let x):
             let v = try eval(x, env, expected)
@@ -191,6 +204,8 @@ extension KInterpreter {
                     s += String.localizedStringWithFormat("%lld", i)
                 } else if localized, case .double(let d) = v {
                     s += String.localizedStringWithFormat("%lf", d)
+                } else if Self.mayBeOptional(first.value), let t = staticType(first.value, env), Self.hasOptional(t) {
+                    s += describe(v, as: t)
                 } else {
                     s += describe(v)
                 }
@@ -367,6 +382,7 @@ extension KInterpreter {
                 return try runGetter(p, env: env)
             }
             if name == "localizedDescription" { return try errorDescription(base, s.type) }
+            if let v = try stdlibMember(base, s.type, name, line) { return v }
             throw noMember(s.type, name, line: line)
         case .enumV(let e):
             if name == "rawValue" { return try rawValue(e) }
@@ -382,6 +398,7 @@ extension KInterpreter {
             if let i = e.payloadLabels.firstIndex(of: name), i < e.payload.count { return e.payload[i] }
             if name == "hashValue" { return .int(base.hashValue) }
             if name == "localizedDescription" { return try errorDescription(base, e.type) }
+            if let v = try stdlibMember(base, e.type, name, line) { return v }
             throw noMember(e.type, name, line: line)
         case .object(let o):
             readTracker?.objects[ObjectIdentifier(o)] = o
@@ -399,6 +416,7 @@ extension KInterpreter {
             }
             if o.type.storedDecl(name) != nil { return .nilValue }
             if name == "localizedDescription" { return try errorDescription(base, o.type) }
+            if let v = try stdlibMember(base, o.type, name, line) { return v }
             throw noMember(o.type, name, line: line)
         case .type(.user(let t)):
             return try staticMember(t, name, line)
@@ -451,6 +469,7 @@ extension KInterpreter {
 
     func subscriptGet(_ base: KV, _ idx: [KV], _ labels: [String?], _ line: Int) throws -> KV {
         guard let first = idx.first else { throw fail("Subscript needs an index", line) }
+        if labels.first == "keyPath", let v = try keyPathGet(base, first, line) { return v }
         switch base {
         case .array(let a):
             if case .range(let lo, let hi, let closed) = first {
@@ -480,12 +499,21 @@ extension KInterpreter {
             }
             throw fail("Can't subscript a String with \(describe(first))", line)
         case .structV(let s):
-            if let sub = s.type.subscripts.first {
+            if let sub = userSubscript(s.type, labels) {
                 return try invoke(sub, args: idx, labels: labels, selfContext: KSelfContext(type: s.type, location: .box(KBox(base))), parent: globalEnv)
             }
         case .object(let o):
-            if let sub = o.type.subscripts.first {
+            if let sub = userSubscript(o.type, labels) {
                 return try invoke(sub, args: idx, labels: labels, selfContext: KSelfContext(type: o.type, location: .box(KBox(base))), parent: globalEnv)
+            }
+        case .enumV(let e):
+            if let sub = userSubscript(e.type, labels) {
+                return try invoke(sub, args: idx, labels: labels, selfContext: KSelfContext(type: e.type, location: .box(KBox(base))), parent: globalEnv)
+            }
+        case .type(.user(let t)):
+            // `Settings["volume"]`: a static subscript.
+            if let sub = userSubscript(t, labels, isStatic: true) {
+                return try invoke(sub, args: idx, labels: labels, selfContext: KSelfContext(type: t, location: .box(KBox(base)), isStatic: true), parent: globalEnv)
             }
         case .binding(let b):
             return .binding(KBinding(get: { [unowned self] in (try? self.subscriptGet(b.get(), idx, labels, line)) ?? .nilValue },
@@ -635,12 +663,22 @@ extension KInterpreter {
     }
 
     func arithmetic(_ op: String, _ a: KV, _ b: KV, _ line: Int) throws -> KV {
+        // A native number (`UInt8`, `Decimal`, a SIMD vector) does its own arithmetic, even with an `Int`.
+        if case .native(.boxed) = a, let v = try nativeOperator(op, a, b, line) { return v }
+        if case .native(.boxed) = b, let v = try nativeOperator(op, a, b, line) { return v }
         switch (a, b) {
         case (.int(let x), .int(let y)):
             switch op {
-            case "+": return .int(x &+ y)
-            case "-": return .int(x &- y)
-            case "*": return .int(x &* y)
+            case "+", "-", "*":
+                // Swift traps on overflow; `&+`, `&-` and `&*` wrap.
+                let (r, o) = op == "+" ? x.addingReportingOverflow(y) : op == "-" ? x.subtractingReportingOverflow(y) : x.multipliedReportingOverflow(by: y)
+                if o { throw fail("Arithmetic overflow: \(x) \(op) \(y) doesn't fit in an Int (use &\(op) to wrap around)", line) }
+                return .int(r)
+            case "&+": return .int(x &+ y)
+            case "&-": return .int(x &- y)
+            case "&*": return .int(x &* y)
+            case "&<<": return .int(x &<< y)
+            case "&>>": return .int(x &>> y)
             case "/":
                 guard y != 0 else { throw fail("Division by zero", line) }
                 return .int(x / y)
@@ -762,7 +800,20 @@ extension KInterpreter {
         switch callee {
         case .ident(let name, _):
             if let box = env.lookup(name) {
+                if box.value.userType?.methods["callAsFunction"] != nil, let v = try callAsFunction(box.value, location: .box(box), argExprs, env, line) {
+                    return v
+                }
                 return try callValue(box.value, argExprs, env, line)
+            }
+            // `print(x)` and `String(describing: x)` show an optional as Swift does (`Optional(5)`).
+            if (name == "print" || name == "debugPrint"), functions[name] == nil, env.nearestSelf?.type.methods[name] == nil,
+               let f = registry.function(name) {
+                let args = try argExprs.map { try evalShown($0.value, env) }
+                return try runBridge(f.forms, name, values: args, labels: labels, line: line).0
+            }
+            if name == "String", argExprs.count == 1, let l = argExprs[0].label, l == "describing" || l == "reflecting", types["String"] == nil {
+                let v = try eval(argExprs[0].value, env)
+                return .string(describe(v, as: staticType(argExprs[0].value, env), quoted: l == "reflecting"))
             }
             if let ctx = env.nearestSelf {
                 let instance = ctx.isStatic ? [] : (ctx.type.methods[name] ?? [])
@@ -804,6 +855,24 @@ extension KInterpreter {
                 return try callMethod(.selfRef(line: line), name, argExprs, env, line, expected)
             }
             return try callNamed(name, argExprs, env, line, expected)
+
+        case .member(.selfRef, "init", _) where env.nearestSelf.map({ !$0.isStatic }) ?? false:
+            // `convenience init() { self.init(name: "anon") }`: another of this type's
+            // initializers, on the same `self`.
+            let ctx = env.nearestSelf!
+            let candidates = ctx.type.inits + ctx.type.extensionInits
+            if let m = Self.fit(candidates, labels, closures: closures) {
+                let args = try evalArgs(argExprs, env, params: m.params)
+                return try invoke(m, args: args, labels: labels, selfContext: ctx, parent: globalEnv)
+            }
+            if candidates.isEmpty, !ctx.type.isClass {
+                // A struct with no initializer of its own: its memberwise one.
+                let v = try construct(ctx.type, argExprs, env, line)
+                try write(ctx.location, v)
+                return .void
+            }
+            try requireLabels(nil, among: candidates, labels, closures: closures, name: "init", owner: ctx.type.name, line: line)
+            throw noMember(ctx.type, "init", line: line)
 
         case .member(let baseExpr, let name, _):
             // `super.speak()`, `super.init(name:)`: the superclass's own, on this `self`.
@@ -910,6 +979,9 @@ extension KInterpreter {
             throw fail("\(describe(f)) is not a function", line)
         case .type(.builtin(let n)):
             return try callNamed(n, argExprs, env, line, nil)
+        case .structV, .object, .enumV:
+            if let v = try callAsFunction(f, location: nil, argExprs, env, line) { return v }
+            throw fail("\(describe(f)) is not a function", line)
         case .native(let n):
             return try callNativeValue(n, argExprs, env, line)
         case .binding(let b):
@@ -991,6 +1063,11 @@ extension KInterpreter {
         }
         if KBuiltins.isViewLike(base), isModifierName(name) || !KBuiltins.hasValueMethod(base, name) {
             if let v = KBuiltins.asViews(base, self).first { return try viewMethod(v, name, argExprs, env, line) }
+        }
+        if userMethod == nil, let v = try optionalMap(baseExpr, base, name, argExprs, env, line) { return v }
+        // An app type that's a `Sequence` has the standard library's methods.
+        if let t = base.userType, userMethod == nil, isUserSequence(t), !KBuiltins.isViewLike(base), let xs = try userSequenceElements(base) {
+            return try nativeMethod(.array(xs), name, argExprs, env, line).0
         }
         // The app's own type has no such member (Optional's `map` aside: Kiln keeps optionals unwrapped).
         if let t = base.userType, name != "map", name != "flatMap", !KBuiltins.isViewLike(base) {

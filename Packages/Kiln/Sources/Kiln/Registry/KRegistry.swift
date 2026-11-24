@@ -748,11 +748,13 @@ final class KRegistry {
     }
 
     func add(_ b: KTypeBridge) {
+        symbolicCache = nil
         claim("type:" + b.name, b.family, b.source)
         types[b.name] = b
     }
 
     func add(_ b: KFunctionBridge) {
+        symbolicCache = nil
         claim("function:" + b.name, b.family, b.source)
         functions[b.name] = b
     }
@@ -794,6 +796,47 @@ final class KRegistry {
     private(set) var hiddenAliases: Set<String> = []
 
     func addConstant(_ name: String, _ value: @escaping @MainActor (KInterpreter) -> KV) { constants[name] = value }
+
+    /// How a literal or a plain number becomes a native type's value where
+    /// that type is expected: `let b: UInt8 = 200`, `let d: Decimal = 7`.
+    /// nil: the value isn't one it takes.
+    private(set) var literalCoercions: [String: @MainActor (KV) -> KV?] = [:]
+    func addLiteralCoercion(_ type: String, _ make: @escaping @MainActor (KV) -> KV?) { literalCoercions[type] = make }
+
+    /// Type names written in bridges' signatures (`Edge.Set`, `HorizontalAlignment`):
+    /// SwiftUI's symbolic types, whose members the bridge reads by name. Both
+    /// `Kiln.check` and the engine read it: `Edge.Set.all` is symbolic, while
+    /// `Bundle.main` (no bridge, in no signature) is an unknown name.
+    var symbolicTypeNames: Set<String> {
+        if let s = symbolicCache { return s }
+        var out: Set<String> = []
+        func add(_ o: KOverload) {
+            for p in o.params { addKind(p.kind) }
+            for k in o.lenientKinds.values { addKind(k) }
+        }
+        func addKind(_ k: KArgKind) {
+            switch k {
+            case .typed(let n), .typedArray(let n):
+                out.insert(n)
+                if let first = n.split(separator: ".").first { out.insert(String(first)) }
+            default: break
+            }
+        }
+        for b in views.values { b.forms.forEach { add($0.overload) } }
+        for b in modifiers.values {
+            b.forms.forEach { add($0.overload) }
+            if let s = b.styles { out.insert(s.owner) }
+        }
+        for t in types.values {
+            t.inits.forEach { add($0.overload) }
+            t.methods.values.forEach { $0.forEach { add($0.overload) } }
+            t.staticMethods.values.forEach { $0.forEach { add($0.overload) } }
+        }
+        for f in functions.values { f.forms.forEach { add($0.overload) } }
+        symbolicCache = out
+        return out
+    }
+    private var symbolicCache: Set<String>?
 
     /// Every bridge, for the manifest.
     var allBridges: [KBridge] {

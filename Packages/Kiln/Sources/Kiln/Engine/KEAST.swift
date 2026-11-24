@@ -16,7 +16,8 @@ indirect enum KETypeRef: Equatable, CustomStringConvertible {
     case array(KETypeRef)
     case dictionary(KETypeRef, KETypeRef)
     case optional(KETypeRef)
-    case tuple([KETypeRef])
+    /// Element types, and their labels (`(min: Int, max: Int)`; nil where there's none).
+    case tuple([KETypeRef], [String?])
     case function([KETypeRef], KETypeRef)
     case opaque(KETypeRef)          // some View / any View
 
@@ -26,7 +27,8 @@ indirect enum KETypeRef: Equatable, CustomStringConvertible {
         case .array(let e): return "[\(e)]"
         case .dictionary(let k, let v): return "[\(k): \(v)]"
         case .optional(let w): return "\(w)?"
-        case .tuple(let t): return "(\(t.map(\.description).joined(separator: ", ")))"
+        case .tuple(let t, let labels):
+            return "(" + t.enumerated().map { i, x in (i < labels.count ? labels[i].map { $0 + ": " } ?? "" : "") + x.description }.joined(separator: ", ") + ")"
         case .function(let p, let r): return "(\(p.map(\.description).joined(separator: ", "))) -> \(r)"
         case .opaque(let t): return "some \(t)"
         }
@@ -65,6 +67,8 @@ final class KEClosure {
     let line: Int
     /// Whether the body has an `await` (KEAsync's `awaits`).
     var awaitsCache: Bool?
+    /// The highest `$n` the body uses, -1 for none (KEClosureScan).
+    var anonymousMaxCache: Int?
     init(params: [Param], body: [KEStmt], hasExplicitParams: Bool, line: Int) {
         self.params = params
         self.body = body
@@ -253,6 +257,8 @@ final class KEFuncDecl {
     var constraints: [KEConstraint] = []
     /// Declared without a body, in a protocol: a requirement.
     var isRequirement = false
+    /// A subscript's `set { … }`: its parameter's name (`newValue`) and body.
+    var setter: (String, [KEStmt])?
     init(name: String, params: [KEParam], returnType: KETypeRef?, body: [KEStmt], isStatic: Bool,
          isMutating: Bool, attributes: [KEAttribute], line: Int) {
         self.name = name; self.params = params; self.returnType = returnType; self.body = body

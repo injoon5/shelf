@@ -1,0 +1,960 @@
+# The standard library and the language: everyday calls, each with the value
+# compiled Swift prints. Format: Sources/Kiln/Registry/KilnCorpus.swift.
+# Values: Tools/corpus/oracle.py --write.
+
+## Strings
+
+String.count :: "héllo".count => 5
+String.utf16.count :: "héllo".utf16.count => 5
+String.utf8.count :: "héllo".utf8.count => 6
+String.unicodeScalars.count :: "é".unicodeScalars.count => 1
+String.unicodeScalars.map(\.value) :: "AB".unicodeScalars.map(\.value) => [65, 66]
+Unicode.Scalar.value :: "a".unicodeScalars.first!.value => 97
+Unicode.Scalar(UInt32) :: Character(Unicode.Scalar(98)!) => b
+UnicodeScalar + 1 :: { let c: Character = "b"; return String(Character(UnicodeScalar(c.unicodeScalars.first!.value + 1)!)) }() => c
+Unicode.Scalar.properties.isEmoji :: "😀".unicodeScalars.first!.properties.isEmoji => true
+Character.asciiValue :: Character("A").asciiValue ?? 0 => 65
+Character.asciiValue nil :: Character("é").asciiValue == nil => true
+Character.isLetter :: Character("b").isLetter => true
+Character.isNumber :: Character("7").isNumber => true
+Character.wholeNumberValue :: Character("7").wholeNumberValue! => 7
+Character.isUppercase :: Character("Q").isUppercase => true
+Character.isWhitespace :: Character(" ").isWhitespace => true
+Character.isPunctuation :: Character("!").isPunctuation => true
+Character.isHexDigit :: Character("f").isHexDigit => true
+Character.hexDigitValue :: Character("f").hexDigitValue! => 15
+Character.uppercased :: Character("a").uppercased() => A
+Character.isEmoji-ish :: Character("😀").unicodeScalars.first!.properties.isEmojiPresentation => true
+Character(String) :: String(Character("x")) + "y" => xy
+String.index(_:offsetBy:) :: { let s = "hello"; return String(s[s.index(s.startIndex, offsetBy: 1)]) }() => e
+String.index(before:) :: { let s = "hello"; return s[s.index(before: s.endIndex)] }() => o
+String.index(after:) :: { let s = "hello"; return s[s.index(after: s.startIndex)] }() => e
+String.index(_:offsetBy:limitedBy:) :: { let s = "hi"; return s.index(s.startIndex, offsetBy: 5, limitedBy: s.endIndex) == nil }() => true
+String[range of indices] :: { let s = "hello"; let a = s.index(s.startIndex, offsetBy: 1); let b = s.index(s.startIndex, offsetBy: 4); return String(s[a..<b]) }() => ell
+String[...index] :: { let s = "hello"; let i = s.firstIndex(of: "l")!; return String(s[...i]) }() => hel
+String[index...] :: { let s = "hello"; let i = s.firstIndex(of: "l")!; return String(s[i...]) }() => llo
+String.distance(from:to:) :: { let s = "hello"; return s.distance(from: s.startIndex, to: s.firstIndex(of: "o")!) }() => 4
+String.firstIndex(of:) :: { let s = "a=b"; let i = s.firstIndex(of: "=")!; return String(s[..<i]) }() => a
+String.lastIndex(of:) :: { let s = "a/b/c"; let i = s.lastIndex(of: "/")!; return String(s[s.index(after: i)...]) }() => c
+String.firstIndex(where:) :: { let s = "abc1"; let i = s.firstIndex(where: { $0.isNumber })!; return s.distance(from: s.startIndex, to: i) }() => 3
+String.indices :: "abc".indices.count => 3
+String.insert(_:at:) :: { var s = "ac"; s.insert("b", at: s.index(after: s.startIndex)); return s }() => abc
+String.remove(at:) :: { var s = "abc"; s.remove(at: s.startIndex); return s }() => bc
+String.replaceSubrange :: { var s = "hello"; s.replaceSubrange(s.startIndex..<s.index(s.startIndex, offsetBy: 2), with: "J"); return s }() => Jllo
+String.removeSubrange :: { var s = "hello"; s.removeSubrange(s.index(s.startIndex, offsetBy: 1)...s.index(s.startIndex, offsetBy: 2)); return s }() => hlo
+String.ranges(of:) :: "abcabc".ranges(of: "b").count => 2
+String.firstRange(of:) :: "abcabc".firstRange(of: "ca") != nil => true
+String.trimmingPrefix :: String("#tag".trimmingPrefix("#")) => tag
+String.trimmingPrefix(while:) :: String("  x".trimmingPrefix(while: \.isWhitespace)) => x
+String.prefix(_:) :: String("hello".prefix(3)) => hel
+String.suffix(_:) :: String("hello".suffix(2)) => lo
+String.prefix(while:) :: String("123abc".prefix(while: { $0.isNumber })) => 123
+String.dropFirst :: String("hello".dropFirst(2)) => llo
+String.dropLast :: String("hello".dropLast()) => hell
+String.drop(while:) :: String("aaab".drop(while: { $0 == "a" })) => b
+String.split(separator:) :: "a b  c".split(separator: " ") => ["a", "b", "c"]
+String.split(maxSplits:omittingEmptySubsequences:) :: "a,b,c".split(separator: ",", maxSplits: 1).map(String.init) => ["a", "b,c"]
+String.split(whereSeparator:) :: "a1b2c".split(whereSeparator: { $0.isNumber }).count => 3
+String.joined(separator:) :: ["a", "b"].joined(separator: ", ") => a, b
+String.reversed :: String("abc".reversed()) => cba
+String.filter :: String("a1b2".filter { $0.isNumber }) => 12
+String.map :: "abc".map { $0.uppercased() }.joined() => ABC
+String.compactMap :: "a1b2".compactMap { $0.wholeNumberValue } => [1, 2]
+String.contains(where:) :: "abc".contains(where: { $0 == "b" }) => true
+String.allSatisfy :: "123".allSatisfy(\.isNumber) => true
+String.lowercased/uppercased :: "MiXeD".lowercased() + "MiXeD".uppercased() => mixedMIXED
+String.hasPrefix :: "prefix".hasPrefix("pre") => true
+String.starts(with:) :: "prefix".starts(with: "pref") => true
+String.isEmpty :: "".isEmpty => true
+String.first/last :: "ab".first! == "a" && "ab".last! == "b" => true
+String(repeating:count:) :: String(repeating: "ab", count: 3) => ababab
+String(Int) :: String(42) => 42
+String(Double) :: String(2.5) => 2.5
+String(Bool) :: String(true) => true
+String(Int, radix:) :: String(255, radix: 16) => ff
+String(Int, radix:uppercase:) :: String(255, radix: 16, uppercase: true) => FF
+String(Int, radix: 2) :: String(5, radix: 2) => 101
+String(describing: Optional) :: String(describing: Optional(5)) => Optional(5)
+String(describing: nil) :: { let x: Int? = nil; return String(describing: x) }() => nil
+String(describing: [Int]) :: String(describing: [1, 2]) => [1, 2]
+String(describing: Character) :: String(describing: Character("c")) => c
+String(reflecting:) :: String(reflecting: "q") => "q"
+Optional interpolation :: { let x: Int? = 3; return "\(x)" }() => Optional(3)
+Optional in print :: print(Optional("s") as Any) => Optional("s")
+Array of optionals :: [1, nil, 3] as [Int?] => [Optional(1), nil, Optional(3)]
+Dictionary description :: ["a": 1] => ["a": 1]
+Tuple description :: (1, "a") => (1, "a")
+Labeled tuple description :: (x: 1, y: 2) => (x: 1, y: 2)
+Nested array description :: [[1], [2, 3]] => [[1], [2, 3]]
+String array description :: ["a", "b"] => ["a", "b"]
+Double description :: 1.0 / 3.0 => 0.3333333333333333
+Double whole description :: 2.0 => 2.0
+Float description :: Float(0.1) => 0.1
+Int(String) :: Int("42")! + 1 => 43
+Int(String) failing :: Int("4x") == nil => true
+Int(String, radix:) :: Int("ff", radix: 16)! => 255
+Double(String) :: Double("2.5")! * 2 => 5.0
+String.description :: "abc".description => abc
+String += :: { var s = "a"; s += "b"; return s }() => ab
+String.append :: { var s = "a"; s.append("bc"); s.append(Character("d")); return s }() => abcd
+String.removeLast :: { var s = "abc"; s.removeLast(); return s }() => ab
+String.removeFirst(_:) :: { var s = "abcd"; s.removeFirst(2); return s }() => cd
+String.removeAll(where:) :: { var s = "a-b-c"; s.removeAll(where: { $0 == "-" }); return s }() => abc
+String multiline ::
+    let a = """
+        line1
+        line2
+        """
+    print(a.count, a.hasSuffix("2"))
+=> 11 true
+String raw :: #"a\nb"#.count => 4
+String unicode escape :: "\u{1F600}".count => 1
+String comparison :: "apple" < "banana" => true
+String.max :: ["b", "a", "c"].max()! => c
+String * repeat in sorted :: ["bb", "a", "ccc"].sorted { $0.count < $1.count } => ["a", "bb", "ccc"]
+String.count(where:) :: "banana".filter { $0 == "a" }.count => 3
+String.Index.utf16Offset :: { let s = "héllo"; return s.firstIndex(of: "l")!.utf16Offset(in: s) }() => 2
+Substring to String :: { let sub = "hello"[...]; return type(of: String(sub)) == String.self }() => true
+String.enumerated :: "ab".enumerated().map { "\($0.offset)\($0.element)" }.joined() => 0a1b
+String.zip :: zip("ab", "xy").map { "\($0)\($1)" }.joined() => axby
+String.sorted :: String("cab".sorted()) => abc
+String.Set :: Set("hello").count => 4
+String.ranges(of:) loop :: { let s = "a,b,c"; var n = 0; for _ in s.ranges(of: ",") { n += 1 }; return n }() => 2
+String.replacing(_:with:) :: "a-b".replacing("-", with: "+") => a+b
+String.contains(Character) :: "abc".contains(Character("b")) => true
+String.lines split :: "a\nb".split(separator: "\n").count => 2
+String.wholeMatch Regex :: ("2026".wholeMatch(of: /\d{4}/) != nil) => true
+String.utf8 bytes :: Array("hi".utf8) => [104, 105]
+String(cString:) [gap] :: String(cString: [104, 105, 0] as [CChar]) => hi
+String.utf16 to array :: Array("hé".utf16) => [104, 233]
+String(utf16CodeUnits:count:) :: String(utf16CodeUnits: [104, 105], count: 2) => hi
+
+## Numbers
+
+Int arithmetic :: 17 % 5 + -7 / 2 => -1
+Int.max :: Int.max => 9223372036854775807
+Int.min :: Int.min => -9223372036854775808
+&+ overflow :: Int.max &+ 1 == Int.min => true
+&- overflow :: Int.min &- 1 == Int.max => true
+&* overflow :: (Int.max &* 2) == -2 => true
+UInt8 &+ :: UInt8(200) &+ UInt8(100) => 44
+UInt8.max :: UInt8.max => 255
+Int8.min :: Int8.min => -128
+Int16(truncatingIfNeeded:) :: Int16(truncatingIfNeeded: 70000) => 4464
+UInt32 arithmetic :: UInt32(4_000_000_000) + 1 => 4000000001
+UInt64 :: UInt64.max => 18446744073709551615
+Int32(clamping:) :: Int32(clamping: Int.max) => 2147483647
+Int64 conversion :: Int64(5) * 3 => 15
+UInt(bitPattern:) :: UInt(bitPattern: -1) == UInt.max => true
+Int(UInt8) :: Int(UInt8(250)) + 10 => 260
+UInt8(exactly:) :: UInt8(exactly: 300) == nil => true
+type(of: UInt8) :: type(of: UInt8(1)) => UInt8
+UInt8 array sum :: [UInt8](arrayLiteral: 1, 2, 3).reduce(0, +) => 6
+UInt8 wraps in &+= :: { var b: UInt8 = 250; b &+= 10; return b }() => 4
+UInt8 shift :: UInt8(1) << 7 => 128
+UInt8 bitwise not :: ~UInt8(0b0000_1111) => 240
+Int bitwise not :: ~5 => -6
+&<< :: 1 &<< 65 => 2
+bit ops :: 0b1010 & 0b0110 | 1 << 4 => 18
+^ xor :: 6 ^ 3 => 5
+>> shift :: -16 >> 2 => -4
+leadingZeroBitCount :: UInt8(1).leadingZeroBitCount => 7
+nonzeroBitCount :: 255.nonzeroBitCount => 8
+trailingZeroBitCount :: 8.trailingZeroBitCount => 3
+bitWidth :: Int16.bitWidth => 16
+byteSwapped :: UInt16(0x0102).byteSwapped => 513
+addingReportingOverflow :: Int8(100).addingReportingOverflow(100) => (partialValue: -56, overflow: true)
+multipliedReportingOverflow :: UInt8(16).multipliedReportingOverflow(by: 16).overflow => true
+Int.isMultiple(of:) :: 12.isMultiple(of: 4) => true
+Int.quotientAndRemainder :: 17.quotientAndRemainder(dividingBy: 5) => (quotient: 3, remainder: 2)
+Int.signum :: (-4).signum() => -1
+abs :: abs(-3) + abs(-2.5) => 5.5
+Int.magnitude :: (-7).magnitude => 7
+min/max :: min(3, 1, 2) + max(4, 9) => 10
+Int.clamped-free :: max(0, min(10, 15)) => 10
+Double.rounded :: 2.5.rounded() => 3.0
+Double.rounded(.down) :: Double.pi.rounded(.down) => 3.0
+Double.rounded(.toNearestOrEven) :: 2.5.rounded(.toNearestOrEven) => 2.0
+Double.rounded(.up) :: 2.1.rounded(.up) => 3.0
+Double.squareRoot :: Int((2.0).squareRoot() * 1000) => 1414
+pow :: Int(pow(2.0, 10)) => 1024
+sqrt/floor/ceil :: sqrt(16.0) + floor(2.7) + ceil(2.1) => 9.0
+round :: round(2.5) => 3.0
+Double.truncatingRemainder :: 7.5.truncatingRemainder(dividingBy: 2) => 1.5
+Double.remainder :: 7.5.remainder(dividingBy: 2) => -0.5
+Double.isNaN :: Double.nan.isNaN => true
+Double.infinity :: Double.infinity > 1e308 => true
+Double.ulp-free :: Double.greatestFiniteMagnitude > 1 => true
+Double.pi :: Double.pi => 3.141592653589793
+Float.pi :: Float.pi => 3.1415925
+CGFloat :: CGFloat(2) * 1.5 => 3.0
+Double(Int) :: Double(7) / 2 => 3.5
+Int(Double) :: Int(7.9) => 7
+Int(Double.rounded) :: Int(7.5.rounded()) => 8
+Int(exactly:) :: Int(exactly: 2.5) == nil => true
+Double.description of whole :: 3.0 * 2 => 6.0
+Int / Int :: 7 / 2 => 3
+Double % via fmod :: fmod(7.5, 2) => 1.5
+exp/log :: (log(exp(2.0)) * 100).rounded() => 200.0
+log10/log2 :: log10(1000.0) + log2(8.0) => 6.0
+trig :: (sin(Double.pi / 2) + cos(0)).rounded() => 2.0
+atan2 :: (atan2(1.0, 1.0) * 4 * 1000).rounded() / 1000 => 3.142
+hypot :: hypot(3.0, 4.0) => 5.0
+Int.random(in:) range :: (0..<10).contains(Int.random(in: 0..<10)) => true
+Double.random(in:) :: (0...1).contains(Double.random(in: 0...1)) => true
+Bool.random :: [true, false].contains(Bool.random()) => true
+SystemRandomNumberGenerator :: { var g = SystemRandomNumberGenerator(); return Int.random(in: 0...0, using: &g) }() => 0
+SystemRandomNumberGenerator.next :: { var g = SystemRandomNumberGenerator(); _ = g.next(); return "ok" }() => ok
+seeded generator ::
+    struct LCG: RandomNumberGenerator {
+        var state: UInt64
+        mutating func next() -> UInt64 {
+            state = state &* 6364136223846793005 &+ 1442695040888963407
+            return state
+        }
+    }
+    var g = LCG(state: 42)
+    print(g.next(), g.next() % 100)
+    var g2 = LCG(state: 7)
+    print([1, 2, 3, 4, 5].shuffled(using: &g2).count, Int.random(in: 1...6, using: &g2) <= 6)
+=> 10481999410520546993 20
+=> 5 true
+randomElement(using:) ::
+    var g = SystemRandomNumberGenerator()
+    print([1, 2, 3].randomElement(using: &g)! > 0)
+=> true
+SIMD2 :: SIMD2<Double>(1, 2).x => 1.0
+SIMD2 arithmetic :: SIMD2<Double>(1, 2) + SIMD2<Double>(3, 4) => SIMD2<Double>(4.0, 6.0)
+SIMD2 * scalar :: SIMD2<Float>(1, 2) * 3 => SIMD2<Float>(3.0, 6.0)
+SIMD3 :: SIMD3<Float>(1, 2, 3).z => 3.0
+SIMD3 sum :: SIMD3<Double>(1, 2, 3).sum() => 6.0
+SIMD4 :: SIMD4<Int>(1, 2, 3, 4)[2] => 3
+SIMD2 equality :: SIMD2(1, 2) == SIMD2(1, 2) => true
+SIMD2 mutate :: { var v = SIMD2<Double>(0, 0); v.x = 5; v.y += 1; return v }() => SIMD2<Double>(5.0, 1.0)
+SIMD length :: (SIMD2<Double>(3, 4) * SIMD2<Double>(3, 4)).sum().squareRoot() => 5.0
+SIMD min/max :: pointwiseMin(SIMD2<Double>(1, 5), SIMD2<Double>(3, 2)) => SIMD2<Double>(1.0, 2.0)
+Comparable.clamped-like min max :: [5, 3, 9].min()! + [5, 3, 9].max()! => 12
+Numeric literal underscores :: 1_000_000 + 0x10 + 0o10 + 0b10 => 1000026
+Double literal exponent :: 1.5e3 => 1500.0
+Int literal as Double :: { let d: Double = 3; return d / 2 }() => 1.5
+Integer division negative :: -7 % 3 => -1
+
+## Collections
+
+Array.append(contentsOf:) :: { var a = [1]; a.append(contentsOf: [2, 3]); return a }() => [1, 2, 3]
+Array.insert(_:at:) :: { var a = [1, 3]; a.insert(2, at: 1); return a }() => [1, 2, 3]
+Array.remove(at:) :: { var a = [1, 2, 3]; let x = a.remove(at: 0); return "\(x) \(a)" }() => 1 [2, 3]
+Array.removeAll(where:) :: { var a = [1, 2, 3, 4]; a.removeAll { $0 % 2 == 0 }; return a }() => [1, 3]
+Array.removeFirst(_:) :: { var a = [1, 2, 3]; a.removeFirst(2); return a }() => [3]
+Array.popLast :: { var a = [1, 2]; return a.popLast()! }() => 2
+Array.swapAt :: { var a = [1, 2, 3]; a.swapAt(0, 2); return a }() => [3, 2, 1]
+Array.reverse :: { var a = [1, 2, 3]; a.reverse(); return a }() => [3, 2, 1]
+Array.sort(by:) :: { var a = [3, 1, 2]; a.sort(by: >); return a }() => [3, 2, 1]
+Array.sorted() :: [3, 1, 2].sorted() => [1, 2, 3]
+Array.sorted(by:) :: ["bb", "a"].sorted { $0.count < $1.count } => ["a", "bb"]
+Array.sorted(using: KeyPathComparator) :: [3, 1, 2].sorted(using: KeyPathComparator(\.self)).map(String.init).joined() => 123
+Array.sorted(using: KeyPathComparator order:) ::
+    struct P { var name: String; var age: Int }
+    let ps = [P(name: "a", age: 3), P(name: "b", age: 1), P(name: "c", age: 2)]
+    print(ps.sorted(using: KeyPathComparator(\.age, order: .reverse)).map(\.name))
+=> ["a", "c", "b"]
+Array.sorted(using: [KeyPathComparator]) ::
+    struct P { var name: String; var age: Int }
+    let ps = [P(name: "b", age: 1), P(name: "a", age: 1), P(name: "c", age: 0)]
+    print(ps.sorted(using: [KeyPathComparator(\.age), KeyPathComparator(\.name)]).map(\.name))
+=> ["c", "a", "b"]
+Array.sorted(using: SortDescriptor) ::
+    struct P { var name: String; var age: Int }
+    let ps = [P(name: "b", age: 1), P(name: "a", age: 2)]
+    print(ps.sorted(using: SortDescriptor(\.name)).map(\.name))
+=> ["a", "b"]
+Array.sort(using:) ::
+    var xs = ["pear", "fig", "apple"]
+    xs.sort(using: KeyPathComparator(\.count, order: .reverse))
+    print(xs)
+=> ["apple", "pear", "fig"]
+Array.min(by:) :: [3, 1, 2].min(by: <)! => 1
+Array.max(by:) :: ["a", "ccc", "bb"].max(by: { $0.count < $1.count })! => ccc
+Array slice :: Array([1, 2, 3, 4][1...2]).count => 2
+ArraySlice indices :: { let s = [1, 2, 3, 4][1...]; return s.startIndex }() => 1
+Array.first(where:) :: [1, 5, 8].first(where: { $0 > 4 })! => 5
+Array.last(where:) :: [1, 5, 8].last(where: { $0 < 6 })! => 5
+Array.firstIndex(of:) :: ["a", "b"].firstIndex(of: "b")! => 1
+Array.contains(where:) :: [1, 2].contains(where: { $0 == 2 }) => true
+Array.allSatisfy :: [2, 4].allSatisfy { $0 % 2 == 0 } => true
+Array.filter :: [1, 2, 3, 4].filter { $0 > 2 } => [3, 4]
+Array.map :: [1, 2].map { $0 * 10 } => [10, 20]
+Array.compactMap :: ["1", "x", "3"].compactMap(Int.init) => [1, 3]
+Array.flatMap :: [[1], [2, 3]].flatMap { $0 } => [1, 2, 3]
+Array.reduce :: [1, 2, 3].reduce(0, +) => 6
+Array.reduce(into:) :: [1, 2, 2].reduce(into: [:]) { counts, x in counts[x, default: 0] += 1 } => [2: 2, 1: 1]
+Array.enumerated :: ["a", "b"].enumerated().map { "\($0.offset)\($0.element)" }.joined() => 0a1b
+Array.enumerated reversed :: ["a", "b"].enumerated().reversed().map { "\($0.offset)\($0.element)" }.joined() => 1b0a
+for (i, x) in enumerated :: { var s = ""; for (i, x) in ["a", "b"].enumerated() { s += "\(i)\(x)" }; return s }() => 0a1b
+Array.indices :: [5, 6].indices.map { $0 } => [0, 1]
+Array.zip :: zip([1, 2], ["a", "b"]).map { "\($0)\($1)" }.joined() => 1a2b
+zip tuple :: zip([1, 2], [3, 4]).map { $0 + $1 } => [4, 6]
+zip .0 .1 :: zip([1, 2], ["a", "b"]).map { "\($0.0)\($0.1)" } => ["1a", "2b"]
+Array(zip) :: Array(zip([1, 2], [3, 4])).count => 2
+stride(from:to:by:) :: stride(from: 0, to: 10, by: 3).map(String.init).joined() => 0369
+stride(from:through:by:) :: Array(stride(from: 10, through: 0, by: -5)) => [10, 5, 0]
+lazy.map.first :: [1, 2, 3].lazy.map { $0 * 2 }.first! => 2
+lazy.filter :: Array([1, 2, 3, 4].lazy.filter { $0 % 2 == 0 }.map { $0 * 10 }) => [20, 40]
+Array.difference(from:) :: [1, 2].difference(from: [1]).count => 1
+Array.difference insertions :: { let d = ["a", "c"].difference(from: ["a", "b"]); return "\(d.insertions.count) \(d.removals.count)" }() => 1 1
+Array.applying(difference) :: { let d = [1, 2, 4].difference(from: [1, 3]); return [1, 3].applying(d)! }() => [1, 2, 4]
+Array.chunked-free stride :: stride(from: 0, to: 5, by: 2).map { Array([1, 2, 3, 4, 5][$0..<min($0 + 2, 5)]) } => [[1, 2], [3, 4], [5]]
+Array.split :: [1, 0, 2, 3, 0, 4].split(separator: 0).map(Array.init) => [[1], [2, 3], [4]]
+Array.prefix/suffix :: Array([1, 2, 3].prefix(2)) + Array([1, 2, 3].suffix(1)) => [1, 2, 3]
+Array.dropFirst :: Array([1, 2, 3].dropFirst()) => [2, 3]
+Array.joined :: [[1, 2], [3]].joined().map { $0 } => [1, 2, 3]
+Array(repeating:count:) :: Array(repeating: 0, count: 3) => [0, 0, 0]
+Array 2D :: { var g = Array(repeating: Array(repeating: 0, count: 3), count: 3); g[1][2] = 5; return g.flatMap { $0 }.reduce(0, +) }() => 5
+Array.count(where:) :: [1, 2, 3, 4].count(where: { $0 > 1 }) => 3
+Array.elementsEqual :: [1, 2].elementsEqual([1, 2]) => true
+Array.starts(with:) :: [1, 2, 3].starts(with: [1, 2]) => true
+Array == :: [1, 2] == [1, 2] => true
+Array.isEmpty :: [Int]().isEmpty => true
+Array.randomElement :: [7].randomElement()! => 7
+Array.shuffled count :: [1, 2, 3].shuffled().count => 3
+Array.firstIndex(where:) :: [3, 4, 5].firstIndex(where: { $0 > 3 })! => 1
+Array.replaceSubrange :: { var a = [1, 2, 3]; a.replaceSubrange(0..<2, with: [9]); return a }() => [9, 3]
+Array.move(fromOffsets:toOffset:) :: { var a = ["a", "b", "c"]; a.move(fromOffsets: IndexSet(integer: 0), toOffset: 3); return a }() => ["b", "c", "a"]
+Array.remove(atOffsets:) :: { var a = ["a", "b", "c"]; a.remove(atOffsets: IndexSet([0, 2])); return a }() => ["b"]
+Array.partition :: { var a = [1, 2, 3, 4, 5]; let p = a.partition(by: { $0 > 3 }); return p }() => 3
+Array.withUnsafe-free sum :: [1.5, 2.5].reduce(0, +) => 4.0
+Array.max() :: [3, 9, 2].max()! => 9
+Array.sum via reduce :: [1, 2, 3].reduce(0, +) => 6
+Array.uniqued via Set :: Array(Set([1, 1, 2])).sorted() => [1, 2]
+Array of tuples sort :: [(1, "b"), (0, "a")].sorted { $0.0 < $1.0 }.map { $0.1 } => ["a", "b"]
+Sort multi-key tuple compare ::
+    struct P { var a: Int; var b: String }
+    print([P(a: 1, b: "z"), P(a: 1, b: "a"), P(a: 0, b: "m")].sorted { ($0.a, $0.b) < ($1.a, $1.b) }.map(\.b).joined())
+=> maz
+Dictionary(grouping:by:) :: Dictionary(grouping: [1, 2, 3, 4], by: { $0 % 2 }).count => 2
+Dictionary(grouping:) values :: Dictionary(grouping: ["apple", "avocado", "banana"], by: { $0.first! })["a"]! => ["apple", "avocado"]
+Dictionary(uniqueKeysWithValues:) :: Dictionary(uniqueKeysWithValues: [("a", 1)]).count => 1
+Dictionary(_:uniquingKeysWith:) :: Dictionary([("a", 1), ("a", 2)], uniquingKeysWith: +)["a"]! => 3
+Dictionary subscript default :: { var d: [String: Int] = [:]; d["a", default: 0] += 1; return d["a"]! }() => 1
+Dictionary.sorted by key :: ["b": 2, "a": 1].sorted { $0.key < $1.key }.map(\.key).joined() => ab
+Dictionary.merging :: ["a": 1].merging(["b": 2]) { a, _ in a }.count => 2
+Dictionary.merging values :: ["a": 1, "b": 2].merging(["b": 5]) { $0 + $1 }["b"]! => 7
+Dictionary.merge :: { var d = ["a": 1]; d.merge(["a": 3, "c": 1]) { _, new in new }; return d["a"]! + d["c"]! }() => 4
+Dictionary.mapValues :: ["a": 1].mapValues { $0 * 2 }["a"]! => 2
+Dictionary.compactMapValues :: ["a": "1", "b": "x"].compactMapValues(Int.init).count => 1
+Dictionary.filter :: ["a": 1, "b": 2].filter { $0.value > 1 }.keys.first! => b
+Dictionary.keys sorted :: ["b": 1, "a": 2].keys.sorted() => ["a", "b"]
+Dictionary.values sorted :: ["b": 1, "a": 2].values.sorted() => [1, 2]
+Dictionary.removeValue(forKey:) :: { var d = ["a": 1]; return d.removeValue(forKey: "a")! }() => 1
+Dictionary.updateValue :: { var d = ["a": 1]; return d.updateValue(5, forKey: "a")! }() => 1
+Dictionary.first(where:) :: ["a": 1].first(where: { $0.value == 1 })!.key => a
+Dictionary.map :: ["a": 1].map { "\($0.key)=\($0.value)" } => ["a=1"]
+Dictionary iteration sorted :: { var s = ""; for (k, v) in ["b": 2, "a": 1].sorted(by: { $0.key < $1.key }) { s += "\(k)\(v)" }; return s }() => a1b2
+Dictionary.count/isEmpty :: [String: Int]().isEmpty => true
+Dictionary.contains(where:) :: ["a": 1].contains { $0.key == "a" } => true
+Dictionary.reduce :: ["a": 1, "b": 2].reduce(0) { $0 + $1.value } => 3
+Dictionary.keys.contains :: ["a": 1].keys.contains("a") => true
+Dictionary nested update :: { var d: [String: [Int]] = [:]; d["a", default: []].append(1); d["a"]!.append(2); return d["a"]! }() => [1, 2]
+Dictionary.max(by:) :: ["a": 3, "b": 7].max(by: { $0.value < $1.value })!.key => b
+Set.union :: Set([1, 2]).union([3]).count => 3
+Set.subtracting :: Set([1, 2, 3]).subtracting([2]).sorted() => [1, 3]
+Set.intersection :: Set([1, 2, 3]).intersection([2, 3, 4]).sorted() => [2, 3]
+Set.symmetricDifference :: Set([1, 2]).symmetricDifference([2, 3]).sorted() => [1, 3]
+Set.isSubset :: Set([1]).isSubset(of: [1, 2]) => true
+Set.isDisjoint :: Set([1]).isDisjoint(with: [2]) => true
+Set.insert result :: { var s: Set = [1]; return s.insert(1).inserted }() => false
+Set.remove :: { var s: Set = [1, 2]; s.remove(1); return s.count }() => 1
+Set.contains :: Set(["a"]).contains("a") => true
+Set.formUnion :: { var s: Set = [1]; s.formUnion([2, 3]); return s.count }() => 3
+Set.sorted :: Set([3, 1, 2]).sorted() => [1, 2, 3]
+Set.map :: Set([1, 2]).map { $0 * 2 }.sorted() => [2, 4]
+Set.filter :: Set([1, 2, 3]).filter { $0 > 1 }.count => 2
+Optional.map :: Optional(2).map { $0 * 2 }! => 4
+Optional.flatMap :: Optional("4").flatMap(Int.init)! => 4
+Optional.map nil :: { let x: Int? = nil; return x.map { $0 + 1 } == nil }() => true
+Optional ?? chain :: { let a: Int? = nil; let b: Int? = nil; return a ?? b ?? 3 }() => 3
+Optional chaining :: { let a: [Int]? = [4]; return a?.first ?? 0 }() => 4
+Optional.unsafelyUnwrapped-free ! :: { let x: Int? = 5; return x! }() => 5
+Optional == nil :: { let x: Int? = 5; return x != nil }() => true
+Optional pattern :: { let x: Int? = 5; if case .some(let v) = x { return v }; return 0 }() => 5
+Optional.none :: { let x: Int? = .none; return x == nil }() => true
+Result.success.get :: { let r: Result<Int, Error> = .success(3); return try! r.get() }() => 3
+Result.failure ::
+    enum E: Error { case bad }
+    let r: Result<Int, E> = .failure(.bad)
+    switch r { case .success(let v): print(v); case .failure(let e): print("failed", e) }
+=> failed bad
+Result.map :: { let r: Result<Int, Error> = .success(2); return try! r.map { $0 * 5 }.get() }() => 10
+Result(catching:) ::
+    enum E: Error { case bad }
+    func f() throws -> Int { throw E.bad }
+    let r = Result { try f() }
+    if case .failure = r { print("caught") }
+=> caught
+Result.get throws ::
+    enum E: Error { case bad }
+    let r: Result<Int, E> = .failure(.bad)
+    do { _ = try r.get(); print("no") } catch { print("threw \(error)") }
+=> threw bad
+Range.contains :: (1..<5).contains(4) => true
+ClosedRange.count :: (1...5).count => 5
+Range.reversed :: Array((1...3).reversed()) => [3, 2, 1]
+Range.map :: (0..<3).map { $0 * 2 } => [0, 2, 4]
+Range ~= :: { switch 15 { case 10..<20: return "teen"; default: return "x" } }() => teen
+Range.clamped :: (0...10).clamped(to: 5...20) => 5...10
+Range.lowerBound/upperBound :: (2..<9).lowerBound + (2..<9).upperBound => 11
+One-sided range :: Array([1, 2, 3, 4][2...]) => [3, 4]
+Range of Double contains :: (0.0...1.0).contains(0.5) => true
+Range.overlaps :: (0..<5).overlaps(3..<8) => true
+repeatElement :: Array(repeatElement("x", count: 2)) => ["x", "x"]
+sequence(first:next:) :: Array(sequence(first: 1, next: { $0 < 8 ? $0 * 2 : nil })) => [1, 2, 4, 8]
+AnySequence-free IndexSet :: IndexSet([1, 3, 5]).count => 3
+Mirror(reflecting:).children :: Mirror(reflecting: (1, 2)).children.count => 2
+Mirror labels ::
+    struct P { var name = "a"; var age = 3 }
+    print(Mirror(reflecting: P()).children.map { $0.label ?? "?" })
+=> ["name", "age"]
+Mirror values ::
+    struct P { var name = "a"; var age = 3 }
+    print(Mirror(reflecting: P()).children.map { "\($0.value)" })
+=> ["a", "3"]
+Mirror.displayStyle ::
+    struct P { var x = 1 }
+    print(Mirror(reflecting: P()).displayStyle == .struct)
+
+=> true
+## Language
+
+enum associated values ::
+    enum Shape { case circle(r: Double), rect(w: Double, h: Double) }
+    func area(_ s: Shape) -> Double { switch s { case .circle(let r): return 3 * r * r; case let .rect(w, h): return w * h } }
+    print(area(.rect(w: 2, h: 3)) + area(.circle(r: 1)))
+=> 9.0
+if case ::
+    enum E { case a(Int), b }
+    let e = E.a(5)
+    if case .a(let n) = e, n > 3 { print("y\(n)") }
+=> y5
+switch tuple range ::
+    let p = (1, 15)
+    switch p { case (0, _): print("zero"); case (_, 10..<20) where p.0 > 0: print("teen"); default: print("other") }
+=> teen
+protocol extension default ::
+    protocol Greeter { var name: String { get } }
+    extension Greeter { func greet() -> String { "hi " + name } }
+    struct P: Greeter { let name = "x" }
+    print(P().greet())
+=> hi x
+associated type ::
+    protocol Box { associatedtype T; var v: T { get } }
+    struct IntBox: Box { let v = 3 }
+    func unwrap<B: Box>(_ b: B) -> B.T { b.v }
+    print(unwrap(IntBox()))
+=> 3
+generic struct ::
+    struct Stack<T> { var items: [T] = []; mutating func push(_ x: T) { items.append(x) }; mutating func pop() -> T? { items.popLast() } }
+    var s = Stack<Int>()
+    s.push(1); s.push(2)
+    print(s.pop()!)
+=> 2
+generic where ::
+    func biggest<T: Comparable>(_ xs: [T]) -> T? where T: Equatable { xs.max() }
+    print(biggest([3, 9, 2])!)
+=> 9
+didSet ::
+    struct T { var n = 0 { didSet { log.append(n) } }; var log: [Int] = [] }
+    var t = T()
+    t.n = 3; t.n = 4
+    print(t.log)
+=> [3, 4]
+didSet oldValue ::
+    struct T { var n = 0 { didSet { prev = oldValue } }; var prev = -1 }
+    var t = T()
+    t.n = 5
+    print(t.prev)
+=> 0
+willSet newValue ::
+    class C { var n = 0 { willSet { next = newValue } }; var next = 0 }
+    let c = C()
+    c.n = 8
+    print(c.next)
+=> 8
+lazy var ::
+    class C { lazy var v: Int = { 42 }() }
+    print(C().v)
+=> 42
+custom subscript get set ::
+    struct Grid { var a = [1, 2, 3, 4]; subscript(r: Int, c: Int) -> Int { get { a[r * 2 + c] } set { a[r * 2 + c] = newValue } } }
+    var g = Grid()
+    g[1, 1] = 9
+    print(g[1, 1])
+=> 9
+custom subscript compound assign ::
+    struct Bag { var d: [String: Int] = [:]; subscript(k: String) -> Int { get { d[k] ?? 0 } set { d[k] = newValue } } }
+    var b = Bag()
+    b["x"] += 2
+    b["x"] += 3
+    print(b["x"])
+=> 5
+class subscript setter ::
+    class Store { var items = ["a", "b"]; subscript(i: Int) -> String { get { items[i] } set { items[i] = newValue } } }
+    let s = Store()
+    s[1] = "z"
+    print(s.items)
+=> ["a", "z"]
+static subscript ::
+    enum Cfg { static var values = ["a": 1]; static subscript(k: String) -> Int { values[k] ?? 0 } }
+    print(Cfg["a"])
+=> 1
+operator overload ::
+    struct V { var x: Double }
+    func + (a: V, b: V) -> V { V(x: a.x + b.x) }
+    print((V(x: 1) + V(x: 2)).x)
+=> 3.0
+operator in type ::
+    struct V: Equatable { var x: Double; static func * (a: V, k: Double) -> V { V(x: a.x * k) } }
+    print((V(x: 2) * 3).x)
+=> 6.0
+custom operator compound ::
+    struct V { var x: Int; static func += (a: inout V, b: V) { a.x += b.x } }
+    var v = V(x: 1)
+    v += V(x: 4)
+    print(v.x)
+=> 5
+prefix operator ::
+    struct V { var x: Int; static prefix func - (v: V) -> V { V(x: -v.x) } }
+    print((-V(x: 3)).x)
+=> -3
+extension Int ::
+    extension Int { var squared: Int { self * self }; func times(_ f: () -> Void) { for _ in 0..<self { f() } } }
+    var c = 0
+    3.times { c += 1 }
+    print(4.squared + c)
+=> 19
+inout ::
+    func bump(_ x: inout Int) { x += 1 }
+    var a = 1
+    bump(&a)
+    print(a)
+=> 2
+defer order ::
+    var s = ""
+    do { defer { s += "b" }; s += "a" }
+    print(s)
+=> ab
+custom error localizedDescription ::
+    enum AppError: Error, LocalizedError { case bad(String); var errorDescription: String? { if case .bad(let m) = self { return m }; return nil } }
+    func f() throws -> Int { throw AppError.bad("boom") }
+    do { print(try f()) } catch let e as AppError { print(e.localizedDescription) } catch { print("other") }
+=> boom
+typed throws ::
+    enum E: Error { case x }
+    func f() throws(E) -> Int { throw .x }
+    do { _ = try f(); print("no") } catch { print(error == .x ? "typed" : "?") }
+=> typed
+try? ::
+    func f() throws -> Int { throw CancellationError() }
+    print(String(describing: try? f()))
+=> nil
+rawValue and allCases ::
+    enum Color: String, CaseIterable { case red, green }
+    print((Color(rawValue: "green")?.rawValue ?? "nil") + String(Color.allCases.count))
+=> green2
+Int raw values ::
+    enum P: Int { case low = 1, mid, high }
+    print(P.high.rawValue, P(rawValue: 2)!)
+=> 3 mid
+indirect enum ::
+    indirect enum Expr { case n(Int); case add(Expr, Expr) }
+    func ev(_ e: Expr) -> Int { switch e { case .n(let v): return v; case .add(let a, let b): return ev(a) + ev(b) } }
+    print(ev(.add(.n(2), .add(.n(3), .n(4)))))
+=> 9
+enum description ::
+    enum Suit { case hearts, spades }
+    print(Suit.hearts, "\(Suit.spades)")
+=> hearts spades
+enum with payload description ::
+    enum E { case a(Int), b(x: String) }
+    print(E.a(1), E.b(x: "s"))
+=> a(1) b(x: "s")
+struct description ::
+    struct P { var x = 1; var name = "a" }
+    print(P())
+=> P(x: 1, name: "a")
+class description ::
+    class C { var x = 1 }
+    print(String(describing: C()).hasSuffix("C"))
+=> true
+CustomStringConvertible ::
+    struct P: CustomStringConvertible { var x = 1; var description: String { "P\(x)" } }
+    print(P(), "\(P())", String(describing: P()))
+=> P1 P1 P1
+keyPath generic read ::
+    struct U { var name: String; var age: Int }
+    func pluck<T, V>(_ xs: [T], _ kp: KeyPath<T, V>) -> [V] { xs.map { $0[keyPath: kp] } }
+    print(pluck([U(name: "a", age: 1)], \.name).joined())
+=> a
+keyPath write ::
+    struct U { var age = 1 }
+    var u = U()
+    let kp = \U.age
+    u[keyPath: kp] = 7
+    print(u.age)
+=> 7
+keyPath through generic function write ::
+    struct U { var age = 1; var name = "a" }
+    func set<T, V>(_ x: inout T, _ kp: WritableKeyPath<T, V>, _ v: V) { x[keyPath: kp] = v }
+    var u = U()
+    set(&u, \.name, "zed")
+    set(&u, \.age, 30)
+    print(u.name, u.age)
+=> zed 30
+keyPath nested ::
+    struct A { var b = B() }
+    struct B { var c = 5 }
+    var a = A()
+    a[keyPath: \A.b.c] += 1
+    print(a[keyPath: \.b.c])
+=> 6
+keyPath on class ::
+    class M { var n = 1 }
+    let m = M()
+    m[keyPath: \M.n] = 4
+    print(m.n)
+=> 4
+keyPath as function :: ["a", "bb"].map(\.count) => [1, 2]
+keyPath \.self :: [3, 1].map(\.self) => [3, 1]
+keyPath appending ::
+    struct A { var b = B() }
+    struct B { var c = 9 }
+    let kp = (\A.b).appending(path: \B.c)
+    print(A()[keyPath: kp])
+=> 9
+closure capture list ::
+    class C { var n = 1 }
+    let c = C()
+    let f = { [weak c] in c?.n ?? 0 }
+    c.n = 5
+    print(f())
+=> 5
+labeled tuple return ::
+    func mm() -> (min: Int, max: Int) { (1, 9) }
+    let (a, b) = mm()
+    let t = mm()
+    print("\(a)\(b)\(t.max)")
+=> 199
+labeled tuple from variable ::
+    func pair() -> (name: String, count: Int) { let r = ("x", 2); return r }
+    print(pair().name, pair().count)
+=> x 2
+labeled tuple in array ::
+    let xs: [(name: String, n: Int)] = [("a", 1), ("b", 2)]
+    print(xs.map(\.name), xs[1].n)
+=> ["a", "b"] 2
+tuple destructure in closure :: [(1, 2), (3, 4)].map { a, b in a * b } => [2, 12]
+labeled loop ::
+    var c = 0
+    outer: for i in 0..<5 { for j in 0..<5 { if j == 2 { continue outer }; if i == 3 { break outer }; c += 1 } }
+    print(c)
+=> 6
+repeat while ::
+    var i = 0
+    repeat { i += 2 } while i < 7
+    print(i)
+=> 8
+nested func recursion ::
+    func fib(_ n: Int) -> Int { n < 2 ? n : fib(n - 1) + fib(n - 2) }
+    print(fib(15))
+=> 610
+variadic default ::
+    func sum(_ xs: Int..., scale: Int = 1) -> Int { xs.reduce(0, +) * scale }
+    print(sum(1, 2, 3) + sum(1, scale: 10))
+=> 16
+Codable CodingKeys ::
+    struct U: Codable { var fullName: String; enum CodingKeys: String, CodingKey { case fullName = "full_name" } }
+    let u = try! JSONDecoder().decode(U.self, from: Data(#"{"full_name":"Ann"}"#.utf8))
+    print(u.fullName)
+=> Ann
+Codable nested enum ::
+    enum K: String, Codable { case a, b }
+    struct W: Codable { var k: K; var xs: [Int]?; var d: Date? }
+    let w = try! JSONDecoder().decode(W.self, from: Data(#"{"k":"b","xs":[1,2]}"#.utf8))
+    print(w.k.rawValue + String(w.xs!.count))
+=> b2
+Comparable conformance ::
+    struct S: Comparable { var v: Int; static func < (a: S, b: S) -> Bool { a.v < b.v } }
+    print([S(v: 3), S(v: 1)].sorted().map { String($0.v) }.joined())
+=> 13
+Hashable set ::
+    struct S: Hashable { var v: Int }
+    print(Set([S(v: 1), S(v: 1), S(v: 2)]).count)
+=> 2
+any existential ::
+    protocol A { func f() -> Int }
+    struct X: A { func f() -> Int { 1 } }
+    struct Y: A { func f() -> Int { 2 } }
+    let xs: [any A] = [X(), Y()]
+    print(xs.map { $0.f() }.reduce(0, +))
+=> 3
+is / as? ::
+    protocol A {}
+    struct X: A {}
+    let v: Any = X()
+    print(v is X, (v as? A) != nil, (v as? Int) == nil)
+=> true true true
+class inheritance override ::
+    class Animal { func sound() -> String { "..." } }
+    class Dog: Animal { override func sound() -> String { "woof" + super.sound() } }
+    let a: Animal = Dog()
+    print(a.sound())
+=> woof...
+convenience init and super.init ::
+    class A { var x: Int; init(x: Int) { self.x = x } }
+    class B: A { var y: Int; init(y: Int) { self.y = y; super.init(x: y * 2) }; convenience init() { self.init(y: 1) } }
+    let b = B()
+    print("\(b.x)\(b.y)")
+=> 21
+convenience init chain ::
+    class P { var name: String; var age: Int
+        init(name: String, age: Int) { self.name = name; self.age = age }
+        convenience init(name: String) { self.init(name: name, age: 0) }
+        convenience init() { self.init(name: "anon") } }
+    let p = P()
+    print(p.name, p.age)
+=> anon 0
+struct init delegation ::
+    struct R { var w: Double; var h: Double
+        init(w: Double, h: Double) { self.w = w; self.h = h }
+        init(side: Double) { self.init(w: side, h: side) } }
+    print(R(side: 3).h)
+=> 3.0
+failable init ::
+    struct Even { let n: Int; init?(_ n: Int) { if n % 2 != 0 { return nil }; self.n = n } }
+    print(Even(3) == nil, Even(4)!.n)
+=> true 4
+required init and subclass ::
+    class A { let v: Int; required init(v: Int) { self.v = v } }
+    class B: A {}
+    print(B(v: 4).v)
+=> 4
+super.init with property defaults ::
+    class Base { var tag = "base"; init() {} }
+    class Sub: Base { var extra: Int; init(extra: Int) { self.extra = extra; super.init(); tag = "sub" } }
+    let s = Sub(extra: 2)
+    print(s.tag, s.extra)
+=> sub 2
+deinit-free class identity ::
+    class C {}
+    let a = C(), b = a
+    print(a === b, a !== C())
+=> true true
+static members ::
+    struct Cfg { static let shared = Cfg(); static var count = 0; let v = 5 }
+    Cfg.count += 2
+    print(Cfg.shared.v + Cfg.count)
+=> 7
+struct copy semantics ::
+    struct P { var x = 0 }
+    var a = P()
+    var b = a
+    b.x = 5
+    a.x = 1
+    print("\(a.x)\(b.x)")
+=> 15
+class reference semantics ::
+    class P { var x = 0 }
+    let a = P()
+    let b = a
+    b.x = 5
+    print(a.x)
+=> 5
+optional chaining deep ::
+    struct A { var b: B? }
+    struct B { var c: [Int]? }
+    let a = A(b: B(c: [4]))
+    print(String(a.b?.c?.first ?? 0) + String(describing: a.b?.c?.last.map { $0 + 1 }))
+=> 4Optional(5)
+guard let shorthand ::
+    func f() -> String {
+        let v: Int? = 2
+        let w: Int? = 5
+        guard let v else { return "nil" }
+        if let w, w > v { return "ok\(v)\(w)" }
+        return "x"
+    }
+    print(f())
+=> ok25
+if and switch expressions ::
+    let n = 4
+    let s = if n > 3 { "big" } else { "small" }
+    let t = switch n { case 4: "four"; default: "x" }
+    print(s + t)
+=> bigfour
+@Observable class ::
+    @Observable class M { var n = 0 { didSet { log += 1 } }; var log = 0; var doubled: Int { n * 2 } }
+    let m = M()
+    m.n = 3
+    print("\(m.doubled)\(m.log)")
+=> 61
+result builder ::
+    @resultBuilder struct SB { static func buildBlock(_ p: String...) -> String { p.joined() } }
+    func make(@SB _ f: () -> String) -> String { f() }
+    print(make { "a"; "b" })
+=> ab
+property wrapper ::
+    @propertyWrapper struct Clamped { var v: Int; var wrappedValue: Int { get { v } set { v = min(max(newValue, 0), 10) } }; init(wrappedValue: Int) { v = min(max(wrappedValue, 0), 10) } }
+    struct S { @Clamped var x = 50 }
+    print(S().x)
+=> 10
+@dynamicMemberLookup ::
+    @dynamicMemberLookup struct D { subscript(dynamicMember k: String) -> String { k.uppercased() } }
+    print(D().hello)
+=> HELLO
+@dynamicMemberLookup key path ::
+    struct Inner { var name = "in"; var n = 2 }
+    @dynamicMemberLookup struct Wrap { var inner = Inner(); subscript<T>(dynamicMember kp: KeyPath<Inner, T>) -> T { inner[keyPath: kp] } }
+    let w = Wrap()
+    print(w.name, w.n)
+=> in 2
+@dynamicMemberLookup writable ::
+    struct Inner { var n = 2 }
+    @dynamicMemberLookup struct Wrap { var inner = Inner(); subscript<T>(dynamicMember kp: WritableKeyPath<Inner, T>) -> T { get { inner[keyPath: kp] } set { inner[keyPath: kp] = newValue } } }
+    var w = Wrap()
+    w.n = 7
+    print(w.inner.n)
+=> 7
+callAsFunction ::
+    struct Adder { let n: Int; func callAsFunction(_ x: Int) -> Int { x + n } }
+    print(Adder(n: 2)(5))
+=> 7
+callAsFunction on variable ::
+    struct Mul { let k: Int; func callAsFunction(_ x: Int, plus y: Int = 0) -> Int { x * k + y } }
+    let m = Mul(k: 3)
+    print(m(2), m(2, plus: 1), m.callAsFunction(1))
+=> 6 7 3
+callAsFunction mutating ::
+    struct Counter { var n = 0; mutating func callAsFunction() { n += 1 } }
+    var c = Counter()
+    c()
+    c()
+    print(c.n)
+=> 2
+custom Sequence ::
+    struct Count: Sequence, IteratorProtocol { var n = 0; mutating func next() -> Int? { n += 1; return n <= 3 ? n : nil } }
+    print(Count().map(String.init).joined())
+=> 123
+custom Sequence for-in ::
+    struct Countdown: Sequence { let start: Int
+        func makeIterator() -> Iterator { Iterator(n: start) }
+        struct Iterator: IteratorProtocol { var n: Int; mutating func next() -> Int? { if n == 0 { return nil }; defer { n -= 1 }; return n } } }
+    var out: [Int] = []
+    for x in Countdown(start: 3) { out.append(x) }
+    print(out, Countdown(start: 2).reduce(0, +), Array(Countdown(start: 2)))
+=> [3, 2, 1] 3 [2, 1]
+custom Sequence methods ::
+    struct Evens: Sequence, IteratorProtocol { var n = 0; mutating func next() -> Int? { n += 2; return n <= 8 ? n : nil } }
+    print(Evens().filter { $0 > 2 }, Evens().contains(6), Evens().first(where: { $0 > 3 })!, Evens().max()!)
+=> [4, 6, 8] true 4 8
+AnyIterator ::
+    var i = 0
+    let it = AnyIterator<Int> { i += 1; return i <= 2 ? i : nil }
+    print(Array(it))
+=> [1, 2]
+string switch prefix ::
+    let s = "apple"
+    switch s { case let x where x.hasPrefix("a"): print("A"); default: print("?") }
+=> A
+character ops ::
+    let c: Character = "b"
+    print(String(Character(UnicodeScalar(c.unicodeScalars.first!.value + 1)!)) + String(c.isLetter))
+=> ctrue
+closure as variable ::
+    let add: (Int, Int) -> Int = { $0 + $1 }
+    print(add(2, 3))
+=> 5
+closure trailing multiple ::
+    func both(_ a: () -> Int, then b: (Int) -> Int) -> Int { b(a()) }
+    print(both { 2 } then: { $0 * 10 })
+=> 20
+escaping closure store ::
+    var handlers: [() -> Int] = []
+    func add(_ h: @escaping () -> Int) { handlers.append(h) }
+    add { 1 }
+    add { 2 }
+    print(handlers.map { $0() })
+=> [1, 2]
+autoclosure ::
+    func check(_ c: @autoclosure () -> Bool) -> String { c() ? "yes" : "no" }
+    print(check(2 > 1))
+=> yes
+generic constraint protocol ::
+    protocol Named { var name: String { get } }
+    struct D: Named { var name = "d" }
+    func names<T: Named>(_ xs: [T]) -> [String] { xs.map(\.name) }
+    print(names([D(), D(name: "e")]))
+=> ["d", "e"]
+some return ::
+    protocol Shape { func area() -> Double }
+    struct Sq: Shape { var s: Double; func area() -> Double { s * s } }
+    func make() -> some Shape { Sq(s: 3) }
+    print(make().area())
+=> 9.0
+protocol static requirement ::
+    protocol Zero { static var zero: Self { get } }
+    struct V: Zero { var x = 0; static var zero: V { V() } }
+    print(V.zero.x)
+=> 0
+Equatable synthesized enum ::
+    enum E: Equatable { case a(Int), b }
+    print(E.a(1) == .a(1), E.a(1) == .b)
+=> true false
+Comparable enum ::
+    enum Size: Int, Comparable { case s, m, l; static func < (a: Size, b: Size) -> Bool { a.rawValue < b.rawValue } }
+    print([Size.l, .s, .m].sorted(), Size.s < .l)
+=> [bin.Size.s, bin.Size.m, bin.Size.l] true
+Identifiable ::
+    struct Item: Identifiable { let id = 7 }
+    print(Item().id)
+=> 7
+nested types ::
+    struct Outer { struct Inner { var v = 3 }; var i = Inner() }
+    print(Outer().i.v, Outer.Inner().v)
+=> 3 3
+static func on enum ::
+    enum Math { static func double(_ x: Int) -> Int { x * 2 } }
+    print(Math.double(4))
+=> 8
+where clause in for ::
+    var s = 0
+    for i in 1...10 where i % 3 == 0 { s += i }
+    print(s)
+=> 18
+tuple comparison :: (1, "b") < (1, "c") => true
+tuple swap ::
+    var a = 1, b = 2
+    (a, b) = (b, a)
+    print(a, b)
+=> 2 1
+swap :: { var a = [1, 2]; a.swapAt(0, 1); var x = 1, y = 2; swap(&x, &y); return "\(a) \(x)\(y)" }() => [2, 1] 21
+type(of:) :: type(of: 3) => Int
+Self in protocol extension ::
+    protocol Copyable { func copy() -> Self }
+    struct P: Copyable { var v = 1; func copy() -> P { self } }
+    print(P().copy().v)
+=> 1
+mutating method on enum ::
+    enum Light { case on, off; mutating func toggle() { self = self == .on ? .off : .on } }
+    var l = Light.on
+    l.toggle()
+    print(l)
+=> off
+Bool.toggle :: { var b = false; b.toggle(); return b }() => true
+precondition passes :: { precondition(true); return "ok" }() => ok
+fatalError-free assert :: { assert(1 < 2); return "ok" }() => ok
+generic typealias ::
+    typealias Pair<T> = (T, T)
+    let p: Pair<Int> = (1, 2)
+    print(p.0 + p.1)
+=> 3
+shadowing in if let :: { let x: Int? = 3; if let x { return x * 2 }; return 0 }() => 6
+string interpolation expression :: { let n = 3; return "n=\(n * 2), \(n > 2 ? "big" : "small")" }() => n=6, big

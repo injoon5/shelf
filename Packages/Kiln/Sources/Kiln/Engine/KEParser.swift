@@ -146,7 +146,7 @@ struct KEParser {
 
     private static let modifierWords: Set<String> = ["private", "fileprivate", "public", "internal", "open", "final",
         "static", "override", "required", "convenience", "mutating", "nonmutating", "lazy", "weak", "unowned",
-        "dynamic", "optional", "indirect", "nonisolated", "isolated", "consuming", "borrowing", "package"]
+        "dynamic", "optional", "indirect", "nonisolated", "isolated", "consuming", "borrowing", "package", "prefix", "postfix", "infix"]
 
     private static let declarationWords: Set<String> = ["func", "var", "let", "class", "struct", "enum", "protocol",
         "extension", "init", "subscript", "typealias", "actor", "deinit", "case", "convenience", "required"]
@@ -198,8 +198,8 @@ struct KEParser {
         case "typealias":
             next()
             let name = try identifier()
-            if at("<") { try skipAngles() }
-            try expect("=")
+            if atOp("<") || (cur.opValue?.hasPrefix("<") ?? false) { try skipAngles() }
+            if atOp("=") { next() } else { try expect("=") }
             if let t = try? parseType() { return .typeAlias(name, t) }
             return .typeAlias(name, .named(name, []))
         default:
@@ -323,30 +323,42 @@ struct KEParser {
                 next(); try skipBalanced("{", "}")
             case "subscript":
                 next()
+                let generics = try parseGenericParams()
                 let params = try parseParams()
                 var ret: KETypeRef? = nil
                 if atOp("->") { next(); ret = try parseType() }
+                _ = try parseWhere()
                 var body: [KEStmt] = []
+                var setter: (String, [KEStmt])?
                 if at("{") {
                     let save = p
                     next()
-                    if atIdent("get") {
+                    if atIdent("get") || atIdent("set") {
                         p = save
                         next()
                         while !at("}") && !atEOF {
                             if eatIdent("get") { body = try parseBlock() }
-                            else if eatIdent("set") { if at("(") { try skipBalanced("(", ")") }; _ = try parseBlock() }
+                            else if eatIdent("set") {
+                                var newName = "newValue"
+                                if at("(") { next(); newName = try identifier(); try expect(")") }
+                                setter = (newName, try parseBlock())
+                            }
                             else { next() }
                         }
                         try expect("}")
                     } else { p = save; body = try parseBlock() }
                 }
-                decl.subscripts.append(KEFuncDecl(name: "subscript", params: params, returnType: ret, body: body,
-                                                  isStatic: mods.contains("static"), isMutating: false, attributes: attrs, line: cur.line))
+                let sub = KEFuncDecl(name: "subscript", params: params, returnType: ret, body: body,
+                                     isStatic: mods.contains("static"), isMutating: false, attributes: attrs, line: cur.line)
+                sub.generics = generics
+                sub.setter = setter
+                decl.subscripts.append(sub)
             case "struct", "class", "enum", "protocol", "extension", "actor":
                 decl.nested.append(try parseTypeDecl(attrs: attrs))
             case "typealias":
-                next(); _ = try identifier(); if eat("=") || atOp("=") { if atOp("=") { next() }; _ = try? parseType() }
+                next(); _ = try identifier()
+                if atOp("<") || (cur.opValue?.hasPrefix("<") ?? false) { try skipAngles() }
+                if eat("=") || atOp("=") { if atOp("=") { next() }; _ = try? parseType() }
             case "associatedtype":
                 next(); _ = try identifier(); if eat(":") { _ = try? parseType() }
                 if atOp("=") { next(); _ = try? parseType() }
@@ -378,6 +390,9 @@ struct KEParser {
         let generics = try parseGenericParams()
         let params = try parseParams()
         var attributes = attrs
+        // `static prefix func - (v: V) -> V`: a prefix operator (KEEval's `.prefix`).
+        if mods.contains("prefix") { attributes.append(KEAttribute(name: "prefix", args: [])) }
+        if mods.contains("postfix") { attributes.append(KEAttribute(name: "postfix", args: [])) }
         while let w = cur.identValue, ["async", "throws", "rethrows", "reasync"].contains(w) {
             // `Kiln.check` reads it: an `await` needs an `async` function, and a call to one needs `await`.
             if w == "async" || w == "reasync" { attributes.append(KEAttribute(name: "async", args: [])) }
@@ -526,9 +541,12 @@ struct KEParser {
         } else if at("(") {
             next()
             var elems: [KETypeRef] = []
+            var labels: [String?] = []
             while !at(")") {
-                if cur.identValue != nil, ahead(1).isPunct(":") { next(); next() }
-                else if cur.identValue != nil, ahead(1).identValue != nil, ahead(2).isPunct(":") { next(); next(); next() }
+                var label: String? = nil
+                if let l = cur.identValue, ahead(1).isPunct(":") { label = l == "_" ? nil : l; next(); next() }
+                else if cur.identValue != nil, let l = ahead(1).identValue, ahead(2).isPunct(":") { label = l == "_" ? nil : l; next(); next(); next() }
+                labels.append(label)
                 elems.append(try parseType())
                 if atOp("...") { next() }
                 if !eat(",") { break }
@@ -539,7 +557,7 @@ struct KEParser {
                 next()
                 t = .function(elems, try parseType())
             } else {
-                t = elems.count == 1 ? elems[0] : .tuple(elems)
+                t = elems.count == 1 ? elems[0] : .tuple(elems, labels)
             }
         } else {
             var name = try identifier("a type")
@@ -628,6 +646,19 @@ struct KEParser {
             return try parseVarDecl(attrs: attrs + [KEAttribute(name: "asyncLet", args: [])], mods: mods, inType: false).map { .variable($0) }
         }
 
+        // `prefix operator √`, `infix operator ** : MultiplicationPrecedence`, `precedencegroup P { … }`:
+        // declarations of operator names, which the engine needs no notice of.
+        if ["prefix", "postfix", "infix"].contains(w), ahead(1).isIdent("operator") {
+            next(); next()
+            while !atEOF && !cur.newlineBefore { next() }
+            return []
+        }
+        if w == "precedencegroup" {
+            next(); _ = try? identifier()
+            try skipBalanced("{", "}")
+            return []
+        }
+
         switch w {
         case "let", "var":
             return try parseVarDecl(attrs: attrs, mods: mods, inType: false).map { .variable($0) }
@@ -688,7 +719,9 @@ struct KEParser {
             if w == "class", ahead(1).identValue.map({ ["func", "var"].contains($0) }) == true { break }
             return [.declaration(.type(try parseTypeDecl(attrs: attrs)))]
         case "typealias":
-            next(); _ = try identifier(); if atOp("=") { next(); _ = try? parseType() }
+            next(); _ = try identifier()
+            if atOp("<") || (cur.opValue?.hasPrefix("<") ?? false) { try skipAngles() }
+            if atOp("=") { next(); _ = try? parseType() }
             return []
         case "import":
             if case .some(.importDecl) = try parseDeclaration(attrs: [], mods: []) { return [] }
@@ -698,7 +731,8 @@ struct KEParser {
         return [try parseExpressionStatement()]
     }
 
-    private static let assignOps: Set<String> = ["=", "+=", "-=", "*=", "/=", "%=", "&&=", "||=", "??=", "<<=", ">>=", "&=", "|=", "^="]
+    private static let assignOps: Set<String> = ["=", "+=", "-=", "*=", "/=", "%=", "&&=", "||=", "??=", "<<=", ">>=", "&=", "|=", "^=",
+                                                 "&+=", "&-=", "&*=", "&<<=", "&>>="]
 
     private mutating func parseExpressionStatement() throws -> KEStmt {
         let line = cur.line
@@ -907,7 +941,7 @@ struct KEParser {
         "..<": 6, "...": 6,
         "+": 7, "-": 7, "|": 7, "^": 7, "&+": 7, "&-": 7,
         "*": 8, "/": 8, "%": 8, "&": 8, "&*": 8,
-        "<<": 9, ">>": 9,
+        "<<": 9, ">>": 9, "&<<": 9, "&>>": 9,
     ]
 
     /// An operator token works as a binary operator: spaces on both sides or neither,
@@ -1001,6 +1035,12 @@ struct KEParser {
             if at("["), !cur.newlineBefore, !cur.spaceBefore || isSubscriptable(e) {
                 next()
                 var args: [KEArg] = []
+                // `s[...]`: the whole collection (UnboundedRange).
+                if atOp("..."), ahead(1).isPunct("]") {
+                    next(); next()
+                    e = .subscriptAccess(e, [KEArg(label: nil, value: .value(.range(.nilValue, .nilValue, closed: false)))], line: line)
+                    continue
+                }
                 while !at("]") {
                     var label: String? = nil
                     if let l = cur.identValue, ahead(1).isPunct(":"), !Self.keywords.contains(l) || l == "default" { label = l; next(); next() }
@@ -1201,7 +1241,7 @@ struct KEParser {
                 // Generic type used as a value: Set<Int>(), Array<String>.init()
                 if name.first?.isUppercase == true, atOp("<"), !cur.spaceBefore {
                     let save = p
-                    if let args = try? parseGenericArgs(), at("(") || at(".") {
+                    if let args = try? parseGenericArgs(), at("(") || at(".") || (at("{") && !noTrailing) {
                         return .typeExpr(.named(name, args))
                     }
                     p = save

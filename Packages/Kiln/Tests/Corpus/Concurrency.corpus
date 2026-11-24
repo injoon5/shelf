@@ -1,0 +1,204 @@
+# Combine, clocks and Dispatch: everyday calls, each with the value compiled
+# Swift prints. Format: Sources/Kiln/Registry/KilnCorpus.swift.
+# Values: Tools/corpus/oracle.py --write.
+
+## Combine
+
+PassthroughSubject.sink :: { let s = PassthroughSubject<Int, Never>(); var out = 0; let c = s.sink { out = $0 }; s.send(4); _ = c; return out }() => 4
+PassthroughSubject several ::
+    let s = PassthroughSubject<String, Never>()
+    var got: [String] = []
+    let c = s.sink { got.append($0) }
+    s.send("a")
+    s.send("b")
+    print(got)
+    c.cancel()
+    s.send("c")
+    print(got)
+=> ["a", "b"]
+=> ["a", "b"]
+sink(receiveCompletion:receiveValue:) ::
+    let s = PassthroughSubject<Int, Never>()
+    var log: [String] = []
+    let c = s.sink(receiveCompletion: { _ in log.append("done") }, receiveValue: { log.append("\($0)") })
+    s.send(1)
+    s.send(completion: .finished)
+    s.send(2)
+    print(log)
+    _ = c
+=> ["1", "done"]
+CurrentValueSubject.value ::
+    let s = CurrentValueSubject<Int, Never>(1)
+    var got: [Int] = []
+    let c = s.sink { got.append($0) }
+    s.send(2)
+    s.value = 3
+    print(got, s.value)
+    _ = c
+=> [1, 2, 3] 3
+AnyCancellable.store(in:) ::
+    var bag = Set<AnyCancellable>()
+    let s = PassthroughSubject<Int, Never>()
+    var n = 0
+    s.sink { n += $0 }.store(in: &bag)
+    s.send(5)
+    print(n, bag.count)
+=> 5 1
+map/filter ::
+    let s = PassthroughSubject<Int, Never>()
+    var got: [String] = []
+    let c = s.filter { $0 % 2 == 0 }.map { "#\($0)" }.sink { got.append($0) }
+    for i in 1...4 { s.send(i) }
+    print(got)
+    _ = c
+=> ["#2", "#4"]
+compactMap/removeDuplicates ::
+    let s = PassthroughSubject<String, Never>()
+    var got: [Int] = []
+    let c = s.compactMap(Int.init).removeDuplicates().sink { got.append($0) }
+    ["1", "1", "x", "2", "2", "1"].forEach { s.send($0) }
+    print(got)
+    _ = c
+=> [1, 2, 1]
+scan ::
+    let s = PassthroughSubject<Int, Never>()
+    var got: [Int] = []
+    let c = s.scan(0, +).sink { got.append($0) }
+    [1, 2, 3].forEach { s.send($0) }
+    print(got)
+    _ = c
+=> [1, 3, 6]
+prefix/dropFirst ::
+    let s = PassthroughSubject<Int, Never>()
+    var got: [Int] = []
+    let c = s.dropFirst().prefix(2).sink { got.append($0) }
+    [1, 2, 3, 4].forEach { s.send($0) }
+    print(got)
+    _ = c
+=> [2, 3]
+Just ::
+    var got = 0
+    let c = Just(7).sink { got = $0 }
+    print(got)
+    _ = c
+=> 7
+Publishers.Sequence :: { var got: [Int] = []; let c = [1, 2, 3].publisher.map { $0 * 2 }.sink { got.append($0) }; _ = c; return got }() => [2, 4, 6]
+collect ::
+    var got: [[Int]] = []
+    let c = [1, 2, 3].publisher.collect().sink { got.append($0) }
+    print(got)
+    _ = c
+=> [[1, 2, 3]]
+reduce publisher ::
+    var got = 0
+    let c = [1, 2, 3].publisher.reduce(0, +).sink { got = $0 }
+    print(got)
+    _ = c
+=> 6
+combineLatest ::
+    let a = PassthroughSubject<Int, Never>()
+    let b = PassthroughSubject<String, Never>()
+    var got: [String] = []
+    let c = a.combineLatest(b).sink { got.append("\($0)\($1)") }
+    a.send(1)
+    b.send("x")
+    a.send(2)
+    print(got)
+    _ = c
+=> ["1x", "2x"]
+merge ::
+    let a = PassthroughSubject<Int, Never>()
+    let b = PassthroughSubject<Int, Never>()
+    var got: [Int] = []
+    let c = a.merge(with: b).sink { got.append($0) }
+    a.send(1)
+    b.send(2)
+    print(got)
+    _ = c
+=> [1, 2]
+assign(to:on:) ::
+    class M { var text = "" }
+    let m = M()
+    let s = PassthroughSubject<String, Never>()
+    let c = s.assign(to: \.text, on: m)
+    s.send("hi")
+    print(m.text)
+    _ = c
+=> hi
+@Published publisher ::
+    class Model { @Published var count = 0 }
+    let m = Model()
+    var got: [Int] = []
+    let c = m.$count.sink { got.append($0) }
+    m.count = 1
+    m.count = 2
+    print(got)
+    _ = c
+=> [0, 1, 2]
+@Published dropFirst map ::
+    class Model { @Published var name = "a" }
+    let m = Model()
+    var got: [String] = []
+    let c = m.$name.dropFirst().map { $0.uppercased() }.sink { got.append($0) }
+    m.name = "b"
+    print(got)
+    _ = c
+=> ["B"]
+ObservableObject objectWillChange ::
+    class Model: ObservableObject { @Published var n = 0 }
+    let m = Model()
+    var fired = 0
+    let c = m.objectWillChange.sink { _ in fired += 1 }
+    m.n = 5
+    print(fired)
+    _ = c
+=> 1
+eraseToAnyPublisher ::
+    let s = PassthroughSubject<Int, Never>()
+    let p: AnyPublisher<Int, Never> = s.map { $0 + 1 }.eraseToAnyPublisher()
+    var got = 0
+    let c = p.sink { got = $0 }
+    s.send(1)
+    print(got)
+    _ = c
+=> 2
+receive(on:) and debounce accepted ::
+    let s = PassthroughSubject<String, Never>()
+    let c = s.debounce(for: .milliseconds(300), scheduler: RunLoop.main).receive(on: DispatchQueue.main).sink { print($0) }
+    print("subscribed")
+    _ = c
+=> subscribed
+Future ::
+    var got = 0
+    let f = Future<Int, Never> { promise in promise(.success(9)) }
+    let c = f.sink { got = $0 }
+    print(got)
+    _ = c
+=> 9
+Fail and catch ::
+    enum E: Error { case bad }
+    var got = 0
+    let c = Fail<Int, E>(error: .bad).catch { _ in Just(-1) }.sink { got = $0 }
+    print(got)
+    _ = c
+=> -1
+NotificationCenter.publisher ::
+    var got = ""
+    let c = NotificationCenter.default.publisher(for: Notification.Name("ping")).sink { got = $0.name.rawValue }
+    NotificationCenter.default.post(name: Notification.Name("ping"), object: nil)
+    print(got)
+    _ = c
+=> ping
+Timer.publish autoconnect accepted :: { let c = Timer.publish(every: 1, on: .main, in: .common).autoconnect().sink { _ in }; c.cancel(); return "ok" }() => ok
+
+## Clocks and durations
+
+ContinuousClock.now :: ContinuousClock.now < ContinuousClock.now.advanced(by: .seconds(1)) => true
+ContinuousClock.measure :: ContinuousClock().measure { _ = (1...100).reduce(0, +) } < .seconds(5) => true
+SuspendingClock.now :: SuspendingClock.now <= SuspendingClock.now => true
+Clock instant duration :: { let a = ContinuousClock.now; let b = a.advanced(by: .milliseconds(250)); return a.duration(to: b) }() => 0.25 seconds
+Duration.seconds(Double) :: Duration.seconds(1.5) => 1.5 seconds
+Duration.components.attoseconds :: Duration.milliseconds(1500).components.attoseconds => 500000000000000000
+Duration * :: Duration.seconds(2) * 3 => 6.0 seconds
+Duration.zero :: Duration.zero == .seconds(0) => true
+Task.sleep(for:) accepted :: { Task { try? await Task.sleep(for: .milliseconds(1)) }; return "ok" }() => ok
