@@ -85,26 +85,24 @@ private struct ComposeView: View {
                         .frame(maxWidth: .infinity, minHeight: CreateMetrics.buttonHeight)
                 }
                 .buttonStyle(.glassProminent)
+                .disabled(!model.hasIdea)
 
-                ShareLink(item: model.prompt(includeSource: settings.includeSource)) {
-                    Image(systemName: "square.and.arrow.up")
+                Menu {
+                    ShareLink(item: model.prompt(includeSource: settings.includeSource)) {
+                        Label("Share Prompt", systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(!model.hasIdea)
+                    Button("Copy Token", systemImage: "key") { model.copyToken() }
+                        .disabled(!model.hasToken)
+                } label: {
+                    Image(systemName: "ellipsis")
                         .font(.body.weight(.semibold))
                         .frame(minWidth: CreateMetrics.buttonHeight, minHeight: CreateMetrics.buttonHeight)
                 }
                 .buttonStyle(.glass)
                 .buttonBorderShape(.circle)
-                .accessibilityLabel("Share Prompt")
+                .accessibilityLabel("More")
             }
-            .disabled(!model.hasIdea)
-
-            // The system's own paste button: iOS asks nothing before it reads.
-            PasteButton(payloadType: String.self) { strings in
-                guard let text = strings.first else { return }
-                Task { @MainActor in model.paste(text, library: library) }
-            }
-            .labelStyle(.titleAndIcon)
-            .buttonBorderShape(.capsule)
-            .frame(maxWidth: .infinity)
         }
         .padding(CreateMetrics.padding)
         .onAppear { isFocused = true }
