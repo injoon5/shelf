@@ -72,6 +72,15 @@ final class CreateModel {
         return Prompts.change(idea, slug: app.slug, source: currentSource, includeSource: includeSource, install: install)
     }
 
+    /// Whether there's a live install key to copy on its own.
+    var hasToken: Bool { install != nil }
+
+    /// Copies just the install key, for an agent that already has the prompt.
+    func copyToken() {
+        guard let install else { return }
+        UIPasteboard.general.string = install.key
+    }
+
     func copy(includeSource: Bool) {
         UIPasteboard.general.string = prompt(includeSource: includeSource)
         didCopy = true
