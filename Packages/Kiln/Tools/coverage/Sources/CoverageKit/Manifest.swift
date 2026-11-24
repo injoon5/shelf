@@ -53,6 +53,26 @@ public struct ManifestSymbol: Codable, Equatable, Sendable {
     }
 }
 
+/// The Foundation and standard-library corpus as it ran when the manifest was
+/// written (Packages/Kiln/Tests/Corpus): what Foundation and the standard
+/// library are counted against, since no SDK list of theirs is read.
+public struct ManifestCorpus: Codable, Equatable, Sendable {
+    public struct Section: Codable, Equatable, Sendable {
+        public var name: String
+        public var entries: Int
+        public var passing: Int
+        /// Entries that need UIKit: checked on the simulator, not counted.
+        public var ios: Int
+        public var gaps: [String]
+        public var failing: [String]
+    }
+    public struct Family: Codable, Equatable, Sendable {
+        public var name: String
+        public var sections: [Section]
+    }
+    public var families: [Family]
+}
+
 public struct Manifest: Codable, Equatable, Sendable {
     public static let currentSchemaVersion = 1
 
@@ -62,6 +82,8 @@ public struct Manifest: Codable, Equatable, Sendable {
     /// What produced it: `kiln-registry` (§1.4), or `coverage/interim-switch-scan`.
     public var generator: String
     public var description: String?
+    /// Since Round 2C: the corpus's results (nil in older manifests).
+    public var corpus: ManifestCorpus?
     public var symbols: [ManifestSymbol]
 
     public init(interim: Bool, generator: String, description: String? = nil, symbols: [ManifestSymbol]) {

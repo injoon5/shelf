@@ -128,12 +128,11 @@ struct FeatureFixtureTests {
     /// prompt's "What doesn't work" section warns against it. If one starts
     /// passing, Kiln has improved and the prompt can say so.
     @Test(arguments: [
-        ("tuple labels from the type", #"Text("\(bounds().max)")"#, "max"),
+        ("enum with a payload as Codable", #"Text("x").onAppear { print("decoded", (try? JSONDecoder().decode([Payload].self, from: JSONEncoder().encode([Payload.some(1)])))?.count ?? 0) }"#, "decoded 1"),
     ])
-    func doesntWork(_ claim: String, _ body: String, _ mentioned: String) {
-        let source = Self.claimSource(body)
-        let errors = Kiln.validate(source, context: Self.check()).errors
-        #expect(errors.contains { $0.contains(mentioned) }, "\(claim) now works? errors: \(errors)")
+    func doesntWork(_ claim: String, _ body: String, _ printedIfItWorked: String) {
+        let (errors, console, _) = Self.probe(Self.claimSource(body))
+        #expect(!errors.isEmpty || !console.contains(printedIfItWorked), "\(claim) now works? \(console)")
     }
 
     /// PLAN.md §1.6: what the prompt used to warn against, now working.
@@ -143,6 +142,7 @@ struct FeatureFixtureTests {
         ("binding animation", #"Toggle("On", isOn: $on.animation()).onAppear { print("animated", on) }"#, "animated false"),
         ("one-sided range in case", #"Text("x").onAppear { print(grade(95), grade(3)) }"#, "A B"),
         ("Data from a UTF-8 view", #"Text("x").onAppear { print("bytes", Data("abc".utf8).count) }"#, "bytes 3"),
+        ("tuple labels from the type", #"Text("x").onAppear { print("max", bounds().max) }"#, "max 9"),
         ("custom init(from:)", #"Text("x").onAppear { print("custom", (try? JSONDecoder().decode(Custom.self, from: Data("{\"name\":\"x\"}".utf8)))?.count ?? -1) }"#, "custom 99"),
     ])
     func nowWorks(_ claim: String, _ body: String, _ printed: String) {

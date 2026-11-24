@@ -165,6 +165,9 @@ final class KInterpreter {
     var budget = 4_000_000
     /// Random numbers for the program: seeded by Kiln.randomSeed, else the system's.
     var rng = KilnRandom(seed: Kiln.randomSeed)
+    /// The generic arguments of the type being constructed (`SIMD2<Double>(1, 2)`,
+    /// `PassthroughSubject<Int, Never>()`), for its bridge's initializer.
+    var constructingGenerics: [KETypeRef] = []
     var readTracker: KReadTracker?
     /// A global variable changed: re-render everything.
     var onGlobalChange: (() -> Void)?
@@ -314,6 +317,8 @@ final class KInterpreter {
         let key = d.name.split(separator: ".").last.map(String.init) ?? d.name
         let ext = builtinExtensions[key] ?? KBuiltinExtension()
         builtinExtensions[key] = ext
+        // A nested native type is found by its full name too (`extension Notification.Name`).
+        if d.name.contains(".") { builtinExtensions[d.name] = ext }
         if !d.inherits.isEmpty { builtinConformances[key, default: []].formUnion(d.inherits) }
         for p in d.properties {
             if KMacros.applyPropertyMacros(p, owner: key, self) { continue }   // `@Entry` (KEMacros)
@@ -764,6 +769,11 @@ final class KInterpreter {
         }
         let current = try read(loc)
         let rhs = try eval(valueExpr, env, expected ?? typeRef(of: current))
+        if let f = current.userType?.staticMethods[op]?.first ?? functions[op]?.first {
+            let inout_ = KBinding.inOut(get: { [unowned self] in (try? self.read(loc)) ?? .nilValue }, set: { [unowned self] v in try? self.write(loc, v) })
+            _ = try invoke(f, args: [.binding(inout_), rhs], labels: [nil, nil], selfContext: nil, parent: globalEnv)
+            return
+        }
         let binOp = String(op.dropLast())
         let result: KV
         if binOp == "??" { result = current.isNil ? rhs : current }
@@ -806,12 +816,22 @@ final class KInterpreter {
             if case .ident(let tn, _) = base, env.lookup(tn) == nil, let t = types[tn], !(env.nearestSelf.map { (try? selfMemberLocation($0, tn)) != nil } ?? false) {
                 return .staticMember(t, name)
             }
+            // `Self.calendar.date(…)`: a static member through `Self`.
+            if case .ident("Self", _) = base, let t = env.nearestSelf?.type, t.staticDecls[name] != nil {
+                return .staticMember(t, name)
+            }
             let baseLoc = try lvalue(base, env)
             return try memberLocation(baseLoc, name)
         case .subscriptAccess(let base, let args, let line):
             let baseLoc = try lvalue(base, env)
             guard let first = args.first else { throw fail("Subscript needs an index", line) }
             let idx = try eval(first.value, env)
+            if first.label == "keyPath", let loc = try keyPathLocation(baseLoc, idx) { return loc }
+            let baseValue = try read(baseLoc)
+            if baseValue.userType != nil || { if case .type(.user) = baseValue { return true }; return false }() {
+                let all = try [idx] + args.dropFirst().map { try eval($0.value, env) }
+                if let loc = try userSubscriptLocation(baseLoc, baseValue, all, args.map(\.label), line) { return loc }
+            }
             if let d = args.first(where: { $0.label == "default" }) {
                 let def = try eval(d.value, env)
                 return .computed(get: { [unowned self] in
@@ -864,9 +884,13 @@ final class KInterpreter {
         let value = try read(base)
         switch value {
         case .object(let o):
+            if o.fields[name] == nil, o.type.storedDecl(name) == nil, o.type.computed[name] == nil, !o.type.wrappedNames.contains(name),
+               let loc = dynamicMemberLocation(value, name, base) { return loc }
             return .objectField(o, name)
         case .structV(let s):
             if s.type.wrapper(of: name) == "Binding", case .binding(let b)? = s.fields[name] { return .binding(b) }
+            if s.fields[name] == nil, s.type.storedDecl(name) == nil, s.type.computed[name] == nil, !s.type.wrappedNames.contains(name),
+               let loc = dynamicMemberLocation(value, name, base) { return loc }
             return .member(base, name)
         case .binding(let b):
             return .member(.binding(b), name)
@@ -912,6 +936,7 @@ final class KInterpreter {
             let old = o.fields[name] ?? .nilValue
             let v = coerce(newValue, to: decl?.type)
             if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: .box(KBox(.object(o))), type: o.type) }
+            if o.combineHooks != nil { try KCombine.willSet(o, name, v) }
             o.fields[name] = v
             o.didChange()
             if let ds = decl?.didSet { try runObserver(ds, old, selfLoc: .box(KBox(.object(o))), type: o.type) }
@@ -1045,6 +1070,14 @@ final class KInterpreter {
             return .dict(out)
         case (.array(let items), .named("Set", let args)):
             return .set(Set(items.map { coerce($0, to: args.first) }))
+        case (.tuple(let vals, let old), .tuple(let ts, let labels)) where vals.count == ts.count:
+            // `-> (min: Int, max: Int)` labels the `(1, 9)` it returns.
+            let named = labels.count == vals.count && labels.contains { $0 != nil } ? labels : old
+            return .tuple(zip(vals, ts).map { coerce($0.0, to: $0.1) }, named)
+        case (.int, .named(let n, _)), (.double, .named(let n, _)), (.array, .named(let n, _)), (.native(.implicit), .named(let n, _)):
+            // `let b: UInt8 = 200`, `let d: Decimal = 7`, `let v: SIMD2<Double> = [1, 2]` (`KRegistry.literalCoercions`).
+            guard n != "Int", n != "Double", n != "String", let make = registry.literalCoercions[n], let v2 = make(v, t) else { return v }
+            return v2
         default:
             return v
         }
@@ -1236,7 +1269,8 @@ final class KInterpreter {
     }
 
     func bindClosureParams(_ c: KEClosure, _ args: [KV], _ env: KEnv) {
-        if c.hasExplicitParams {
+        // `{ [weak self] in self?.seen.append($0) }`: a capture list alone, so `$0` is the argument.
+        if c.hasExplicitParams, !(c.params.isEmpty && !args.isEmpty) {
             if c.params.count == 1, args.count > 1 {
                 // `{ pair in … }` receiving several values gets a tuple.
                 env.declare(c.params[0].name, .tuple(args, Array(repeating: nil, count: args.count)))
@@ -1261,7 +1295,9 @@ final class KInterpreter {
                 else { env.declare("$\(i)", a) }
             }
             if args.count == 1, case .tuple(let vals, _) = args[0] {
-                for (i, a) in vals.enumerated() where i > 0 { env.declare("$\(i)", a) }
+                // `zip(a, b).map { "\($0)\($1)" }`: a closure that uses `$1` takes the tuple's halves.
+                let splat = KEClosureScan.maxAnonymous(c) >= 1
+                for (i, a) in vals.enumerated() where i > 0 || splat { env.declare("$\(i)", a) }
             }
         }
     }
@@ -1364,7 +1400,12 @@ final class KInterpreter {
             return (closed ? Array(l...h) : Array(l..<h)).map { .int($0) }
         case .string(let s): return s.map { .string(String($0)) }
         case .nilValue: return []
+        case .native(.object(_, let ref)) where ref.value is KNativeSequence:
+            return try (ref.value as! KNativeSequence).elements(self)
+        case .native(.boxed(let b)) where b.value.base is KNativeSequence:
+            return try (b.value.base as! KNativeSequence).elements(self)
         default:
+            if let xs = try userSequenceElements(v) { return xs }
             throw fail("Can't loop over \(describe(v))")
         }
     }
@@ -1422,7 +1463,8 @@ final class KInterpreter {
             return "\(s.type.name)(\(parts.joined(separator: ", ")))"
         case .enumV(let e):
             if e.payload.isEmpty { return e.caseName }
-            return "\(e.caseName)(\(e.payload.map { describe($0, quoted: true) }.joined(separator: ", ")))"
+            let declared = e.type.enumCase(e.caseName)?.associated.map(\.0) ?? []
+            return "\(e.caseName)(\(e.payload.enumerated().map { i, x in (i < declared.count ? declared[i].map { $0 + ": " } ?? "" : "") + describe(x, quoted: true) }.joined(separator: ", ")))"
         case .object(let o): return o.type.name
         case .function: return "(Function)"
         case .type(let t): return t.name

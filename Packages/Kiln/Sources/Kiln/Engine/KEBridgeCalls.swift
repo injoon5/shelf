@@ -100,13 +100,39 @@ extension KInterpreter {
         if name == "self" { return .type(.builtin(typeName)) }
         // A nested native type: `NSTextCheckingResult.CheckingType`, `UIImpactFeedbackGenerator.FeedbackStyle`.
         if name.first?.isUppercase == true, registry.type(typeName + "." + name) != nil { return .type(.builtin(typeName + "." + name)) }
+        try requireSymbolic(typeName, name, line)
         // Other members of SwiftUI's types are symbolic until a view reads them (`Edge.Set.all`).
         return .native(.implicit(name, []))
+    }
+
+    /// A static member Kiln doesn't bridge is an error, as `Kiln.check` reports
+    /// it, never a placeholder that shows as text (`.main.bundleIdentifier`).
+    /// SwiftUI's symbolic types stay symbolic (`Edge.Set.all`, a `Font.Weight`):
+    /// a type whose bridge lists no statics, or one only signatures name.
+    func requireSymbolic(_ typeName: String, _ name: String, _ line: Int) throws {
+        if name.first?.isUppercase == true { return }
+        if let (tn, _) = builtinExtensions.first(where: { $0.value.staticDecls[name] != nil || $0.value.staticMethods[name] != nil }) {
+            _ = tn
+            return
+        }
+        if let t = registry.type(typeName) {
+            if t.anyStatic != nil || t.anyStaticMethod != nil || t.implicit?(name, [], []) != nil { return }
+            if t.staticProperties.isEmpty && t.staticMethods.isEmpty { return }
+            throw fail("Type '\(typeName)' has no member '\(name)' in Kiln", line)
+        }
+        let root = typeName.split(separator: ".").first.map(String.init) ?? typeName
+        if registry.symbolicTypeNames.contains(typeName) || registry.symbolicTypeNames.contains(root) || registry.view(root) != nil
+            || registry.protocols[root] != nil || KInterpreter.styleName(root) != nil { return }
+        throw fail("Cannot find '\(typeName)' in scope: Kiln doesn't have it", line)
     }
 
     /// `Type.name(…)` for a native type.
     func nativeStaticCall(_ typeName: String, _ name: String, _ argExprs: [KEArg], _ env: KEnv, _ line: Int,
                           _ expected: KETypeRef?) throws -> KV {
+        // `Unicode.Scalar(98)`, `Calendar.Component(…)`: a nested native type's initializer.
+        if name.first?.isUppercase == true, let nested = registry.type(typeName + "." + name), !nested.inits.isEmpty {
+            return try runBridge(nested.inits, typeName + "." + name, argExprs, env, line: line).0
+        }
         if let t = registry.type(typeName) {
             if let ms = t.staticMethods[name] {
                 return try runBridge(ms, name, owner: typeName, argExprs, env, line: line).0
@@ -122,6 +148,7 @@ extension KInterpreter {
         }
         let args = try evalArgs(argExprs, env)
         if name == "init" { return try callNamedValues(typeName, args, argExprs.map(\.label), line) }
+        try requireSymbolic(typeName, name, line)
         // An unknown static call on a SwiftUI type: a symbolic value (`.degrees(90)` written in full).
         return .native(.implicit(name, args))
     }
@@ -359,15 +386,19 @@ extension KInterpreter {
     /// `[Habit]()`, `[String: Int]()`, `Set<Int>()`: a type written as an expression, called.
     func constructType(_ t: KETypeRef, _ args: [KV], _ labels: [String?], _ line: Int) throws -> KV {
         switch t.core {
-        case .array:
+        case .array(let elem):
             if let r = labels.firstIndex(of: "repeating") {
-                return .array(Array(repeating: args[r], count: labels.firstIndex(of: "count").flatMap { args[$0].asInt } ?? 0))
+                return .array(Array(repeating: coerce(args[r], to: elem), count: labels.firstIndex(of: "count").flatMap { args[$0].asInt } ?? 0))
             }
-            if let f = args.first { return .array(try sequence(f)) }
+            if labels.first == "arrayLiteral" { return .array(args.map { coerce($0, to: elem) }) }
+            if let f = args.first { return .array(try sequence(f).map { coerce($0, to: elem) }) }
             return .array([])
         case .dictionary: return .dict([:])
-        case .named(let n, _):
+        case .named(let n, let generics):
             if n == "Set" { return .set(Set(try args.first.map { try sequence($0) } ?? [])) }
+            let saved = constructingGenerics
+            constructingGenerics = generics
+            defer { constructingGenerics = saved }
             return try callNamedValues(n, args, labels, line)
         default:
             return .nilValue

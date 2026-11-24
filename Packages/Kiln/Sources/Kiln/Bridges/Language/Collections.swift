@@ -53,7 +53,7 @@ extension LanguageBridges {
                     guard c.args.count > 1, case .function(let fun) = c.args[1] else { throw c.interp.fail("reduce(into:) needs a closure", c.line) }
                     let acc = KBox(c.args[0])
                     for x in a(c) {
-                        _ = try c.interp.call(fun, [.binding(KBinding(get: { acc.value }, set: { acc.value = $0 })), x], [nil, nil])
+                        _ = try c.interp.call(fun, [.binding(KBinding.inOut(get: { acc.value }, set: { acc.value = $0 })), x], [nil, nil])
                     }
                     return acc.value
                 }
@@ -339,10 +339,12 @@ extension LanguageBridges {
     static func dictionary(_ r: KRegistry) {
         r.type("Dictionary", .language) { t in
             t.initializer { c in
-                if let g = c.arg("grouping"), case .function(let by)? = c.arg("by") {
+                if let g = c.arg("grouping"), let byArg = c.arg("by") {
+                    // `by:` is a closure or a key path (`\.category`).
+                    let by = try c.interp.applier(byArg, c.line)
                     var d: [KV: KV] = [:]
                     for item in try c.interp.sequence(g) {
-                        let k = try c.interp.call(by, [item], [nil])
+                        let k = try by(item)
                         if d[k] == nil { d[k] = .array([]) }
                         if case .array(var a)? = d[k] { a.append(item); d[k] = .array(a) }
                     }

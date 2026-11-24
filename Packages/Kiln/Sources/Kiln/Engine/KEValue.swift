@@ -49,6 +49,7 @@ indirect enum KV {
         switch self {
         case .int(let i): return i
         case .double(let d) where d.isFinite: return Int(d)
+        case .native(.boxed(let b)): return (b.value.base as? KNumericBox)?.intValue   // `UInt8`, `Int32` (KNumericBox)
         default: return nil
         }
     }
@@ -56,6 +57,7 @@ indirect enum KV {
         switch self {
         case .int(let i): return Double(i)
         case .double(let d): return d
+        case .native(.boxed(let b)): return (b.value.base as? KNumericBox)?.doubleValue
         default: return nil
         }
     }
@@ -138,7 +140,19 @@ extension KV: Hashable {
         // An enum-like native value against the symbol the app wrote (`size == .large`).
         case (.native(.boxed(let x)), .native(.implicit(let n, let args))) where x.caseName != nil && args.isEmpty: return x.caseName == n
         case (.native(.implicit(let n, let args)), .native(.boxed(let y))) where y.caseName != nil && args.isEmpty: return y.caseName == n
+        // `Data` is held as an `NSData`: two compare by their bytes, as Swift's do.
+        case (.native(.object("Data", let x)), .native(.object("Data", let y))):
+            if x === y { return true }
+            guard let p = x.value as? NSData, let q = y.value as? NSData else { return false }
+            return p.isEqual(to: q as Data)
         case (.native(let x), .native(let y)): return x == y
+        // `byte == 5`: a fixed-width integer and a number (KNumericBox).
+        case (.native(.boxed(let x)), .int), (.native(.boxed(let x)), .double):
+            guard let n = x.value.base as? KNumericBox, let d = b.asDouble else { return false }
+            return n.doubleValue == d
+        case (.int, .native(.boxed(let y))), (.double, .native(.boxed(let y))):
+            guard let n = y.value.base as? KNumericBox, let d = a.asDouble else { return false }
+            return n.doubleValue == d
         default: return false
         }
     }
@@ -170,6 +184,7 @@ extension KV: Hashable {
         case .type(let t): h.combine(t.name)
         case .binding(let b): h.combine(ObjectIdentifier(b))
         case .view(let v): h.combine(ObjectIdentifier(v))
+        case .native(.object("Data", let r)): h.combine((r.value as? NSData)?.length ?? 0)
         case .native(let n): h.combine(n)
         }
     }
@@ -195,6 +210,8 @@ final class KObject {
     let type: KType
     var fields: [String: KV]
     let changed = PassthroughSubject<Void, Never>()
+    /// Combine's view of it: `$name` publishers and `objectWillChange` (Bridges/Concurrency/Combine.swift).
+    var combineHooks: KObjectHooks?
 
     init(type: KType, fields: [String: KV]) {
         self.type = type

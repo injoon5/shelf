@@ -16,6 +16,8 @@ final class ConcurrencyBridges: KBridgeFamily {
         tasks(r)
         groups(r)
         streams(r)
+        combine(r)
+        clocks(r)
     }
 
     @MainActor static func body(_ c: KCall) -> KFunction? {
@@ -37,6 +39,10 @@ final class ConcurrencyBridges: KBridgeFamily {
             }
             t.staticMethod("sleep", notes: "`for: .seconds(n)`, `nanoseconds:`; really waits.", async: true) { c in
                 if let n = c.arg("nanoseconds")?.asDouble { return KBuiltins.sleep(n / 1_000_000_000) }
+                // A `Duration` value (`let d: Duration = .seconds(1)`, Clocks.swift).
+                if case .native(.boxed)? = c.arg("for") ?? c.first, let d = KDuration.from(c.arg("for") ?? c.first) {
+                    return KBuiltins.sleep(KDuration(d: d).seconds)
+                }
                 if let s = KBuiltins.seconds(c.arg("for") ?? c.arg("seconds") ?? c.first) { return KBuiltins.sleep(s) }
                 if case .native(.date(let d))? = c.arg("until") { return KBuiltins.sleep(d.timeIntervalSinceNow) }
                 return KBuiltins.sleep(0)

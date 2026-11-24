@@ -40,7 +40,10 @@ enum KilnEngine {
         let code = parsed.source
         let program: KEProgram
         switch parsed.program {
-        case .success(let p): program = p
+        case .success(var p):
+            // `Result`, `AnyIterator`: the standard library's Swift, for an app that names them.
+            p.types = KSwiftPrelude.types(for: code, declared: Set(p.types.map(\.name))) + p.types
+            program = p
         case .failure(let e): throw Failure.syntax(formatSyntaxError(e, code))
         }
         let interp = try KInterpreter(program: program, headless: headless, context: context)
@@ -99,7 +102,8 @@ enum KilnEngine {
             // Closing the app's screen stops its tasks and timers first.
             context.onTearDown { [weak interp] in interp?.tearDown() }
             let view = AnyView(KRootView(compiled: compiled))
-            var result = KilnResult(view: view, consoleOutput: interp.console, errors: [])
+            // Errors from the top-level code (its globals) are the run's too, not only `onError`'s.
+            var result = KilnResult(view: view, consoleOutput: interp.console, errors: interp.errors)
             result.interp = interp
             result.context = context
             return result
@@ -324,7 +328,13 @@ final class KProbe {
             }
             if Self.actionModifiers.contains(m.name), case .function(let f)? = m.args.last {
                 switch m.name {
-                case "onReceive": for _ in 0..<max(1, ticks) { actions.append((f, [.native(.date(Date()))], false)) }
+                case "onReceive":
+                    // A Combine publisher gives what it has now (a subject's value, `Just`'s); a timer, dates.
+                    if let values = KCombineValues.sample(m.args.first ?? .nilValue) {
+                        for v in values.prefix(max(1, ticks)) { actions.append((f, [v], false)) }
+                    } else {
+                        for _ in 0..<max(1, ticks) { actions.append((f, [.native(.date(Date()))], false)) }
+                    }
                 case "onDelete": actions.append((f, [.native(.indexSet(IndexSet(integer: 0)))], false))
                 case "onChange":
                     let n = KRenderer(interp: interp).closureParamCount(.function(f))

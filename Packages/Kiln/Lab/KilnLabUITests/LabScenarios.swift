@@ -380,6 +380,25 @@ final class AppScenarios: LabCase {
     }
     func testTripNotesNative() { trip("native") }
     func testTripNotesKiln() { trip("kiln") }
+
+    // MARK: Ledger (Round 2C: Foundation and the standard library)
+
+    func ledger(_ mode: String) {
+        launch("Ledger", mode)
+        snap("1 start, March 2026")
+        app.swipeUp()
+        snap("2 largest first and checks")
+        app.swipeUp()
+        tap("Add coffee")
+        snap("3 coffee added")
+        tap("Next month")
+        tap("Reshuffle")
+        app.swipeDown()
+        app.swipeDown()
+        snap("4 April, reshuffled")
+    }
+    func testLedgerNative() { ledger("native") }
+    func testLedgerKiln() { ledger("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

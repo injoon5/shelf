@@ -11,11 +11,24 @@
 import Foundation
 
 struct KManifest: Codable, Equatable {
+    /// One form of a symbol: the labels a call writes, and (since Round 2C)
+    /// the bridge's own signature, so a batch availability check can tell a
+    /// form Kiln takes from one it doesn't (`Calendar.date(bySetting:value:of:)`
+    /// against `Calendar.date(from:in:)`). Docs/manifest.md, "Forms".
     struct Overload: Codable, Equatable {
         var labels: [String]
         var receiver: String?
         var introduced: String?
         var notes: String?
+        /// `label:kind` pairs as the bridge declares them: `?` marks one with a
+        /// default (it can be left out), `...` a variadic one.
+        var signature: String?
+        /// For a type's member: `init`, `static` (a static method), `method`.
+        var member: String?
+        /// `stub` when this form is accepted with no effect (otherwise the symbol's).
+        var support: String?
+        /// The call must be awaited.
+        var async: Bool?
     }
 
     struct Symbol: Codable, Equatable {
@@ -34,6 +47,29 @@ struct KManifest: Codable, Equatable {
         /// whether native code can use the app's value through a proxy (§1.5).
         var requirements: [String]?
         var proxy: Bool?
+        /// A form that reads its arguments by label itself (the standard
+        /// library's loose bridges): label sets other than `overloads` may work.
+        var anyLabels: Bool?
+    }
+
+    /// The Foundation and standard-library corpus (`Tests/Corpus`), as it runs
+    /// when the manifest is written: entries per family and section, and the
+    /// ids of those that don't pass (known gaps, and failures).
+    struct Corpus: Codable, Equatable {
+        struct Section: Codable, Equatable {
+            var name: String
+            var entries: Int
+            var passing: Int
+            /// Entries that need UIKit (`[ios]`): checked on the simulator, not counted here.
+            var ios: Int
+            var gaps: [String]
+            var failing: [String]
+        }
+        struct Family: Codable, Equatable {
+            var name: String
+            var sections: [Section]
+        }
+        var families: [Family]
     }
 
     /// A family, for the prompt: what it covers, and how many symbols it has.
@@ -73,6 +109,7 @@ struct KManifest: Codable, Equatable {
     /// What `KLanguageGaps` finds failing when the manifest is written.
     var gaps: [Gap]?
     var wontDo: [WontDo]?
+    var corpus: Corpus?
     var symbols: [Symbol]
 
     func encoded() throws -> Data {
@@ -99,15 +136,22 @@ extension KRegistry {
                                  support: (support ?? b.support).rawValue, introduced: b.introduced,
                                  overloads: overloads, notes: notes ?? b.notes, source: b.source))
         }
-        func overloads(_ os: [KOverload], receiver: String? = nil) -> [KManifest.Overload]? {
+        func overloads(_ os: [KOverload], receiver: String? = nil, member: String? = nil) -> [KManifest.Overload]? {
             let listed = os.filter { !$0.lenient }
             if listed.isEmpty { return os.isEmpty ? [] : nil }
             var seen = Set<[String]>()
             return listed.compactMap { o in
-                guard seen.insert(o.manifestLabels + [o.receiver ?? receiver ?? ""]).inserted else { return nil }
+                guard seen.insert(o.manifestLabels + [o.receiver ?? receiver ?? "", member ?? ""]).inserted else { return nil }
                 return .init(labels: o.manifestLabels, receiver: o.receiver ?? receiver,
-                             introduced: o.availability?.iOSString, notes: o.notes)
+                             introduced: o.availability?.iOSString, notes: o.notes,
+                             signature: o.params.map { ($0.label ?? "_") + ":" + $0.kind.keyword + ($0.variadic ? "..." : ($0.optional ? "?" : "")) }.joined(separator: " "),
+                             member: member, support: o.isStub ? "stub" : nil, async: o.isAsync ? true : nil)
             }
+        }
+        /// Marks the symbol just added as having a loose form.
+        func markLoose(_ os: [KOverload], from before: Int) {
+            guard os.contains(where: \.lenient), symbols.count > before else { return }
+            symbols[symbols.count - 1].anyLabels = true
         }
 
         for b in views.values where !b.isInternal {
@@ -125,18 +169,25 @@ extension KRegistry {
             }
         }
         for t in types.values where !t.isInternal {
-            symbol(t.manifestKind, t.name, owner: nil, t, overloads: t.inits.isEmpty ? [] : overloads(t.inits.map(\.overload)))
+            var before = symbols.count
+            symbol(t.manifestKind, t.name, owner: nil, t, overloads: t.inits.isEmpty ? [] : overloads(t.inits.map(\.overload), member: "init"))
+            markLoose(t.inits.map(\.overload), from: before)
             for (name, p) in t.staticProperties {
                 symbol("member", name, owner: t.name, t, overloads: [], support: p.support, notes: p.notes ?? "")
             }
             for (name, ms) in t.staticMethods where t.staticProperties[name] == nil {
-                symbol("member", name, owner: t.name, t, overloads: overloads(ms.map(\.overload)), notes: ms.first?.overload.notes ?? "")
+                before = symbols.count
+                symbol("member", name, owner: t.name, t, overloads: overloads(ms.map(\.overload), member: "static"), notes: ms.first?.overload.notes ?? "")
+                markLoose(ms.map(\.overload), from: before)
             }
             for (name, p) in t.properties where t.staticProperties[name] == nil && t.staticMethods[name] == nil {
                 symbol("member", name, owner: t.name, t, overloads: [], support: p.support, notes: p.notes ?? "")
             }
-            for (name, ms) in t.methods where t.staticProperties[name] == nil && t.staticMethods[name] == nil && t.properties[name] == nil {
-                symbol("member", name, owner: t.name, t, overloads: overloads(ms.map(\.overload)), notes: ms.first?.overload.notes ?? "")
+            for (name, ms) in t.methods where t.staticProperties[name] == nil && t.staticMethods[name] == nil {
+                before = symbols.count
+                // A name that's a property and a method (`first`, `first(where:)`) is one member with both.
+                symbol("member", name, owner: t.name, t, overloads: overloads(ms.map(\.overload), member: "method"), notes: ms.first?.overload.notes ?? "")
+                markLoose(ms.map(\.overload), from: before)
             }
         }
         // Another name for a type (`CGFloat` is `Double` here).
@@ -145,7 +196,9 @@ extension KRegistry {
             symbol("type", alias, owner: nil, t, overloads: nil, notes: "The same as `\(target)` in Kiln.")
         }
         for f in functions.values {
+            let before = symbols.count
             symbol("member", f.name, owner: f.owner, f, overloads: overloads(f.forms.map(\.overload)))
+            markLoose(f.forms.map(\.overload), from: before)
         }
         for p in protocols.values {
             let before = symbols.count
@@ -164,6 +217,7 @@ extension KRegistry {
         for s in symbols {
             if var prior = byID[s.id] {
                 if let o = s.overloads { prior.overloads = (prior.overloads ?? []) + o.filter { !(prior.overloads ?? []).contains($0) } }
+                if s.anyLabels == true { prior.anyLabels = true }
                 byID[s.id] = prior
             } else {
                 byID[s.id] = s
@@ -171,7 +225,10 @@ extension KRegistry {
         }
         for (id, var s) in byID {
             if s.notes == "" { s.notes = nil }
-            s.overloads = s.overloads?.sorted { $0.labels.joined(separator: ",") + ($0.receiver ?? "") < $1.labels.joined(separator: ",") + ($1.receiver ?? "") }
+            s.overloads = s.overloads?.sorted {
+                ($0.member ?? "") + "|" + $0.labels.joined(separator: ",") + ($0.receiver ?? "") + ($0.signature ?? "")
+                    < ($1.member ?? "") + "|" + $1.labels.joined(separator: ",") + ($1.receiver ?? "") + ($1.signature ?? "")
+            }
             byID[id] = s
         }
         let sorted = byID.values.sorted { $0.id < $1.id }
@@ -191,6 +248,10 @@ extension KRegistry {
         m.gaps = KLanguageGaps.current()
         struct File: Decodable { var entries: [KManifest.WontDo] }
         m.wontDo = try JSONDecoder().decode(File.self, from: Data(contentsOf: url)).entries
+        // The corpus next to the won't-do list's package (`Tests/Corpus`), as it runs today.
+        let corpusFolder = url.deletingLastPathComponent().appendingPathComponent("../../Tests/Corpus").standardized
+        let entries = KilnCorpus.load(corpusFolder)
+        if !entries.isEmpty { m.corpus = KilnCorpus.summary(entries) }
         return m
     }
 }

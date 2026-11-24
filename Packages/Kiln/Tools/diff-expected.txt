@@ -27,6 +27,11 @@ tests/NavigationBridgeTests-8.swift Round 1A: `\.isPresented` is read from Swift
 Packages/Kiln/Examples/Apps/DoodlePad.swift Round 1's Lab example: before, gestures, Canvas and focus weren't bridged (Canvas drew nothing; @FocusState and .gesture were stubs).
 fixtures/apps/accessibility-motion.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
 fixtures/apps/charts.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
+fixtures/apps/swift-language.swift Round 2C: `.dateTime.weekday(.wide)` is Foundation's own style, replayed with its argument ("Wednesday"); before, the argument was dropped ("Wed").
+tests/RestOfSwiftUITests-20.swift Round 2C: a `Date` in an interpolation prints as Swift prints it ("1970-01-01 00:00:00 +0000"); before, Kiln formatted it ("Jan 1, 1970 at 12:00 AM").
+tests/Round2CTests-0.swift Round 2C's test: before, Combine's `PassthroughSubject` didn't exist.
+Packages/Kiln/Examples/Apps/Ledger.swift Round 2C's Lab example: before, a generic subscript (`subscript<T>(dynamicMember:)`) didn't parse.
+fixtures/apps/foundation-stdlib.swift Round 2C's fixture: before, `Logger`, Combine's operators and most of what it uses didn't exist.
 fixtures/apps/focus-environment.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
 fixtures/apps/gestures-canvas.swift Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.
 tests/RestOfSwiftUITests-0.swift Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.

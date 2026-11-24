@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 enum KFormatting {
     /// `String(format:)` with Swift's argument types.
-    static func format(_ fmt: String, _ args: [KV], _ interp: KInterpreter) -> String {
+    static func format(_ fmt: String, _ args: [KV], _ interp: KInterpreter, locale: Locale? = nil) -> String {
         var cargs: [CVarArg] = []
         var specs: [Character] = []
         var i = fmt.startIndex
@@ -35,6 +35,7 @@ enum KFormatting {
             }
         }
         let normalized = fmt.replacingOccurrences(of: "%s", with: "%@").replacingOccurrences(of: "%S", with: "%@")
+        if let locale { return String(format: normalized, locale: locale, arguments: cargs) }
         return String(format: normalized, arguments: cargs)
     }
 
@@ -45,6 +46,14 @@ enum KFormatting {
     /// `value.formatted(style)`.
     static func formatted(_ v: KV, _ style: KV, _ interp: KInterpreter) -> String {
         if case .native(let n) = v, let f = valueFormatters[KRegistry.typeName(of: .native(n))], let s = f(v, style, interp) { return s }
+        // Foundation's own styles, from the calls the app made (FormatStyles.swift).
+        do {
+            if let s = try KFormatStyles.format(v, style, interp) { return s }
+        } catch let e as KFormatStyles.Unsupported {
+            interp.report(KERuntimeError(message: e.message))
+        } catch {
+            interp.report(error)
+        }
         if case .native(.date(let d)) = v {
             if case .native(.format(let f)) = style, f.kind == .dateTime, !f.components.isEmpty {
                 var fs = Date.FormatStyle()

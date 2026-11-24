@@ -291,6 +291,17 @@ PLAN.md §3.1–§3.4, Round 2A (haptics, share and paste, text parsing, units),
 - **Kiln Lab:** `TripNotes` matches native on every step, labels and screenshots.
 - **New inputs.** The four Round 2A fixtures (`haptics`, `sharing`, `text-parsing`, `units`) and Lab's `TripNotes`. `text-parsing` and `TripNotes` validate in about 4 ms: NaturalLanguage's taggers and the data detector load their models on first use.
 
+### after-3c-round2c.json
+
+PLAN.md §3, Round 2C (Foundation and the standard library), with Round 2B merged, against the bar `after-3a-round2a.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-3c-round2c.json --compare Benchmarks/after-3a-round2a.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is `Apps/TripNotes.swift` at 4.5%, then `apps/time.swift` and `apps/accessibility-motion.swift` at 4.1%; the compute workloads are 1% slower to 4% faster (`Arithmetic` −3.7%, `Collections` −3.5%), Chess within 1%.
+- **A first run was 15–35% slower.** Most of it was one call: deciding whether an app names `Result` or `AnyIterator` (Swift's types Kiln writes in Swift, `KSwiftPrelude`) searched the whole source with Foundation's Unicode-aware `contains`, about a quarter of a small app's run; it's a byte search now. Also cut: a literal-coercion lookup in every `coerce`, a second lookup for each interpolated name, and a cast in every `KRef` comparison. Measured against `shelf-fixes` on the same machine, interleaved: the same within noise.
+- **What it costs.** A static member the type's bridge doesn't have is checked against the registry's symbolic types (`requireSymbolic`); a closure's `$n` are scanned once per closure (`KEClosureScan`); a `Sequence` method on an app's value first looks for its iterator.
+- **Kiln Lab** (`Tools/iterate.sh`): 16 of 16 apps match native on every step but `Terrain`, whose last step reads the slider after the UI test drags it (2.9 against 3.0, and the other way on a rerun); `Ledger` matches on every step, labels 100%.
+- **New inputs.** The fixture `foundation-stdlib` and Lab's `Ledger`, with nothing to compare against.
+
 ## §3.7: SurfacePlot
 
 `SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.

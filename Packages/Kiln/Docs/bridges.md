@@ -568,6 +568,21 @@ A view whose type reads a live environment value, or has `@Namespace`, `@FocusSt
 - **A `Canvas`** renderer runs in a view's body and records into `KCanvasRecording`; SwiftUI's `Canvas` replays it. `GraphicsContext` is a value (`KGCState`), so a copy's transform stays on the copy.
 - **A chart's marks** become Swift Charts' own, erased to `AnyChartContent` (`KChartBuilder`), built for the axes' plottable types (`KPlotType`).
 
+## Foundation and the standard library
+
+Round 2C (PLAN.md §3) made Foundation, Combine and the standard library behave as compiled Swift does, checked by the corpus. What that means for a bridge:
+
+- **Add a corpus entry for it.** `Tests/Corpus/<Family>.corpus` (format in `Registry/KilnCorpus.swift`): one line per call, `Calendar.date(from:) :: Calendar.current.date(from: …)!`, then `Tools/corpus/oracle.py --write <id>` compiles it with swiftc and writes the value compiled Swift prints after `=>`. `CorpusTests` then holds Kiln to it, and the manifest and `COVERAGE.md` count it. Mark one that needs UIKit `[ios]` (Shelf's `KilnCorpusTests` runs it on the simulator, and you write its value by hand), and one Kiln can't do yet `[gap]` with a won't-do entry or a PLAN.md note.
+- **Real signatures, not `nil`.** A loose bridge (`t.method("date") { c in … }`) takes any labels, so the checker can't report a form it doesn't have and the manifest can't list its forms (`anyLabels`). Write every form: `t.method("date", "byAdding:any value:number to:any wrappingComponents:bool?")`. Read arguments with `c["label"]` (it follows the overload's binding, so a trailing closure is found by its parameter's label), not `c.arg("label")` (the label as written).
+- **`first: true`** puts a precise form ahead of an older loose one (`t.method("firstIndex", "where:closure", first: true)`): overloads are tried in order, and a loose one takes everything.
+- **An unknown static member is an error.** `Type.name` that the type's bridge doesn't have stops the code with its line (`requireSymbolic`), as `Kiln.check` reports it. A type whose bridge lists no static members stays symbolic (`Edge.Set.all` is passed on by name), and so does a type only signatures name. So a type with some statics must list every static an app may write.
+- **Value types.** Box them (`KBoxed`) with a `Hashable` value; conform it to `KDescribable` to print as Swift prints it, to `KNumericBox` (`intValue`, `doubleValue`) to read as a number wherever one is read (`UInt8`, `Int32`), and to `KNativeSequence` to loop with `for in`, `Array(x)` and the `Sequence` methods (`Data`'s bytes, a digest, SIMD's scalars). `t.operator("+")` gives it arithmetic (asked before the engine's own for a boxed operand), `"prefix-"` and `"prefix~"` its prefix operators.
+- **Literals.** `r.addLiteralCoercion("UInt8") { v, type in … }` makes a literal or a plain number the type's value where the type is expected: `let b: UInt8 = 200`, a `[UInt8]` array, `let v: SIMD2<Double> = [1, 2]`, `let d: Duration = .seconds(2)`. `type` is the full written type, with its generic arguments.
+- **Generic arguments.** `SIMD2<Double>(1, 2)` and `PassthroughSubject<Int, Never>()`: the initializer reads `c.interp.constructingGenerics` (`[KETypeRef]`).
+- **Format styles** are kept as the calls made on them (`KFormat.steps`) and replayed onto Foundation's own style for the value being formatted (`Bridges/Foundation/FormatStyles.swift`): to support a style call, add its case to the replay; one it doesn't know is an error (`KFormatStyles.Unsupported`), never dropped. `KFormatStyles.symbol(_:)` reads a symbol whether it arrived as `.implicit` or as a context-free style (`.currency`, `.percent`).
+- **Standard-library types written in Swift.** `Result` and `AnyIterator` are Swift source (`KSwiftPrelude`, `Bridges/Language/Stdlib.swift`), added to an app that names them and doesn't declare its own: the engine runs them as the app's types, and `Kiln.check` reads (but doesn't check) them. Prefer this for a type whose behavior is plain Swift.
+- **Combine** publishers are `KPub` (`Bridges/Concurrency/Combine.swift`): a bridge that publishes makes a `KSubject` or `KMadePub { subscriber, token in … }`; `KCombineBridge(pub:)` is the real Combine publisher SwiftUI's `.onReceive` takes.
+
 ## What the checker and the prompt read
 
 `Kiln.check` (PLAN.md §1.8) and Shelf's prompt (§7) are built from the registry, so a bridge reaches both the day it's registered. What each needs from it:
@@ -589,11 +604,14 @@ Language features that don't work yet are `KLanguageGaps` probes (`Registry/KLan
 ## After adding a bridge
 
 1. **Tests.** Add a test for each bridge: the arguments decode, the overloads resolve, the view builds, and a wrong call's error reads correctly. `RegistryTests` has the patterns.
-2. **The manifest.** Run `Tools/manifest.sh`, which rewrites `kiln-manifest.json` (`testManifestIsCurrent` fails until you do), with the language gaps and the won't-do list. Then run `Tools/coverage.sh`, which rewrites `COVERAGE.md`. Shelf bundles the manifest: its prompt changes with it, and `PromptsTests` checks the result.
-3. **The differential.** `Tools/diff.sh` should still be identical on every input, or the difference goes in `Tools/diff-expected.txt` with a reason.
-4. **The bench.** `Benchmarks/run.sh` must show no input more than 10% slower.
+2. **The corpus**, for Foundation and the standard library: an entry per call, its value from `Tools/corpus/oracle.py --write` (see "Foundation and the standard library" above).
+3. **The manifest.** Run `Tools/manifest.sh`, which rewrites `kiln-manifest.json` (`testManifestIsCurrent` fails until you do), with the language gaps and the won't-do list. Then run `Tools/coverage.sh`, which rewrites `COVERAGE.md`. Shelf bundles the manifest: its prompt changes with it, and `PromptsTests` checks the result.
+4. **The differential.** `Tools/diff.sh` should still be identical on every input, or the difference goes in `Tools/diff-expected.txt` with a reason.
+5. **The bench.** `Benchmarks/run.sh` must show no input more than 10% slower.
 
 ## Gotchas
+
+- **Nested types' extensions.** `extension Notification.Name { static let … }` is found by the full name and the last part (`builtinExtensions`), so `.planChanged` resolves where `Notification.Name` is expected: declare the kind as `Notification.Name`, not `any`.
 
 - **Helper functions need `@MainActor`.** A local function inside a `register` closure isn't main-actor isolated in Swift 5 mode, so write `@MainActor func f(_ c: KCall)`, or a `static func` on the family class.
 - **View-builder closures can't hold `for`, `guard` or `continue`.** Move that work into a `static func`.

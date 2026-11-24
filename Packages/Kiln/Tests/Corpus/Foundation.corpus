@@ -1,0 +1,561 @@
+# Foundation: everyday calls, each with the value compiled Swift prints.
+# Format: Sources/Kiln/Registry/KilnCorpus.swift. Values: Tools/corpus/oracle.py --write.
+# `ref` is 14 March 2026, 3:09:26 PM in New York (the corpus's time zone).
+
+prelude ::
+    let ref = Calendar.current.date(from: DateComponents(year: 2026, month: 3, day: 14, hour: 15, minute: 9, second: 26))!
+
+## System
+
+Bundle.main.bundleIdentifier [ios] :: Bundle.main.bundleIdentifier != nil => true
+Bundle.main.infoDictionary :: Bundle.main.infoDictionary != nil => true
+Bundle.main.object(forInfoDictionaryKey:) :: (Bundle.main.object(forInfoDictionaryKey: "NoSuchKey") as? String) ?? "none" => none
+ProcessInfo.processInfo.systemUptime :: ProcessInfo.processInfo.systemUptime > 0 => true
+ProcessInfo.processInfo.processorCount :: ProcessInfo.processInfo.processorCount > 0 => true
+ProcessInfo.processInfo.physicalMemory :: ProcessInfo.processInfo.physicalMemory > 0 => true
+ProcessInfo.processInfo.isLowPowerModeEnabled :: ProcessInfo.processInfo.isLowPowerModeEnabled || true => true
+ProcessInfo.processInfo.environment :: ProcessInfo.processInfo.environment["KILN_NO_SUCH_VARIABLE"] ?? "none" => none
+ProcessInfo.processInfo.thermalState :: ProcessInfo.processInfo.thermalState != .critical || true => true
+ProcessInfo.processInfo.globallyUniqueString :: ProcessInfo.processInfo.globallyUniqueString.isEmpty => false
+UIDevice.current.systemName [ios] :: UIDevice.current.systemName => iOS
+UIDevice.current.userInterfaceIdiom [ios] :: UIDevice.current.userInterfaceIdiom == .phone => true
+UIDevice.current.model [ios] :: UIDevice.current.model.isEmpty => false
+UIDevice.current.batteryLevel [ios] :: UIDevice.current.batteryLevel <= 1 => true
+UIFont.preferredFont(forTextStyle:) [ios] :: UIFont.preferredFont(forTextStyle: .body).pointSize > 0 => true
+UIFont.systemFont(ofSize:) [ios] :: UIFont.systemFont(ofSize: 20).pointSize => 20.0
+UIFont.systemFont(ofSize:weight:) [ios] :: UIFont.systemFont(ofSize: 15, weight: .bold).pointSize => 15.0
+UIScreen.main.scale [ios] :: UIScreen.main.scale >= 1 => true
+UIApplication.shared.open [ios] :: { UIApplication.shared.open(URL(string: "https://apple.com")!); return "ok" }() => ok
+NotificationCenter.post(name:object:) :: { NotificationCenter.default.post(name: .init("x"), object: nil); return "ok" }() => ok
+NotificationCenter.addObserver(forName:) ::
+    var got = ""
+    let token = NotificationCenter.default.addObserver(forName: Notification.Name("ping"), object: nil, queue: nil) { note in
+        got = note.name.rawValue
+    }
+    NotificationCenter.default.post(name: Notification.Name("ping"), object: nil)
+    NotificationCenter.default.removeObserver(token)
+    print(got)
+=> ping
+Locale.current.identifier :: Locale.current.identifier => en_US
+Locale.current.region :: Locale.current.region?.identifier ?? "nil" => US
+Locale.current.currency :: Locale.current.currency?.identifier ?? "nil" => USD
+Locale.current.language.languageCode :: Locale.current.language.languageCode?.identifier ?? "nil" => en
+Locale(identifier:) :: Locale(identifier: "fr_FR").identifier => fr_FR
+Locale.decimalSeparator :: Locale(identifier: "de_DE").decimalSeparator ?? "nil" => ,
+Locale.localizedString(forRegionCode:) :: Locale(identifier: "en_US").localizedString(forRegionCode: "JP") ?? "nil" => Japan
+Locale.preferredLanguages :: Locale.preferredLanguages.isEmpty => false
+TimeZone.current.identifier :: TimeZone.current.identifier => America/New_York
+TimeZone.secondsFromGMT(for:) :: TimeZone.current.secondsFromGMT(for: ref) => -14400
+TimeZone(identifier:) :: TimeZone(identifier: "Asia/Tokyo")!.secondsFromGMT() => 32400
+TimeZone(secondsFromGMT:) :: TimeZone(secondsFromGMT: 3600)!.identifier => GMT+0100
+TimeZone.abbreviation(for:) :: TimeZone(identifier: "America/New_York")!.abbreviation(for: ref) ?? "nil" => EDT
+TimeZone.gmt :: TimeZone.gmt.identifier => GMT
+TimeZone.isDaylightSavingTime(for:) :: TimeZone.current.isDaylightSavingTime(for: ref) => true
+UUID(uuidString:) :: UUID(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F") != nil => true
+UUID().uuidString :: UUID().uuidString.count => 36
+UUID equality :: UUID(uuidString: "E621E1F8-C36C-495A-93FC-0C247A3E6E5F") == UUID(uuidString: "e621e1f8-c36c-495a-93fc-0c247a3e6e5f") => true
+Logger.info :: { Logger().info("hi"); return "ok" }() => ok
+Logger(subsystem:category:) :: { let log = Logger(subsystem: "app", category: "ui"); log.debug("x \(1)"); log.error("bad"); return "ok" }() => ok
+os_log :: { os_log("hello %d", 3); return "ok" }() => ok
+print(separator:terminator:) :: print(1, 2, 3, separator: "-", terminator: "!\n") => 1-2-3!
+debugPrint ::
+    debugPrint("a", 1)
+=> "a" 1
+
+## Dates
+
+Date(timeIntervalSince1970:) :: Date(timeIntervalSince1970: 0) => 1970-01-01 00:00:00 +0000
+Date.description :: ref.description => 2026-03-14 19:09:26 +0000
+Date.timeIntervalSince1970 :: ref.timeIntervalSince1970 => 1773515366.0
+Date.addingTimeInterval :: ref.addingTimeInterval(3600) => 2026-03-14 20:09:26 +0000
+Date + TimeInterval :: ref + 86400 => 2026-03-15 19:09:26 +0000
+Date comparison :: ref < ref.addingTimeInterval(1) => true
+Date.distance(to:) :: ref.distance(to: ref.addingTimeInterval(90)) => 90.0
+Date.timeIntervalSince :: ref.addingTimeInterval(90).timeIntervalSince(ref) => 90.0
+Date.ISO8601Format() :: ref.ISO8601Format() => 2026-03-14T19:09:26Z
+Date.formatted(.iso8601) :: ref.formatted(.iso8601) => 2026-03-14T19:09:26Z
+Date.formatted(date:time:) :: ref.formatted(date: .abbreviated, time: .shortened) => Mar 14, 2026 at 3:09 PM
+Date.formatted(date: .numeric) :: ref.formatted(date: .numeric, time: .omitted) => 3/14/2026
+Date.formatted(.dateTime) :: ref.formatted(.dateTime.weekday(.wide).hour()) => Saturday 3 PM
+Date.formatted(.dateTime.year().month().day()) :: ref.formatted(.dateTime.year().month().day()) => Mar 14, 2026
+Date.formatted(.dateTime.month(.wide)) :: ref.formatted(.dateTime.month(.wide)) => March
+Date.formatted(.dateTime.hour().minute()) :: ref.formatted(.dateTime.hour().minute()) => 3:09 PM
+Date.formatted(.relative) :: ref.formatted(.relative(presentation: .named, unitsStyle: .wide)).isEmpty => false
+Date.FormatStyle(date:time:) :: Date.FormatStyle(date: .long, time: .omitted).format(ref) => March 14, 2026
+Date(_:strategy:) :: try! Date("2026-03-14T19:09:26Z", strategy: .iso8601) == ref => true
+ISO8601DateFormatter.string(from:) :: ISO8601DateFormatter().string(from: ref) => 2026-03-14T19:09:26Z
+ISO8601DateFormatter.date(from:) :: ISO8601DateFormatter().date(from: "2026-03-14T19:09:26Z") == ref => true
+ISO8601DateFormatter.formatOptions ::
+    let f = ISO8601DateFormatter()
+    f.formatOptions = [.withFullDate]
+    print(f.string(from: ref))
+=> 2026-03-14
+ISO8601DateFormatter.timeZone ::
+    let f = ISO8601DateFormatter()
+    f.timeZone = TimeZone(identifier: "America/New_York")
+    print(f.string(from: ref))
+=> 2026-03-14T15:09:26-04:00
+DateFormatter.dateFormat ::
+    let f = DateFormatter()
+    f.dateFormat = "yyyy-MM-dd HH:mm"
+    print(f.string(from: ref))
+=> 2026-03-14 15:09
+DateFormatter.dateStyle ::
+    let f = DateFormatter()
+    f.dateStyle = .medium
+    f.timeStyle = .short
+    print(f.string(from: ref))
+=> Mar 14, 2026 at 3:09 PM
+DateFormatter.date(from:) ::
+    let f = DateFormatter()
+    f.dateFormat = "yyyy-MM-dd"
+    print(f.date(from: "2026-03-14")!)
+=> 2026-03-14 04:00:00 +0000
+DateFormatter.locale ::
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "fr_FR")
+    f.dateFormat = "EEEE d MMMM"
+    print(f.string(from: ref))
+=> samedi 14 mars
+DateFormatter.timeZone ::
+    let f = DateFormatter()
+    f.timeZone = TimeZone(identifier: "UTC")
+    f.dateFormat = "HH:mm"
+    print(f.string(from: ref))
+=> 19:09
+DateFormatter.localizedString(from:dateStyle:timeStyle:) :: DateFormatter.localizedString(from: ref, dateStyle: .short, timeStyle: .none) => 3/14/26
+DateFormatter.setLocalizedDateFormatFromTemplate ::
+    let f = DateFormatter()
+    f.setLocalizedDateFormatFromTemplate("MMMd")
+    print(f.string(from: ref))
+=> Mar 14
+DateFormatter.monthSymbols :: DateFormatter().monthSymbols.count => 12
+RelativeDateTimeFormatter.localizedString(for:relativeTo:) :: RelativeDateTimeFormatter().localizedString(for: ref, relativeTo: ref.addingTimeInterval(7200)) => 2 hours ago
+RelativeDateTimeFormatter.unitsStyle ::
+    let f = RelativeDateTimeFormatter()
+    f.unitsStyle = .full
+    print(f.localizedString(fromTimeInterval: -86400 * 3))
+=> 3 days ago
+DateComponentsFormatter.string(from:) :: DateComponentsFormatter().string(from: 125) ?? "nil" => 2:05
+DateComponentsFormatter.unitsStyle ::
+    let f = DateComponentsFormatter()
+    f.unitsStyle = .abbreviated
+    f.allowedUnits = [.hour, .minute]
+    print(f.string(from: 3725) ?? "nil")
+=> 1h 2m
+DateComponentsFormatter.positional ::
+    let f = DateComponentsFormatter()
+    f.unitsStyle = .positional
+    f.allowedUnits = [.minute, .second]
+    f.zeroFormattingBehavior = .pad
+    print(f.string(from: 65) ?? "nil")
+=> 01:05
+DateComponentsFormatter.string(from:to:) ::
+    let f = DateComponentsFormatter()
+    f.unitsStyle = .full
+    f.allowedUnits = [.day]
+    print(f.string(from: ref, to: ref.addingTimeInterval(86400 * 2)) ?? "nil")
+=> 2 days
+DateInterval(start:duration:) :: DateInterval(start: ref, duration: 60).duration => 60.0
+DateInterval(start:end:) :: DateInterval(start: ref, end: ref.addingTimeInterval(120)).end == ref.addingTimeInterval(120) => true
+DateInterval.contains :: DateInterval(start: ref, duration: 60).contains(ref.addingTimeInterval(30)) => true
+DateInterval.intersects :: DateInterval(start: ref, duration: 60).intersects(DateInterval(start: ref.addingTimeInterval(50), duration: 60)) => true
+DateInterval.intersection(with:) :: DateInterval(start: ref, duration: 60).intersection(with: DateInterval(start: ref.addingTimeInterval(50), duration: 60))!.duration => 10.0
+DateInterval.formatted :: (ref..<ref.addingTimeInterval(3600)).formatted(.interval.hour().minute()) => 3:09 – 4:09 PM
+
+## Calendar
+
+Calendar.current.timeZone :: Calendar.current.timeZone.identifier => America/New_York
+Calendar.current.identifier :: Calendar.current.identifier == .gregorian => true
+Calendar(identifier:) :: Calendar(identifier: .gregorian).firstWeekday => 1
+Calendar.firstWeekday :: Calendar.current.firstWeekday => 1
+Calendar.minimumDaysInFirstWeek :: Calendar(identifier: .iso8601).minimumDaysInFirstWeek => 4
+Calendar.component(_:from:) :: Calendar.current.component(.weekday, from: ref) => 7
+Calendar.component(.hour) :: Calendar.current.component(.hour, from: ref) => 15
+Calendar.component(.weekOfYear) :: Calendar.current.component(.weekOfYear, from: ref) => 11
+Calendar.component(.dayOfYear) :: Calendar.current.ordinality(of: .day, in: .year, for: ref) ?? -1 => 73
+Calendar.component(.nanosecond) :: Calendar.current.component(.nanosecond, from: ref) => 0
+Calendar.dateComponents(_:from:) :: "[\(Calendar.current.dateComponents([.year, .month], from: ref))]" => [year: 2026 month: 3 isLeapMonth: false ]
+Calendar.dateComponents(_:from:).month :: Calendar.current.dateComponents([.year, .month], from: ref).month ?? -1 => 3
+Calendar.dateComponents(_:from:).day is nil :: Calendar.current.dateComponents([.year, .month], from: ref).day == nil => true
+Calendar.dateComponents(_:from:to:) :: "[\(Calendar.current.dateComponents([.day, .hour], from: ref, to: ref.addingTimeInterval(86400 + 7200)))]" => [day: 1 hour: 2 ]
+Calendar.dateComponents(_:from:to:).day :: Calendar.current.dateComponents([.day], from: ref, to: ref.addingTimeInterval(86400 * 10)).day! => 10
+Calendar.dateComponents(in:from:) :: Calendar.current.dateComponents(in: TimeZone(identifier: "UTC")!, from: ref).hour! => 19
+Calendar.date(from:) :: Calendar.current.date(from: DateComponents(year: 2026, month: 1, day: 2))! => 2026-01-02 05:00:00 +0000
+Calendar.date(byAdding:value:to:) :: Calendar.current.date(byAdding: .day, value: 1, to: ref)! => 2026-03-15 19:09:26 +0000
+Calendar.date(byAdding: .month) :: Calendar.current.date(byAdding: .month, value: -2, to: ref)! => 2026-01-14 20:09:26 +0000
+Calendar.date(byAdding: DateComponents, to:) :: Calendar.current.date(byAdding: DateComponents(day: 1, hour: 2), to: ref)! => 2026-03-15 21:09:26 +0000
+Calendar.date(bySettingHour:minute:second:of:) :: Calendar.current.date(bySettingHour: 9, minute: 0, second: 0, of: ref)! => 2026-03-14 13:00:00 +0000
+Calendar.date(bySetting:value:of:) :: Calendar.current.date(bySetting: .hour, value: 20, of: ref)! => 2026-03-15 00:00:00 +0000
+Calendar.startOfDay(for:) :: Calendar.current.startOfDay(for: ref) => 2026-03-14 04:00:00 +0000
+Calendar.isDate(_:inSameDayAs:) :: Calendar.current.isDate(ref, inSameDayAs: ref.addingTimeInterval(3600)) => true
+Calendar.isDate(_:equalTo:toGranularity:) :: Calendar.current.isDate(ref, equalTo: ref.addingTimeInterval(86400 * 3), toGranularity: .weekOfYear) => false
+Calendar.isDateInWeekend :: Calendar.current.isDateInWeekend(ref) => true
+Calendar.isDateInToday :: Calendar.current.isDateInToday(Date()) => true
+Calendar.isDateInYesterday :: Calendar.current.isDateInYesterday(Date().addingTimeInterval(-86400)) => true
+Calendar.range(of:in:for:) :: Calendar.current.range(of: .day, in: .month, for: ref)! => 1..<32
+Calendar.range(of:in:for:).count :: Calendar.current.range(of: .day, in: .month, for: ref)!.count => 31
+Calendar.range(of: .weekday) :: Calendar.current.range(of: .weekday, in: .weekOfYear, for: ref)! => 1..<8
+Calendar.ordinality(of:in:for:) :: Calendar.current.ordinality(of: .weekday, in: .weekOfMonth, for: ref)! => 7
+Calendar.dateInterval(of:for:) :: Calendar.current.dateInterval(of: .month, for: ref)!.start => 2026-03-01 05:00:00 +0000
+Calendar.dateInterval(of: .weekOfYear) :: Calendar.current.dateInterval(of: .weekOfYear, for: ref)!.duration => 601200.0
+Calendar.nextDate(after:matching:matchingPolicy:) :: Calendar.current.nextDate(after: ref, matching: DateComponents(hour: 9), matchingPolicy: .nextTime)! => 2026-03-15 13:00:00 +0000
+Calendar.nextDate weekday :: Calendar.current.nextDate(after: ref, matching: DateComponents(weekday: 2), matchingPolicy: .nextTime)! => 2026-03-16 04:00:00 +0000
+Calendar.enumerateDates(startingAfter:matching:matchingPolicy:) ::
+    var days: [Int] = []
+    Calendar.current.enumerateDates(startingAfter: ref, matching: DateComponents(hour: 0), matchingPolicy: .nextTime) { date, _, stop in
+        if let date { days.append(Calendar.current.component(.day, from: date)) }
+        if days.count == 3 { stop = true }
+    }
+    print(days)
+=> [15, 16, 17]
+Calendar.shortWeekdaySymbols :: Calendar.current.shortWeekdaySymbols.joined() => SunMonTueWedThuFriSat
+Calendar.weekdaySymbols :: Calendar.current.weekdaySymbols[0] => Sunday
+Calendar.veryShortWeekdaySymbols :: Calendar.current.veryShortWeekdaySymbols => ["S", "M", "T", "W", "T", "F", "S"]
+Calendar.monthSymbols :: Calendar.current.monthSymbols[2] => March
+Calendar.shortMonthSymbols :: Calendar.current.shortMonthSymbols.count => 12
+Calendar.standaloneMonthSymbols :: Calendar.current.standaloneMonthSymbols.last! => December
+Calendar.amSymbol :: Calendar.current.amSymbol + Calendar.current.pmSymbol => AMPM
+Calendar.timeZone set ::
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "UTC")!
+    print(cal.component(.hour, from: ref))
+=> 19
+Calendar.locale ::
+    var cal = Calendar(identifier: .gregorian)
+    cal.locale = Locale(identifier: "fr_FR")
+    print(cal.monthSymbols[0])
+=> janvier
+Calendar.firstWeekday set ::
+    var cal = Calendar(identifier: .gregorian)
+    cal.firstWeekday = 2
+    print(cal.dateInterval(of: .weekOfYear, for: ref)!.start)
+=> 2026-03-09 04:00:00 +0000
+Calendar.compare(_:to:toGranularity:) :: Calendar.current.compare(ref, to: ref.addingTimeInterval(60), toGranularity: .hour) == .orderedSame => true
+Calendar.Component.allCases-ish :: Calendar.current.dateComponents([.era, .year, .quarter, .month, .day, .weekday, .weekdayOrdinal, .weekOfMonth, .weekOfYear, .yearForWeekOfYear, .hour, .minute, .second], from: ref).weekdayOrdinal! => 2
+Calendar days between :: Calendar.current.dateComponents([.day], from: Calendar.current.startOfDay(for: ref), to: Calendar.current.date(from: DateComponents(year: 2026, month: 12, day: 25))!).day! => 286
+Calendar.current.date(byAdding: .weekOfYear) :: Calendar.current.date(byAdding: .weekOfYear, value: 1, to: ref)! => 2026-03-21 19:09:26 +0000
+
+## DateComponents
+
+DateComponents(year:month:day:) :: "[\(DateComponents(year: 2026, month: 1, day: 2))]" => [year: 2026 month: 1 day: 2 ]
+DateComponents properties :: DateComponents(year: 2026, month: 1, day: 2).day! => 2
+DateComponents settable ::
+    var c = DateComponents()
+    c.hour = 7
+    c.minute = 30
+    print(c.hour!, c.minute!, c.second == nil)
+=> 7 30 true
+DateComponents equality :: DateComponents(day: 1) == DateComponents(day: 1) => true
+DateComponents.date :: { var c = DateComponents(year: 2026, month: 6, day: 1); c.calendar = Calendar.current; return c.date! }() => 2026-06-01 04:00:00 +0000
+DateComponents.isValidDate :: DateComponents(calendar: Calendar.current, year: 2026, month: 2, day: 30).isValidDate => false
+DateComponents.value(for:) :: DateComponents(month: 4).value(for: .month)! => 4
+DateComponents.setValue ::
+    var c = DateComponents()
+    c.setValue(5, for: .day)
+    print(c.day!)
+=> 5
+DateComponents.weekday :: DateComponents(weekday: 3).weekday! => 3
+
+## Formatting
+
+Int.formatted() :: 1234567.formatted() => 1,234,567
+Double.formatted() :: 1234.5678.formatted() => 1,234.5678
+.number.precision(.fractionLength) :: 3.14159.formatted(.number.precision(.fractionLength(2))) => 3.14
+.number.precision(.significantDigits) :: 3.14159.formatted(.number.precision(.significantDigits(3))) => 3.14
+.number.grouping(.never) :: 1234567.formatted(.number.grouping(.never)) => 1234567
+.number.notation(.compactName) :: 1234567.formatted(.number.notation(.compactName)) => 1.2M
+.number.notation(.scientific) :: 1234.0.formatted(.number.notation(.scientific)) => 1.234E3
+.number.rounded :: 3.7.formatted(.number.rounded(rule: .down, increment: 1)) => 3
+.number.sign :: 5.formatted(.number.sign(strategy: .always())) => +5
+.percent :: 0.25.formatted(.percent) => 25%
+.percent.precision :: 0.12345.formatted(.percent.precision(.fractionLength(1))) => 12.3%
+.currency(code:) :: 9.5.formatted(.currency(code: "USD")) => $9.50
+.currency(code: EUR) :: 1234.5.formatted(.currency(code: "EUR")) => €1,234.50
+.currency.precision :: 12.0.formatted(.currency(code: "USD").precision(.fractionLength(0))) => $12
+.number.locale :: 1234.5.formatted(.number.locale(Locale(identifier: "de_DE"))) => 1.234,5
+IntegerFormatStyle.number :: 42.formatted(.number) => 42
+Int(_:format:) :: (try? Int("1,234", format: .number)) ?? -1 => 1234
+Double(_:format:) :: (try? Double("12.5%", format: .percent)) ?? -1 => 0.125
+.byteCount(style: .file) :: Int64(1_500_000).formatted(.byteCount(style: .file)) => 1.5 MB
+.byteCount(style: .memory) :: Int64(1_500_000).formatted(.byteCount(style: .memory)) => 1.4 MB
+.byteCount on Int :: 2048.formatted(.byteCount(style: .binary)) => 2 kB
+ByteCountFormatter.string(fromByteCount:countStyle:) :: ByteCountFormatter.string(fromByteCount: 1_500_000, countStyle: .file) => 1.5 MB
+ByteCountFormatter instance ::
+    let f = ByteCountFormatter()
+    f.allowedUnits = [.useKB]
+    f.countStyle = .memory
+    print(f.string(fromByteCount: 4096))
+=> 4 KB
+.list(type: .and) :: ["a", "b", "c"].formatted(.list(type: .and)) => a, b, and c
+.list(type: .or) :: ["a", "b"].formatted(.list(type: .or)) => a or b
+[String].formatted() :: ["red", "green"].formatted() => red and green
+.list(memberStyle:type:) :: [1, 2, 3].formatted(.list(memberStyle: .number, type: .and)) => 1, 2, and 3
+ListFormatter.localizedString(byJoining:) :: ListFormatter.localizedString(byJoining: ["x", "y", "z"]) => x, y, and z
+Duration.seconds.formatted() :: Duration.seconds(90).formatted() => 0:01:30
+Duration.formatted(.units) :: Duration.seconds(3725).formatted(.units(allowed: [.hours, .minutes])) => 1 hr, 2 min
+Duration.formatted(.time) :: Duration.seconds(3725).formatted(.time(pattern: .hourMinuteSecond)) => 1:02:05
+Duration.components :: Duration.milliseconds(1500).components.seconds => 1
+Duration arithmetic :: Duration.seconds(2) + .milliseconds(500) => 2.5 seconds
+Duration comparison :: Duration.seconds(1) < .milliseconds(1500) => true
+Duration description :: Duration.seconds(3) => 3.0 seconds
+Duration / Int :: Duration.seconds(3) / 2 => 1.5 seconds
+NumberFormatter.numberStyle ::
+    let f = NumberFormatter()
+    f.numberStyle = .decimal
+    print(f.string(from: 1234567)!)
+=> 1,234,567
+NumberFormatter.currency ::
+    let f = NumberFormatter()
+    f.numberStyle = .currency
+    f.currencyCode = "JPY"
+    print(f.string(from: 1500)!)
+=> ¥1,500
+NumberFormatter.fractionDigits ::
+    let f = NumberFormatter()
+    f.minimumFractionDigits = 2
+    f.maximumFractionDigits = 2
+    print(f.string(from: NSNumber(value: 3.14159))!)
+=> 3.14
+NumberFormatter.spellOut ::
+    let f = NumberFormatter()
+    f.numberStyle = .spellOut
+    print(f.string(from: 42)!)
+=> forty-two
+NumberFormatter.ordinal ::
+    let f = NumberFormatter()
+    f.numberStyle = .ordinal
+    print(f.string(from: 3)!)
+=> 3rd
+NumberFormatter.number(from:) ::
+    let f = NumberFormatter()
+    f.numberStyle = .decimal
+    print(f.number(from: "1,234.5")!.doubleValue)
+=> 1234.5
+NumberFormatter.localizedString(from:number:) :: NumberFormatter.localizedString(from: 0.5, number: .percent) => 50%
+String(format:) :: String(format: "%.2f %d", 3.14159, 7) => 3.14 7
+String(format: %05d) :: String(format: "%05d|%x|%@", 42, 255, "s") => 00042|ff|s
+String(format: width) :: String(format: "%6.2f|%-4d|", 3.14159, 7) =>   3.14|7   |
+String(format: %e) :: String(format: "%.1e", 12345.0) => 1.2e+04
+String(format: %%) :: String(format: "%d%%", 50) => 50%
+String(format:locale:) :: String(format: "%.1f", locale: Locale(identifier: "de_DE"), 2.5) => 2,5
+PersonNameComponents.formatted ::
+    var p = PersonNameComponents()
+    p.givenName = "Ada"
+    p.familyName = "Lovelace"
+    print(p.formatted())
+=> Ada Lovelace
+PersonNameComponents.formatted(.name(style: .abbreviated)) ::
+    var p = PersonNameComponents()
+    p.givenName = "Ada"
+    p.familyName = "Lovelace"
+    print(p.formatted(.name(style: .abbreviated)))
+=> AL
+URL.formatted :: URL(string: "https://www.apple.com/iphone?x=1")!.formatted(.url.scheme(.never).query(.never)) => www.apple.com/iphone
+
+## Strings
+
+String.components(separatedBy: String) :: "a,b,,c".components(separatedBy: ",") => ["a", "b", "", "c"]
+String.components(separatedBy: CharacterSet) :: "a,b;c".components(separatedBy: CharacterSet(charactersIn: ",;")).joined() => abc
+String.trimmingCharacters(in:) :: "  hi \n".trimmingCharacters(in: .whitespacesAndNewlines) => hi
+String.trimmingCharacters(in: .punctuationCharacters) :: "!!hi?".trimmingCharacters(in: .punctuationCharacters) => hi
+String.trimmingCharacters(in: CharacterSet(charactersIn:)) :: "xxhixx".trimmingCharacters(in: CharacterSet(charactersIn: "x")) => hi
+CharacterSet.decimalDigits.inverted :: "a1b2c3".components(separatedBy: CharacterSet.decimalDigits.inverted).joined() => 123
+CharacterSet.contains :: CharacterSet.letters.contains("é".unicodeScalars.first!) => true
+CharacterSet.union :: "a-b_c".components(separatedBy: CharacterSet(charactersIn: "-").union(CharacterSet(charactersIn: "_"))) => ["a", "b", "c"]
+CharacterSet.alphanumerics :: "ab-12".unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) }.count => 4
+String.rangeOfCharacter(from:) :: "abc1".rangeOfCharacter(from: .decimalDigits) != nil => true
+String.range(of:) :: "hello world".range(of: "world").map { "hello world"[$0] } ?? "nil" => world
+String.range(of:options: .caseInsensitive) :: "Hello".range(of: "hELLO", options: .caseInsensitive) != nil => true
+String.range(of:options: .backwards) :: { let s = "a.b.c"; let r = s.range(of: ".", options: .backwards)!; return String(s[r.upperBound...]) }() => c
+String.range(of:options: .regularExpression) :: { let s = "id: 4821"; let r = s.range(of: "[0-9]+", options: .regularExpression)!; return String(s[r]) }() => 4821
+String.replacingOccurrences(of:with:) :: "a-b-c".replacingOccurrences(of: "-", with: "+") => a+b+c
+String.replacingOccurrences options :: "Cat cat".replacingOccurrences(of: "cat", with: "dog", options: .caseInsensitive) => dog dog
+String.replacingOccurrences regex :: "a1b22c333".replacingOccurrences(of: "[0-9]+", with: "#", options: .regularExpression) => a#b#c#
+String.contains :: "Swift".contains("if") => true
+String.localizedCaseInsensitiveContains :: "Straße".localizedCaseInsensitiveContains("STRASSE") => true
+String.localizedStandardContains :: "Café".localizedStandardContains("cafe") => true
+String.localizedCompare :: "a".localizedCompare("B") == .orderedAscending => true
+String.localizedCaseInsensitiveCompare :: "a".localizedCaseInsensitiveCompare("B") == .orderedAscending => true
+String.localizedStandardCompare :: ["file10", "file2", "File1"].sorted { $0.localizedStandardCompare($1) == .orderedAscending } => ["File1", "file2", "file10"]
+String.compare :: "b".compare("a") => NSComparisonResult
+String.compare(_:options:) :: "ABC".compare("abc", options: .caseInsensitive) == .orderedSame => true
+String.compare numeric :: "item9".compare("item10", options: .numeric) == .orderedAscending => true
+String.caseInsensitiveCompare :: "Apple".caseInsensitiveCompare("apple") == .orderedSame => true
+String.capitalized :: "hello wide world".capitalized => Hello Wide World
+String.localizedCapitalized :: "hello world".localizedCapitalized => Hello World
+String.uppercased(with:) :: "istanbul".uppercased(with: Locale(identifier: "tr_TR")) => İSTANBUL
+String.padding(toLength:withPad:startingAt:) :: "ab".padding(toLength: 5, withPad: ".", startingAt: 0) => ab...
+String.folding(options:locale:) :: "Crème Brûlée".folding(options: .diacriticInsensitive, locale: .current) => Creme Brulee
+String.applyingTransform :: "Привет".applyingTransform(.toLatin, reverse: false) ?? "nil" => Privet
+String.addingPercentEncoding :: "a b&c".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "nil" => a%20b&c
+String.removingPercentEncoding :: "a%20b".removingPercentEncoding ?? "nil" => a b
+String.data(using:) :: "héllo".data(using: .utf8)!.count => 6
+String(data:encoding:) :: String(data: Data("hi".utf8), encoding: .utf8) ?? "nil" => hi
+String(decoding:as:) :: String(decoding: Data("hi".utf8), as: UTF8.self) => hi
+String.lengthOfBytes(using:) :: "héllo".lengthOfBytes(using: .utf8) => 6
+String.enumerateLines ::
+    var n = 0
+    "a\nb\nc".enumerateLines { _, _ in n += 1 }
+    print(n)
+=> 3
+String.components(separatedBy: .newlines) :: "a\nb\r\nc".components(separatedBy: .newlines).count => 4
+String.hasPrefix/hasSuffix :: "photo.png".hasSuffix(".png") && "photo.png".hasPrefix("ph") => true
+String.appendingFormat :: "x".appendingFormat("%d", 5) => x5
+String.appending :: "a".appending("b") => ab
+NSString.pathExtension :: ("photo.final.png" as NSString).pathExtension => png
+NSString.lastPathComponent :: ("/a/b/c.txt" as NSString).lastPathComponent => c.txt
+NSString.deletingPathExtension :: ("c.txt" as NSString).deletingPathExtension => c
+String.abbreviatingWithTildeInPath-free URL path :: URL(fileURLWithPath: "/tmp/x/y.txt").deletingLastPathComponent().path => /tmp/x
+AttributedString(markdown:) :: String(try! AttributedString(markdown: "**bold** text").characters) => bold text
+AttributedString characters :: AttributedString("hello").characters.count => 5
+NSAttributedString(string:) :: NSAttributedString(string: "x").string => x
+NSAttributedString.length :: NSAttributedString(string: "héllo").length => 5
+NSMutableAttributedString.append ::
+    let s = NSMutableAttributedString(string: "a")
+    s.append(NSAttributedString(string: "b"))
+    print(s.string, s.length)
+=> ab 2
+NSAttributedString(attributes:) :: NSAttributedString(string: "big", attributes: [.kern: 2]).string => big
+AttributedString(NSAttributedString) :: String(AttributedString(NSAttributedString(string: "conv")).characters) => conv
+
+## Data and encoding
+
+Data(String.utf8) :: Data("hi".utf8).count => 2
+Data([UInt8]) :: Data([0x48, 0x69]) => 2 bytes
+Data.base64EncodedString() :: Data("hi".utf8).base64EncodedString() => aGk=
+Data(base64Encoded:) :: String(data: Data(base64Encoded: "aGk=")!, encoding: .utf8)! => hi
+Data(base64Encoded:) invalid :: Data(base64Encoded: "!!") == nil => true
+Data.map hex :: Data([0x0f, 0xa0]).map { String(format: "%02x", $0) }.joined() => 0fa0
+Data subscript :: Data([1, 2, 3])[1] => 2
+Data.append :: { var d = Data([1]); d.append(contentsOf: [2, 3]); d.append(4); return d.count }() => 4
+Data.first :: Data([9, 8]).first! => 9
+Data equality :: Data([1, 2]) == Data([1, 2]) => true
+Data.prefix :: Data([1, 2, 3]).prefix(2).count => 2
+Data.reduce :: Data([1, 2, 3]).reduce(0) { $0 + Int($1) } => 6
+Array(Data) :: Array(Data("AB".utf8)) => [65, 66]
+SHA256.hash(data:) :: SHA256.hash(data: Data("a".utf8)).description => SHA256 digest: ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb
+SHA256 hex :: SHA256.hash(data: Data("abc".utf8)).map { String(format: "%02x", $0) }.joined() => ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+SHA256 compactMap :: SHA256.hash(data: Data("abc".utf8)).compactMap { String(format: "%02x", $0) }.joined().prefix(8) => ba7816bf
+Insecure.MD5 :: Insecure.MD5.hash(data: Data("abc".utf8)).map { String(format: "%02x", $0) }.joined() => 900150983cd24fb0d6963f7d28e17f72
+SHA512 :: Array(SHA512.hash(data: Data("abc".utf8))).count => 64
+JSONSerialization.jsonObject(with:) [gap] :: String(describing: try! JSONSerialization.jsonObject(with: Data("[1]".utf8)))
+=> (
+=>     1
+=> )
+JSONSerialization dictionary :: (try! JSONSerialization.jsonObject(with: Data(#"{"a": 2}"#.utf8)) as! [String: Any])["a"] as! Int => 2
+JSONSerialization.data(withJSONObject:) :: String(data: try! JSONSerialization.data(withJSONObject: ["a": 1]), encoding: .utf8)! => {"a":1}
+JSONSerialization.data sortedKeys :: String(data: try! JSONSerialization.data(withJSONObject: ["b": 1, "a": [true, "x"]], options: [.sortedKeys]), encoding: .utf8)! => {"a":[true,"x"],"b":1}
+JSONSerialization.isValidJSONObject :: JSONSerialization.isValidJSONObject(["a": [1, 2]]) => true
+JSONEncoder.encode :: String(data: try! JSONEncoder().encode([1, 2]), encoding: .utf8)! => [1,2]
+JSONEncoder.outputFormatting sortedKeys ::
+    struct P: Codable { var b = 1; var a = "x" }
+    let e = JSONEncoder()
+    e.outputFormatting = [.sortedKeys]
+    print(String(data: try! e.encode(P()), encoding: .utf8)!)
+=> {"a":"x","b":1}
+JSONEncoder.keyEncodingStrategy ::
+    struct P: Codable { var firstName = "A" }
+    let e = JSONEncoder()
+    e.keyEncodingStrategy = .convertToSnakeCase
+    print(String(data: try! e.encode(P()), encoding: .utf8)!)
+=> {"first_name":"A"}
+JSONDecoder.keyDecodingStrategy ::
+    struct P: Codable { var firstName: String }
+    let d = JSONDecoder()
+    d.keyDecodingStrategy = .convertFromSnakeCase
+    print(try! d.decode(P.self, from: Data(#"{"first_name":"Bo"}"#.utf8)).firstName)
+=> Bo
+JSONDecoder.dateDecodingStrategy ::
+    struct E: Codable { var at: Date }
+    let d = JSONDecoder()
+    d.dateDecodingStrategy = .iso8601
+    print(try! d.decode(E.self, from: Data(#"{"at":"2026-03-14T19:09:26Z"}"#.utf8)).at == ref)
+=> true
+JSONEncoder.dateEncodingStrategy ::
+    struct E: Codable { var at: Date }
+    let e = JSONEncoder()
+    e.dateEncodingStrategy = .iso8601
+    print(String(data: try! e.encode(E(at: ref)), encoding: .utf8)!)
+=> {"at":"2026-03-14T19:09:26Z"}
+JSONDecoder error :: (try? JSONDecoder().decode([Int].self, from: Data("{".utf8))) == nil => true
+PropertyListEncoder.encode :: try! PropertyListEncoder().encode([1]).count > 0 => true
+PropertyListDecoder round trip ::
+    struct S: Codable { var n: Int; var s: String }
+    let data = try! PropertyListEncoder().encode(S(n: 3, s: "x"))
+    let back = try! PropertyListDecoder().decode(S.self, from: data)
+    print(back.n, back.s)
+=> 3 x
+PropertyListEncoder.outputFormat xml ::
+    let e = PropertyListEncoder()
+    e.outputFormat = .xml
+    print(String(data: try! e.encode(["k": 1]), encoding: .utf8)!.contains("<key>k</key>"))
+=> true
+PropertyListSerialization ::
+    let data = try! PropertyListSerialization.data(fromPropertyList: ["a": 1], format: .binary, options: 0)
+    let back = try! PropertyListSerialization.propertyList(from: data, format: nil) as! [String: Int]
+    print(back["a"]!)
+
+=> 1
+## Decimal
+
+Decimal(string:) + Decimal :: (Decimal(string: "1.10")! + Decimal(2)).description => 3.1
+Decimal(_ Double) :: Decimal(3.5) => 3.5
+Decimal exact :: Decimal(string: "0.1")! + Decimal(string: "0.2")! == Decimal(string: "0.3")! => true
+Decimal * / :: Decimal(10) / Decimal(4) * Decimal(3) => 7.5
+Decimal comparison :: Decimal(2) < Decimal(string: "2.5")! => true
+Decimal.formatted(.currency) :: Decimal(3.5).formatted(.currency(code: "USD")) => $3.50
+Decimal.formatted(.number) :: Decimal(string: "1234.5")!.formatted(.number.precision(.fractionLength(2))) => 1,234.50
+Decimal.rounded ::
+    var x = Decimal(string: "2.675")!
+    var r = Decimal()
+    NSDecimalRound(&r, &x, 2, .plain)
+    print(r)
+=> 2.68
+NSDecimalNumber.doubleValue :: NSDecimalNumber(decimal: Decimal(string: "1.25")!).doubleValue => 1.25
+Decimal from Int literal :: { let d: Decimal = 7; return d * 2 }() => 14
+Decimal sum :: [Decimal(string: "0.1")!, Decimal(string: "0.2")!].reduce(0, +) => 0.3
+Decimal.isZero :: Decimal(0).isZero => true
+Decimal(Int) :: Decimal(42).description => 42
+Decimal negation :: -Decimal(string: "1.5")! => -1.5
+Decimal(sign:exponent:significand:) :: Decimal(sign: .plus, exponent: -2, significand: 1999) => 19.99
+Decimal += :: { var t = Decimal(0); for _ in 0..<3 { t += Decimal(string: "0.1")! }; return t }() => 0.3
+
+## Timers and queues
+
+Timer(timeInterval:repeats:block:) :: { let t = Timer(timeInterval: 1, repeats: false) { _ in }; t.invalidate(); return "ok" }() => ok
+Timer.scheduledTimer.isValid :: { let t = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { _ in }; let v = t.isValid; t.invalidate(); return "\(v) \(t.isValid)" }() => true false
+DispatchGroup :: { let g = DispatchGroup(); g.enter(); g.leave(); return "ok" }() => ok
+DispatchGroup.notify ::
+    let g = DispatchGroup()
+    var log: [String] = []
+    g.enter()
+    log.append("work")
+    g.leave()
+    g.notify(queue: .main) { print("notified") }
+    print(log)
+=> ["work"]
+DispatchSemaphore :: { let s = DispatchSemaphore(value: 1); s.wait(); s.signal(); return "ok" }() => ok
+DispatchQueue.main.async :: { DispatchQueue.main.async { }; return "ok" }() => ok
+DispatchQueue(label:) :: { let q = DispatchQueue(label: "work"); q.sync { }; return q.label }() => work
+DispatchTime.now() :: DispatchTime.now() < DispatchTime.now() + 1 => true
+OperationQueue.main :: OperationQueue.main.maxConcurrentOperationCount != 0 => true
+
+## Images
+
+UIGraphicsImageRenderer [ios] :: UIGraphicsImageRenderer(size: CGSize(width: 2, height: 2)).image { _ in }.size.width => 2.0
+UIGraphicsImageRenderer fill [ios] ::
+    let image = UIGraphicsImageRenderer(size: CGSize(width: 4, height: 3)).image { ctx in
+        UIColor.red.setFill()
+        ctx.fill(CGRect(x: 0, y: 0, width: 4, height: 3))
+    }
+    print(image.size)
+=> (4.0, 3.0)
+UIImage(systemName:) [ios] :: UIImage(systemName: "star") != nil => true
+ImageRenderer.uiImage [ios] :: ImageRenderer(content: Text("x")).uiImage != nil => true
+ImageRenderer.scale [ios] ::
+    let r = ImageRenderer(content: Color.red.frame(width: 10, height: 10))
+    r.scale = 2
+    print(r.uiImage!.size, r.uiImage!.scale)
+=> (10.0, 10.0) 2.0
+ImageRenderer.cgImage [ios] :: ImageRenderer(content: Color.blue.frame(width: 4, height: 6)).cgImage!.height => 6

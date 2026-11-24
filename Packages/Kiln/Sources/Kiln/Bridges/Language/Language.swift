@@ -22,6 +22,8 @@ final class LanguageBridges: KBridgeFamily {
         collections(r)
         hashing(r)
         regex(r)
+        integers(r)
+        stdlib(r)
     }
 
     // MARK: Global functions
@@ -33,7 +35,7 @@ final class LanguageBridges: KBridgeFamily {
         for name in ["print", "debugPrint", "NSLog"] {
             r.function(name, .language, owner: name == "NSLog" ? "Foundation" : "Swift") { c in
                 let sep = c.arg("separator")?.asString ?? " "
-                let items = zip(c.args, c.labels).filter { $0.1 == nil }.map { c.interp.describe($0.0) }
+                let items = zip(c.args, c.labels).filter { $0.1 == nil }.map { c.interp.describe($0.0, quoted: name == "debugPrint") }
                 c.interp.console += items.joined(separator: sep) + (c.arg("terminator")?.asString ?? "\n")
                 return .void
             }
@@ -64,7 +66,16 @@ final class LanguageBridges: KBridgeFamily {
         }
         r.function("fmod", .language, owner: "Foundation") { c in .double(fmod(c.at(0)?.asDouble ?? 0, c.at(1)?.asDouble ?? 1)) }
         r.function("zip", .language) { c in
-            let a = try c.interp.sequence(c.at(0) ?? .nilValue), b = try c.interp.sequence(c.at(1) ?? .nilValue)
+            // A one-sided range (`zip(1..., names)`) runs as long as the other sequence.
+            @MainActor func items(_ v: KV, _ other: KV) throws -> [KV] {
+                if case .range(let lo, .nilValue, _) = v, let start = lo.asInt {
+                    let n = (try? c.interp.sequence(other).count) ?? 0
+                    return (0..<n).map { .int(start + $0) }
+                }
+                return try c.interp.sequence(v)
+            }
+            let x = c.at(0) ?? .nilValue, y = c.at(1) ?? .nilValue
+            let a = try items(x, y), b = try items(y, x)
             return .array(zip(a, b).map { .tuple([$0, $1], [nil, nil]) })
         }
         r.function("stride", .language) { c in
@@ -111,7 +122,7 @@ final class LanguageBridges: KBridgeFamily {
                 case .double(let d)?: return d.isFinite ? .int(Int(d)) : .nilValue
                 case .string(let s)?: return Int(s.trimmingCharacters(in: .whitespaces)).map { .int($0) } ?? .nilValue
                 case .bool(let b)?: return .int(b ? 1 : 0)
-                default: return .int(0)
+                default: return c.first?.asInt.map { .int($0) } ?? .int(0)   // `Int(byte)`
                 }
             }
             t.staticProperties(["max": .int(.max), "min": .int(.min), "zero": .int(0)])
@@ -139,7 +150,6 @@ final class LanguageBridges: KBridgeFamily {
             // The rest of a number's methods, as a Double (`rounded`, `squareRoot`).
             t.fallback("FloatingPoint") { v, _ in .double(Double(v.asInt ?? 0)) }
         }
-        for alias in ["Int64", "Int32", "UInt", "Int16", "Int8", "UInt64", "UInt32", "UInt16", "UInt8"] { r.alias(alias, to: "Int") }
 
         r.type("Double", .language, support: .full) { t in
             t.initializer { c in
@@ -149,7 +159,7 @@ final class LanguageBridges: KBridgeFamily {
                 case .int(let i)?: return .double(Double(i))
                 case .double(let d)?: return .double(d)
                 case .string(let s)?: return Double(s.trimmingCharacters(in: .whitespaces)).map { .double($0) } ?? .nilValue
-                default: return .double(0)
+                default: return .double(c.first?.asDouble ?? 0)
                 }
             }
             t.staticProperties(["pi": .double(.pi), "infinity": .double(.infinity), "greatestFiniteMagnitude": .double(.greatestFiniteMagnitude),
@@ -208,7 +218,10 @@ final class LanguageBridges: KBridgeFamily {
                 if case .string(let s)? = c.first { return s == "true" ? .bool(true) : (s == "false" ? .bool(false) : .nilValue) }
                 return .bool(c.first.map { c.interp.truthy($0) } ?? false)
             }
-            t.staticMethod("random") { c in .bool(Bool.random(using: &c.interp.rng)) }
+            t.staticMethod("random") { c in
+                if c.arg("using") != nil { return .bool(try KRandom.with(c) { g in Bool.random(using: &g) }) }
+                return .bool(Bool.random(using: &c.interp.rng))
+            }
             t.property("description") { c in .string(c.receiver.asBool == true ? "true" : "false") }
             t.property("toggled") { c in .bool(!(c.receiver.asBool ?? false)) }
             t.method("toggle") { c in
@@ -221,6 +234,12 @@ final class LanguageBridges: KBridgeFamily {
     /// `Int.random(in:)`, `Double.random(in:)`: from the run's seeded generator.
     static func random(_ c: KCall, isInt: Bool) throws -> KV {
         guard case .range(let lo, let hi, let closed)? = c.arg("in") ?? c.first else { return .int(0) }
+        // `using: &generator`: the app's own generator, through Swift's algorithm (Integers.swift).
+        if c.arg("using") != nil {
+            if isInt, let l = lo.asInt, let h = hi.asInt { return .int(try KRandom.int(c, l, h, closed: closed)) }
+            let l = lo.asDouble ?? 0, h = hi.asDouble ?? 1
+            return .double(try KRandom.with(c) { g in closed ? Double.random(in: l...h, using: &g) : Double.random(in: l..<h, using: &g) })
+        }
         if isInt, let l = lo.asInt, let h = hi.asInt {
             if closed ? l > h : l >= h { throw c.interp.fail("Int.random(in:) needs a non-empty range", c.line) }
             return .int(closed ? Int.random(in: l...h, using: &c.interp.rng) : Int.random(in: l..<h, using: &c.interp.rng))

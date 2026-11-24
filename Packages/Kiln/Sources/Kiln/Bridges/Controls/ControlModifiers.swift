@@ -224,6 +224,7 @@ enum KDateComponents {
     static let fields: [(String, Calendar.Component)] = [("year", .year), ("month", .month), ("day", .day), ("hour", .hour), ("minute", .minute), ("second", .second)]
 
     static func native(_ v: KV) -> DateComponents? {
+        if case .native(.boxed(let b)) = v, let d = b.value.base as? KDateValue { return d.components }
         guard case .tuple(let vals, let labels) = v else { return nil }
         var dc = DateComponents()
         for (i, l) in labels.enumerated() {
@@ -242,6 +243,8 @@ enum KDateComponents {
     }
 
     static func kv(_ dc: DateComponents) -> KV {
+        // A value since Round 2C (Bridges/Foundation/Dates.swift), with only the components it has.
+        if dc.year != nil || dc.day != nil { return KDates.comps(dc) }
         var vals: [KV] = [], labels: [String?] = []
         for (name, comp) in fields {
             if let n = dc.value(for: comp), n != NSDateComponentUndefined { vals.append(.int(n)); labels.append(name) }
