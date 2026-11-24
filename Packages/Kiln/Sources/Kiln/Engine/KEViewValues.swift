@@ -40,7 +40,7 @@ enum KBuiltins {
     /// Whether `name` is a method of the value itself (Color.opacity) rather than a view modifier.
     static func hasValueMethod(_ base: KV, _ name: String) -> Bool {
         switch base {
-        case .native(.color): return ["opacity", "gradient", "mix", "description"].contains(name)
+        case .native(.color): return ["opacity", "gradient", "mix", "description", "setFill", "setStroke", "set"].contains(name)
         default: return true
         }
     }
