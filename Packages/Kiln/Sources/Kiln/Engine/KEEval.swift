@@ -256,6 +256,11 @@ extension KInterpreter {
         if name.hasPrefix("$"), name.count > 1 {
             let base = String(name.dropFirst())
             if base.first?.isNumber == true { throw fail("'\(name)' used outside of a closure", line) }
+            // In the class, `$query` is the `@Published` property's publisher (Combine).
+            if let ctx = env.nearestSelf, !ctx.isStatic, ctx.type.isClass, ctx.type.storedDecl(base)?.wrapper == "Published",
+               case .object(let o)? = try? read(ctx.location) {
+                return KCombine.published(o, base)
+            }
             if let ctx = env.nearestSelf, let proj = try projection(ctx, base) { return proj }
             if let box = env.lookup(base) {
                 return .binding(KBinding(get: { box.value }, set: { box.value = $0 }))

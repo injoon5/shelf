@@ -306,6 +306,8 @@ final class KInterpreter {
         let key = d.name.split(separator: ".").last.map(String.init) ?? d.name
         let ext = builtinExtensions[key] ?? KBuiltinExtension()
         builtinExtensions[key] = ext
+        // A nested native type is found by its full name too (`extension Notification.Name`).
+        if d.name.contains(".") { builtinExtensions[d.name] = ext }
         if !d.inherits.isEmpty { builtinConformances[key, default: []].formUnion(d.inherits) }
         for p in d.properties {
             if KMacros.applyPropertyMacros(p, owner: key, self) { continue }   // `@Entry` (KEMacros)
@@ -1249,7 +1251,8 @@ final class KInterpreter {
     }
 
     func bindClosureParams(_ c: KEClosure, _ args: [KV], _ env: KEnv) {
-        if c.hasExplicitParams {
+        // `{ [weak self] in self?.seen.append($0) }`: a capture list alone, so `$0` is the argument.
+        if c.hasExplicitParams, !(c.params.isEmpty && !args.isEmpty) {
             if c.params.count == 1, args.count > 1 {
                 // `{ pair in … }` receiving several values gets a tuple.
                 env.declare(c.params[0].name, .tuple(args, Array(repeating: nil, count: args.count)))

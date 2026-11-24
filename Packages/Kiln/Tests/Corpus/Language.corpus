@@ -219,6 +219,14 @@ seeded generator ::
     print([1, 2, 3, 4, 5].shuffled(using: &g2).count, Int.random(in: 1...6, using: &g2) <= 6)
 => 10481999410520546993 20
 => 5 true
+Int.random(in:using:) seeded ::
+    struct LCG: RandomNumberGenerator {
+        var state: UInt64
+        mutating func next() -> UInt64 { state = state &* 6364136223846793005 &+ 1442695040888963407; return state }
+    }
+    var g = LCG(state: 7)
+    print(Int.random(in: 300...9_000, using: &g), Double.random(in: 0..<1, using: &g) < 1, Bool.random(using: &g), [1, 2, 3].randomElement(using: &g)!)
+=> 4591 true false 1
 randomElement(using:) ::
     var g = SystemRandomNumberGenerator()
     print([1, 2, 3].randomElement(using: &g)! > 0)

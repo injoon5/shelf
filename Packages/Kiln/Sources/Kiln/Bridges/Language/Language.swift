@@ -67,7 +67,7 @@ final class LanguageBridges: KBridgeFamily {
         r.function("fmod", .language, owner: "Foundation") { c in .double(fmod(c.at(0)?.asDouble ?? 0, c.at(1)?.asDouble ?? 1)) }
         r.function("zip", .language) { c in
             // A one-sided range (`zip(1..., names)`) runs as long as the other sequence.
-            func items(_ v: KV, _ other: KV) throws -> [KV] {
+            @MainActor func items(_ v: KV, _ other: KV) throws -> [KV] {
                 if case .range(let lo, .nilValue, _) = v, let start = lo.asInt {
                     let n = (try? c.interp.sequence(other).count) ?? 0
                     return (0..<n).map { .int(start + $0) }
@@ -218,7 +218,10 @@ final class LanguageBridges: KBridgeFamily {
                 if case .string(let s)? = c.first { return s == "true" ? .bool(true) : (s == "false" ? .bool(false) : .nilValue) }
                 return .bool(c.first.map { c.interp.truthy($0) } ?? false)
             }
-            t.staticMethod("random") { c in .bool(Bool.random(using: &c.interp.rng)) }
+            t.staticMethod("random") { c in
+                if c.arg("using") != nil { return .bool(try KRandom.with(c) { g in Bool.random(using: &g) }) }
+                return .bool(Bool.random(using: &c.interp.rng))
+            }
             t.property("description") { c in .string(c.receiver.asBool == true ? "true" : "false") }
             t.property("toggled") { c in .bool(!(c.receiver.asBool ?? false)) }
             t.method("toggle") { c in
@@ -231,6 +234,12 @@ final class LanguageBridges: KBridgeFamily {
     /// `Int.random(in:)`, `Double.random(in:)`: from the run's seeded generator.
     static func random(_ c: KCall, isInt: Bool) throws -> KV {
         guard case .range(let lo, let hi, let closed)? = c.arg("in") ?? c.first else { return .int(0) }
+        // `using: &generator`: the app's own generator, through Swift's algorithm (Integers.swift).
+        if c.arg("using") != nil {
+            if isInt, let l = lo.asInt, let h = hi.asInt { return .int(try KRandom.int(c, l, h, closed: closed)) }
+            let l = lo.asDouble ?? 0, h = hi.asDouble ?? 1
+            return .double(try KRandom.with(c) { g in closed ? Double.random(in: l...h, using: &g) : Double.random(in: l..<h, using: &g) })
+        }
         if isInt, let l = lo.asInt, let h = hi.asInt {
             if closed ? l > h : l >= h { throw c.interp.fail("Int.random(in:) needs a non-empty range", c.line) }
             return .int(closed ? Int.random(in: l...h, using: &c.interp.rng) : Int.random(in: l..<h, using: &c.interp.rng))

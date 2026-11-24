@@ -144,6 +144,19 @@ assign(to:on:) ::
     print(got)
     _ = c
 => ["B"]
+@Published publisher inside the class ::
+    class Search: ObservableObject {
+        @Published var query = ""
+        var seen: [String] = []
+        var bag = Set<AnyCancellable>()
+        init() { $query.dropFirst().removeDuplicates().sink { [weak self] in self?.seen.append($0) }.store(in: &bag) }
+    }
+    let s = Search()
+    s.query = "a"
+    s.query = "a"
+    s.query = "ab"
+    print(s.seen)
+=> ["a", "ab"]
 ObservableObject objectWillChange ::
     class Model: ObservableObject { @Published var n = 0 }
     let m = Model()

@@ -183,6 +183,17 @@ extension FoundationBridges {
                 }
                 return .native(.implicit(s, []))
             }
+            #else
+            // A Mac (the tests, KilnDiff): the same members, the Mac's values.
+            t.staticProperty("current") { _ in .native(.object("UIDevice", KRef(NSObject()))) }
+            t.property("systemName") { _ in .string("macOS") }
+            t.property("systemVersion") { _ in .string(ProcessInfo.processInfo.operatingSystemVersionString) }
+            t.properties(["model", "localizedModel"]) { _, _ in .string("Mac") }
+            t.property("name") { _ in .string(Host.current().localizedName ?? "Mac") }
+            t.property("userInterfaceIdiom") { _ in .native(.implicit("mac", [])) }
+            t.property("orientation") { _ in .native(.implicit("unknown", [])) }
+            t.property("batteryLevel") { _ in .double(-1) }
+            t.property("batteryState") { _ in .native(.implicit("unknown", [])) }
             #endif
         }
 
