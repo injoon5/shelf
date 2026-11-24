@@ -28,13 +28,18 @@ enum KAttributed {
 extension KTextBridges {
     static func attributed(_ r: KRegistry) {
         r.type("AttributedString", .text, support: .partial,
-               notes: "`AttributedString(\"…\")` and `AttributedString(markdown:)`, attributes set on the whole string (`foregroundColor`, `backgroundColor`, `font`, `link`), `append`, and `String(s.characters)`. Ranges and runs aren't bridged.") { t in
+               notes: "`AttributedString(\"…\")` and `AttributedString(markdown:options:)`, attributes set on the whole string (`foregroundColor`, `backgroundColor`, `font`, `link`), `append`, and `String(s.characters)`. Ranges and runs aren't bridged.") { t in
             t.initializer("") { _ in KAttributed.kv(AttributedString()) }
             t.initializer("_:string") { c in KAttributed.kv(AttributedString(c.string(0) ?? "")) }
-            t.initializer("markdown:string") { c in
+            // Without options, whitespace is kept (so line breaks show in `Text`); `options:` is Foundation's.
+            t.initializer("markdown:string options:any? baseURL:any?") { c in
+                var syntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax = .inlineOnlyPreservingWhitespace
+                if case .native(.boxed(let b))? = c["options"], let name = b.get(String.self) {
+                    syntax = name == "full" ? .full : (name == "inlineOnly" ? .inlineOnly : .inlineOnlyPreservingWhitespace)
+                }
                 do {
-                    return KAttributed.kv(try AttributedString(markdown: c.string("markdown") ?? "",
-                                                               options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+                    return KAttributed.kv(try AttributedString(markdown: c.string("markdown") ?? "", options: .init(interpretedSyntax: syntax),
+                                                               baseURL: c.url("baseURL")))
                 } catch {
                     throw KEThrown(value: KBuiltins.errorValue("The Markdown couldn't be read"))
                 }
@@ -55,6 +60,16 @@ extension KTextBridges {
                 if let other = KAttributed.value(c.first) { out.append(other) } else { out.append(AttributedString(c.string(0) ?? "")) }
                 c.mutated = KAttributed.kv(out)
                 return .void
+            }
+        }
+    }
+}
+
+extension KTextBridges {
+    static func markdownOptions(_ r: KRegistry) {
+        r.type("AttributedString.MarkdownParsingOptions", .text, support: .full) { t in
+            t.initializer("interpretedSyntax:any") { c in
+                .native(.boxed(KBoxed("AttributedString.MarkdownParsingOptions", c.symbol("interpretedSyntax") ?? "full")))
             }
         }
     }

@@ -7,7 +7,7 @@ set -e
 LAB=${0:A:h}
 SIM=$(cat "$LAB/.sim-udid" 2>/dev/null || xcrun simctl list devices available | grep -m1 -E "iPhone" | grep -oE "[0-9A-F-]{36}")
 OUT=${KILN_QUICK_OUT:-$(mktemp -d -t kilnquick)}
-DERIVED="$LAB/.build-quick"
+DERIVED=${KILN_DERIVED_DATA:-$LAB/.build-quick}
 cd "$LAB"
 python3 gen_native.py >/dev/null
 xcodegen generate --quiet

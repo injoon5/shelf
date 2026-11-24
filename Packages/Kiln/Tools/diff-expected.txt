@@ -50,3 +50,8 @@ tests/Chart3DBridgeTests-0.swift Round 2 §3.7: before, Chart3D and SurfacePlot 
 fixtures/apps/streams.swift Round 2 §3.8's fixture: before, webSocketTask and bytes(from:) weren't bridged.
 tests/StreamsBridgeTests-5.swift Round 2 §3.8: before, webSocketTask wasn't bridged.
 tests/StreamsBridgeTests-6.swift Round 2 §3.8: before, webSocketTask wasn't bridged.
+Packages/Kiln/Examples/Apps/TripNotes.swift Round 2A's Lab example: before, RegexBuilder, NSDataDetector, NaturalLanguage, Decimal, Measurement, haptics and the pasteboard weren't bridged.
+fixtures/apps/haptics.swift Round 2A's Haptics fixture: before, `SensoryFeedback`'s values and `.sensoryFeedback(trigger:_:)` weren't bridged (the modifier was a stub).
+fixtures/apps/sharing.swift Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.
+fixtures/apps/text-parsing.swift Round 2A's text-parsing fixture: before, RegexBuilder, NSDataDetector, NaturalLanguage and Decimal weren't bridged.
+fixtures/apps/units.swift Round 2A's Units fixture: before, `Measurement` was a stub holding its value, with no units or conversion.

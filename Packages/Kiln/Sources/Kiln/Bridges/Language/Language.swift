@@ -104,6 +104,8 @@ final class LanguageBridges: KBridgeFamily {
     static func numbers(_ r: KRegistry) {
         r.type("Int", .language, support: .full) { t in
             t.initializer { c in
+                // `Int("1,234", format: .number)` (Text/ParseStrategies.swift).
+                if c.arg("format") != nil || c.arg("strategy") != nil { return try KParsing.number(c, "Int") }
                 switch c.first {
                 case .int(let i)?: return .int(i)
                 case .double(let d)?: return d.isFinite ? .int(Int(d)) : .nilValue
@@ -141,6 +143,8 @@ final class LanguageBridges: KBridgeFamily {
 
         r.type("Double", .language, support: .full) { t in
             t.initializer { c in
+                if c.arg("format") != nil || c.arg("strategy") != nil { return try KParsing.number(c, "Double") }
+                if let d = KDecimal.from(c.arg("truncating") ?? c.first), case .native = (c.arg("truncating") ?? c.first) { return .double(NSDecimalNumber(decimal: d).doubleValue) }
                 switch c.first {
                 case .int(let i)?: return .double(Double(i))
                 case .double(let d)?: return .double(d)

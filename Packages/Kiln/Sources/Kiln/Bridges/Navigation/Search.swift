@@ -27,6 +27,21 @@ extension NavigationBridges {
                      "text:binding tokens:binding suggestedTokens:binding placement:any? prompt:title? token:content",
                      "text:binding editableTokens:binding placement:any? prompt:title? token:content"]) { c, view in searchable(c, view) }
         }
+        // iOS 26: the selection in the search field, a `TextSelection?` over the `.searchable` text (Sharing).
+        r.modifier("searchSelection", .navigation, introduced: "26.0") { m in
+            m.form("_:binding", introduced: "26.0") { c, view in
+                if #available(iOS 26, macOS 26, *), let sb = c.kbinding(0) {
+                    let text = c.base?.modifier("searchable")?.arg("text")
+                    let interp = c.interp
+                    view.searchSelection(KTextSelection.binding(sb) {
+                        if case .binding(let b)? = text { return b.get().asString ?? "" }
+                        return text.flatMap { interp.describe($0) } ?? ""
+                    })
+                } else {
+                    view
+                }
+            }
+        }
         r.modifier("searchSuggestions", .navigation) { m in
             m.form("_:content") { c, view in
                 let content = c.content(0)

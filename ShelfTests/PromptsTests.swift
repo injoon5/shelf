@@ -212,9 +212,9 @@ struct PromptsTests {
     }
 
     /// Short enough to paste into a chat. Off for now, as asked: Round 2's
-    /// family lines took the prompt past 20,000 characters (20,619 after
-    /// trimming 2B's own lines, 24 Nov 2026).
-    @Test(.disabled("Off for now: Round 2's family lines took the prompt to 20,619 characters"))
+    /// family lines took the prompt past 20,000 characters (21,136 with 2A and
+    /// 2B, after trimming 2B's own lines, 24 Nov 2026).
+    @Test(.disabled("Off for now: Round 2's family lines took the prompt to 21,136 characters"))
     func thePromptStaysShort() {
         let prompt = Prompts.newApp(idea: Self.idea, install: nil)
         print("new-app prompt: \(prompt.count) characters")

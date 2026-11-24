@@ -316,6 +316,8 @@ struct KTypeBuilder {
     func anyStaticMethod(_ f: @escaping @MainActor (inout KCall, String) throws -> KV?) { bridge.anyStaticMethod = f }
     func anySetter(_ f: @escaping @MainActor (inout KCall, String) throws -> Bool) { bridge.anySetter = f }
     func implicit(_ f: @escaping @MainActor (String, [KV], [String?]) -> KV?) { bridge.implicit = f }
+    /// `a op b` where either operand is this type's value; return nil for operands it doesn't take.
+    func `operator`(_ op: String, _ f: @escaping @MainActor (KV, KV, Int) throws -> KV?) { bridge.operators[op] = f }
 
     func fallback(_ type: String, _ convert: @escaping @MainActor (KV, KInterpreter) throws -> KV) {
         bridge.fallback = type

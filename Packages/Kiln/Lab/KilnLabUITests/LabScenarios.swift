@@ -362,6 +362,24 @@ final class AppScenarios: LabCase {
     }
     func testLineFeedNative() { feed("native") }
     func testLineFeedKiln() { feed("kiln") }
+
+    // MARK: Trip notes (Round 2A: text parsing, units, haptics, sharing)
+
+    func trip(_ mode: String) {
+        launch("TripNotes", mode)
+        snap("1 start, the note parsed")
+        app.swipeUp()
+        tap("Add traveler")
+        snap("2 three travelers")
+        tap("Walk 2 km more")
+        snap("3 walked further")
+        app.swipeUp()
+        tap("Pack a bag")
+        tap("Copy plan")
+        snap("4 packed and copied")
+    }
+    func testTripNotesNative() { trip("native") }
+    func testTripNotesKiln() { trip("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

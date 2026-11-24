@@ -117,13 +117,9 @@ extension AudioBridges {
             for name in callbacks { spec.selectors["speechSynthesizer(_:\(name):)"] = "speechSynthesizer:\(name)SpeechUtterance:" }
             spec.arguments("speechSynthesizer(_:willSpeakRangeOfSpeechString:utterance:)") { args, _ in
                 let range = (args.count > 1 ? args[1] as? NSValue : nil)?.rangeValue ?? NSRange(location: 0, length: 0)
-                return [KNativeValues.kv(from: args.first), .native(.boxed(KBoxed("NSRange", range))),
+                return [KNativeValues.kv(from: args.first), KNSRange(r: range).kv,
                         KNativeValues.kv(from: args.count > 2 ? args[2] : nil)]
             }
-        }
-        r.type("NSRange", .audio, support: .full) { t in
-            t.property("location") { c in .int((c.receiver.boxedValue(NSRange.self))?.location ?? 0) }
-            t.property("length") { c in .int((c.receiver.boxedValue(NSRange.self))?.length ?? 0) }
         }
     }
 

@@ -98,6 +98,8 @@ extension KInterpreter {
             }
         }
         if name == "self" { return .type(.builtin(typeName)) }
+        // A nested native type: `NSTextCheckingResult.CheckingType`, `UIImpactFeedbackGenerator.FeedbackStyle`.
+        if name.first?.isUppercase == true, registry.type(typeName + "." + name) != nil { return .type(.builtin(typeName + "." + name)) }
         // Other members of SwiftUI's types are symbolic until a view reads them (`Edge.Set.all`).
         return .native(.implicit(name, []))
     }
@@ -163,6 +165,10 @@ extension KInterpreter {
             }
         }
         if case .nilValue = base { _ = try evalArgs(argExprs, env); return (.nilValue, nil) }
+        // A nested native type's static method: `URLSessionWebSocketTask.Message.string(text)`.
+        if case .type(.builtin(let tn)) = base, registry.type(tn) != nil {
+            return (try nativeStaticCall(tn, name, argExprs, env, line, nil), nil)
+        }
         // The type's own methods, then each fallback's (converted only when reached).
         var tn = KRegistry.typeName(of: base)
         var value = base

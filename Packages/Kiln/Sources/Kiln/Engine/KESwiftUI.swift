@@ -123,9 +123,16 @@ enum KNative: Hashable {
         case .angle(let d): return "\(d)°"
         case .object("Error", let ref): return (ref.value as? NSError)?.localizedDescription ?? "Error"
         case .object("NSNumber", let ref): return (ref.value as? NSNumber)?.stringValue ?? "0"
+        case .object(_, let ref) where ref.value is KDescribable: return (ref.value as! KDescribable).describe(interp)
+        case .boxed(let b) where b.value.base is KDescribable: return (b.value.base as! KDescribable).describe(interp)
         default: return kindName
         }
     }
+}
+
+/// A native value that prints as Swift prints it (`"\(distance)"` is "5.0 km").
+protocol KDescribable {
+    @MainActor func describe(_ interp: KInterpreter) -> String
 }
 
 /// A native value type that compares by value, with the name of the type its
