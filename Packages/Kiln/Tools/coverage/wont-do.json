@@ -171,14 +171,6 @@
       "match": { "ids": ["member:PresentationDetent.custom"] }
     },
     {
-      "id": "search-selection",
-      "what": "`.searchSelection(_:)`: the selected range in the search field",
-      "reason": "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
-      "status": "later",
-      "source": "Round 1 (Navigation)",
-      "match": { "ids": ["modifier:searchSelection"] }
-    },
-    {
       "id": "render-thread-protocols",
       "what": "Custom text renderers, animations and visual-effect types (`TextRenderer`, `customAttribute`, `CustomAnimation`, your own `VisualEffect`)",
       "reason": "SwiftUI calls them on its render thread every frame, where an app's code can't run. `contentTransition(.numericText())`, `phaseAnimator`, `keyframeAnimator`, `Canvas` and `visualEffect`'s closure cover the effects.",

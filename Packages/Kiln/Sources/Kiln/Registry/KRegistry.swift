@@ -597,6 +597,9 @@ final class KTypeBridge: KBridge {
     var anySetter: (@MainActor (inout KCall, String) throws -> Bool)?
     /// `.name` where this type is expected: `.red` for a `Color`.
     var implicit: (@MainActor (String, [KV], [String?]) -> KV?)?
+    /// Binary operators on this type's values (`a + b`, `a < b`), by operator:
+    /// the engine asks the left operand's type, then the right's. nil: not for these operands.
+    var operators: [String: @MainActor (KV, KV, Int) throws -> KV?] = [:]
     /// Another type whose members this one also has (`Set` → `Sequence`).
     var fallback: String?
     /// Turns a value of this type into the fallback's (a `String` into its characters).
@@ -699,6 +702,12 @@ final class KRegistry {
         for f in KilnFamily.allCases {
             guard let cls = NSClassFromString("KilnBridges_" + f.folder.replacingOccurrences(of: " ", with: "")) as? KBridgeFamily.Type else { continue }
             cls.register(into: self)
+        }
+        // A second pass, once every family's types exist: a family can add to
+        // a type a later family declares (Units adds `Double.init(_:format:)`).
+        for f in KilnFamily.allCases {
+            guard let cls = NSClassFromString("KilnBridges_" + f.folder.replacingOccurrences(of: " ", with: "")) as? KBridgeFamily.Type else { continue }
+            cls.extend(into: self)
         }
     }
 
@@ -854,4 +863,6 @@ final class KRegistry {
 @MainActor
 class KBridgeFamily: NSObject {
     @MainActor class func register(into r: KRegistry) {}
+    /// After every family has registered: `r.extend(…)` types other families declare.
+    @MainActor class func extend(into r: KRegistry) {}
 }

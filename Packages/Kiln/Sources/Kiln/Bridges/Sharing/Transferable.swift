@@ -15,8 +15,9 @@
 //  native `Transferable` standing for the app's value: it offers, in order, a
 //  URL and a string (from `ProxyRepresentation`s), then data in each content
 //  type the representations export (Codable as JSON, `DataRepresentation`s).
-//  Importing goes the other way (`KTransferables.importValue`), for Round 2's
-//  paste and drop and Round 3's file importer.
+//  Importing goes the other way (`KTransferables.importValue`), for
+//  `PasteButton` and `.pasteDestination` (Sharing.swift) and Round 3's drop and
+//  file importer.
 //
 
 import SwiftUI
@@ -40,7 +41,7 @@ final class KTransferRep {
 extension SharingBridges {
     static func transferable(_ r: KRegistry) {
         r.protocolBridge("Transferable", .sharing, requirements: ["static transferRepresentation"], support: .partial,
-                         notes: "For `ShareLink`: `CodableRepresentation`, `DataRepresentation`, `ProxyRepresentation(exporting:)`.") { app in
+                         notes: "Your own type, for `ShareLink`, `PasteButton` and copy and paste: `CodableRepresentation(contentType:)`, `DataRepresentation`, `ProxyRepresentation(exporting:importing:)`, with `.suggestedFileName` and `.exportingCondition`.") { app in
             KTransferItem(app)
         }
         r.resultBuilder("TransferRepresentationBuilder", .sharing) { b in
@@ -85,9 +86,9 @@ extension SharingBridges {
             t.method("exportingCondition", "_:closure") { c in receiver(c)?.condition = c.function(0); return c.receiver }
             t.method("visibility", "_:any") { c in c.receiver }
         }
-        r.type("SharePreview", .sharing) { t in
+        r.type("SharePreview", .sharing, support: .full) { t in
             for sig in ["_:title", "_:title image:any", "_:title icon:any", "_:title image:any icon:any"] {
-                t.initializer(sig) { c in .native(.object("SharePreview", KRef(KSharePreview(title: c.title(0), image: c["image"] ?? c["icon"])))) }
+                t.initializer(sig) { c in .native(.object("SharePreview", KRef(KSharePreview(title: c.title(0), image: c["image"], icon: c["icon"])))) }
             }
         }
     }
@@ -96,9 +97,11 @@ extension SharingBridges {
 final class KSharePreview {
     let title: String
     let image: KV?
-    init(title: String, image: KV?) {
+    let icon: KV?
+    init(title: String, image: KV?, icon: KV? = nil) {
         self.title = title
         self.image = image
+        self.icon = icon
     }
 }
 

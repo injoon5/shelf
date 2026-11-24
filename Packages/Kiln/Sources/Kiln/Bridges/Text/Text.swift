@@ -230,8 +230,5 @@ final class KTextBridges: KBridgeFamily {
                 if let n = c.symbol(0) { view.textCase(n == "lowercase" ? .lowercase : .uppercase) } else { view.textCase(nil) }
             }
         }
-        r.modifier("textSelection", .text) { m in
-            m.form("_:any") { _, view in view.textSelection(.enabled) }
-        }
     }
 }
