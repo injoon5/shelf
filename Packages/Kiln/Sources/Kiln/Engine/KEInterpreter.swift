@@ -721,6 +721,8 @@ final class KInterpreter {
              (.array, "Array"), (.dict, "Dictionary"): return true
         case (.int, _), (.double, _), (.string, _), (.bool, _): return valueConforms(v, n)
         case (.native(.object("Error", _)), "CancellationError"): return KAsync.isCancellation(KEThrown(value: v))
+        // A number from Objective-C as `Any` (`callJavaScript`'s result) casts as `NSNumber` would.
+        case (.native(.object("NSNumber", _)), _): return KNativeValues.numberTypes.contains(n) || n == "Any"
         default:
             if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) || (n == "AnyObject" && ut.isClass) }
             if protocols[n] != nil || builtinConformances.values.contains(where: { $0.contains(n) }) { return valueConforms(v, n) }
@@ -1007,6 +1009,8 @@ final class KInterpreter {
         switch (v, t.core) {
         case (.int(let i), .named(let n, _)) where ["Double", "CGFloat", "Float", "TimeInterval"].contains(n):
             return .double(Double(i))
+        case (.native(.object("NSNumber", let ref)), .named(let n, _)) where KNativeValues.numberTypes.contains(n):
+            return KNativeValues.number(ref.value as? NSNumber, as: n)
         case (.native(.implicit(let name, let args)), .named(let n, _)):
             if let ut = types[n] {
                 if let resolved = try? implicitOn(ut, name, args.isEmpty ? nil : args) { return resolved }

@@ -75,6 +75,8 @@ enum RunContext {
                                   files: KilnFiles(root: folder), capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        // Its web pages' cookies and storage go with it.
+        context.provide(KilnEphemeralWebsiteData())
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: folder)

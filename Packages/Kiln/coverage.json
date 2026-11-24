@@ -42673,8 +42673,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewBackForwardNavigationGestures",
@@ -42698,8 +42699,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewContentBackground",
@@ -42723,8 +42725,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewElementFullscreenBehavior",
@@ -42748,8 +42751,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewLinkPreviews",
@@ -42773,8 +42777,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewMagnificationGestures",
@@ -42798,8 +42803,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewOnScrollGeometryChange",
@@ -42826,7 +42832,7 @@
     {
       "family" : "Web",
       "round" : 2,
-      "status" : "missing",
+      "status" : "wontDo",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewScrollInputBehavior",
@@ -42847,12 +42853,14 @@
             "signature" : "func webViewScrollInputBehavior(_ behavior: ScrollInputBehavior, for input: ScrollInputKind) -> some View"
           }
         ]
-      }
+      },
+      "wontDo" : "web-scroll-input"
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewScrollPosition",
@@ -42876,8 +42884,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 1,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "modifier:webViewTextSelection",
@@ -61568,8 +61577,9 @@
     },
     {
       "family" : "Web",
+      "overloadsCovered" : 2,
       "round" : 2,
-      "status" : "missing",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "view:WebView",
@@ -63628,6 +63638,25 @@
     "member:ViewDimensions.width",
     "member:ViewSpacing.distance",
     "member:ViewSpacing.zero",
+    "member:WebPage.BackForwardList.Item.initialURL",
+    "member:WebPage.BackForwardList.Item.title",
+    "member:WebPage.BackForwardList.Item.url",
+    "member:WebPage.BackForwardList.backList",
+    "member:WebPage.BackForwardList.currentItem",
+    "member:WebPage.BackForwardList.forwardList",
+    "member:WebPage.backForwardList",
+    "member:WebPage.callJavaScript",
+    "member:WebPage.customUserAgent",
+    "member:WebPage.estimatedProgress",
+    "member:WebPage.hasOnlySecureContent",
+    "member:WebPage.isLoading",
+    "member:WebPage.load",
+    "member:WebPage.navigations",
+    "member:WebPage.reload",
+    "member:WebPage.stopLoading",
+    "member:WebPage.themeColor",
+    "member:WebPage.title",
+    "member:WebPage.url",
     "modifier:axisBehavior",
     "modifier:contentMarginsRemoved",
     "modifier:customizationBehavior",
@@ -63808,6 +63837,9 @@
     "type:ViewDimensions",
     "type:ViewSpacing",
     "type:Visibility",
+    "type:WebPage",
+    "type:WebPage.BackForwardList",
+    "type:WebPage.BackForwardList.Item",
     "type:ZStackLayout",
     "wrapper:Published"
   ],
@@ -63967,12 +63999,12 @@
     },
     {
       "family" : "Web",
-      "missing" : 10,
-      "missingNew" : 10,
+      "missing" : 0,
+      "missingNew" : 0,
       "round" : 2,
-      "supported" : 0,
+      "supported" : 9,
       "total" : 10,
-      "wontDo" : 0
+      "wontDo" : 1
     },
     {
       "family" : "Chart3D",
@@ -64132,7 +64164,7 @@
     "generator" : "kiln-registry",
     "interim" : false,
     "path" : "kiln-manifest.json",
-    "symbols" : 1615
+    "symbols" : 1646
   },
   "schemaVersion" : 1,
   "sdk" : {

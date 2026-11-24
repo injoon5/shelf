@@ -179,6 +179,14 @@
       "match": { "ids": ["modifier:searchSelection"] }
     },
     {
+      "id": "web-scroll-input",
+      "what": "`.webViewScrollInputBehavior(_:for:)`",
+      "reason": "iOS has no `ScrollInputKind` to pass it: its kinds are watchOS's and visionOS's.",
+      "status": "wontDo",
+      "source": "PLAN.md §3.6",
+      "match": { "ids": ["modifier:webViewScrollInputBehavior"] }
+    },
+    {
       "id": "realtime-audio",
       "what": "Real-time audio render callbacks (`AVAudioSourceNode`, `AVAudioSinkNode`, taps)",
       "reason": "They'd call the app's code on the audio thread, many times a second; `AVAudioPlayer` plays `Data` the app makes (§3.5).",

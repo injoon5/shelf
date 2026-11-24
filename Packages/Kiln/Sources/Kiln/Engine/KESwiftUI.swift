@@ -122,6 +122,7 @@ enum KNative: Hashable {
         case .point(let x, let y): return "(\(x), \(y))"
         case .angle(let d): return "\(d)°"
         case .object("Error", let ref): return (ref.value as? NSError)?.localizedDescription ?? "Error"
+        case .object("NSNumber", let ref): return (ref.value as? NSNumber)?.stringValue ?? "0"
         default: return kindName
         }
     }

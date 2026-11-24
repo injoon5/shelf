@@ -125,6 +125,8 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
         case .audio:
             return "`AVAudioPlayer(data:)` for `Data` the app makes, or `(contentsOf:)` a file in its own folder (there's no app bundle), with `volume`, `rate` (after `enableRate = true`), `numberOfLoops`, `currentTime` and `AVAudioPlayerDelegate`; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`, `AVSpeechSynthesisVoice` and its delegate. Sound mixes with other audio and stops when the app closes"
+        case .web:
+            return "`WebView(url:)`, and `WebView(page)` with a `WebPage()`: `load` a URL, a `URLRequest` or `html:`; `title`, `url`, `isLoading`, `estimatedProgress`; `reload()`; `backForwardList`; `try await page.callJavaScript(\"return …\")`. The `.webView…` modifiers and `.findNavigator`. Each app has its own cookies and storage"
         default:
             return nil
         }

@@ -109,10 +109,11 @@
       "supported" : 82
     },
     {
+      "line" : "`WebView(url:)`, and `WebView(page)` with a `WebPage()`: `load` a URL, a `URLRequest` or `html:`; `title`, `url`, `isLoading`, `estimatedProgress`; `reload()`; `backForwardList`; `try await page.callJavaScript(\"return …\")`. The `.webView…` modifiers and `.findNavigator`. Each app has its own cookies and storage",
       "name" : "Web",
       "stubs" : 0,
       "summary" : "web views and web pages",
-      "supported" : 0
+      "supported" : 31
     },
     {
       "name" : "Chart3D",
@@ -10818,6 +10819,286 @@
       "support" : "full"
     },
     {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.initialURL",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "initialURL",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.title",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "title",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.Item.url",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList.Item",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.backList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "backList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.currentItem",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "currentItem",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.BackForwardList.forwardList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "forwardList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage.BackForwardList",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.backForwardList",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "backForwardList",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.callJavaScript",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "callJavaScript",
+      "overloads" : [
+        {
+          "labels" : [
+            "_",
+            "arguments",
+            "in",
+            "contentWorld"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.customUserAgent",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "customUserAgent",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.estimatedProgress",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "estimatedProgress",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.hasOnlySecureContent",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "hasOnlySecureContent",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.isLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "isLoading",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.load",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "load",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "_",
+            "mimeType",
+            "characterEncoding",
+            "baseURL"
+          ]
+        },
+        {
+          "labels" : [
+            "html",
+            "baseURL"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.navigations",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "navigations",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.reload",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "reload",
+      "overloads" : [
+        {
+          "labels" : [
+            "fromOrigin"
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.stopLoading",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "stopLoading",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.themeColor",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "themeColor",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.title",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "title",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "member:WebPage.url",
+      "introduced" : "26.0",
+      "kind" : "member",
+      "name" : "url",
+      "overloads" : [
+
+      ],
+      "owner" : "WebPage",
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Charts",
       "id" : "modifier:ChartContent.annotation",
       "kind" : "modifier",
@@ -17169,6 +17450,143 @@
       "support" : "full"
     },
     {
+      "family" : "Web",
+      "id" : "modifier:webViewBackForwardNavigationGestures",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewBackForwardNavigationGestures",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewContentBackground",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewContentBackground",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewElementFullscreenBehavior",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewElementFullscreenBehavior",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewLinkPreviews",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewLinkPreviews",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewMagnificationGestures",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewMagnificationGestures",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewOnScrollGeometryChange",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewOnScrollGeometryChange",
+      "overloads" : [
+        {
+          "labels" : [
+            "for",
+            "of",
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "for",
+            "of",
+            "action"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewScrollPosition",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewScrollPosition",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "modifier:webViewTextSelection",
+      "introduced" : "26.0",
+      "kind" : "modifier",
+      "name" : "webViewTextSelection",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "modifier:zIndex",
       "kind" : "modifier",
@@ -20692,6 +21110,46 @@
       "support" : "partial"
     },
     {
+      "family" : "Web",
+      "id" : "type:WebPage",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage",
+      "overloads" : [
+        {
+          "labels" : [
+
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "type:WebPage.BackForwardList",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage.BackForwardList",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
+      "family" : "Web",
+      "id" : "type:WebPage.BackForwardList.Item",
+      "introduced" : "26.0",
+      "kind" : "type",
+      "name" : "WebPage.BackForwardList.Item",
+      "overloads" : [
+
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "type:ZStackLayout",
       "kind" : "type",
@@ -23016,6 +23474,27 @@
       "support" : "full"
     },
     {
+      "family" : "Web",
+      "id" : "view:WebView",
+      "introduced" : "26.0",
+      "kind" : "view",
+      "name" : "WebView",
+      "overloads" : [
+        {
+          "labels" : [
+            "_"
+          ]
+        },
+        {
+          "labels" : [
+            "url"
+          ]
+        }
+      ],
+      "source" : "Sources/Kiln/Web.swift",
+      "support" : "full"
+    },
+    {
       "family" : "Layout",
       "id" : "view:ZStack",
       "kind" : "view",
@@ -23331,6 +23810,12 @@
       "reason" : "It binds a `TextSelection`, which arrives with text selection in Sharing (§3.2).",
       "status" : "later",
       "what" : "`.searchSelection(_:)`: the selected range in the search field"
+    },
+    {
+      "id" : "web-scroll-input",
+      "reason" : "iOS has no `ScrollInputKind` to pass it: its kinds are watchOS's and visionOS's.",
+      "status" : "wontDo",
+      "what" : "`.webViewScrollInputBehavior(_:for:)`"
     },
     {
       "id" : "realtime-audio",
