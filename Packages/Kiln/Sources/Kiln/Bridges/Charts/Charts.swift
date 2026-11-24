@@ -153,8 +153,9 @@ final class ChartsBridges: KBridgeFamily {
     static func axes(_ r: KRegistry) {
         for name in ["chartXAxis", "chartYAxis"] {
             r.modifier(name, .charts, notes: "`.hidden`, or `AxisMarks` with grid lines, ticks and labels.") { m in
-                m.formOnBase("_:any") { c in KChartBuilder(interp: c.interp).axisVisibility(c, name) }
+                // The content form first: a trailing closure would bind `_:any` too.
                 m.formOnBase("content:content") { c in KChartBuilder(interp: c.interp).axis(c, name) }
+                m.formOnBase("_:any") { c in KChartBuilder(interp: c.interp).axisVisibility(c, name) }
             }
         }
         r.view("AxisMarks", .charts) { v in

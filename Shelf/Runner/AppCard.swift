@@ -291,7 +291,9 @@ final class AppCard {
     let state = CardState()
     let host: UIHostingController<CardRoot>
     let face: CardFaceView
-    private(set) var phase = Phase.opening
+    private(set) var phase = Phase.opening {
+        didSet { updateScenePhase() }
+    }
     /// What it was doing when a finger caught it.
     private var heldFrom = Phase.open
     private(set) var landingFades = false
@@ -350,8 +352,28 @@ final class AppCard {
     /// Its tasks and timers are cancelled, whatever its bridges started
     /// stops, and a permission sheet still up for it goes.
     func tearDown() {
+        // The app sees `.background` before it stops (`onChange(of: scenePhase)`
+        // runs in this layout pass); nothing of its code runs after teardown.
+        if let context = state.run?.context, !context.isTornDown {
+            context.scenePhase = .background
+            host.view.setNeedsLayout()
+            host.view.layoutIfNeeded()
+        }
         state.run?.tearDown()
         state.run = nil
+    }
+
+    /// `@Environment(\.scenePhase)` in the app (plan §2): `.active` while
+    /// the card is open or opening, `.inactive` under a finger or on its way
+    /// to its icon, `.background` when it lands. Shelf's own phase (in the
+    /// background, say) lowers it further, in Kiln.
+    private func updateScenePhase() {
+        guard let context = state.run?.context, !context.isTornDown else { return }
+        switch phase {
+        case .opening, .open: context.scenePhase = .active
+        case .held, .closing: context.scenePhase = .inactive
+        case .landed: context.scenePhase = .background
+        }
     }
 
     /// The app has faded in over the launch surface.

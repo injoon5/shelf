@@ -17,11 +17,8 @@ final class ScenesBridges: KBridgeFamily {
         r.modifier("scenePadding", .scenes) { m in
             m.form("_:Edge.Set?") { c, view in view.scenePadding(c.has(0) ? c.edges(0) : .all) }
             m.form("_:any edges:Edge.Set?") { c, view in
-                #if os(iOS)
-                view.scenePadding(c.symbol(0) == "navigationBar" ? .navigationBar : .minimum, edges: c.has("edges") ? c.edges("edges") : .all)
-                #else
+                // `.navigationBar` is watchOS's; iOS has `.minimum`.
                 view.scenePadding(.minimum, edges: c.has("edges") ? c.edges("edges") : .all)
-                #endif
             }
         }
     }

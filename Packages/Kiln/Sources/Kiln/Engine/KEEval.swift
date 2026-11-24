@@ -643,6 +643,13 @@ extension KInterpreter {
         case (.array(let x), .array(let y)) where op == "+": return .array(x + y)
         case (.array(let x), _) where op == "+": return .array(x + [b])
         case (.view(let x), .view(let y)) where op == "+": return .view(.textConcat(x, y))
+        // `Angle`: `a + b`, `a - b`, `a * 2`, `a / 2` (SwiftUI's own arithmetic).
+        case (.native(.angle(let x)), .native(.angle(let y))) where op == "+" || op == "-":
+            return .native(.angle(op == "+" ? x + y : x - y))
+        case (.native(.angle(let x)), _) where (op == "*" || op == "/") && b.asDouble != nil:
+            return .native(.angle(op == "*" ? x * b.asDouble! : x / b.asDouble!))
+        case (_, .native(.angle(let y))) where op == "*" && a.asDouble != nil:
+            return .native(.angle(a.asDouble! * y))
         case (.native(.date(let d)), _) where op == "+" || op == "-":
             if let s = b.asDouble { return .native(.date(op == "+" ? d.addingTimeInterval(s) : d.addingTimeInterval(-s))) }
             if case .native(.date(let e)) = b, op == "-" { return .double(d.timeIntervalSince(e)) }

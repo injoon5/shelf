@@ -155,7 +155,7 @@ struct KHostView: View {
         // a reader of them (KEHostInputs); the others don't depend on all of it.
         if interp.needsHostInputs(value.type) {
             let storage = self.storage, value = self.value, interp = self.interp, dismiss = self.dismiss, objects = self.objects
-            KHostInputs(readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
+            KHostInputs(storage: storage, readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
                 storage.setEnvironment(value, dismiss: dismiss, colorScheme: inputs.environment.colorScheme, objects: objects, interp: interp,
                                        inputs: inputs)
                 return Self.render(value, interp, storage)
@@ -248,7 +248,7 @@ struct KModifierHost: View {
         if interp.needsHostInputs(value.type) {
             let storage = self.storage, value = self.value, interp = self.interp, dismiss = self.dismiss, objects = self.objects
             let content = KNativeContent.value(self.content)
-            KHostInputs(readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
+            KHostInputs(storage: storage, readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
                 storage.setEnvironment(value, dismiss: dismiss, colorScheme: inputs.environment.colorScheme, objects: objects, interp: interp,
                                        inputs: inputs)
                 return KHostView.render(value, interp, storage, content: content)

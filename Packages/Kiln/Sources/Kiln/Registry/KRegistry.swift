@@ -81,11 +81,11 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .layout: return "stacks, grids, scroll views, frames and padding"
         case .lists: return "lists, forms and sections"
         case .navigation: return "navigation stacks, tabs, toolbars, sheets and alerts"
-        case .gestures: return "taps, long presses, drags, pinches and rotations"
+        case .gestures: return "taps, long presses, drags, pinches, rotations and composed gestures"
         case .drawing: return "shapes, paths, colors, gradients, images, effects and animation"
-        case .focus: return "keyboard focus, submit and keyboard types"
+        case .focus: return "keyboard focus, submit, keyboard types and hardware keys"
         case .environment: return "state, bindings, observable models and environment values"
-        case .accessibility: return "accessibility labels, hints and values"
+        case .accessibility: return "accessibility labels, traits, actions and rotors"
         case .charts: return "Swift Charts"
         case .scenes: return "the app's scene"
         case .haptics: return "haptic feedback"
@@ -123,6 +123,22 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
         case .navigation:
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        case .core:
+            return "views' life cycle (`onAppear`, `.task`, `onChange`, `onReceive`), `TimelineView` (`.animation`, `.periodic`, `.everyMinute`, `.explicit`), and the `@Entry` and `@Animatable` macros"
+        case .text:
+            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values"
+        case .gestures:
+            return "every gesture (`TapGesture`, `SpatialTapGesture`, `LongPressGesture`, `DragGesture`, `MagnifyGesture`, `RotateGesture`, your own `Gesture`) with `.onChanged`, `.onEnded`, `.updating` and `@GestureState`, `.simultaneously`, `.sequenced`, `.exclusively`; `.gesture`, `.simultaneousGesture`, `.highPriorityGesture`, `.onTapGesture` (with the tap's location), `.onLongPressGesture`, hover and Pencil. A drag that starts at the very top or bottom edge closes the app instead"
+        case .drawing:
+            return "shapes and their operations (`union`, `inset`, `rotation`), `Path`, every color, gradient (`MeshGradient` too) and shape style, `Image` with `.symbolEffect`, `Canvas` with `GraphicsContext`, Liquid Glass (`.glassEffect`, `GlassEffectContainer`, `.glassEffectID`), `matchedGeometryEffect`, every visual effect, blend mode, animation and transition, `.contentTransition(.numericText())`, `phaseAnimator`, `keyframeAnimator`, `visualEffect`, and your own `Shape`, `Animatable` and `Transition`"
+        case .focus:
+            return "`@FocusState` (a `Bool`, or an enum of fields) with `.focused`, `.defaultFocus`, `.onSubmit` and `.submitLabel`; keyboard and text content types, `.scrollDismissesKeyboard`, `@FocusedValue`, `.keyboardShortcut` and `.onKeyPress`"
+        case .environment:
+            return "`@State`, `@Binding`, `@Observable` with `@Bindable` and `@Environment(Model.self)`, `@AppStorage`, your own `@Entry` values, every SwiftUI environment value (`\\.scenePhase` is `.active` while the app is open; `\\.openURL` opens web, mail, phone and Maps links), `PreferenceKey`, and `.redacted`"
+        case .accessibility:
+            return "every `accessibility…` modifier (labels, values, traits, actions, rotors, `@AccessibilityFocusState`), the speech modifiers and the accessibility environment values"
+        case .charts:
+            return "every mark and plot (`LinePlot(x:y:domain:)` draws a function), `.foregroundStyle(by:)`, annotations, `AxisMarks`, scales, legends, `.chartXSelection`, `.chartScrollableAxes` and `.chartOverlay` with `ChartProxy`; each axis takes one kind of value (text, numbers or dates)"
         default:
             return nil
         }

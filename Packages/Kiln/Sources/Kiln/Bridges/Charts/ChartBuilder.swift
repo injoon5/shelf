@@ -672,7 +672,7 @@ struct KChartBuilder {
         if let range = c["range"]?.asArray {
             return AnyView(view.chartForegroundStyleScale(range: range.map { c.r.shapeStyle($0) ?? AnyShapeStyle(.foreground) }))
         }
-        if case .function(let fn)? = c["mapping"] {
+        if case .function(let fn)? = c["mapping"] ?? c[0] {
             let interp = c.interp
             return AnyView(view.chartForegroundStyleScale { (value: String) -> AnyShapeStyle in
                 let v = (try? interp.entry { try interp.call(fn, [.string(value)], [nil]) }) ?? .nilValue

@@ -438,6 +438,27 @@ final class RestOfSwiftUITests: XCTestCase {
         _ = try run(Self.focusApp)
     }
 
+    /// A view hosted with SwiftUI's environment, a namespace or focus still
+    /// redraws when its `@State` changes.
+    func testAHostInputsViewRedrawsOnItsState() throws {
+        let source = """
+        import SwiftUI
+        struct ContentView: View {
+            @Namespace private var space
+            @FocusState private var focused: Bool
+            @Environment(\\.dynamicTypeSize) private var size
+            @State private var n = 0
+            var body: some View {
+                Text("n \\(n)")
+                    .onAppear { n = 1 }
+                    .onChange(of: n) { _, new in print("redrawn", new) }
+            }
+        }
+        """
+        let (_, result, _) = try run(source)
+        XCTAssertTrue((result.interp?.console ?? "").contains("redrawn 1"), result.interp?.console ?? "")
+    }
+
     func testFocusedValuesShareASlotByName() {
         XCTAssertEqual(KFocusSlots.slot("draft"), KFocusSlots.slot("draft"))
         XCTAssertLessThan(KFocusSlots.slot("somethingElse"), KFocusSlots.count)
@@ -671,6 +692,30 @@ final class RestOfSwiftUITests: XCTestCase {
         """
         expectClean(source)
         _ = try run(source)
+    }
+
+    // MARK: Shelf's fixtures
+
+    /// Round 1's fixtures (`fixtures/apps/`): they check, validate with no
+    /// error or warning, and show with no error, as Shelf's fixture test wants.
+    func testRoundOneFixtures() throws {
+        let root = CheckCorpusTests.repoRoot.appending(path: "fixtures/apps")
+        for name in ["gestures-canvas", "focus-environment", "charts", "accessibility-motion"] {
+            let source = try String(contentsOf: root.appending(path: name + ".swift"), encoding: .utf8)
+            let check = Kiln.check(source)
+            XCTAssertTrue(check.passed, "\(name) check: \(check.errors.map { "\($0.line): \($0.message)" })")
+            XCTAssertEqual(check.warnings.map(\.message), [], name)
+            let v = Kiln.validate(source)
+            XCTAssertEqual(v.errors, [], name)
+            XCTAssertEqual(v.warnings, [], name)
+            XCTAssertTrue(v.renderedContent, name)
+            let result = Kiln.run(source)
+            XCTAssertEqual(result.errors, [], name)
+            let view = try XCTUnwrap(result.view, name)
+            let window = mount(view, width: 390, height: 800)
+            _ = window
+            XCTAssertEqual(result.interp?.errors ?? [], [], name)
+        }
     }
 
     // MARK: TimelineView

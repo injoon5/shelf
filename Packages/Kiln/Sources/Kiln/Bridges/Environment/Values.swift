@@ -258,14 +258,16 @@ extension EnvironmentBridges {
                            read: { _, i in .native(.object("UserDefaults", KRef(i.context.defaults))) })
         r.environmentValue("preferredPencilDoubleTapAction", .environment, value: { _ in .nilValue }, read: { env, _ in
             #if os(iOS)
-            return symbol(env.preferredPencilDoubleTapAction)
+            if #available(iOS 17.5, *) { return symbol(env.preferredPencilDoubleTapAction) }
+            return .nilValue
             #else
             return .nilValue
             #endif
         })
         r.environmentValue("preferredPencilSqueezeAction", .environment, value: { _ in .nilValue }, read: { env, _ in
             #if os(iOS)
-            return symbol(env.preferredPencilSqueezeAction)
+            if #available(iOS 17.5, *) { return symbol(env.preferredPencilSqueezeAction) }
+            return .nilValue
             #else
             return .nilValue
             #endif

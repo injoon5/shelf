@@ -365,7 +365,7 @@ final class GesturesBridges: KBridgeFamily {
             m.form("perform:action") { c, view in
                 #if os(iOS)
                 let interp = c.interp
-                if case .function(let fn)? = c["perform"] {
+                if #available(iOS 17.5, *), case .function(let fn)? = c["perform"] {
                     AnyView(view.onPencilDoubleTap { value in
                         let hover = value.hoverPose.map { KV.native(.point($0.location.x, $0.location.y)) } ?? .nilValue
                         interp.perform(fn, [.tuple([hover], ["hoverPose"])])
@@ -382,7 +382,7 @@ final class GesturesBridges: KBridgeFamily {
             m.form("perform:action") { c, view in
                 #if os(iOS)
                 let interp = c.interp
-                if case .function(let fn)? = c["perform"] {
+                if #available(iOS 17.5, *), case .function(let fn)? = c["perform"] {
                     AnyView(view.onPencilSqueeze { phase in
                         switch phase {
                         case .active: interp.perform(fn, [.native(.implicit("active", []))])

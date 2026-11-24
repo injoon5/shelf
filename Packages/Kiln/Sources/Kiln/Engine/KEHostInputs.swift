@@ -42,6 +42,9 @@ struct KHostInputs<Content: View>: View {
     @Namespace private var namespace
     @FocusState private var focus: KV?
     @AccessibilityFocusState private var accessibilityFocus: KV?
+    /// The view's own storage: its `@State` changing redraws this view, which
+    /// runs the app's body (the closure alone wouldn't tell SwiftUI it changed).
+    @ObservedObject var storage: KViewStorage
     var readsFocusedValues = false
     let content: @MainActor (KHostInputValues) -> Content
 

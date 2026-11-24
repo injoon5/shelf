@@ -197,7 +197,9 @@ extension DrawingBridges {
                 if #available(iOS 18, macOS 15, *) {
                     switch c.symbol(0) {
                     case "active": AnyView(view.materialActiveAppearance(.active))
+                    #if os(macOS)
                     case "inactive": AnyView(view.materialActiveAppearance(.inactive))
+                    #endif
                     case "matchWindow": AnyView(view.materialActiveAppearance(.matchWindow))
                     default: AnyView(view.materialActiveAppearance(.automatic))
                     }
