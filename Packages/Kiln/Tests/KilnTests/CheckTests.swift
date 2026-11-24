@@ -96,8 +96,8 @@ final class CheckTests: XCTestCase {
     }
 
     func testUnknownTypesStaticMemberIsAnError() {
-        let issue = only(.unknownName, in: app(#"Button("Name") { print(UIDevice.current.name) }"#))
-        XCTAssertEqual(issue?.message, "Kiln doesn't have 'UIDevice'")
+        let issue = only(.unknownName, in: app(#"Button("Health") { print(HKHealthStore.isHealthDataAvailable()) }"#))
+        XCTAssertEqual(issue?.message, "Kiln doesn't have 'HKHealthStore'")
     }
 
     func testUnknownViewIsAnError() {
@@ -262,11 +262,11 @@ final class CheckTests: XCTestCase {
     // MARK: Stubs
 
     func testStubIsAWarningNotAnError() throws {
-        let check = Kiln.check(app(#"Button("Zone") { print(TimeZone.current) }"#))
+        let check = Kiln.check(app(#"Button("App") { print(UIApplication.shared) }"#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         let warning = try XCTUnwrap(check.warnings.first)
         XCTAssertEqual(warning.kind, .stub)
-        XCTAssertEqual(warning.message, "`TimeZone` is accepted but has no effect yet")
+        XCTAssertEqual(warning.message, "`UIApplication` is accepted but has no effect yet")
     }
 
     func testStubViewAndTypeAreWarnings() {
@@ -285,7 +285,7 @@ final class CheckTests: XCTestCase {
     func testErrorsComeFirstInLineOrder() {
         let check = Kiln.check(app(#"""
             VStack {
-                Button("a") { print(TimeZone.current) }
+                Button("a") { print(UIApplication.shared) }
                 Text("b").zzz()
                 Text("c").yyy()
             }

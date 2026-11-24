@@ -60,9 +60,9 @@ import Foundation
         func header(_ s: Substring) -> (String, Set<String>) {
             var id = s.trimmingCharacters(in: .whitespaces)
             var flags = Set<String>()
-            while id.hasSuffix("]"), let open = id.lastIndex(of: "[") {
-                flags.insert(String(id[id.index(after: open)..<id.index(before: id.endIndex)]))
-                id = id[..<open].trimmingCharacters(in: .whitespaces)
+            while let f = ["gap", "ios"].first(where: { id.hasSuffix("[\($0)]") }) {
+                flags.insert(f)
+                id = String(id.dropLast(f.count + 2)).trimmingCharacters(in: .whitespaces)
             }
             return (id, flags)
         }
@@ -162,5 +162,25 @@ import Foundation
     /// Whether an entry prints what compiled Swift prints.
     @MainActor public static func passes(_ entry: KilnCorpusEntry) -> Bool {
         run(entry) == entry.expected
+    }
+
+    /// Every entry run here, by family and section, for the manifest.
+    @MainActor static func summary(_ entries: [KilnCorpusEntry]) -> KManifest.Corpus {
+        var families: [KManifest.Corpus.Family] = []
+        for family in Array(NSOrderedSet(array: entries.map(\.family))) as! [String] {
+            let mine = entries.filter { $0.family == family }
+            var sections: [KManifest.Corpus.Section] = []
+            for section in Array(NSOrderedSet(array: mine.map(\.section))) as! [String] {
+                let es = mine.filter { $0.section == section }
+                var s = KManifest.Corpus.Section(name: section, entries: es.count, passing: 0, ios: 0, gaps: [], failing: [])
+                for e in es {
+                    if !runsHere(e) { s.ios += 1; continue }
+                    if passes(e) { s.passing += 1 } else if e.isGap { s.gaps.append(e.id) } else { s.failing.append(e.id) }
+                }
+                sections.append(s)
+            }
+            families.append(.init(name: family, sections: sections))
+        }
+        return KManifest.Corpus(families: families)
     }
 }

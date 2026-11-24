@@ -37,8 +37,8 @@ def parse(path):
         if " ::" not in raw:
             continue
         head, rest = raw.split(" ::", 1)
-        flags = set(re.findall(r"\[(\w+)\]", head))
-        ident = re.sub(r"\s*\[\w+\]", "", head).strip()
+        flags = set(re.findall(r"\[(gap|ios)\]", head))
+        ident = re.sub(r"\s*\[(gap|ios)\]", "", head).strip()
         rest = rest.strip()
         start = i - 1
         expected = []

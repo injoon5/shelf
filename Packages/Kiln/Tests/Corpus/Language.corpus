@@ -125,7 +125,7 @@ String.contains(Character) :: "abc".contains(Character("b")) => true
 String.lines split :: "a\nb".split(separator: "\n").count => 2
 String.wholeMatch Regex :: ("2026".wholeMatch(of: /\d{4}/) != nil) => true
 String.utf8 bytes :: Array("hi".utf8) => [104, 105]
-String(cString:) [gap] :: String(cString: [104, 105, 0] as [CChar]) => hi
+String(cString:) :: String(cString: [104, 105, 0] as [CChar]) => hi
 String.utf16 to array :: Array("hé".utf16) => [104, 233]
 String(utf16CodeUnits:count:) :: String(utf16CodeUnits: [104, 105], count: 2) => hi
 

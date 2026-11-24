@@ -212,11 +212,16 @@ public enum Report {
             o.append("")
         }
 
+        // Foundation and the standard library, against the corpus.
+        if let corpus = r.manifest.corpus {
+            o.append(contentsOf: corpusSection(corpus))
+        }
+
         // Extras.
         o.append("## In the manifest, not in the SDK")
         o.append("")
         o.append("Kiln-only names (`UserShape`), Swift and Foundation types the engine constructs (`Date`, `URL`), and names that don't match an SDK symbol's id. "
-                 + "These don't count anywhere.")
+                 + "They don't count here: Foundation and the standard library are counted against the corpus, above.")
         o.append("")
         o.append(r.extras.isEmpty ? "None." : r.extras.map { "`\($0.id)`" }.joined(separator: ", "))
         o.append("")
@@ -249,6 +254,7 @@ public enum Report {
         var conflicts: [Conflict]
         var extras: [String]
         var entries: [CoverageEntry]
+        var corpus: ManifestCorpus?
     }
 
     struct ManifestInfo: Codable {
@@ -258,12 +264,48 @@ public enum Report {
         var symbols: Int
     }
 
+    /// "Foundation and the standard library": the corpus's counts, and what doesn't pass.
+    static func corpusSection(_ corpus: ManifestCorpus) -> [String] {
+        var o: [String] = []
+        o.append("## Foundation and the standard library")
+        o.append("")
+        o.append("The SDK lists above are SwiftUI's. Foundation, Combine and the standard library are counted against the corpus instead: "
+                 + "everyday calls, each checked against the value compiled Swift prints (`Tests/Corpus`, PLAN.md §3, Round 2C; "
+                 + "`Tools/corpus/oracle.py` writes the values). **Covered** is passing ÷ the entries run on the Mac; "
+                 + "entries that need UIKit run on the simulator, in Shelf's tests.")
+        o.append("")
+        o.append("| Family | Section | Entries | Passing | Known gaps | Failing | Need iOS | Covered |")
+        o.append("|---|---|---:|---:|---:|---:|---:|---:|")
+        var total = (entries: 0, passing: 0, gaps: 0, failing: 0, ios: 0)
+        for f in corpus.families {
+            for s in f.sections {
+                let ran = s.entries - s.ios
+                let pct = ran == 0 ? 100 : s.passing * 100 / ran
+                o.append("| \(f.name) | \(s.name) | \(s.entries) | \(s.passing) | \(s.gaps.count) | \(s.failing.count) | \(s.ios) | \(pct)% |")
+                total.entries += s.entries; total.passing += s.passing; total.gaps += s.gaps.count
+                total.failing += s.failing.count; total.ios += s.ios
+            }
+        }
+        let ran = total.entries - total.ios
+        o.append("| **All** | | \(total.entries) | \(total.passing) | \(total.gaps) | \(total.failing) | \(total.ios) | \(ran == 0 ? 100 : total.passing * 100 / ran)% |")
+        o.append("")
+        let missing = corpus.families.flatMap { f in f.sections.flatMap { s in
+            s.gaps.map { "- \(f.name) · \(s.name): `\($0)` (a known gap)" } + s.failing.map { "- \(f.name) · \(s.name): `\($0)` (**fails**)" }
+        } }
+        o.append("### Not passing")
+        o.append("")
+        o.append(contentsOf: missing.isEmpty ? ["Nothing."] : missing)
+        o.append("")
+        return o
+    }
+
     public static func json(_ r: CoverageResult, sdk: SDKInfo, manifestPath: String) throws -> Data {
         let rep = JSONReport(sdk: sdk,
                              manifest: ManifestInfo(path: manifestPath, generator: r.manifest.generator, interim: r.manifest.interim,
                                                     symbols: r.manifest.symbols.count),
                              families: r.families, staleWontDo: r.staleWontDo, conflicts: r.conflicts,
-                             extras: r.extras.map(\.id), entries: r.entries.sorted { $0.symbol.id < $1.symbol.id })
+                             extras: r.extras.map(\.id), entries: r.entries.sorted { $0.symbol.id < $1.symbol.id },
+                             corpus: r.manifest.corpus)
         let e = JSONEncoder()
         e.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         return try e.encode(rep) + Data("\n".utf8)

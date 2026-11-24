@@ -914,6 +914,9 @@ final class KChecker {
         return Self.swiftTypes.contains(name) || symbolicTypes.contains(name)
     }
 
+    /// Static properties that are the type's own shared value.
+    static let sharedInstances: Set<String> = ["current", "autoupdatingCurrent", "shared", "main", "default", "standard", "processInfo"]
+
     /// Swift's own names a declaration can mention, which aren't values to bridge.
     static let swiftTypes: Set<String> = ["Any", "AnyObject", "Never", "Void", "Self", "Optional", "Error", "Element",
                                           "Key", "Value", "Index", "Wrapped", "Content", "Label", "Body"]
@@ -1015,6 +1018,8 @@ final class KChecker {
         if let p = b.staticProperties[name] {
             if p.support == .stub { stub("`\(typeName).\(name)`", line, notes: p.notes ?? b.notes, needle: name) }
             if p.isAsync { /* a static async property: rare; awaited by its caller */ }
+            // `Calendar.current`, `Bundle.main`, `NotificationCenter.default`: the type's own value.
+            if Self.sharedInstances.contains(name), b.support != .stub { return .native(b.name) }
             return b.membersInManifest ? .native(b.name) : .unknown
         }
         if name == "self" || name == "init" { return .unknown }
