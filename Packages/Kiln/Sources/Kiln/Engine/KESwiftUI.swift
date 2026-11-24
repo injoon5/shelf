@@ -130,8 +130,8 @@ enum KNative: Hashable {
 }
 
 /// A native value that prints as Swift prints it (`"\(distance)"` is "5.0 km").
-@MainActor protocol KDescribable {
-    func describe(_ interp: KInterpreter) -> String
+protocol KDescribable {
+    @MainActor func describe(_ interp: KInterpreter) -> String
 }
 
 /// A native value type that compares by value, with the name of the type its

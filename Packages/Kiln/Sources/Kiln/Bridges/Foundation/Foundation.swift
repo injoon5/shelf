@@ -222,10 +222,31 @@ final class FoundationBridges: KBridgeFamily {
             t.methods(["autoconnect", "receive", "eraseToAnyPublisher"]) { c, _ in c.receiver }
         }
 
-        r.type("Locale", .foundation, support: .stub) { t in
-            t.initializer { _ in .native(.object("Locale", KRef(NSObject()))) }
-            t.staticProperty("current") { _ in .native(.object("Locale", KRef(NSObject()))) }
-            t.property("identifier") { _ in .string(Locale.current.identifier) }
+        r.type("Locale", .foundation, support: .full,
+               notes: "`Locale.current`, `Locale(identifier:)`: `identifier`, `measurementSystem` (`.metric`, `.us`, `.uk`), `usesMetricSystem`, `region`, `language`, `currency`, `decimalSeparator`.") { t in
+            t.initializer("identifier:string") { c in localeValue(Locale(identifier: c.string("identifier") ?? "")) }
+            t.initializer("_:string") { c in localeValue(Locale(identifier: c.string(0) ?? "")) }
+            t.staticProperty("current") { _ in localeValue(.current) }
+            t.staticProperty("autoupdatingCurrent") { _ in localeValue(.autoupdatingCurrent) }
+            @MainActor func me(_ c: KCall) -> Locale { locale(c.receiver) ?? .current }
+            t.property("identifier") { c in .string(me(c).identifier) }
+            t.property("measurementSystem") { c in
+                let m = me(c).measurementSystem
+                return .native(.implicit(m == .us ? "us" : (m == .uk ? "uk" : "metric"), []))
+            }
+            t.property("usesMetricSystem") { c in .bool(me(c).measurementSystem == .metric) }
+            t.property("region") { c in me(c).region.map { .tuple([.string($0.identifier)], ["identifier"]) } ?? .nilValue }
+            t.property("language") { c in
+                let l = me(c).language
+                return .tuple([l.languageCode.map { .tuple([.string($0.identifier)], ["identifier"]) } ?? .nilValue], ["languageCode"])
+            }
+            t.property("currency") { c in me(c).currency.map { .tuple([.string($0.identifier)], ["identifier"]) } ?? .nilValue }
+            t.property("decimalSeparator") { c in me(c).decimalSeparator.map { .string($0) } ?? .nilValue }
+            t.property("groupingSeparator") { c in me(c).groupingSeparator.map { .string($0) } ?? .nilValue }
+            t.method("localizedString", "forIdentifier:string") { c in me(c).localizedString(forIdentifier: c.string("forIdentifier") ?? "").map { .string($0) } ?? .nilValue }
+        }
+        r.type("Locale.MeasurementSystem", .foundation, support: .full) { t in
+            for n in ["metric", "us", "uk"] { t.staticProperty(n) { _ in .native(.implicit(n, [])) } }
         }
         r.type("TimeZone", .foundation, support: .stub) { t in
             t.initializer { _ in .native(.object("TimeZone", KRef(NSObject()))) }
@@ -240,6 +261,20 @@ final class FoundationBridges: KBridgeFamily {
         r.type("UIApplication", .foundation, support: .stub) { t in
             t.anyStatic { _, _ in .native(.object("UIApplication", KRef(NSObject()))) }
             t.anyMethod { _, _ in .void }
+        }
+    }
+
+    // MARK: Locale
+
+    /// A `Locale` value (`Locale.current`, `\.locale`), as an object the app passes around.
+    static func localeValue(_ l: Locale) -> KV { .native(.object("Locale", KRef(l as NSLocale))) }
+
+    /// The `Locale` an argument names: a locale value, or an identifier.
+    static func locale(_ v: KV?) -> Locale? {
+        switch v {
+        case .native(.object("Locale", let ref))?: return (ref.value as? NSLocale).map { $0 as Locale }
+        case .string(let s)?: return Locale(identifier: s)
+        default: return nil
         }
     }
 
