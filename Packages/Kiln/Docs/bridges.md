@@ -285,6 +285,8 @@ t.method("startRecording", "to:URL") { c in
 }
 ```
 
+**Files the person picks** are the exception (`Bridges/Files/Grants.swift`): a bridge that hands the app a URL outside its folder (an importer's, a mover's, a dropped file, a camera's movie) calls `KFileGrants.of(c.context).grant(url)`, which starts security-scoped access until teardown, and `FoundationBridges.file` and `c.context.resolveFile(url)` then let it through.
+
 `URL.documentsDirectory`, `.applicationSupportDirectory`, `.cachesDirectory`, `.temporaryDirectory`, `FileManager.default.urls(for:in:)`, `Data(contentsOf:)`, `data.write(to:)`, `String(contentsOf:encoding:)` and `text.write(to:atomically:encoding:)` already resolve there (`Bridges/Foundation/FileSystem.swift`). A Foundation error the app can catch goes through `FoundationBridges.thrown(error, c)`, which leaves the folder's real place on the device out of the message. The host's Settings reads `files.usage()`.
 
 ### Capabilities, as a suspension
@@ -335,6 +337,10 @@ token.cancel()
 ```swift
 let source: MotionSource = c.context.provided(FakeMotion.self) ?? (c.context.isStub ? FakeMotion.still : RealMotion())
 ```
+
+Round 3A's are `KilnFakeCamera` and `KilnFakeMicrophone` (`Context/KilnFakeMedia.swift`): public, so a host can provide them (Shelf does on the simulator), and a stub context and a transcript use their own.
+
+**A bridge that hands the app a `Result`** (a completion handler with `Result<URL, Error>`) passes `FilesBridges.success(v, interp)` or `failure(error, interp)`: the prelude's `Result` when the app has it, so `try result.get()` works. Add the bridge's name to `KSwiftPrelude.alsoNeeded`, which brings `Result` into apps that use the bridge without naming `Result`.
 
 ### Errors
 
@@ -464,6 +470,11 @@ r.type("UIImagePickerController", .camera) { t in … }          // init, source
 r.representableController(UIImagePickerController.self, "UIImagePickerController")
 #endif
 ```
+
+A family can show its own controller in place of the app's
+(`KRepresentables.hosts[name] = { vc, interp in … }`, conforming to
+`KHostingController` so the app's update method still gets its own): the
+camera's gate does this (`Camera/CameraGate.swift`).
 
 `r.representableView(UIVisualEffectView.self, "UIVisualEffectView")` is the
 same for `UIViewRepresentable`. Register the type's declaration on every

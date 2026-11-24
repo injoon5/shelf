@@ -302,6 +302,17 @@ PLAN.md §3, Round 2C (Foundation and the standard library), with Round 2B merge
 - **Kiln Lab** (`Tools/iterate.sh`): 16 of 16 apps match native on every step but `Terrain`, whose last step reads the slider after the UI test drags it (2.9 against 3.0, and the other way on a rerun); `Ledger` matches on every step, labels 100%.
 - **New inputs.** The fixture `foundation-stdlib` and Lab's `Ledger`, with nothing to compare against.
 
+### after-4a-round3a.json
+
+PLAN.md §4, Round 3A (files, photos, the camera and recording), against the base commit `0d20cf9` (`after-3c-round2c`'s engine) measured back to back on the same machine.
+
+- **The command.** `Benchmarks/run.sh base.json` in a worktree at `0d20cf9`, then `Benchmarks/run.sh Benchmarks/after-4a-round3a.json --compare base.json` here. Date: 24 November 2026.
+- **No input is more than 10% slower.** The worst is +4.6%; the compute workloads are within 3% (`Arithmetic` −2.2%).
+- **Why not against `after-3c-round2c.json` directly.** The Mac was busy (other agents' builds and simulators): a first run against the checked-in file was 5–12% slower on every input, the pure-arithmetic workload included, which this round doesn't touch. Back to back with the base engine, the difference is gone.
+- **What it costs.** Deciding whether an app needs the prelude's `Result` now also searches for five bridge names (`fileImporter`, `loadTransferable`…), a byte search each.
+- **Kiln Lab:** `Scrapbook` (files, `UTType`, `resourceValues`, drag and drop) matches native on every step.
+- **New inputs.** The fixtures `files`, `photos`, `camera` and `recorder`, and Lab's `Scrapbook`, with nothing to compare against.
+
 ## §3.7: SurfacePlot
 
 `SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.
