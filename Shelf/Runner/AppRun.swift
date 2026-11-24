@@ -13,13 +13,18 @@ struct AppHost {
     var defaults: AppDefaults
     var files: AppFiles
     var builds: Prebuilds
+    /// A key that lets an agent put a fix to the app in itself (Copy for
+    /// Agents on the error screen), or nil.
+    var fixKey: @MainActor (_ slug: String) async -> Prompts.Install?
 
     /// A library's own, so a demo library's runs never touch the real data.
-    init(data: AppData, defaults: AppDefaults = .standard, files: AppFiles = .standard, builds: Prebuilds = .shared) {
+    init(data: AppData, defaults: AppDefaults = .standard, files: AppFiles = .standard, builds: Prebuilds = .shared,
+         fixKey: @escaping @MainActor (_ slug: String) async -> Prompts.Install? = { _ in nil }) {
         self.data = data
         self.defaults = defaults
         self.files = files
         self.builds = builds
+        self.fixKey = fixKey
     }
 }
 

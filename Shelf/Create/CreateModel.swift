@@ -60,10 +60,7 @@ final class CreateModel {
     // MARK: Prompt
 
     private var install: Prompts.Install? {
-        guard let key, key.expires > .now else { return nil }
-        var origin = Account.site.absoluteString
-        while origin.hasSuffix("/") { origin.removeLast() }
-        return Prompts.Install(origin: origin, key: key.key, expires: key.expires)
+        Prompts.Install(key)
     }
 
     func prompt(includeSource: Bool) -> String {
@@ -89,6 +86,14 @@ final class CreateModel {
             try? await Task.sleep(for: Motion.copiedStay)
             if !Task.isCancelled { self?.didCopy = false }
         }
+    }
+
+    /// Copy for Agents on a reply that can't be installed: Kiln's report,
+    /// the reply's source and the sheet's own key, so the agent fixes it
+    /// and installs it (and `watch` sees the key used and closes the sheet).
+    func fixPrompt(for error: CompileError, online: Bool = Connectivity.shared.isOnline) -> String {
+        Prompts.fixReply(error.report, source: reply?.source ?? "", slug: slug, idea: idea, changing: isChange,
+                         install: online ? install : nil)
     }
 
     // MARK: Install key
@@ -282,6 +287,16 @@ final class CreateModel {
     }
 }
 
+extension Prompts.Install {
+    /// What a prompt says about `key`: nil without one, or once it has expired.
+    init?(_ key: API.InstallKey?) {
+        guard let key, key.expires > .now else { return nil }
+        var origin = Account.site.absoluteString
+        while origin.hasSuffix("/") { origin.removeLast() }
+        self.init(origin: origin, key: key.key, expires: key.expires)
+    }
+}
+
 /// Unused install keys, kept while they have time left. Opening the sheet
 /// again reuses one instead of minting another; the server allows only
 /// twenty live keys at once.
@@ -295,7 +310,16 @@ final class KeyRing {
     func key(for slug: String?, api: API) async throws(API.Failure) -> API.InstallKey {
         // Keys belong to the server that issued them.
         let name = api.origin.absoluteString + " " + (slug ?? "")
-        if let held = keys[name], held.expires.timeIntervalSinceNow > minimumLife { return held }
+        if let held = keys[name], held.expires.timeIntervalSinceNow > minimumLife {
+            // An agent may have used it since it was handed out (from an
+            // error screen, or a sheet closed before the agent ran). Only
+            // a key the server says is used or gone is dropped: when it
+            // can't be asked, the key is still the best there is.
+            switch try? await api.keyStatus(held.id) {
+            case .used?, .expired?: forget(held)
+            case .waiting?, nil: return held
+            }
+        }
         let minted = try await api.mintKey(for: slug)
         keys[name] = minted
         return minted

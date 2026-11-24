@@ -34,6 +34,9 @@ struct HomeScreen: View {
                 // wouldn't otherwise see change while it's up.
                 .environment(\.iconTone, model.iconTone)
             }
+            #if DEBUG
+            .task { if Demo.reply != nil { model.sheet = .newApp } }
+            #endif
             .onChange(of: library.isSignedIn) { model.stopEditing() }
             // Leaving the foreground ends a drag (the stage lets go of its
             // icon when the model says so) and saves where it left the others.

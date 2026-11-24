@@ -61,6 +61,13 @@ enum Demo {
     static let deleteFails = UserDefaults.standard.bool(forKey: "ShelfDemoDeleteFails")
     static let deleteFailDelay: Double = 1
 
+    /// `-ShelfDebugReply <Swift file on the Mac>`: New App opens once the
+    /// Home Screen is up, with that file pasted as the reply, for seeing the
+    /// preview and its error screen (the sheet has no Paste button).
+    static var reply: String? {
+        UserDefaults.standard.string(forKey: "ShelfDebugReply").flatMap { try? String(contentsOfFile: $0, encoding: .utf8) }
+    }
+
     /// Asks for capabilities as an app would, once the Home Screen is up:
     /// `-ShelfDebugAskPermission location` (or a list, `location,camera`),
     /// as the app `-ShelfDebugAskPermissionApp workout` (by default the

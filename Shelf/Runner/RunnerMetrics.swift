@@ -164,14 +164,27 @@ enum RunnerMetrics {
 
     // MARK: Error screen
 
-    static let errorIconSize: CGFloat = 60
-    static let errorSpacing: CGFloat = 16
+    static let errorIconSize: CGFloat = 64
+    static let errorSpacing: CGFloat = 20
+    static let errorHeadingSpacing: CGFloat = 6
+    /// Below the icon, before the title.
+    static let errorIconGap: CGFloat = 8
     static let errorPadding: CGFloat = 24
+    /// Its column on a wide screen, or a wide sheet.
+    static let errorWidth: CGFloat = 560
+    /// Above the bottom of the safe area: the card's home indicator.
+    static let errorButtonsBottom: CGFloat = 12
+    static let errorBadgeSize: CGFloat = 22
+    /// The ring of background that cuts the badge out of the icon.
+    static let errorBadgeRim: CGFloat = 2
+    static let errorBadgeOffset: CGFloat = 6
+    /// The code block's fill: quieter than a grouped cell, light or dark.
+    static let codeFillOpacity: Double = 0.6
     /// Lines shown on each side of the failing one.
     static let errorContext = 2
     static let codeRadius: CGFloat = 14
     static let codePadding: CGFloat = 12
     static let codeLineSpacing: CGFloat = 2
     static let gutterGap: CGFloat = 10
-    static let failingLineOpacity: Double = 0.16
+    static let failingLineOpacity: Double = 0.14
 }

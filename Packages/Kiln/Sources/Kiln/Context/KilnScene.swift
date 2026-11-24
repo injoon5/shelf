@@ -36,11 +36,13 @@ final class KilnSceneState {
     var phase: KilnScenePhase = .active
 }
 
-/// What a run's root view gets from its context: the host's `openURL`.
+/// What a run's root view gets from its context: the host's `openURL`,
+/// and the context itself, for the host's error screen (`KilnErrorScreen`).
 struct KRunEnvironment: ViewModifier {
     let context: KilnContext
 
     func body(content: Content) -> some View {
+        let content = content.environment(\.kilnRunContext, context)
         if let open = context.openURL {
             content.environment(\.openURL, OpenURLAction { url in open(url) ? .handled : .discarded })
         } else {

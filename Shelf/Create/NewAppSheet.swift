@@ -36,6 +36,9 @@ struct NewAppSheet: View {
         .sensoryFeedback(.success, trigger: model.installs)
         .sensoryFeedback(.error, trigger: model.rejections)
         .task { await model.mint(library: library) }
+        #if DEBUG
+        .task { if let reply = Demo.reply, model.reply == nil, !model.isChange { model.paste(reply, library: library) } }
+        #endif
         // Restarting on every return to the foreground gives the check that
         // matters most: you were just in the agent's app.
         .task(id: scenePhase) {
@@ -116,54 +119,73 @@ private struct PreviewView: View {
     @Environment(\.dismiss) private var dismiss
     var model: CreateModel
     @State private var connectivity = Connectivity.shared
-    @State private var didCopyError = false
 
     var body: some View {
-        @Bindable var model = model
         VStack(spacing: CreateMetrics.spacing) {
             SheetHeader(title: model.isChange ? "Update" : "New App", back: { model.discardReply() }) { dismiss() }
+                .padding([.horizontal, .top], CreateMetrics.padding)
 
             if let meta = model.previewMeta, let reply = model.reply {
-                stage(meta, source: reply.source)
-
-                HStack(spacing: CreateMetrics.spacing) {
-                    IconImage(face: IconFace(meta), size: CreateMetrics.tileSize)
-                    VStack(alignment: .leading, spacing: CreateMetrics.fieldSpacing) {
-                        TextField("Name", text: $model.name)
-                            .font(.headline)
-                            .onChange(of: model.name) { _, name in
-                                if name.count > CreateModel.nameLimit { model.name = CreateModel.fitting(name) }
-                            }
-                        if model.isChange {
-                            Text(model.slug)
-                                .font(.footnote.monospaced())
-                                .foregroundStyle(.secondary)
-                        } else {
-                            TextField("slug", text: $model.slug)
-                                .font(.footnote.monospaced())
-                                .foregroundStyle(model.isSlugValid && !model.isSlugTaken(in: library) ? .secondary : Color.red)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                        }
-                    }
-                    installButton
-                }
-
-                if let failure = model.failure {
-                    Text(failure)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if let error = model.checkError ?? model.compileError {
+                    // Nothing to try and nothing to install: the error is the
+                    // sheet, with no preview frame, and no name or Install
+                    // under it. Copy for Agents sends it back with the
+                    // sheet's key, to be fixed and installed.
+                    ErrorScreen(face: IconFace(meta), name: meta.name, error: error,
+                                title: "\(meta.name) can’t be installed") { model.fixPrompt(for: error) }
                         .transition(.opacity)
-                }
-
-                if !model.warnings.isEmpty {
-                    warnings
+                } else {
+                    tryOut(meta, source: reply.source)
+                        .padding([.horizontal, .bottom], CreateMetrics.padding)
                         .transition(.opacity)
                 }
             }
         }
-        .padding(CreateMetrics.padding)
+        .animation(Motion.quick, value: model.checkError ?? model.compileError)
+    }
+
+    /// The reply running, and what it will be installed as.
+    private func tryOut(_ meta: AppMeta, source: String) -> some View {
+        @Bindable var model = model
+        return VStack(spacing: CreateMetrics.spacing) {
+            stage(meta, source: source)
+
+            HStack(spacing: CreateMetrics.spacing) {
+                IconImage(face: IconFace(meta), size: CreateMetrics.tileSize)
+                VStack(alignment: .leading, spacing: CreateMetrics.fieldSpacing) {
+                    TextField("Name", text: $model.name)
+                        .font(.headline)
+                        .onChange(of: model.name) { _, name in
+                            if name.count > CreateModel.nameLimit { model.name = CreateModel.fitting(name) }
+                        }
+                    if model.isChange {
+                        Text(model.slug)
+                            .font(.footnote.monospaced())
+                            .foregroundStyle(.secondary)
+                    } else {
+                        TextField("slug", text: $model.slug)
+                            .font(.footnote.monospaced())
+                            .foregroundStyle(model.isSlugValid && !model.isSlugTaken(in: library) ? .secondary : Color.red)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
+                }
+                installButton
+            }
+
+            if let failure = model.failure {
+                Text(failure)
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .transition(.opacity)
+            }
+
+            if !model.warnings.isEmpty {
+                warnings
+                    .transition(.opacity)
+            }
+        }
         .animation(Motion.quick, value: model.failure)
         .animation(Motion.quick, value: model.warnings)
     }
@@ -195,48 +217,19 @@ private struct PreviewView: View {
 
     private func stage(_ meta: AppMeta, source: String) -> some View {
         let shape = RoundedRectangle(cornerRadius: CreateMetrics.previewRadius, style: .continuous)
-        return ZStack {
-            if let error = model.checkError {
-                // What Kiln found before running it: the reply can't be installed as written.
-                ZStack {
-                    Color(.systemBackground)
-                    ErrorScreen(face: IconFace(meta), name: meta.name, error: error,
-                                title: "\(meta.name) can’t be installed")
-                }
-                .transition(.opacity)
-            } else {
-                AppStage(app: meta, source: source,
-                         // A change is tried against a copy of the app's real data; nothing here is saved.
-                         store: .scratch(copying: model.app?.slug), host: library.host,
-                         // The real capabilities, after the same sheet an installed app gets.
-                         permissions: model.previewPermissions(library.permissions),
-                         onError: { error in model.previewFailed(error) })
-            }
-        }
-        .animation(Motion.quick, value: model.checkError)
-        .clipShape(shape)
-        .overlay { shape.strokeBorder(.separator, lineWidth: CreateMetrics.previewBorder) }
-        .overlay(alignment: .bottom) {
-            if let error = model.checkError ?? model.compileError {
-                // A broken reply goes back to the model with the lines around the failure.
-                Button {
-                    UIPasteboard.general.string = error.report
-                    didCopyError = true
-                } label: {
-                    Label(didCopyError ? "Copied" : "Copy Error", systemImage: didCopyError ? "checkmark" : "doc.on.doc")
-                        .contentTransition(.symbolEffect(.replace))
-                }
-                .buttonStyle(.glass)
-                .padding(CreateMetrics.padding)
-                .task(id: didCopyError) {
-                    guard didCopyError else { return }
-                    try? await Task.sleep(for: Motion.copiedStay)
-                    didCopyError = false
-                }
-            }
-        }
-        // The preview is keyed to the source alone: renaming the app mustn't restart it.
-        .id(source)
+        return AppStage(app: meta, source: source,
+                        // A change is tried against a copy of the app's real data; nothing here is saved.
+                        store: .scratch(copying: model.app?.slug), host: library.host,
+                        // The real capabilities, after the same sheet an installed app gets.
+                        permissions: model.previewPermissions(library.permissions),
+                        // Failing while it runs blocks Install too, and the sheet shows the error instead.
+                        onError: { error in model.previewFailed(error) },
+                        errorTitle: "\(meta.name) can’t be installed",
+                        fixPrompt: { model.fixPrompt(for: $0) })
+            .clipShape(shape)
+            .overlay { shape.strokeBorder(.separator, lineWidth: CreateMetrics.previewBorder) }
+            // The preview is keyed to the source alone: renaming the app mustn't restart it.
+            .id(source)
     }
 
     private var installButton: some View {

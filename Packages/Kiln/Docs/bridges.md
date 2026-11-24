@@ -272,7 +272,7 @@ Every run has a `KilnContext` (PLAN.md §1.7, `Sources/Kiln/Context/`). The host
 | Capabilities | the host's gate for this app (`KilnCapabilityGate`; Shelf's `AppPermissions`) | `c.context.capabilities.request(.location)` |
 | Teardown | what stops when the app's screen closes | `c.context.onTearDown { … }` |
 | Stub | `isStub`: a check, not a real run | use the fake, write nothing that lasts |
-| Errors | `onError`, which the host sets: every check, `body` and runtime error with its line (`KilnError`) | nothing: throw as usual |
+| Errors | `onError`, which the host sets: every check, `body` and runtime error with its line (`KilnError`); `KilnErrorScreen`, which the host provides, draws one in place of what failed | nothing: throw as usual |
 
 ### Files
 
@@ -339,6 +339,16 @@ let source: MotionSource = c.context.provided(FakeMotion.self) ?? (c.context.isS
 ### Errors
 
 The host sets `context.onError`. It hears each error once, as a `KilnError` with its `phase` (`.check`: the code doesn't parse or has no view; `.body`: a view's `body` failed, so what shows is broken; `.runtime`: an action, a task, a global), `line` and `message`, on the main actor and never during a SwiftUI update. Shelf shows its error screen for `.check` and `.body`.
+
+Where part of a view fails while it runs, Kiln draws an error in its place. The host draws it if it provides a `KilnErrorScreen` for the run (`Context/KilnErrorScreen.swift`), which is given the error with its line:
+
+```swift
+context.provide(KilnErrorScreen { error in
+    MyErrorScreen(line: error.line, message: error.message)
+})
+```
+
+Every error Kiln draws comes this way, whichever phase `onError` gave it: a custom style's `makeBody`, which SwiftUI calls on its own time, is a `.runtime` error that still broke what shows. Shelf draws nothing in place and, from the view's `onAppear`, swaps the whole app for its own screen. Without a screen (Kiln Lab, tests), Kiln draws its red label.
 
 ### Building off the main thread
 
