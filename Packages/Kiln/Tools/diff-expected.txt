@@ -60,3 +60,11 @@ fixtures/apps/haptics.swift Round 2A's Haptics fixture: before, `SensoryFeedback
 fixtures/apps/sharing.swift Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.
 fixtures/apps/text-parsing.swift Round 2A's text-parsing fixture: before, RegexBuilder, NSDataDetector, NaturalLanguage and Decimal weren't bridged.
 fixtures/apps/units.swift Round 2A's Units fixture: before, `Measurement` was a stub holding its value, with no units or conversion.
+Packages/Kiln/Examples/Apps/Wayfinder.swift Round 3B's Lab example: before, Core Location and Core Motion weren't bridged.
+fixtures/apps/location.swift Round 3B's Location fixture: before, CLLocationManager, CLLocationUpdate, CLServiceSession, MapKit's geocoding and LocationButton weren't bridged.
+fixtures/apps/motion.swift Round 3B's Motion fixture: before, CMMotionManager, CMPedometer, CMAltimeter, CMMotionActivityManager and CMHeadphoneMotionManager weren't bridged.
+tests/MotionLocationTests-9.swift Round 3B: before, CMMotionManager and CMPedometer weren't bridged.
+tests/MotionLocationTests-17.swift Round 3B: before, Core Motion wasn't bridged.
+tests/MotionLocationTests-19.swift Round 3B: before, Core Location and MapKit's geocoding weren't bridged.
+tests/MotionLocationTests-20.swift Round 3B: before, Core Location wasn't bridged.
+tests/MotionLocationTests-21.swift Round 3B: before, Core Motion wasn't bridged.

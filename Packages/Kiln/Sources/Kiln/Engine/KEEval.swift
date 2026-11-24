@@ -376,6 +376,20 @@ extension KInterpreter {
     }
 
     func member(_ base: KV, _ name: String, line: Int) throws -> KV {
+        // `try await request.mapItems.first`: `await` covers the chain, and
+        // waits on the async property inside it. The member is read from
+        // what it resumes with (nil stays nil: only an optional chain reaches
+        // a member of nil in code that compiles).
+        if case .native(.suspension(let s)) = base, case .native(let start) = s.work {
+            let mapped = KSuspension.callback { ctx, resume in
+                start(ctx) { [unowned self] result in
+                    resume(result.flatMap { v in v.isNil ? .success(.nilValue) : Result { try self.member(v, name, line: line) } })
+                }
+            }
+            mapped.name = s.name
+            mapped.line = s.line
+            return .suspension(mapped)
+        }
         switch base {
         case .structV(let s):
             if let f = s.fields[name] { return unwrapField(s.type, name, f) }

@@ -485,6 +485,14 @@ final class MotionLocationTests: XCTestCase {
                 out.append((error as? MKError)?.code == .placemarkNotFound ? "not found" : "other error")
             }
             out.append(MKGeocodingRequest(addressString: "  ") == nil ? "nil for empty" : "made")
+            // `await` over a chain: the async property inside it is waited on.
+            if let request = MKReverseGeocodingRequest(location: here), let first = try? await request.mapItems.first {
+                out.append(first.name ?? "no name")
+            }
+            let city = try? await MKReverseGeocodingRequest(location: here)?.mapItems.first?.addressRepresentations?.cityName
+            out.append(city ?? "no city")
+            let count = (try? await MKGeocodingRequest(addressString: "Atlantis")?.mapItems.count) ?? -1
+            out.append(String(count))
             var placemark = ""
             CLGeocoder().reverseGeocodeLocation(here) { marks, error in
                 placemark = marks?.first.map { "\\($0.locality ?? "") \\($0.postalCode ?? "")" } ?? "error"
@@ -496,7 +504,7 @@ final class MotionLocationTests: XCTestCase {
             return out.joined(separator: "; ")
         }
         """, context(location: .applePark()))
-        XCTAssertEqual(out, "Apple Park; Cupertino, CA; 1 Apple Park Way, Cupertino; San Francisco; not found; nil for empty; Cupertino 95014; Infinite Loop")
+        XCTAssertEqual(out, "Apple Park; Cupertino, CA; 1 Apple Park Way, Cupertino; San Francisco; not found; nil for empty; Apple Park; Cupertino; -1; Cupertino 95014; Infinite Loop")
     }
 
     // MARK: Checks

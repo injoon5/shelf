@@ -723,12 +723,12 @@ The SDK lists above are SwiftUI's. Foundation, Combine and the standard library 
 | Language | Strings | 118 | 118 | 0 | 0 | 0 | 100% |
 | Language | Numbers | 92 | 91 | 1 | 0 | 0 | 98% |
 | Language | Collections | 142 | 141 | 1 | 0 | 0 | 99% |
-| Language | Language | 110 | 110 | 0 | 0 | 0 | 100% |
+| Language | Language | 111 | 111 | 0 | 0 | 0 | 100% |
 | Location | Coordinates | 8 | 8 | 0 | 0 | 0 | 100% |
 | Location | Locations | 8 | 8 | 0 | 0 | 0 | 100% |
 | Location | Constants | 6 | 5 | 0 | 0 | 1 | 100% |
 | Motion | Values | 10 | 10 | 0 | 0 | 0 | 100% |
-| **All** | | 848 | 828 | 3 | 0 | 17 | 99% |
+| **All** | | 849 | 829 | 3 | 0 | 17 | 99% |
 
 ### Not passing
 
