@@ -65,6 +65,7 @@ struct ContentView: View {
                             }
                             .labelStyle(.iconOnly)
                         }
+                        .buttonStyle(.borderless)
                     }
                     .onDelete(perform: delete)
                 }

@@ -394,9 +394,20 @@ struct KExportDocument: FileDocument, @unchecked Sendable {
     init(source: Source, contentType: UTType) {
         self.source = source
         self.contentType = contentType
+        Self.lock.withLock { _ = Self.used.insert(contentType) }
     }
 
     static var readableContentTypes: [UTType] { [.data, .item, .content] }
+
+    /// SwiftUI exports only in a type listed here exactly, so it lists every
+    /// type Kiln knows and each one an app has exported (`UTType(exportedAs:)`).
+    static var writableContentTypes: [UTType] {
+        let used = lock.withLock { Self.used }
+        return [.data, .item, .content] + FilesBridges.knownTypes.values.sorted { $0.identifier < $1.identifier } + used.sorted { $0.identifier < $1.identifier }
+    }
+
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var used: Set<UTType> = []
 
     init(configuration: ReadConfiguration) throws {
         source = .data(configuration.file.regularFileContents ?? Data())
