@@ -391,6 +391,49 @@ final class ContextTests: XCTestCase {
         XCTAssertEqual(heard.first?.line, 7)
     }
 
+    /// The host's error screen draws what failed, with its line, where
+    /// Kiln's red label would have been: in a `body`, and in a list's row.
+    func testTheHostsErrorScreenDrawsAnErrorInPlace() async throws {
+        for (name, body, state) in [
+            ("body", #"""
+            VStack {
+                        Text("Total")
+                        Text(String(totals[3]))
+                    }
+            """#, "let totals = [1, 2]"),
+            ("row", #"""
+            List {
+                        ForEach(0..<2, id: \.self) { i in
+                            Text(String(totals[i + 3]))
+                        }
+                    }
+            """#, "let totals = [1, 2]"),
+        ] {
+            let ctx = context(name)
+            var drawn: [KilnError] = []
+            ctx.provide(KilnErrorScreen { error in
+                Text("Host: \(error.message)").onAppear { drawn.append(error) }
+            })
+            let result = Kiln.run(app(body, state: state), context: ctx)
+            try show(try XCTUnwrap(result.view))
+            try await Task.sleep(for: .milliseconds(20))
+            XCTAssertFalse(drawn.isEmpty, name)
+            XCTAssertEqual(drawn.first?.line, 7, "\(name): \(drawn)")
+            XCTAssertTrue(drawn.first?.message.contains("out of range") == true, "\(name): \(drawn)")
+            result.tearDown()
+        }
+    }
+
+    /// Without a screen of the host's, Kiln draws its own.
+    func testWithoutAHostScreenKilnDrawsItsOwn() throws {
+        let ctx = context("own")
+        let result = Kiln.run(app(#"Text(String(totals[3]))"#, state: "let totals = [1, 2]"), context: ctx)
+        try show(try XCTUnwrap(result.view))
+        XCTAssertNil(ctx.provided(KilnErrorScreen.self))
+        XCTAssertEqual(ctx.errors.map(\.line), [5], "\(ctx.errors)")
+        result.tearDown()
+    }
+
     // MARK: Parsing off the main thread
 
     func testSourceParsedOffTheMainThreadRuns() async throws {

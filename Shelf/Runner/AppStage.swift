@@ -6,9 +6,12 @@ import SwiftUI
 /// card (`AppCard`) and inside the New App sheet as a preview.
 ///
 /// Each run has a Kiln context of its own (plan §1.7, `RunContext`): the
-/// app's settings, folder, `DB` session and permission gate. An error in a
-/// view's `body`, found while the app runs, replaces the app with the error
-/// screen, as one Kiln finds before it runs does.
+/// app's settings, folder, `DB` session and permission gate. Part of the
+/// app failing while it runs (a view's `body`, a row, anything Kiln would
+/// draw its red label for) replaces the whole app with the error screen,
+/// as an error Kiln finds before it runs does: the run's context carries
+/// Shelf's screen (`KilnErrorScreen`), which hears of every error Kiln
+/// draws.
 ///
 /// The app and the error screen replace the launch surface with a short
 /// crossfade (`Motion.launch`), as a native app replaces its launch screen.
@@ -40,6 +43,13 @@ struct AppStage: View {
     /// The app, or the error screen, has finished fading in.
     var onLaunched: () -> Void = {}
     var onError: (CompileError) -> Void = { _ in }
+    /// The error screen's title in place of "<name> couldn’t open" or
+    /// "<name> stopped".
+    var errorTitle: String?
+    /// What the error screen's Copy for Agents copies. By default, the
+    /// change prompt with the error and this source, and a key that lets
+    /// the agent update the app (`AppHost.fixKey`) when there is one.
+    var fixPrompt: (@MainActor (CompileError) async -> String)?
     /// The run has begun: a card keeps it, to tear it down when it closes.
     var onRun: (AppRun) -> Void = { _ in }
 
@@ -69,8 +79,9 @@ struct AppStage: View {
                     if let view = result.view, bodyError == nil {
                         view.onAppear { LaunchTiming.mark("shown", app.slug) }
                     } else {
-                        ErrorScreen(face: IconFace(app), name: app.name,
-                                    error: bodyError ?? CompileError(errors: result.errors, source: source))
+                        let error = bodyError ?? CompileError(errors: result.errors, source: source)
+                        ErrorScreen(face: IconFace(app), name: app.name, error: error,
+                                    title: errorTitle ?? (result.view == nil ? nil : "\(app.name) stopped")) { await prompt(for: error) }
                     }
                 }
                 // Faded as one picture. Faded view by view, each of the
@@ -120,20 +131,30 @@ struct AppStage: View {
         holder.run?.tearDown()
         holder.run = run
         onRun(run)
+        let source = source, slug = app.slug
+        // What shows is broken: the error screen takes the whole app's place.
+        let fail = { [weak run] (error: KilnError) in
+            guard let run, !run.isTornDown, bodyError == nil else { return }
+            let screen = CompileError(errors: [error.description], source: source)
+            withAnimation(Motion.launch) { bodyError = screen }
+            onError(screen)
+        }
+        // Where Kiln would draw its red label: nothing, while the stage
+        // swaps the app for its screen. Every error Kiln draws comes this
+        // way, a row's or a style's as well as a `body`'s.
+        context.provide(KilnErrorScreen { error in
+            Color.clear.frame(width: 0, height: 0)
+                .onAppear { fail(error) }
+        })
         LaunchTiming.mark("build", app.slug)
         let built = Kiln.run(parsed, context: context)
         run.result = built
         LaunchTiming.mark("built", app.slug)
-        let source = source, slug = app.slug
         context.onError = { [weak run] error in
             guard let run, !run.isTornDown else { return }
             switch error.phase {
             case .body:
-                // What shows is broken: the error screen takes its place.
-                guard bodyError == nil else { return }
-                let screen = CompileError(errors: [error.description], source: source)
-                withAnimation(Motion.launch) { bodyError = screen }
-                onError(screen)
+                fail(error)
             case .check:
                 // `result` already shows it.
                 break
@@ -148,6 +169,14 @@ struct AppStage: View {
             isLaunched = true
             onLaunched()
         }
+    }
+
+    /// Copy for Agents: the caller's prompt, or the change prompt for this
+    /// app with the error as the change and a key to update it with.
+    private func prompt(for error: CompileError) async -> String {
+        if let fixPrompt { return await fixPrompt(error) }
+        let install = await host.fixKey(app.slug)
+        return Prompts.fixApp(error.report, slug: app.slug, source: source, install: install)
     }
 
     /// Where a session is closed (saved and pushed): nowhere for a scratch one.

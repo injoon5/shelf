@@ -37,6 +37,45 @@ enum Prompts {
         return fill(template("edit"), install: install != nil, values)
     }
 
+    // MARK: - Fixing (Copy for Agents)
+
+    /// An installed app that Kiln can't start, or that failed while it ran:
+    /// the change prompt, with the error as the change and the whole source.
+    /// With `install` (an update key for `slug`) the agent puts the fix in
+    /// itself; without, it replies with the fixed file.
+    static func fixApp(_ report: String, slug: String, source: String, install: Install?) -> String {
+        change(fixRequest(report, found: "Kiln stops this app with this error:", idea: nil),
+               slug: slug, source: source, includeSource: true, install: install)
+    }
+
+    /// A reply the New App sheet won't install. `changing` is true in a
+    /// Change… sheet, whose key updates `slug`: the fix goes out as that
+    /// change. A new app's key installs it, as `slug` if that's free.
+    /// `idea` is what the reply was written for, when the sheet has it.
+    static func fixReply(_ report: String, source: String, slug: String, idea: String, changing: Bool, install: Install?) -> String {
+        let idea = idea.trimmingCharacters(in: .whitespacesAndNewlines)
+        let request = fixRequest(report, found: "Kiln finds this error in it, so Shelf won't install it:",
+                                 idea: idea.isEmpty ? nil : idea)
+        if changing {
+            return change(request, slug: slug, source: source, includeSource: true, install: install)
+        }
+        var values = installValues(install)
+        values["SLUG"] = slug
+        values["REQUEST"] = request
+        values["CURRENT"] = fill(template("current-source"), install: install != nil, ["SOURCE": trimmingTrailingNewlines(source)])
+        values["RULES"] = rules
+        return fill(template("fix"), install: install != nil, values)
+    }
+
+    /// What to fix: Kiln's report (the line, the code around it, the message),
+    /// and what the app was for.
+    static func fixRequest(_ report: String, found: String, idea: String?) -> String {
+        var text = "\(found)\n\n```text\n\(trimmingTrailingNewlines(report))\n```"
+        if let idea { text += "\n\nIt was written for this request:\n\(idea)" }
+        text += "\n\nFind the cause and fix it, using only what \"What works\" lists. Change nothing else."
+        return text
+    }
+
     // MARK: - Templates
 
     /// Everything in the new-app prompt from "## What works" to the end: the
