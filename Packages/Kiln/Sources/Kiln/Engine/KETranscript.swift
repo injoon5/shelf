@@ -180,6 +180,13 @@ final class KTranscript {
                 case "onAppear", "task":
                     actions.append((label, f, [], true, m.name == "task"))
                 case "onReceive":
+                    #if !KILN_BASELINE
+                    // A Combine publisher (Round 2C) gives what it has now; a timer, a date.
+                    if let values = KCombineValues.sample(m.args.first ?? .nilValue) {
+                        for v in values.prefix(1) { actions.append((label, f, [v], false, false)) }
+                        return
+                    }
+                    #endif
                     actions.append((label, f, [.native(.date(Date(timeIntervalSince1970: 0)))], false, false))
                 case "onDelete":
                     actions.append((label, f, [.native(.indexSet(IndexSet(integer: 0)))], false, false))

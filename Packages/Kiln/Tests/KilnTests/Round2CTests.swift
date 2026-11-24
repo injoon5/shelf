@@ -92,6 +92,23 @@ final class Round2CTests: XCTestCase {
         XCTAssertEqual(r.consoleOutput, "6\n")
     }
 
+    // MARK: Closures with `$0`
+
+    func testGestureCallbacksTake$0() {
+        let src = BridgeTest.app(#"""
+            Rectangle()
+                .frame(width: 200, height: 200)
+                .gesture(
+                    DragGesture()
+                        .onChanged { offset = $0.translation; points.append($0.location) }
+                        .onEnded { _ in offset = .zero }
+                        .simultaneously(with: RotateGesture().onChanged { angle = $0.rotation })
+                )
+            """#, state: "@State private var offset = CGSize.zero\n    @State private var points: [CGPoint] = []\n    @State private var angle = Angle.zero")
+        XCTAssertEqual(Kiln.check(src).errors.map(\.message), [])
+        XCTAssertEqual(Kiln.validate(src).errors, [])
+    }
+
     // MARK: The manifest's forms
 
     func testTheManifestListsEachFormOfAMember() throws {

@@ -388,8 +388,12 @@ struct KRenderer {
         }
     }
 
+    /// How many arguments a closure takes: its written parameters, or the
+    /// `$n` it uses (`{ offset = $0.translation }` takes one).
     func closureParamCount(_ f: KV) -> Int {
-        if case .function(let fn) = f, case .closure(let c, _) = fn.kind { return c.params.count }
+        if case .function(let fn) = f, case .closure(let c, _) = fn.kind {
+            return c.hasExplicitParams ? c.params.count : KEClosureScan.maxAnonymous(c) + 1
+        }
         return 0
     }
 

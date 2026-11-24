@@ -676,6 +676,14 @@ enum KCombineTime {
 /// `publisher.values`: what it has sent synchronously, to loop over.
 @MainActor
 enum KCombineValues {
+    /// What a check passes `.onReceive`'s closure: the values a Combine
+    /// publisher gives at once (a `CurrentValueSubject`'s, `Just`'s, `$name`'s),
+    /// none for a `PassthroughSubject`. nil when it isn't a Kiln publisher.
+    static func sample(_ v: KV) -> [KV]? {
+        guard let p = KPub.from(v) else { return nil }
+        return collect(p)
+    }
+
     static func collect(_ p: KPub) -> [KV] {
         var out: [KV] = []
         let token = p.subscribe(KSub(onValue: { out.append($0) }))
