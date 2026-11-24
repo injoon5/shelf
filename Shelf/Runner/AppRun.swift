@@ -66,8 +66,17 @@ enum RunContext {
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        provideFakes(context)
         context.openURL = { URLPolicy.open($0) }
         return context
+    }
+
+    /// The simulator has no camera: apps get Kiln's fake one there, behind
+    /// the same permission sheet (plan §4.3).
+    static func provideFakes(_ context: KilnContext) {
+        #if targetEnvironment(simulator)
+        context.provide(KilnFakeCamera())
+        #endif
     }
 
     /// A try-out (the New App preview): the real capabilities, after the same
@@ -82,6 +91,7 @@ enum RunContext {
                                   files: KilnFiles(root: folder), capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        provideFakes(context)
         // Its web pages' cookies and storage go with it.
         context.provide(KilnEphemeralWebsiteData())
         context.openURL = { URLPolicy.open($0) }

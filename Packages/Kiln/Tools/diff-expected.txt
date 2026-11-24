@@ -60,3 +60,10 @@ fixtures/apps/haptics.swift Round 2A's Haptics fixture: before, `SensoryFeedback
 fixtures/apps/sharing.swift Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.
 fixtures/apps/text-parsing.swift Round 2A's text-parsing fixture: before, RegexBuilder, NSDataDetector, NaturalLanguage and Decimal weren't bridged.
 fixtures/apps/units.swift Round 2A's Units fixture: before, `Measurement` was a stub holding its value, with no units or conversion.
+fixtures/apps/files.swift Round 3A's Files fixture: before, the file pickers, `.quickLookPreview` and drag and drop weren't bridged.
+fixtures/apps/photos.swift Round 3A's Photos fixture: before, `PhotosPicker` and saving to Photos weren't bridged.
+fixtures/apps/camera.swift Round 3A's Camera fixture: before, `.camera` was refused and `AVCaptureDevice` wasn't bridged.
+fixtures/apps/recorder.swift Round 3A's recording fixture: before, `AVAudioRecorder` and `AVAudioApplication` weren't bridged.
+tests/Round3ATests-1.swift Round 3A: before, the file pickers and `FileDocument`'s exporter weren't bridged.
+tests/Round3ATests-4.swift Round 3A: before, drag and drop and iOS 27's drag containers weren't bridged.
+Packages/Kiln/Examples/Apps/Scrapbook.swift Round 3A's Lab example: before, `resourceValues`, `.draggable` and `.dropDestination` weren't bridged.

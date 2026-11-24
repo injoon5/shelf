@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**136 inputs: 77 identical, 59 different as expected, 0 different otherwise.**
+**144 inputs: 78 identical, 66 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -17,6 +17,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
 | Packages/Kiln/Examples/Apps/PlantCare.swift | 1455 | 13 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
+| Packages/Kiln/Examples/Apps/Scrapbook.swift | 297 | 14 | expected (Round 3A's Lab example: before, `resourceValues`, `.draggable` and `.dropDestination` weren't bridged.) |
 | Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
 | Packages/Kiln/Examples/Apps/Terrain.swift | 29 | 1 | expected (Round 2 §3.7's Lab example: before, Chart3D and SurfacePlot weren't bridged.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
@@ -32,9 +33,11 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/accessibility-motion.swift | 2 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/async.swift | 283 | 14 | identical |
 | fixtures/apps/audio.swift | 2 | 1 | expected (Round 2 §3.5's fixture: before, AVAudioPlayer, AVSpeechSynthesizer and VideoPlayer weren't bridged.) |
+| fixtures/apps/camera.swift | 253 | 14 | expected (Round 3A's Camera fixture: before, `.camera` was refused and `AVCaptureDevice` wasn't bridged.) |
 | fixtures/apps/chart3d.swift | 29 | 1 | expected (Round 2 §3.7's fixture: before, Chart3D and SurfacePlot weren't bridged.) |
 | fixtures/apps/charts.swift | 81 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/controls-styles.swift | 508 | 13 | expected (Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.) |
+| fixtures/apps/files.swift | 407 | 14 | expected (Round 3A's Files fixture: before, the file pickers, `.quickLookPreview` and drag and drop weren't bridged.) |
 | fixtures/apps/focus-environment.swift | 703 | 13 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/foundation-stdlib.swift | 2 | 1 | expected (Round 2C's fixture: before, `Logger`, Combine's operators and most of what it uses didn't exist.) |
 | fixtures/apps/gestures-canvas.swift | 6 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
@@ -44,6 +47,8 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/lists-selection.swift | 59 | 1 | expected (Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.) |
 | fixtures/apps/navigation-tabs.swift | 1431 | 13 | expected (Round 1A's Navigation fixture: before, Tab, ToolbarSpacer, zoom transitions and search scopes weren't bridged.) |
 | fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
+| fixtures/apps/photos.swift | 15 | 1 | expected (Round 3A's Photos fixture: before, `PhotosPicker` and saving to Photos weren't bridged.) |
+| fixtures/apps/recorder.swift | 310 | 14 | expected (Round 3A's recording fixture: before, `AVAudioRecorder` and `AVAudioApplication` weren't bridged.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
 | fixtures/apps/sharing.swift | 30 | 1 | expected (Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.) |
 | fixtures/apps/state.swift | 599 | 13 | identical |
@@ -132,6 +137,9 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/RestOfSwiftUITests-3.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/RestOfSwiftUITests-6.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/Round2CTests-0.swift | 2 | 1 | expected (Round 2C's test: before, Combine's `PassthroughSubject` didn't exist.) |
+| tests/Round3ATests-1.swift | 24 | 1 | expected (Round 3A: before, the file pickers and `FileDocument`'s exporter weren't bridged.) |
+| tests/Round3ATests-10.swift | 3 | 1 | identical |
+| tests/Round3ATests-4.swift | 5 | 1 | expected (Round 3A: before, drag and drop and iOS 27's drag containers weren't bridged.) |
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
@@ -392,6 +400,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +        LabeledContent("Range", value: "$3.75 – $88.38")
 +        LabeledContent("Share of food", value: "1.0%")
 +        LabeledContent("Yearly", value: "4.4K")
+…
+```
+
+## Packages/Kiln/Examples/Apps/Scrapbook.swift
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,3 @@
+ == start
+-ContentView {entries=[], sizes=[], starred=[], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
++ContentView {entries=[], sizes=[], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
+   NavigationStack({fn})
+@@ -12,4 +12,4 @@
+         LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
++        LabeledContent("JSON extension", value: "json")
++        LabeledContent("PNG MIME type", value: "image/png")
+         LabeledContent("Total", value: "0 bytes in 0 files")
+@@ -22,17 +22,52 @@
+ == appeared (List.onAppear@60)
+-error: Line 81: Can't loop over .default.contentsOfDirectory.map.sorted((Function))
+-ContentView {entries=.default.contentsOfDirectory.map.sorted({fn}), sizes=[], starred=[nil], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Files", {fn})
+-        ForEach(.default.contentsOfDirectory.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Starred", {fn})
+-        Text("nil")
+-          .dropDestination(for: String, {fn})
+-      Section("Kinds", {fn})
+-        LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
+-        LabeledContent("Total", value: "0 bytes in .default.contentsOfDirectory.map.sorted.count((Function)) files")
++ContentView {entries=[Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Groceries.txt)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], sizes=["Groceries.txt": 15, "Ideas.md": 27, "Trip.json": 26], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
++  NavigationStack({fn})
++    List({fn})
++      Section("Files", {fn})
++        ForEach([Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Groceries.txt)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], {fn})
++          row "Groceries.txt"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Groceries")
++                  .font(Font)
++                Text("public.plain-text")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "15 B")
++                .monospacedDigit()
++              .draggable("Groceries")
++          row "Ideas.md"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Ideas")
++                  .font(Font)
++                Text("net.daringfireball.markdown")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "27 B")
++                .monospacedDigit()
++              .draggable("Ideas")
++          row "Trip.json"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Trip")
++                  .font(Font)
++                Text("public.json")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "26 B")
++                .monospacedDigit()
++              .draggable("Trip")
++          .onDelete(perform: {fn})
++      Section("Starred", {fn})
++        Text("Drop a file here")
++          .dropDestination(for: String, {fn})
++      Section("Kinds", {fn})
++        LabeledContent("Text is data", value: "yes")
++        LabeledContent("JSON extension", value: "json")
++        LabeledContent("PNG MIME type", value: "image/png")
++        LabeledContent("Total", value: "68 bytes in 3 files")
+       Section({fn})
+@@ -44,17 +79,85 @@
+ == after ForEach.onDelete@38
+-error: Line 101: Can't loop over IndexSet
+-ContentView {entries=.default.contentsOfDirectory.map.sorted({fn}), sizes=[], starred=[nil, nil], counter=0, folder=.documentsDirectory.appending("Scrapbook", .isDirectory)}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("Files", {fn})
+-        ForEach(.default.contentsOfDirectory.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Starred", {fn})
+-        Text("nil, nil")
+-          .dropDestination(for: String, {fn})
+-      Section("Kinds", {fn})
+-        LabeledContent("Text is data", value: "yes")
+-        LabeledContent("JSON extension", value: .json.preferredFilenameExtension)
+-        LabeledContent("PNG MIME type", value: .png.preferredMIMEType)
+-        LabeledContent("Total", value: "0 bytes in .default.contentsOfDirectory.map.sorted.count((Function)) files")
++ContentView {entries=[Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], sizes=["Ideas.md": 27, "Trip.json": 26], starred=[], counter=0, folder=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook)}
++  NavigationStack({fn})
++    List({fn})
++      Section("Files", {fn})
++        ForEach([Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Ideas.md)), Entry(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Scrapbook/Trip.json))], {fn})
++          row "Ideas.md"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Ideas")
++                  .font(Font)
++                Text("net.daringfireball.markdown")
++                  .font(Font)
++                  .foregroundStyle(Color)
++              Spacer()
++              Text(_literal: "27 B")
++                .monospacedDigit()
++              .draggable("Ideas")
++          row "Trip.json"
++            HStack({fn})
++              VStack(alignment: .leading, {fn})
++                Text("Trip")
 …
 ```
 
@@ -1151,6 +1285,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/camera.swift
+
+```diff
+--- before
++++ after
+@@ -10,3 +10,3 @@
+       Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
++        Label("Choose Photo", systemImage: "camera.circle.fill")
+           .font(Font)
+@@ -16,16 +16,17 @@
+       .sheet(isPresented: $false, {fn})
+-        content failed
+-      .task({fn})
+-error: Line 88: Value of type 'CameraView' has no method 'ignoresSafeArea'
++        CameraView {source=.photoLibrary, onPhoto={fn}, dismiss=DismissAction}
++          (no body)
++          .ignoresSafeArea()
++      .task({fn})
+ == appeared (VStack.task@90)
+-ContentView {photos=[], showingCamera=false, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
++ContentView {photos=[], showingCamera=false, access="allowed"}
++  NavigationStack({fn})
++    VStack(spacing: 20, {fn})
++      If false
++        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
++          Text(_literal: "Take one with the button below.")
++      Text(_literal: "0 taken · camera allowed")
++        .foregroundStyle(Color)
++      Button({fn}, label: {fn})
++        Label("Choose Photo", systemImage: "camera.circle.fill")
+           .font(Font)
+@@ -35,219 +36,245 @@
+       .sheet(isPresented: $false, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+-          Text(_literal: "Take one with the button below.")
+-      Text(_literal: "0 taken · camera not asked")
+-        .foregroundStyle(Color)
+-      Button({fn}, label: {fn})
+-        Label("Take Photo", systemImage: "camera.circle.fill")
+-          .font(Font)
+-        .buttonStyle(.borderedProminent)
+-      .padding()
+-      .navigationTitle("Snapshot")
+-      .sheet(isPresented: $true, {fn})
+-        content failed
+-      .task({fn})
+-== after Button[…]@74
+-ContentView {photos=[], showingCamera=true, access="not asked"}
+-  NavigationStack({fn})
+-    VStack(spacing: 20, {fn})
+-      If false
+-        ContentUnavailableView("No photos yet", systemImage: "camera", description: <view>)
+…
+```
+
 ## fixtures/apps/chart3d.swift
 
 ```diff
@@ -1526,6 +1786,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -        content failed
 +        DatePicker("Time", selection: $<date>, in: 2026-11-24 <time> +0000...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
+…
+```
+
+## fixtures/apps/files.swift
+
+```diff
+--- before
++++ after
+@@ -16,4 +16,4 @@
+       Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
++        LabeledContent("Kind", value: "text")
++        LabeledContent("Extension", value: "txt")
+         Text("Ready")
+@@ -25,4 +25,3 @@
+       .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
++      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: UTType, defaultFilename: "Note", {fn})
+       .quickLookPreview($nil)
+@@ -30,19 +29,39 @@
+ == appeared (List.onAppear@105)
+-ContentView {notes=.default.contentsOfDirectory.filter.map.sorted({fn}), draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[nil], status="Ready"}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("New note", {fn})
+-        TextField("Write something", text: $"", axis: .vertical)
+-        Button("Save as a file", {fn})
+-          .disabled(true)
+-      Section("Notes", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Pinned (drop a note here)", {fn})
+-        Text("nil")
+-          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
+-          .dropDestination(for: String, {fn})
+-      Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
++ContentView {notes=[Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[], status="Ready"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New note", {fn})
++        TextField("Write something", text: $"", axis: .vertical)
++        Button("Save as a file", {fn})
++          .disabled(true)
++      Section("Notes", {fn})
++        ForEach([Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], {fn})
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)
++            HStack({fn})
++              Label("Sample", systemImage: "doc.text")
++                .draggable("Sample")
++              Spacer()
++              Button("Preview", systemImage: "eye", {fn})
++                .labelStyle(.iconOnly)
++              Button("Export", systemImage: "square.and.arrow.up", {fn})
++                .labelStyle(.iconOnly)
++              .buttonStyle(.borderless)
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)
++            HStack({fn})
++              Label("copy", systemImage: "doc.text")
++                .draggable("copy")
++              Spacer()
++              Button("Preview", systemImage: "eye", {fn})
++                .labelStyle(.iconOnly)
++              Button("Export", systemImage: "square.and.arrow.up", {fn})
++                .labelStyle(.iconOnly)
++              .buttonStyle(.borderless)
++          .onDelete(perform: {fn})
++      Section("Pinned (drop a note here)", {fn})
++        Text("Nothing yet")
++          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
++          .dropDestination(for: String, {fn})
++      Section({fn}, footer: {fn})
++        LabeledContent("Kind", value: "text")
++        LabeledContent("Extension", value: "txt")
+         Text("Ready")
+@@ -54,354 +73,610 @@
+       .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
+-      .quickLookPreview($nil)
++      .fileExporter(isPresented: $true, document: TextFile(text: ""), contentType: UTType, defaultFilename: "Note", {fn})
++      .quickLookPreview($URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))
+       .onAppear(perform: {fn})
+ == after Button[Save as a file]@51
+-ContentView {notes=.default.contentsOfDirectory.filter.map.sorted({fn}), draft="", importing=true, exporting=false, exportText="", preview=nil, pinned=[nil, nil], status="Value of type 'Array' has no method 'write'"}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section("New note", {fn})
+-        TextField("Write something", text: $"", axis: .vertical)
+-        Button("Save as a file", {fn})
+-          .disabled(true)
+-      Section("Notes", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.map.sorted({fn}), {fn})
+-          .onDelete(perform: {fn})
+-      Section("Pinned (drop a note here)", {fn})
+-        Text("nil, nil")
+-          .frame(maxWidth: inf, minHeight: 44, alignment: .leading)
+-          .dropDestination(for: String, {fn})
+-      Section({fn}, footer: {fn})
+-        LabeledContent("Kind", value: .plainText.localizedDescription)
+-        LabeledContent("Extension", value: .plainText.preferredFilenameExtension)
+-        Text("Value of type 'Array' has no method 'write'")
+-          .foregroundStyle(Color)
+-        Text(_literal: "Files stay on this iPhone.")
+-      .navigationTitle("Notebook")
+-      .toolbar({fn})
+-        Button("Open", systemImage: "folder", {fn})
+-      .fileImporter(isPresented: $true, allowedContentTypes: [.plainText], allowsMultipleSelection: true, {fn})
+-      .fileExporter(isPresented: $false, document: TextFile(text: ""), contentType: .plainText, defaultFilename: "Note", {fn})
+-        If false
+-      .quickLookPreview($nil)
++ContentView {notes=[Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], draft="", importing=true, exporting=true, exportText="Sample", preview=URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), pinned=[], status="Saved Note.txt"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New note", {fn})
++        TextField("Write something", text: $"", axis: .vertical)
++        Button("Save as a file", {fn})
++          .disabled(true)
++      Section("Notes", {fn})
++        ForEach([Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Sample.txt)), Note(url: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt))], {fn})
++          row URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/Note.txt)
++            HStack({fn})
++              Label("Note", systemImage: "doc.text")
 …
 ```
 
@@ -2428,6 +2814,171 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -        ForEach([], {fn})
 -      .navigationTitle("Launches")
 -      .searchable(text: $"falcon")
+…
+```
+
+## fixtures/apps/photos.swift
+
+```diff
+--- before
++++ after
+@@ -5,3 +5,27 @@
+       VStack(alignment: .leading, spacing: 16, {fn})
+-        content failed
++        PhotosPicker(selection: $nil, matching: .images, {fn})
++          Group({fn})
++            If false
++              Label("Choose a cover", systemImage: "photo.badge.plus")
++                .frame(maxWidth: inf, maxHeight: inf)
++                .background(.quaternary)
++            .frame(height: 180)
++            .clipShape(<view>)
++              RoundedRectangle(cornerRadius: 16)
++        HStack({fn})
++          PhotosPicker("Add to the board", selection: $[], maxSelectionCount: 6, selectionBehavior: .ordered, matching: .any([.images, .screenshots]))
++          Spacer()
++          Button("Save cover", systemImage: "square.and.arrow.down", {fn})
++            .disabled(true)
++        LazyVGrid(columns: [GridItem], spacing: 8, {fn})
++          ForEach(0..<0, id: KeyPath, {fn})
++        Text(_literal: "Recent")
++          .font(Font)
++        PhotosPicker(selection: $nil, matching: .not(.videos), {fn})
++          Text(_literal: "Photos")
++          .photosPickerStyle(.inline)
++          .photosPickerDisabledCapabilities(.selectionActions)
++          .photosPickerAccessoryVisibility(.hidden, edges: .all)
++          .frame(height: 260)
++        If false
+         .padding()
+@@ -14,2 +38 @@
+       .onChange(of: [], {fn})
+-error: Line 27: Cannot find 'PhotosPicker' in scope
+```
+
+## fixtures/apps/recorder.swift
+
+```diff
+--- before
++++ after
+@@ -23,288 +23,324 @@
+ == appeared (List.onAppear@65)
+-error: Line 85: Binary operator '+' can't be applied to .default.contentsOfDirectory.filter.sorted.count and Int
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-error: Line 59: Can't loop over IndexSet
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after List.onReceive@66
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after List.onReceive@66
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
+-        VStack(spacing: 12, {fn})
+-          Gauge(value: -60.0, in: -60...0, {fn})
+-            Text(_literal: "Level")
+-            .gaugeStyle(.accessoryLinearCapacity)
+-          Text(0.0, format: FormatStyle)
+-            .font(Font)
+-          Button("Record", systemImage: "record.circle", {fn})
+-            .font(Font)
+-            .tint(Color)
+-          If false
+-          .frame(maxWidth: inf)
+-      Section("Recordings", {fn})
+-        ForEach(.default.contentsOfDirectory.filter.sorted({fn}), id: KeyPath, {fn})
+-          .onDelete({fn})
+-      .navigationTitle("Voice Notes")
+-      .onAppear(perform: {fn})
+-      .onReceive(Publisher, {fn})
+-== after ForEach.onDelete@58
+-ContentView {recorder=nil, player=nil, delegate=RecorderDelegate{onFinish: {fn}}, level=-160.0, elapsed=0.0, memos=.default.contentsOfDirectory.filter.sorted({fn}), note="", tick=Publisher}
+-  NavigationStack({fn})
+-    List({fn})
+-      Section({fn})
 …
 ```
 
@@ -5123,6 +5674,258 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +  Text("")
 +    .onReceive(PassthroughSubject, {fn})
 +    .onAppear({fn})
+```
+
+## tests/Round3ATests-1.swift
+
+```diff
+--- before
++++ after
+@@ -6,19 +6,302 @@
+     .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
+-    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: .plainText, defaultFilename: "Note", {fn})
+-    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: .plainText, {fn})
+-    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: .json, {fn})
+-    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
+-    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
+-    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
+-    .fileMover(isPresented: $false, file: .documentsDirectory.appending("copy.txt"), {fn})
+-      If false
+-    .fileMover(isPresented: $false, files: [.documentsDirectory.appending("copy.txt")], {fn}, onCancellation: {fn})
+-    .quickLookPreview($nil)
+-    .quickLookPreview($nil, in: [.documentsDirectory.appending("copy.txt")])
+-    .fileDialogMessage("Pick a note")
+-    .fileDialogConfirmationLabel("Open")
+-    .fileExporterFilenameLabel("Save as")
+-    .fileDialogCustomizationID("notes")
+-    .fileDialogDefaultDirectory(.documentsDirectory)
+-    .fileDialogImportsUnresolvedAliases(false)
+-    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@40
++console: access true
++console: read Sample
++error: Line 47: FileManager.fileExists(atPath:): /Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt is outside the app's folder
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@52
++console: many 1
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileImporter@52
++console: cancelled
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, document: TextFile(text: "hi"), contentType: UTType, defaultFilename: "Note", {fn})
++    .fileExporter(isPresented: $false, documents: [TextFile(text: "1"), TextFile(text: "2")], contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, document: Ledger{lines: ["a", "b"]}, contentType: UTType, {fn})
++    .fileExporter(isPresented: $false, item: Note(text: "n"), contentTypes: [.json], defaultFilename: "n", {fn}, onCancellation: {fn})
++    .fileExporter(isPresented: $false, item: Data, contentTypes: [.plainText], {fn})
++    .fileExporter(isPresented: $false, items: ["a", "b"], contentTypes: [.plainText], {fn})
++    .fileMover(isPresented: $false, file: URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt), {fn})
++    .fileMover(isPresented: $false, files: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)], {fn}, onCancellation: {fn})
++    .quickLookPreview($nil)
++    .quickLookPreview($nil, in: [URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/copy.txt)])
++    .fileDialogMessage("Pick a note")
++    .fileDialogConfirmationLabel("Open")
++    .fileExporterFilenameLabel("Save as")
++    .fileDialogCustomizationID("notes")
++    .fileDialogDefaultDirectory(URL(file:///Users/injoonoh/Library/Application%20Support/Kiln/app/Documents/))
++    .fileDialogImportsUnresolvedAliases(false)
++    .fileDialogBrowserOptions([.displayFileExtensions, .includeHiddenFiles])
++== after VStack.fileExporter@57
++console: exported Note
++ContentView {a=false, b=false, preview=nil}
++  VStack({fn})
++    Text(_literal: "Files")
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText], {fn})
++    .fileImporter(isPresented: $false, allowedContentTypes: [.plainText, .json], allowsMultipleSelection: true, {fn}, onCancellation: {fn})
+…
+```
+
+## tests/Round3ATests-4.swift
+
+```diff
+--- before
++++ after
+@@ -3,3 +3,205 @@
+   VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++        row 2
++          Text("Two")
++        .onDelete({fn})
++        .dropDestination(for: String, {fn})
++    Text(_literal: "Old")
++      .onDrop(of: [.plainText], isTargeted: $false, {fn})
++    Text(_literal: "Old with location")
++      .onDrop(of: ["public.text"], isTargeted: nil, {fn})
++    Text(_literal: "Delegate")
++      .onDrop(of: [.plainText], delegate: Dropper())
++    Text(_literal: "Provider")
++      .onDrag({fn})
++    Text(_literal: "Provider 2")
++      .itemProvider({fn})
++    Text(_literal: "Spring")
++      .springLoadingBehavior(.enabled)
++    HStack({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++            .draggable(containerItemID: 1, containerNamespace: ())
++        row 2
++          Text("Two")
++            .draggable(containerItemID: 2, containerNamespace: ())
++      .dragContainer(for: Card, in: (), {fn})
++      .dragContainerSelection([1], containerNamespace: ())
++      .dragConfiguration(DragConfiguration)
++      .onDragSessionUpdated({fn})
++      .onDropSessionUpdated({fn})
++      .dropConfiguration({fn})
++    Text(_literal: "Item")
++      .draggable(Card, item: Card(id: 2, title: "Two"), containerNamespace: ())
++== after Text.dropDestination@28
++console: strings ["Pasted"] 0.0
++ContentView {cards=[Card(id: 1, title: "One"), Card(id: 2, title: "Two")], over=false, space=()}
++  VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++        row 2
++          Text("Two")
++        .onDelete({fn})
++        .dropDestination(for: String, {fn})
++    Text(_literal: "Old")
++      .onDrop(of: [.plainText], isTargeted: $false, {fn})
++    Text(_literal: "Old with location")
++      .onDrop(of: ["public.text"], isTargeted: nil, {fn})
++    Text(_literal: "Delegate")
++      .onDrop(of: [.plainText], delegate: Dropper())
++    Text(_literal: "Provider")
++      .onDrag({fn})
++    Text(_literal: "Provider 2")
++      .itemProvider({fn})
++    Text(_literal: "Spring")
++      .springLoadingBehavior(.enabled)
++    HStack({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
++            .draggable(containerItemID: 1, containerNamespace: ())
++        row 2
++          Text("Two")
++            .draggable(containerItemID: 2, containerNamespace: ())
++      .dragContainer(for: Card, in: (), {fn})
++      .dragContainerSelection([1], containerNamespace: ())
++      .dragConfiguration(DragConfiguration)
++      .onDragSessionUpdated({fn})
++      .onDropSessionUpdated({fn})
++      .dropConfiguration({fn})
++    Text(_literal: "Item")
++      .draggable(Card, item: Card(id: 2, title: "Two"), containerNamespace: ())
++== after Text.dropDestination@28
++ContentView {cards=[Card(id: 1, title: "One"), Card(id: 2, title: "Two")], over=true, space=()}
++  VStack({fn})
++    Text(_literal: "Drag")
++      .draggable("text")
++    Text(_literal: "Drag card")
++      .draggable(Card(id: 1, title: "One"), {fn})
++        Text(_literal: "Preview")
++    Text(_literal: "URL")
++      .draggable(URL(https://example.com))
++    Text(_literal: "Drop strings")
++      .dropDestination(for: String, {fn}, isTargeted: {fn})
++    Text(_literal: "Drop cards")
++      .dropDestination(for: Card, {fn})
++    List({fn})
++      ForEach([Card(id: 1, title: "One"), Card(id: 2, title: "Two")], {fn})
++        row 1
++          Text("One")
+…
 ```
 
 ## tests/StreamsBridgeTests-5.swift

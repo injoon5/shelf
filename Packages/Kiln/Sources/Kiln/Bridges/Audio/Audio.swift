@@ -8,6 +8,7 @@
 //  - `AVPlayer(url:)` for streams and files, and AVKit's `VideoPlayer`.
 //  - `AudioServicesPlaySystemSound`.
 //  - `AVSpeechSynthesizer` and its voices (Speech.swift).
+//  - Recording with `AVAudioRecorder`, behind the microphone's gate (Recording.swift).
 //
 //  Kiln never configures `AVAudioSession`: the host owns it
 //  (`KilnAudioSession`). Everything a run makes is stopped when its screen
@@ -33,6 +34,7 @@ final class AudioBridges: KBridgeFamily {
         streams(r)
         systemSounds(r)
         speech(r)
+        recording(r)
     }
 
     /// Whether this run makes real sound: not in a check.

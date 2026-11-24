@@ -399,6 +399,23 @@ final class AppScenarios: LabCase {
     }
     func testLedgerNative() { ledger("native") }
     func testLedgerKiln() { ledger("kiln") }
+
+    // MARK: Scrapbook (Round 3A: files)
+
+    func scrapbook(_ mode: String) {
+        launch("Scrapbook", mode)
+        snap("1 three files")
+        app.swipeUp()
+        tap("Add note")
+        tap("Add note")
+        snap("2 two notes added")
+        tap("Duplicate first")
+        tap("Delete last")
+        app.swipeDown()
+        snap("3 duplicated and deleted")
+    }
+    func testScrapbookNative() { scrapbook("native") }
+    func testScrapbookKiln() { scrapbook("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

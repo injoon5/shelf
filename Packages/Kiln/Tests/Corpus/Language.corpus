@@ -419,6 +419,7 @@ Range.overlaps :: (0..<5).overlaps(3..<8) => true
 repeatElement :: Array(repeatElement("x", count: 2)) => ["x", "x"]
 sequence(first:next:) :: Array(sequence(first: 1, next: { $0 < 8 ? $0 * 2 : nil })) => [1, 2, 4, 8]
 AnySequence-free IndexSet :: IndexSet([1, 3, 5]).count => 3
+for in IndexSet :: { var out: [Int] = []; for i in IndexSet([4, 1, 3]) { out.append(i) }; return out }() => [1, 3, 4]
 Mirror(reflecting:).children :: Mirror(reflecting: (1, 2)).children.count => 2
 Mirror labels ::
     struct P { var name = "a"; var age = 3 }
