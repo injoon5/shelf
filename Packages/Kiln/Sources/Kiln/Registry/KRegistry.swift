@@ -553,8 +553,18 @@ struct KProbeCall {
 }
 
 extension KProbe {
-    /// For a modifier, `base` is the view (or gesture) it's on.
+    /// For a modifier, `base` is the view (or gesture) it's on. The arguments
+    /// carry their parameters' labels, a trailing closure's too (`labeled`).
     typealias Hook = @MainActor (_ base: KView?, _ args: KArgs, _ interp: KInterpreter) -> [KProbeCall]
+
+    /// The arguments as written, each labelled with the parameter it was bound
+    /// to: `Canvas { … }`'s closure is `renderer`.
+    static func labeled(_ args: [KV], _ labels: [String?], _ bound: KBound?) -> KArgs {
+        guard let bound, bound.binding.count == args.count else { return KArgs(args: args, labels: labels) }
+        let params = bound.overload.params
+        let named = bound.binding.enumerated().map { i, p in p < params.count ? (params[p].label ?? labels[i]) : labels[i] }
+        return KArgs(args: args, labels: named)
+    }
 }
 
 /// A native type: initializers, static members, properties and methods.

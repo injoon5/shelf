@@ -1039,6 +1039,10 @@ extension KInterpreter {
             let args = try evalArgs(argExprs, env, params: m.params)
             return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: s.type, location: .box(KBox(.structV(s)))), parent: globalEnv)
         }
+        // A method of the value itself, not a modifier (`Circle().path(in:)`).
+        if registry.modifier(name) == nil, registry.type("View")?.methods[name] != nil {
+            return try nativeMethod(.view(v), name, argExprs, env, line).0
+        }
         return try applyModifier(v, name, argExprs, env, line)
     }
 

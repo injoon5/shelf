@@ -269,3 +269,12 @@ PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transi
 - **No input is more than 10% slower.** The worst are the model replies, 6 to 7% slower at about 0.3 ms each (a few hundredths of a millisecond); the example apps and fixtures are within 5%, and the compute workloads within 5%. Before the merge, against `after-1.6-language.json`, the worst was 4.4%.
 - **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
 - **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.
+
+### after-2-round1-rest.json
+
+PLAN.md §2, Round 1's second half (gestures, drawing, focus, environment, charts, text, accessibility), measured with Round 1A merged, against the bar `after-1.5-proxies.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-2-round1-rest.json --compare Benchmarks/after-1.5-proxies.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** The compute workloads are within 3.3% (`Objects` 10% faster). A first run made while other builds ran showed `Arithmetic` 23% slower; run alone it was 3%.
+- **What it costs.** A view that reads SwiftUI's environment, or has a `@FocusState` or `@Namespace`, is hosted inside one more view (`KHostInputs`); others are hosted as before.
+- **New inputs.** The four Round 1 fixtures (`gestures-canvas`, `focus-environment`, `charts`, `accessibility-motion`) and Lab's `DoodlePad`.

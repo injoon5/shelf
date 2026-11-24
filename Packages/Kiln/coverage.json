@@ -62461,10 +62461,10 @@
     },
     {
       "family" : "Environment",
-      "notes" : "The key paths listed as environment values; not `@Environment(Model.self)`.",
+      "notes" : "SwiftUI's environment values, your own `@Entry` values, and `@Environment(Model.self)`.",
       "overloadsCovered" : 0,
       "round" : 1,
-      "status" : "partial",
+      "status" : "supported",
       "symbol" : {
         "deprecated" : false,
         "id" : "wrapper:Environment",

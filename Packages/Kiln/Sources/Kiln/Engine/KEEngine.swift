@@ -289,7 +289,7 @@ final class KProbe {
                 return
             }
             if let hook = interp.registry.view(name)?.probe {
-                run(hook(nil, a, interp), depth: depth)
+                run(hook(nil, KProbe.labeled(args, labels, v.bound), interp), depth: depth)
                 for arg in args { if case .view(let inner) = arg { walk(inner, depth: depth + 1) } }
                 return
             }
@@ -318,7 +318,7 @@ final class KProbe {
         case .modified(let base, let m):
             walk(base, depth: depth + 1)
             if let hook = interp.registry.modifier(m.name)?.probe {
-                run(hook(base, KArgs(args: m.args, labels: m.labels), interp), depth: depth)
+                run(hook(base, KProbe.labeled(m.args, m.labels, m.bound), interp), depth: depth)
                 for arg in m.args { if case .view(let inner) = arg { walk(inner, depth: depth + 1) } }
                 return
             }
