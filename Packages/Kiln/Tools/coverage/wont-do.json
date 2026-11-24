@@ -273,6 +273,30 @@
       "status": "later",
       "source": "PLAN.md §3, Round 2C",
       "outsideSDK": true
+    },
+    {
+      "id": "document-browser",
+      "what": "`.documentBrowserContextMenu`",
+      "reason": "It customizes `DocumentGroup`'s document browser; a Shelf app is one screen, not a document-based app. The file pickers open and save files (§4.1).",
+      "status": "wontDo",
+      "source": "PLAN.md §4.1, Round 3A",
+      "match": { "ids": ["modifier:documentBrowserContextMenu"] }
+    },
+    {
+      "id": "file-dialog-predicate",
+      "what": "`.fileDialogURLEnabled(_:)`",
+      "reason": "It takes a Foundation `#Predicate`, which the compiler builds from a macro that Kiln doesn't expand. `allowedContentTypes:` filters what the picker offers.",
+      "status": "wontDo",
+      "source": "PLAN.md §4.1, Round 3A",
+      "match": { "ids": ["modifier:fileDialogURLEnabled"] }
+    },
+    {
+      "id": "photos-shared-albums",
+      "what": "iCloud Shared Album sheets (`.photosSharedAlbumCreationSheet`, `…CustomizationSheet`, `…PostingSheet`, `.postToPhotosSharedAlbumSheet`)",
+      "reason": "They create and post to the person's iCloud Shared Albums through `PHPhotoLibrary`, which a Shelf app can't read: it can only add photos (§4.2).",
+      "status": "wontDo",
+      "source": "PLAN.md §4.2, Round 3A",
+      "match": { "ids": ["modifier:photosSharedAlbumCreationSheet", "modifier:photosSharedAlbumCustomizationSheet", "modifier:photosSharedAlbumPostingSheet", "modifier:postToPhotosSharedAlbumSheet"] }
     }
   ]
 }

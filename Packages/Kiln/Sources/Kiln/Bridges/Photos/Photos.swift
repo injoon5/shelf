@@ -134,7 +134,7 @@ final class PhotosBridges: KBridgeFamily {
             var forms: [String] = []
             for title in ["", "_:title "] {
                 for library in ["", " photoLibrary:any"] {
-                    for label in [" label:content", ""] where title.isEmpty || label.isEmpty {
+                    for label in [title.isEmpty ? " label:content" : ""] {
                         forms.append(title + "selection:binding matching:PHPickerFilter? preferredItemEncoding:any?" + library + label)
                         forms.append(title + "selection:binding maxSelectionCount:number? selectionBehavior:any? matching:PHPickerFilter? preferredItemEncoding:any?" + library + label)
                     }
@@ -157,33 +157,21 @@ final class PhotosBridges: KBridgeFamily {
         guard let b = c.kbinding("selection") else { return AnyView(EmptyView()) }
         let filter = filter(c["matching"])
         let enc = encoding(c.symbol("preferredItemEncoding"))
-        let label: AnyView? = c.has("label") ? c.content("label") : (c.has(0) ? AnyView(Text(c.title(0))) : nil)
+        let label: AnyView = c.has("label") ? c.content("label") : AnyView(Text(c.title(0)))
         let library = c.has("photoLibrary")
         if isMany(b.get(), c) {
             let many = manyBinding(b)
             let max = c.int("maxSelectionCount")
             let behavior = selectionBehavior(c.symbol("selectionBehavior"))
             switch (label, library) {
-            case (let l?, false): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc) { l })
-            case (let l?, true): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()) { l })
-            #if os(iOS)
-            case (nil, false): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc))
-            case (nil, true): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()))
-            #else
-            case (nil, _): return AnyView(PhotosPicker("Photos", selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc))
-            #endif
+            case (let l, false): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc) { l })
+            case (let l, true): return AnyView(PhotosPicker(selection: many, maxSelectionCount: max, selectionBehavior: behavior, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()) { l })
             }
         }
         let one = oneBinding(b)
         switch (label, library) {
-        case (let l?, false): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc) { l })
-        case (let l?, true): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()) { l })
-        #if os(iOS)
-        case (nil, false): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc))
-        case (nil, true): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()))
-        #else
-        case (nil, _): return AnyView(PhotosPicker("Photos", selection: one, matching: filter, preferredItemEncoding: enc))
-        #endif
+        case (let l, false): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc) { l })
+        case (let l, true): return AnyView(PhotosPicker(selection: one, matching: filter, preferredItemEncoding: enc, photoLibrary: .shared()) { l })
         }
         #else
         return AnyView(EmptyView())
