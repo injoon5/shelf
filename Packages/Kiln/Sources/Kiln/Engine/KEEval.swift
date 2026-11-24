@@ -17,7 +17,7 @@ extension KInterpreter {
         try tick()
         switch e {
         case .int(let i):
-            if let n = expected?.core.name {
+            if let n = expected?.core.name, n != "Int" {
                 if ["Double", "CGFloat", "Float", "TimeInterval"].contains(n) { return .double(Double(i)) }
                 if let make = registry.literalCoercions[n], let v = make(.int(i), expected!) { return v }
             }
@@ -193,7 +193,15 @@ extension KInterpreter {
             case .text(let t): s += t
             case .interp(let args):
                 guard let first = args.first else { continue }
-                let v = try eval(first.value, env)
+                // A plain name: its value and declared type from one lookup.
+                var known: KETypeRef?? = nil
+                let v: KV
+                if case .ident(let n, _) = first.value, let box = env.lookup(n) {
+                    v = box.value
+                    known = .some(box.declaredType)
+                } else {
+                    v = try eval(first.value, env)
+                }
                 if let spec = args.first(where: { $0.label == "specifier" }) {
                     s += KFormatting.format(try eval(spec.value, env).asString ?? "%@", [v], self)
                 } else if let fmt = args.first(where: { $0.label == "format" }) {
@@ -204,6 +212,8 @@ extension KInterpreter {
                     s += String.localizedStringWithFormat("%lld", i)
                 } else if localized, case .double(let d) = v {
                     s += String.localizedStringWithFormat("%lf", d)
+                } else if let k = known {
+                    s += k.map { Self.hasOptional($0) ? describe(v, as: $0) : describe(v) } ?? describe(v)
                 } else if Self.mayBeOptional(first.value), let t = staticType(first.value, env), Self.hasOptional(t) {
                     s += describe(v, as: t)
                 } else {
@@ -673,6 +683,10 @@ extension KInterpreter {
         }
     }
 
+    func overflow(_ x: Int, _ op: String, _ y: Int, _ line: Int) -> KERuntimeError {
+        fail("Arithmetic overflow: \(x) \(op) \(y) doesn't fit in an Int (use &\(op) to wrap around)", line)
+    }
+
     func arithmetic(_ op: String, _ a: KV, _ b: KV, _ line: Int) throws -> KV {
         // A native number (`UInt8`, `Decimal`, a SIMD vector) does its own arithmetic, even with an `Int`.
         if case .native(.boxed) = a, let v = try nativeOperator(op, a, b, line) { return v }
@@ -680,10 +694,18 @@ extension KInterpreter {
         switch (a, b) {
         case (.int(let x), .int(let y)):
             switch op {
-            case "+", "-", "*":
-                // Swift traps on overflow; `&+`, `&-` and `&*` wrap.
-                let (r, o) = op == "+" ? x.addingReportingOverflow(y) : op == "-" ? x.subtractingReportingOverflow(y) : x.multipliedReportingOverflow(by: y)
-                if o { throw fail("Arithmetic overflow: \(x) \(op) \(y) doesn't fit in an Int (use &\(op) to wrap around)", line) }
+            // Swift traps on overflow; `&+`, `&-` and `&*` wrap.
+            case "+":
+                let (r, o) = x.addingReportingOverflow(y)
+                if o { throw overflow(x, op, y, line) }
+                return .int(r)
+            case "-":
+                let (r, o) = x.subtractingReportingOverflow(y)
+                if o { throw overflow(x, op, y, line) }
+                return .int(r)
+            case "*":
+                let (r, o) = x.multipliedReportingOverflow(by: y)
+                if o { throw overflow(x, op, y, line) }
                 return .int(r)
             case "&+": return .int(x &+ y)
             case "&-": return .int(x &- y)

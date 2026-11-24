@@ -57992,6 +57992,42 @@
       "reason" : "Shelf owns the home indicator, whose swipe closes the app; and each app has one settings store, which `@AppStorage` already uses.",
       "status" : "wontDo",
       "what" : "`persistentSystemOverlays` and `defaultAppStorage`"
+    },
+    {
+      "id" : "float32",
+      "reason" : "Kiln's `Float` is a `Double`: the same arithmetic and results an app relies on, printed with a `Double`'s digits (`Float.pi` prints 3.141592653589793, not 3.1415925).",
+      "status" : "wontDo",
+      "what" : "A 32-bit `Float`"
+    },
+    {
+      "id" : "slice-indices",
+      "reason" : "A slice (`xs[2...]`) is a new array in Kiln, indexed from 0; compiled code keeps the base's indices. `Array(xs[2...])` is the same in both.",
+      "status" : "wontDo",
+      "what" : "`ArraySlice` indices"
+    },
+    {
+      "id" : "compiled-printing",
+      "reason" : "An app has no module in Kiln: an enum in a printed array is `[s]`, where compiled code prints `[App.Size.s]`; `JSONSerialization`'s arrays print as Swift's, not `NSArray`'s.",
+      "status" : "wontDo",
+      "what" : "Module names and Objective-C descriptions in printed values"
+    },
+    {
+      "id" : "json-key-order",
+      "reason" : "Kiln writes keys sorted; compiled code writes a struct's in declaration order (and a dictionary's in hash order). The JSON means the same.",
+      "status" : "wontDo",
+      "what" : "`JSONEncoder` keys in declaration order"
+    },
+    {
+      "id" : "blocking-waits",
+      "reason" : "An app's code runs on the main actor, so waiting would freeze it: they return at once. `DispatchGroup.notify` and `async`/`await` wait without blocking.",
+      "status" : "wontDo",
+      "what" : "Blocking waits (`DispatchSemaphore.wait()`, `DispatchGroup.wait()`)"
+    },
+    {
+      "id" : "notification-sequences",
+      "reason" : "`publisher(for:)` with `.onReceive`, and `addObserver(forName:object:queue:using:)`, cover it.",
+      "status" : "later",
+      "what" : "`NotificationCenter.notifications(named:)`"
     }
   ]
 }

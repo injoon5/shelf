@@ -225,6 +225,54 @@
       "status": "wontDo",
       "source": "Round 1 (rest of SwiftUI)",
       "match": { "ids": ["modifier:persistentSystemOverlays", "modifier:defaultAppStorage"] }
+    },
+    {
+      "id": "float32",
+      "what": "A 32-bit `Float`",
+      "reason": "Kiln's `Float` is a `Double`: the same arithmetic and results an app relies on, printed with a `Double`'s digits (`Float.pi` prints 3.141592653589793, not 3.1415925).",
+      "status": "wontDo",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
+    },
+    {
+      "id": "slice-indices",
+      "what": "`ArraySlice` indices",
+      "reason": "A slice (`xs[2...]`) is a new array in Kiln, indexed from 0; compiled code keeps the base's indices. `Array(xs[2...])` is the same in both.",
+      "status": "wontDo",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
+    },
+    {
+      "id": "compiled-printing",
+      "what": "Module names and Objective-C descriptions in printed values",
+      "reason": "An app has no module in Kiln: an enum in a printed array is `[s]`, where compiled code prints `[App.Size.s]`; `JSONSerialization`'s arrays print as Swift's, not `NSArray`'s.",
+      "status": "wontDo",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
+    },
+    {
+      "id": "json-key-order",
+      "what": "`JSONEncoder` keys in declaration order",
+      "reason": "Kiln writes keys sorted; compiled code writes a struct's in declaration order (and a dictionary's in hash order). The JSON means the same.",
+      "status": "wontDo",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
+    },
+    {
+      "id": "blocking-waits",
+      "what": "Blocking waits (`DispatchSemaphore.wait()`, `DispatchGroup.wait()`)",
+      "reason": "An app's code runs on the main actor, so waiting would freeze it: they return at once. `DispatchGroup.notify` and `async`/`await` wait without blocking.",
+      "status": "wontDo",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
+    },
+    {
+      "id": "notification-sequences",
+      "what": "`NotificationCenter.notifications(named:)`",
+      "reason": "`publisher(for:)` with `.onReceive`, and `addObserver(forName:object:queue:using:)`, cover it.",
+      "status": "later",
+      "source": "PLAN.md §3, Round 2C",
+      "outsideSDK": true
     }
   ]
 }

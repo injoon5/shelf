@@ -517,6 +517,11 @@ From `Tools/coverage/wont-do.json`. Each entry matches symbols by id, module, ki
 | Custom audio-graph descriptors (`accessibilityChartDescriptor`) | A `Chart` already describes itself to VoiceOver; a custom descriptor needs `AXChartDescriptor` types Kiln doesn't bridge. | 1 | Round 1 (rest of SwiftUI) |
 | Opening the app from a URL or Handoff (`onOpenURL`, `userActivity`, `onContinueUserActivity`) | A Shelf app has no URL scheme or activity types of its own: the system routes those to Shelf. | 3 | Round 1 (rest of SwiftUI) |
 | `persistentSystemOverlays` and `defaultAppStorage` | Shelf owns the home indicator, whose swipe closes the app; and each app has one settings store, which `@AppStorage` already uses. | 2 | Round 1 (rest of SwiftUI) |
+| A 32-bit `Float` | Kiln's `Float` is a `Double`: the same arithmetic and results an app relies on, printed with a `Double`'s digits (`Float.pi` prints 3.141592653589793, not 3.1415925). | 0 | PLAN.md §3, Round 2C |
+| `ArraySlice` indices | A slice (`xs[2...]`) is a new array in Kiln, indexed from 0; compiled code keeps the base's indices. `Array(xs[2...])` is the same in both. | 0 | PLAN.md §3, Round 2C |
+| Module names and Objective-C descriptions in printed values | An app has no module in Kiln: an enum in a printed array is `[s]`, where compiled code prints `[App.Size.s]`; `JSONSerialization`'s arrays print as Swift's, not `NSArray`'s. | 0 | PLAN.md §3, Round 2C |
+| `JSONEncoder` keys in declaration order | Kiln writes keys sorted; compiled code writes a struct's in declaration order (and a dictionary's in hash order). The JSON means the same. | 0 | PLAN.md §3, Round 2C |
+| Blocking waits (`DispatchSemaphore.wait()`, `DispatchGroup.wait()`) | An app's code runs on the main actor, so waiting would freeze it: they return at once. `DispatchGroup.notify` and `async`/`await` wait without blocking. | 0 | PLAN.md §3, Round 2C |
 
 <details><summary>MapKit views (`Map`, `Marker`, Look Around) (19)</summary>
 
@@ -670,6 +675,7 @@ On PLAN.md's Later list: not in Rounds 1–5, not ruled out. They don't count as
 |---|---|---:|---|
 | Translation (`translationPresentation`, `translationTask`) | On PLAN.md's Later list. | 2 | PLAN.md Later |
 | `.onInsert(of:perform:)`: dropping items into a list | It hands the app `NSItemProvider`s from a drag, which arrive with drag and drop (§4.1). | 1 | Round 1 (Lists) |
+| `NotificationCenter.notifications(named:)` | `publisher(for:)` with `.onReceive`, and `addObserver(forName:object:queue:using:)`, cover it. | 0 | PLAN.md §3, Round 2C |
 
 <details><summary>Translation (`translationPresentation`, `translationTask`) (2)</summary>
 

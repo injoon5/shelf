@@ -578,10 +578,32 @@ enum KSwiftPrelude {
     /// The prelude's declarations an app's code needs: those it names and doesn't declare.
     static func types(for source: String, declared: Set<String>) -> [KETypeDecl] {
         var out: [KETypeDecl] = []
-        for (name, _) in parts where source.contains(name) && !declared.contains(name) {
+        for (name, _) in parts where mentions(source, name) && !declared.contains(name) {
             if let decls = parsed[name] { out.append(contentsOf: decls) }
         }
         return out
+    }
+
+    /// Whether `source` has `name` in it: a byte search (Foundation's
+    /// `contains` compares Unicode-aware, and costs a fifth of a small app's run).
+    static func mentions(_ source: String, _ name: String) -> Bool {
+        let needle = Array(name.utf8)
+        guard let first = needle.first else { return true }
+        var source = source
+        return source.withUTF8 { bytes in
+            let n = needle.count
+            guard bytes.count >= n else { return false }
+            var i = 0
+            while i <= bytes.count - n {
+                if bytes[i] == first {
+                    var j = 1
+                    while j < n, bytes[i + j] == needle[j] { j += 1 }
+                    if j == n { return true }
+                }
+                i += 1
+            }
+            return false
+        }
     }
 
     nonisolated(unsafe) private static let parsed: [String: [KETypeDecl]] = {

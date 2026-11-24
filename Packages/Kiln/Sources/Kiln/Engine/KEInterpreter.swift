@@ -1074,8 +1074,11 @@ final class KInterpreter {
             // `-> (min: Int, max: Int)` labels the `(1, 9)` it returns.
             let named = labels.count == vals.count && labels.contains { $0 != nil } ? labels : old
             return .tuple(zip(vals, ts).map { coerce($0.0, to: $0.1) }, named)
+        case (.int, .named(let n, _)), (.double, .named(let n, _)), (.array, .named(let n, _)), (.native(.implicit), .named(let n, _)):
+            // `let b: UInt8 = 200`, `let d: Decimal = 7`, `let v: SIMD2<Double> = [1, 2]` (`KRegistry.literalCoercions`).
+            guard n != "Int", n != "Double", n != "String", let make = registry.literalCoercions[n], let v2 = make(v, t) else { return v }
+            return v2
         default:
-            if let make = registry.literalCoercions[t.core.name ?? ""], let v2 = make(v, t) { return v2 }
             return v
         }
     }

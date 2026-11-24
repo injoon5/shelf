@@ -13,16 +13,8 @@ import SwiftUI
 final class KRef<T>: Hashable {
     let value: T
     init(_ value: T) { self.value = value }
-    static func == (a: KRef<T>, b: KRef<T>) -> Bool {
-        if a === b { return true }
-        // `Data` is held as an `NSData`: two compare by their bytes, as Swift's do.
-        if let x = a.value as? NSData, let y = b.value as? NSData { return x.isEqual(to: y as Data) }
-        return false
-    }
-    func hash(into h: inout Hasher) {
-        if let d = value as? NSData { h.combine(d.length); return }
-        h.combine(ObjectIdentifier(self))
-    }
+    static func == (a: KRef<T>, b: KRef<T>) -> Bool { a === b }
+    func hash(into h: inout Hasher) { h.combine(ObjectIdentifier(self)) }
 }
 
 /// A grid column or row: GridItem(.flexible(), spacing: 12).

@@ -64,6 +64,7 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `interim` | bool | `true` only for the stand-in built from the 0.2.1 switch files. The registry writes `false`. |
 | `generator` | string | `kiln-registry`, or `coverage/interim-switch-scan`. |
 | `description` | string? | Free text, such as Kiln's version. |
+| `corpus` | object? | Since Round 2C: the Foundation and standard-library corpus as it ran when the manifest was written (see [The corpus](#the-corpus)). |
 | `families` | array? | Every family in the prompt's order: `name`, `summary` (what it covers, for authors: `KilnFamily.summary`), `supported` (symbols that work), `stubs`, and `line` (`KilnFamily.promptLine`: "What works" in one hand-written line, for a family that's nearly all of SwiftUI's; without it the prompt lists the family's names). Shelf's prompt lists a family with nothing supported as "not in Kiln yet". |
 | `gaps` | array? | Swift that doesn't work yet: `id` and `what` (the sentence for authors). Only the `KLanguageGaps` probes that fail when the manifest is written. |
 | `wontDo` | array? | `Tools/coverage/wont-do.json`'s entries: `id`, `what`, `reason`, `status` (`wontDo` or `later`). |
@@ -87,6 +88,7 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `source` | string? | For **maintainers**: the file that implements it. |
 | `requirements` | [string]? | For a `protocol`: what an adopting type declares, as the app writes it (`path(in:)`, `body(content:)`). A trailing `?` marks one with a default or an optional one (`animatableData?`); `static ` and `async ` prefixes mark those (`static transferRepresentation`, `async perform()`). A missing required one is an error with the type's line. |
 | `proxy` | bool? | For a `protocol`: `true` when native code can use the app's value as the real protocol, through a proxy (PLAN.md §1.5): SwiftUI draws the app's `Shape`, lays out with its `Layout`, a UIKit controller calls its delegate. Omitted for declarations only. |
+| `anyLabels` | bool? | `true` when a form reads its arguments by label itself (the standard library's loose bridges, `Sequence.map`): label sets other than `overloads` may work too. Omitted when every form is listed. |
 
 ### An overload
 
@@ -96,8 +98,38 @@ The schema is defined in code in `Tools/coverage/Sources/CoverageKit/Manifest.sw
 | `receiver` | string? | For modifiers, what it's bridged on: `View`, `Shape`, `InsettableShape`, `Text`, `Image`, `ToolbarContent`, `ChartContent` and so on. Omitted means any receiver. |
 | `introduced` | string? | When this overload needs a later iOS than the symbol. |
 | `notes` | string? | As for the symbol, for this form only. |
+| `signature` | string? | The bridge's own signature: `label:kind` pairs in order (`_` unlabelled), `?` after a kind that has a default (the call can leave it out), `...` after a variadic one. `bySettingHour:number minute:number second:number of:any matchingPolicy:any? repeatedTimePolicy:any? direction:any?`. |
+| `member` | string? | For a type's member: `init` (an initializer, on the `type:` symbol), `static` (a static method) or `method`. A name that's both (`member:Calendar.date` has no static form; `member:Date.now` is a static property) keeps them apart. |
+| `support` | string? | `stub` when this form is accepted and does nothing; otherwise omitted (the symbol's). |
+| `async` | bool? | `true` when the call must be awaited. |
 
 The coverage report counts an SDK overload as covered when a manifest overload has the same `labels` and either no `receiver` or the same one. It shows overload coverage only for symbols that list overloads.
+
+### Forms: is this call supported?
+
+Since Round 2C every form of a type's members (methods, static methods, initializers) and of global functions is listed with its `signature`, so a batch check can answer per call, not per name. For a call `Owner.name(label1:label2:…)`:
+
+1. Find the symbol: `member:Owner.name`, or `type:Owner` for an initializer (`member == "init"`), or `member:Swift.name` for a global function. None: **unsupported**.
+2. Match the call's labels against each overload's `signature`: the call's labels, in order, must be the signature's labels with any of those marked `?` (or `...`) left out; an unlabelled argument is `_`. A match: the overload's `support`, else the symbol's (`full` or `partial`; `stub` is accepted but does nothing).
+3. No overload matches: **partial** (the member exists, this form doesn't) — unless the symbol has `anyLabels: true`, when it's **unknown** (a loose bridge may take it; Kiln's check decides).
+
+So `Calendar.date(bySetting:value:of:)` is full, `Calendar.date(from:in:)` is partial, and `Calendar.nonsense(…)` is unsupported. Properties and static properties are symbols with `overloads: []`.
+
+## The corpus
+
+`Tests/Corpus/*.corpus` holds everyday Foundation and standard-library calls, each with the value compiled Swift prints (`Tools/corpus/oracle.py` compiles each with swiftc and writes it; `Sources/Kiln/Registry/KilnCorpus.swift` has the format). `CorpusTests` fails when an entry doesn't print that value, and the manifest records how the corpus ran:
+
+```json
+"corpus" : {
+  "families" : [
+    { "name" : "Foundation", "sections" : [
+      { "name" : "Calendar", "entries" : 51, "passing" : 51, "ios" : 0, "gaps" : [], "failing" : [] }
+    ] }
+  ]
+}
+```
+
+`ios` counts entries that need UIKit: Shelf's `KilnCorpusTests` runs them on the simulator. `gaps` are entries marked `[gap]` (known not to pass; each has a won't-do entry or a PLAN.md note), `failing` the rest that don't pass (none, while `CorpusTests` passes). The coverage report's "Foundation and the standard library" table is this section.
 
 ## Ids
 

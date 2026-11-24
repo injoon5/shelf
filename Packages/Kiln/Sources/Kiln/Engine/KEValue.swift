@@ -140,6 +140,11 @@ extension KV: Hashable {
         // An enum-like native value against the symbol the app wrote (`size == .large`).
         case (.native(.boxed(let x)), .native(.implicit(let n, let args))) where x.caseName != nil && args.isEmpty: return x.caseName == n
         case (.native(.implicit(let n, let args)), .native(.boxed(let y))) where y.caseName != nil && args.isEmpty: return y.caseName == n
+        // `Data` is held as an `NSData`: two compare by their bytes, as Swift's do.
+        case (.native(.object("Data", let x)), .native(.object("Data", let y))):
+            if x === y { return true }
+            guard let p = x.value as? NSData, let q = y.value as? NSData else { return false }
+            return p.isEqual(to: q as Data)
         case (.native(let x), .native(let y)): return x == y
         // `byte == 5`: a fixed-width integer and a number (KNumericBox).
         case (.native(.boxed(let x)), .int), (.native(.boxed(let x)), .double):
@@ -179,6 +184,7 @@ extension KV: Hashable {
         case .type(let t): h.combine(t.name)
         case .binding(let b): h.combine(ObjectIdentifier(b))
         case .view(let v): h.combine(ObjectIdentifier(v))
+        case .native(.object("Data", let r)): h.combine((r.value as? NSData)?.length ?? 0)
         case .native(let n): h.combine(n)
         }
     }
