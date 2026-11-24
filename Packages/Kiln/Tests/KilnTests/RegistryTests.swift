@@ -65,6 +65,13 @@ final class RegistryTests: XCTestCase {
         let appear = KOverload(params: KSignature.parse("perform:action?"))
         XCTAssertEqual(appear.bind([nil], [.closureLiteral]), [0])
         XCTAssertNil(appear.bind([nil], [.stringLiteral]))
+        // …but not when a labeled trailing closure fills the later one:
+        // `.sheet(isPresented:) { dismissed() } content: { … }`.
+        XCTAssertEqual(sheet.bind(["isPresented", nil, "content"], [.other, .closureLiteral, .closureLiteral]), [0, 1, 2])
+        // Nor when another unlabeled closure follows to fill it.
+        let pair = KOverload(params: KSignature.parse("first:closure? second:content"))
+        XCTAssertEqual(pair.bind([nil, nil], [.closureLiteral, .closureLiteral]), [0, 1])
+        XCTAssertEqual(pair.bind([nil], [.closureLiteral]), [1])
     }
 
     func testNoOverloadSaysWhichThereAre() {

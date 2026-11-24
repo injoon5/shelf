@@ -8,7 +8,6 @@ Shelf runs each app's Swift source on the phone with [Kiln](https://github.com/h
 3. **Round 2: APIs with no permission prompt (§3).** Haptics, share and paste, text parsing, unit conversion, audio playback, `WebView`, `Chart3D`, WebSockets.
 4. **Round 3: device and permission APIs (§4).** Files, the photo picker, the camera, audio recording, Core Motion, location.
 5. **Round 4: on-device intelligence (§5).** Vision, VisionKit, Foundation Models.
-6. **Round 5: widgets on Shelf's Home Screen (§6).** Apps declare them with WidgetKit's API, and Shelf hosts them in process, beside the icons.
 
 Maps stay out. The [won't-do list](#wont-do) has the reasons for everything else that's left out.
 
@@ -46,7 +45,7 @@ All of §0 except item 5 of §0.8, §1.1 to §1.4 (§1.3 as its fallback, below)
 Eight pieces of work on Shelf itself. None of them touches Kiln, so they come first and can run alongside the §1.3 spike. The order:
 
 1. **The audit comes first.** Its rules live in `Layout` and `HomeModel`, which don't change in the move, so its tests carry over.
-2. **Then the Home Screen moves to UIKit and Core Animation,** so that deleting apps and widgets are built once, on the new layer.
+2. **Then the Home Screen moves to UIKit and Core Animation,** so that deleting apps is built once, on the new layer.
 3. **Search, rebuilt on it,** as App Library's list. Today every pull down shows two of everything.
 4. **Deleting apps next.** It's the biggest missing feature.
 5. **Then the two visual fixes** (icons, dock).
@@ -102,7 +101,7 @@ Write down Springboard's rules as tests, then drive each case on the simulator w
 Decided: everything the stage shows moves to UIKit and Core Animation. Today the stage, the cards and the search pill are already UIKit; the icons, grid, dock, edit mode, long-press menu, drag and drop, search results, wallpaper and banners are SwiftUI hosted inside it. Moving them gives:
 
 - a long press that opens the menu and turns into a drag when the finger moves, as on Springboard;
-- a drag Shelf drives itself, which widgets need (§6);
+- a drag Shelf drives itself;
 - exact icon frames for cards to open from and land on;
 - one icon renderer instead of two;
 - a jiggle that runs in the render server, off the main thread Kiln uses.
@@ -216,7 +215,7 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Confirming:** an alert, "Delete “Habits”?", saying that everything goes with it, on every device, and can't be undone. Delete or Cancel.
 - **Deleting removes everything** (decided). There's no option to keep anything:
   - on the server: the app, every revision Revert could reach, its `DB` data, and its unused install keys;
-  - on every phone: the source, the `DB` store with pending writes, the `@AppStorage` suite, the app's files (§4.1), its launch snapshot (§0.8), its permission grants (§4.0), and its widgets (§6).
+  - on every phone: the source, the `DB` store with pending writes, the `@AppStorage` suite, the app's files (§4.1), its launch snapshot (§0.8), and its permission grants (§4.0).
 - **The server:** `DELETE /api/apps/{slug}?data=delete` already exists on `shelf-apps` (`fixtures/api/app-delete.json`). Check that it also purges the revisions and the slug's install keys, and add that where it doesn't. A 404 means it's already gone, which counts as success.
 - **Other devices:** they learn from their next sync that the app is gone, and run the same local cleanup. `SyncEngine` already removes the source and `@AppStorage` for apps that leave the index; that grows to everything in the list above.
 - **On the phone:**
@@ -227,7 +226,7 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
 - **Failure** (other than offline or a 404): the icon comes back, and the failure follows the same rule as a failed sync or Revert.
 - **Tests:** `APITests` against the fixture, and `LibraryStoreTests` for online, offline, and failure with the icon restored. `FakeServer` gains DELETE.
 
-**Done: the data, sync and server half.** `API.deleteApp`, `LibraryStore.delete(_:) -> Deletion` (`.deleted`, `.queued`, `.restored(failure)`, `.refused`), the persisted queue (`deletions.json`, sent first by every sync), and `AppCleanup`, which both a delete and a sync-observed removal run. The launch snapshot's folder is `Caches/Snapshots/<slug>/` (`LaunchSnapshots`); files (§4.1) and widgets (§6) add their steps (permission grants, §4.0, has) to `AppCleanup.library` when they arrive. The server now also drops the slug's unused install keys, and still purges for an app it no longer has. **Done: the Home Screen half.** Delete App goes last in the icon's menu (grid, dock and search rows), in red with Edit Home Screen; the minus badge and Delete App both ask through `HomeModel.askToDelete`, and `HomeView` shows `DeleteAlert` (a `UIAlertController` worded as Springboard's second alert). On Delete the icon shrinks away (`IconView.leave`) and the others close up 230 ms later on `Motion.iconCloseUp`, both measured from Springboard frame by frame (`design/reference/README.md`, "Deleting an app"); a refusal brings the same icon back from wherever it had got to. A search row goes with the list's own animation. Checked on the simulator (`design/audit-0.1.md`, "Deleting an app"), with `-ShelfDemoDeleteFails YES` for the refusal. Not checked: the haptic (light, as an icon drops into place), which the simulator can't play.
+**Done: the data, sync and server half.** `API.deleteApp`, `LibraryStore.delete(_:) -> Deletion` (`.deleted`, `.queued`, `.restored(failure)`, `.refused`), the persisted queue (`deletions.json`, sent first by every sync), and `AppCleanup`, which both a delete and a sync-observed removal run. The launch snapshot's folder is `Caches/Snapshots/<slug>/` (`LaunchSnapshots`); files (§4.1) add their steps (permission grants, §4.0, has) to `AppCleanup.library` when they arrive. The server now also drops the slug's unused install keys, and still purges for an app it no longer has. **Done: the Home Screen half.** Delete App goes last in the icon's menu (grid, dock and search rows), in red with Edit Home Screen; the minus badge and Delete App both ask through `HomeModel.askToDelete`, and `HomeView` shows `DeleteAlert` (a `UIAlertController` worded as Springboard's second alert). On Delete the icon shrinks away (`IconView.leave`) and the others close up 230 ms later on `Motion.iconCloseUp`, both measured from Springboard frame by frame (`design/reference/README.md`, "Deleting an app"); a refusal brings the same icon back from wherever it had got to. A search row goes with the list's own animation. Checked on the simulator (`design/audit-0.1.md`, "Deleting an app"), with `-ShelfDemoDeleteFails YES` for the refusal. Not checked: the haptic (light, as an icon drops into place), which the simulator can't play.
 
 ### 0.5 Icon appearance: Automatic, Light, Dark
 
@@ -248,8 +247,7 @@ As on Springboard, with no App Library, so it's "Delete App", not "Remove App":
   - the grid, the dock (Settings' icon included) and search results;
   - the long-press and drag previews;
   - the New App preview;
-  - the card's face, which is the same `IconView`, so a card opens from and closes into the icon you see;
-  - widgets later (§6.3).
+  - the card's face, which is the same `IconView`, so a card opens from and closes into the icon you see.
 
   Labels, the dock's glass and the wallpaper follow the system, not this setting.
 - **Tests:** each place resolves through the one value, a stored `clear` migrates, and screenshots in both appearances with the system in each.
@@ -382,7 +380,7 @@ Each native thing Kiln knows is a small bridge, declared in one place:
 
 The rest is mechanical:
 
-- **Files:** bridges live in `Packages/Kiln/Sources/Kiln/Bridges/<Family>/`. One family per file group: Controls, Layout, Lists, Navigation, Gestures, Drawing, Charts, Haptics, Sharing, Text, Units, Audio, Web, Files, Photos, Camera, Motion, Location, Vision, Intelligence, Widgets.
+- **Files:** bridges live in `Packages/Kiln/Sources/Kiln/Bridges/<Family>/`. One family per file group: Controls, Layout, Lists, Navigation, Gestures, Drawing, Charts, Haptics, Sharing, Text, Units, Audio, Web, Files, Photos, Camera, Motion, Location, Vision, Intelligence.
 - **Arguments:** shared helpers decode and check them (`call.binding("selection", Date.self)`, `call.optional("in", ClosedRange<Date>.self)`, `call.content()`, `call.shapeStyle(0)`), so each bridge is a few lines and every error message reads the same.
 - **Observation:** native `@Observable` objects (`WebPage`, `LanguageModelSession`, `CLServiceSession`…) are read inside the real SwiftUI `body` call, so SwiftUI's own observation tracking sees those reads. A test pins this down.
 - **Porting:** every component, modifier and built-in in the three switch files is moved into the registry, and the switches are deleted.
@@ -413,8 +411,7 @@ Closures already cross from native code into the app (completion handlers, `Butt
 - `UIViewControllerRepresentable` with `makeCoordinator`, for an allowlist of bridged UIKit controllers;
 - `Layout`, `Shape`, `Animatable`, `Transition`, `ViewModifier`;
 - `Transferable` and `FileDocument`;
-- Foundation Models' `Tool`;
-- WidgetKit's `TimelineProvider` and `AppIntent`.
+- Foundation Models' `Tool`.
 
 `async` requirements (a `Tool`'s `call`, an intent's `perform`) run as VM tasks the native side awaits. Proxies are declared in the registry, so the checker knows which protocols an app's types can adopt.
 
@@ -425,7 +422,7 @@ Built ([Docs/bridges.md, "A protocol proxy"](Packages/Kiln/Docs/bridges.md#a-pro
   - `KAppValue` calls a requirement with its own step budget, reads and writes properties, and runs an `async` requirement as a VM task that native code awaits; cancelling the Swift task cancels it.
   - The app's types are checked against the registry's requirements when the program loads: "Line 3: 'Wave' doesn't conform to 'Shape': it has no path(in:)".
   - The manifest lists each protocol's `requirements`, and `proxy: true` where there is one.
-  - Hosts declare their own with `Kiln.registerProtocol` and call the app's value through `KilnAdopter` (`callAsync`), the path Round 4's `Tool` and Round 5's `TimelineProvider` and `AppIntent` take.
+  - Hosts declare their own with `Kiln.registerProtocol` and call the app's value through `KilnAdopter` (`callAsync`), the path Round 4's `Tool` takes.
 - **SwiftUI's protocols:**
   - `Shape`, animating through its own `animatableData`, nested `AnimatablePair`s, `CGPoint`/`CGSize`/`CGRect`/`Angle`, or `@Animatable`'s properties.
   - `Animatable` views and modifiers.
@@ -596,7 +593,7 @@ Where the rewrite stands after §1.5, item by item.
 | 1.2 One engine | Done. |
 | 1.3 Code that can wait | Done as the fallback, a second evaluator (`KEAsync`) for code with `await`. **The bytecode VM isn't built.** Everything it was for works; speed is its only remaining reason, and it waits for after the registry, on `KEAsync`'s frames. |
 | 1.4 Bridges in a registry | Done. |
-| 1.5 Native code calling the app's code | Done: every proxy §1.5 lists for Rounds 1 to 3, the delegate and `async` mechanisms Rounds 3 to 5 build on, and their declarations in the registry and the manifest. What uses them later (the camera, `CLLocationManager`, the file pickers, `Tool`, widgets) is those rounds'. |
+| 1.5 Native code calling the app's code | Done: every proxy §1.5 lists for Rounds 1 to 3, the delegate and `async` mechanisms Rounds 3 and 4 build on, and their declarations in the registry and the manifest. What uses them later (the camera, `CLLocationManager`, the file pickers, `Tool`) is those rounds'. |
 | 1.6 Swift that should work | Done, except `@Generable` and `@Guide` (Round 4). |
 | 1.7 A context for each run | Done. |
 | 1.8 Checking before running | Done. §1.5's requirements are in the form its checker reads (`"name(labels:)"`, `?` for a default), and its prompt lists the protocols that have proxies, with their notes. |
@@ -891,7 +888,7 @@ Built (§4.5 and §4.6; §4.1 to §4.4 are Round 3A's). `COVERAGE.md`: Location 
 
 ---
 
-## Glass icons (just before Round 5)
+## Glass icons
 
 Shelf's icons are flat. They should look like iOS 27's, which have depth: a lit rim, light caught at the edges, and a glyph that sits in the glass. References: `design/reference/springboard/glass-icon-1.png` to `-4.png` (local only).
 
@@ -902,69 +899,10 @@ Shelf's icons are flat. They should look like iOS 27's, which have depth: a lit 
 
 ---
 
-## 6. Round 5: widgets on Shelf's Home Screen
-
-Apps declare widgets in their own file, with ordinary WidgetKit code, and Shelf shows them on its own Home Screen next to the icons, as Springboard does. All of it runs inside Shelf. There's no widget extension, no App Group, and no memory limit beyond the app's own, and a widget reads the same `DB` as its app, in the same process.
-
-It depends on §1 (protocol proxies for `TimelineProvider` and `AppIntent`, real `async`) and Round 1 (`containerBackground` and the rest of the widget-facing modifiers), but not on Rounds 2–4. So it can move ahead of them.
-
-### 6.1 What an app writes
-- `struct …: Widget` with `StaticConfiguration`, `.supportedFamilies`, `.configurationDisplayName` and `.description`. An app can declare several.
-- A `TimelineProvider` (`placeholder`, `getSnapshot`, `getTimeline`, or the `async` `timeline(for:in:)`), a `TimelineEntry`, and `Timeline(entries:policy:)` with `.atEnd`, `.after(_:)` and `.never`.
-- `@Environment(\.widgetFamily)`, `containerBackground(for: .widget)`, `widgetURL`, `Link`, and `Text(_:style:)` for live times.
-- Interactive widgets: `Button(intent:)` and `Toggle(isOn:intent:)` with the app's own `AppIntent` structs (`@Parameter` properties and `perform()`).
-- Later, if wanted: `AppIntentConfiguration` with a `WidgetConfigurationIntent`, with Shelf building the Edit Widget sheet from its `@Parameter`s.
-
-Using WidgetKit's own API, not a Shelf one, means models already know how to write it.
-
-### 6.2 In Kiln
-- **WidgetKit types as Kiln bridges, implemented in Kiln itself.** Kiln provides `Widget`, `StaticConfiguration`, `Timeline` and the families as plain values. WidgetKit isn't linked, since nothing goes to the system.
-- **Widget mode** renders an entry's view the way WidgetKit would:
-  - no scrolling, text fields or animations;
-  - taps go to `widgetURL`, a `Link` or an intent;
-  - `check` reports views a widget can't use.
-- **`Kiln.widgets(in:)`** lists what an app declares, for the gallery.
-- **Shared runs.** An app's parsed program is shared between its card and its widgets, so ten widgets don't mean ten parses.
-
-### 6.3 In Shelf
-- **Layout v2.** A page becomes a list of items, each an icon or a widget of a size, flowed into the 4 × 6 grid by Springboard's rules:
-  - widgets take aligned blocks (small 2 × 2, medium 4 × 2, large 4 × 4), and icons fill the cells around them in reading order;
-  - the dock holds icons only (Settings included);
-  - `layout.json` migrates from v1 on first launch.
-  - `Layout`'s tests grow to cover the packing.
-- **Size.** Measured from `home-page1-light.png`, where Springboard's small widget is 164 × 164 pt, along with its corner and its label (if any).
-- **Adding.** In edit mode, the top-left button (New App today) becomes a menu with New App and Add Widget, as Springboard's Edit button is a menu. Add Widget opens a gallery: apps that declare widgets, each widget at each size it supports, previewed from its `placeholder` or snapshot. Drag one in, or tap to add it to the current page.
-- **Editing:**
-  - In edit mode, widgets jiggle, move, take the minus badge (§0.4) and get a resize handle, as in `edit-mode-page1-light.png`.
-  - The long-press menu has the size row the real-device captures show.
-  - Deleting an app removes its widgets.
-- **Opening.** A tap opens the app's card from the widget's frame, not its icon's, and passes the `widgetURL` to the app's `.onOpenURL`. The card lands back on the widget when it closes.
-- **Timelines.** Shelf runs each provider:
-  - when the page loads;
-  - after a sync changes the app's source or data;
-  - after the app or an intent writes `DB`;
-  - when the timeline's policy says so.
-
-  Entries switch at their dates. This happens only while Shelf is in front, and only for the current page and its neighbours.
-- **Intents.** `perform()` runs in Kiln, then that app's widgets reload.
-- **Appearance.** Widgets follow the icon appearance setting (§0.5) for light and dark.
-- **Budget.** Measure memory and first-render time with a page of four widgets from 600-line apps. If a page costs too much, render widgets that are off screen to images and keep only the visible page live.
-
-### 6.4 Done when
-- A habits app's widget shows today's progress. Checking a habit off in the widget updates the app, and the reverse.
-- A countdown widget changes entries on schedule.
-- Widgets survive a relaunch, a sync, an app change and an app delete.
-- Fixtures and Layout tests cover the packing.
-- The prompt has a Widgets section.
-
-Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later list.
-
----
-
 ## 7. Shelf, along the way
 
 - **Delete:** `SourceRewriter`'s `@AppStorage` rewriting, `Prelude`, `ShelfDBProtocol` and the `DB-Key` header path (§1.7). The server's `/api/apps/{slug}/data` API is unchanged. Done.
-- **Prompts:** "What works" and "What doesn't work" are built from `kiln-manifest.json` plus a short hand-written part (format, design, saving data). New sections per round: Files, Photos and Camera, Motion, Location, Intelligence, Widgets (for Shelf's Home Screen). `PromptsTests` checks the result. ij5.dev's admin doesn't show the prompt, so the server needs no change. Built: `PromptCatalog` reads the manifest Shelf bundles, at run time. "What works" has one line per family with its views, wrappers, environment values, types and modifiers, and the notes of what works only in part; "What doesn't work" lists the families not in Kiln yet (by their summary), every stub, every gap Kiln's probes find, and the won't-do list. The hand-written part is the reply format, Swift, waiting, saving data and design. A family's first bridge moves it from one section to the other, and `everyPromptSectionHasAFixture` then wants a fixture whose `// Covers:` line names it.
+- **Prompts:** "What works" and "What doesn't work" are built from `kiln-manifest.json` plus a short hand-written part (format, design, saving data). New sections per round: Files, Photos and Camera, Motion, Location, Intelligence. `PromptsTests` checks the result. ij5.dev's admin doesn't show the prompt, so the server needs no change. Built: `PromptCatalog` reads the manifest Shelf bundles, at run time. "What works" has one line per family with its views, wrappers, environment values, types and modifiers, and the notes of what works only in part; "What doesn't work" lists the families not in Kiln yet (by their summary), every stub, every gap Kiln's probes find, and the won't-do list. The hand-written part is the reply format, Swift, waiting, saving data and design. A family's first bridge moves it from one section to the other, and `everyPromptSectionHasAFixture` then wants a fixture whose `// Covers:` line names it.
 - **New App sheet:** runs `Kiln.check` and `Kiln.validate` on the pasted reply before Install, and shows the first error with its line. Built: the error screen takes the preview's place ("Tally can’t be installed", the lines around it, every error), and then the sheet's, with Copy for Agents (the error, the reply and the sheet's key), Install waits for the check and stays off after an error, and warnings are listed under the name without blocking. An agent's install goes straight to the server, which can't run Kiln: that's the "symbol check at `PUT`" in Later.
 - **Card lifecycle:** closing a card calls the context's teardown (§1.7). Built: a card that lands tears its run down.
 - **Settings:** Permissions (§4.0), and per-app storage use (files plus `DB`). Built: App Data lists both per app, and Delete Data removes both.
@@ -979,8 +917,7 @@ Widgets on the iPhone's own Home Screen (a WidgetKit extension) are on the Later
 3. The §1.3 VM spike against the fixtures. Go, or switch to the fallback.
 4. §1.4 to §1.11: the registry, porting, proxies, language fixes, context, checker, coverage. Merge when §1.11 holds. Then the second half of §0.8 (building off the main thread).
 5. Round 1. Then Round 2, Round 3 and Round 4, each on its own branch, each merged when its "done when" holds.
-6. Glass icons, designed by a Fable subagent at high effort, just before Round 5.
-7. Round 5, widgets on Shelf's Home Screen. It can move ahead of Rounds 2–4 if wanted, and glass icons move with it.
+6. Glass icons, designed by a Fable subagent at high effort.
 
 For Kiln work, every merge includes: the coverage report regenerated, the prompt regenerated, new fixtures, Lab parity, no benchmark regressions, and the README updated.
 
@@ -1002,6 +939,7 @@ For Kiln work, every merge includes: the coverage report regenerated, the prompt
 | StoreKit, Apple Pay and Wallet, RealityKit/SceneKit/SpriteKit, MusicKit, Sign in with Apple, system services (Siri tips, Screen Time, PermissionKit…), Xcode previews | Proposed by §1.9, accepted in Round 1: they need App Store products, merchant or pass IDs, entitlements or registration per app, or scene graphs of native subclasses; previews have no canvas in Shelf. |
 | `TextRenderer`, `customAttribute`, `CustomAnimation`, an app's own `VisualEffect` | SwiftUI calls them on its render thread every frame, where app code can't run. |
 | Rich-text formatting definitions, custom chart descriptors | Attribute-scope and `AXChartDescriptor` types an app declares can't be made native; a `Chart` describes itself to VoiceOver. |
+| Widgets, on Shelf's Home Screen or the iPhone's (WidgetKit, `TimelineProvider`, `AppIntent`) | Taken out of the plan on 24 Nov 2026. |
 | `onOpenURL`, `userActivity`, `onContinueUserActivity`, `persistentSystemOverlays`, `defaultAppStorage` | A Shelf app has no URL scheme or activity types; Shelf owns the home indicator; each app has one settings store. |
 | A 32-bit `Float`, `ArraySlice`'s base indices, module names and Objective-C descriptions in printed values, `JSONEncoder` keys in declaration order, blocking waits (`DispatchSemaphore.wait()`) | Round 2C: Kiln's `Float` is a `Double`; a slice is a new array; an app has no module; sorted JSON means the same; app code on the main actor can't block. Each is a `[gap]` or a note in the corpus. |
 
@@ -1009,8 +947,7 @@ For Kiln work, every merge includes: the coverage report regenerated, the prompt
 
 - Local notifications that open the app, EventKit, Speech (`SpeechAnalyzer`), AlarmKit, Translation, and Core Haptics patterns.
 - Claude through ij5.dev, with the key kept on the server.
-- Widgets on the iPhone's own Home Screen: a WidgetKit extension that runs Kiln, an App Group holding the sources and `DB`, one configurable "Shelf App" widget kind, and one compiled `RunAppIntent` for interactivity. Spike first: Kiln has to fit the extension's memory limit.
-- Live Activities and Control Center controls, after that.
+- Live Activities and Control Center controls.
 - A cheap symbol check at `PUT /api/apps/{slug}` from `kiln-manifest.json`, so an agent installing with `curl` gets a 422 that names an unsupported API.
 - Offering the language fixes back to upstream Kiln.
 - Accessibility for the Home Screen: VoiceOver labels, reading order (grid, then dock), and actions to open, move and delete.
