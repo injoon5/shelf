@@ -57007,7 +57007,7 @@
             "preview",
             "label"
           ],
-          "signature" : "item:any subject:any? message:any? preview:any? label:content"
+          "signature" : "item:any subject:any? message:any? preview:closure label:content"
         },
         {
           "labels" : [
@@ -57026,7 +57026,7 @@
             "preview",
             "label"
           ],
-          "signature" : "items:any subject:any? message:any? preview:any? label:content"
+          "signature" : "items:any subject:any? message:any? preview:closure label:content"
         },
         {
           "labels" : [

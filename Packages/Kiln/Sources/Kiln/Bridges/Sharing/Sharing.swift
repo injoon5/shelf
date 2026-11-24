@@ -26,7 +26,10 @@ final class SharingBridges: KBridgeFamily {
         r.view("ShareLink", .sharing,
                notes: "A `String`, `URL`, `Image`, `Data` or your `Transferable`, or `items:` an array of one of them; `preview:` a `SharePreview` or a closure per item.") { v in
             for items in ["item:any", "items:any"] {
-                v.forms(["\(items) subject:any? message:any? preview:any?", "_:title \(items) subject:any? message:any? preview:any?",
+                // A preview closure as the first trailing closure, then `label:`:
+                // `ShareLink(items: notes) { note in SharePreview(…) } label: { … }`.
+                v.forms(["\(items) subject:any? message:any? preview:closure label:content",
+                         "\(items) subject:any? message:any? preview:any?", "_:title \(items) subject:any? message:any? preview:any?",
                          "\(items) subject:any? message:any? preview:any? label:content"]) { c in shareLink(c) }
             }
         }

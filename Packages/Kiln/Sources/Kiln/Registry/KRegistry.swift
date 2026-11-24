@@ -454,8 +454,16 @@ final class KOverload {
                 // A trailing closure (unlabeled) binds a labeled closure parameter;
                 // one with a default is passed over when a later closure parameter
                 // needs an argument (Swift's forward scan, SE-0286).
+                // The skip only happens when the arguments still to come can't
+                // fill that later parameter: `ShareLink(items:) { preview } label: { … }`
+                // gives `preview:` the unlabeled closure because `label:` follows.
+                let laterNeedsIt = params[(j + 1)...].contains { later in
+                    later.kind.isClosure && !later.optional
+                        && !labels[(i + 1)...].contains(later.label)
+                        && !labels.indices.dropFirst(i + 1).contains { labels[$0] == nil && syntaxOf($0) == .closureLiteral }
+                }
                 let trailing = label == nil && syntax == .closureLiteral && param.kind.isClosure && param.label != nil
-                    && !(param.optional && params[(j + 1)...].contains { $0.kind.isClosure && !$0.optional })
+                    && !(param.optional && laterNeedsIt)
                 let labelMatches = param.label == label || trailing
                 if labelMatches && param.kind.accepts(syntax) { found = j; break }
                 // Only a parameter with a default can be skipped.
