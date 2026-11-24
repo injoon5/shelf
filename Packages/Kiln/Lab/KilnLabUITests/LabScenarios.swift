@@ -399,6 +399,22 @@ final class AppScenarios: LabCase {
     }
     func testLedgerNative() { ledger("native") }
     func testLedgerKiln() { ledger("kiln") }
+
+    // MARK: Wayfinder (Round 3B: Core Location's values, sensors' availability)
+
+    func wayfinder(_ mode: String) {
+        launch("Wayfinder", mode)
+        snap("1 from Apple Park")
+        tap("Walk 1 km north")
+        tap("Walk 1 km north")
+        snap("2 walked 2 km north")
+        tap("Ferry Building")
+        snap("3 from the Ferry Building")
+        app.swipeUp()
+        snap("4 a coordinate and this device")
+    }
+    func testWayfinderNative() { wayfinder("native") }
+    func testWayfinderKiln() { wayfinder("kiln") }
 }
 
 /// Apple Intelligence's own replies, as Haplo AI receives them. There is no

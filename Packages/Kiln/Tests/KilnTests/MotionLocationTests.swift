@@ -590,6 +590,8 @@ final class MotionLocationTests: XCTestCase {
             let source = try String(contentsOf: apps.appending(path: "\(name).swift"), encoding: .utf8)
             XCTAssertEqual(BridgeTest.problems(source), [], name)
         }
+        let lab = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appending(path: "../../Examples/Apps/Wayfinder.swift").standardized
+        XCTAssertEqual(BridgeTest.problems(try String(contentsOf: lab, encoding: .utf8)), [], "Wayfinder")
     }
 
     func testValidateRunsAHandlerOnceWithAStillDevice() {
