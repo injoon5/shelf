@@ -66,6 +66,10 @@ extension DrawingBridges {
             }
             m.forms(["_:ColorOrStyle ignoresSafeAreaEdges:any?", "_:ColorOrStyle in:any fillStyle:any?", "_:ColorOrStyle alignment:Alignment?",
                      "ignoresSafeAreaEdges:any?"]) { c, view in background(c, view) }
+            // `.background(in: .capsule)`: the background style, in a shape.
+            m.form("in:any fillStyle:any?") { c, view in
+                if let shape = shapeArg(c["in"], c.r) { AnyView(view.background(in: shape)) } else { view }
+            }
         }
         r.modifier("overlay", .drawing) { m in
             m.form("alignment:Alignment? content:content") { c, view in
@@ -74,6 +78,10 @@ extension DrawingBridges {
             }
             m.form("_:any alignment:Alignment?") { c, view in
                 view.overlay(alignment: c.alignment("alignment")) { c.r.renderList(KBuiltins.asViews(c[0] ?? .void, c.interp)) }
+            }
+            // `.overlay(.ultraThinMaterial, ignoresSafeAreaEdges: .all)`.
+            m.form("_:ColorOrStyle ignoresSafeAreaEdges:any") { c, view in
+                if let s = c.shapeStyle(0) { AnyView(view.overlay(s)) } else { view }
             }
             m.form("_:ColorOrStyle in:any fillStyle:any?") { c, view in
                 if let s = c.shapeStyle(0), case .view(let sv)? = c["in"], let chain = c.r.shapeChain(sv) {
@@ -97,12 +105,14 @@ extension DrawingBridges {
             }
         }
         r.modifier("mask", .drawing) { m in
-            m.form("alignment:Alignment? mask:content") { c, view in
-                let mask = c.content("mask")
-                view.mask(alignment: c.alignment("alignment")) { mask }
-            }
+            // `.mask(Circle())`, or `.mask(alignment:) { … }` (pick prefers a
+            // closure parameter for a closure). SwiftUI's mask closure is unlabeled.
             m.form("_:any") { c, view in
                 if case .view(let mv)? = c[0] { view.mask { c.r.render(mv) } } else { view }
+            }
+            m.form("alignment:Alignment? _:content") { c, view in
+                let mask = c.content()
+                view.mask(alignment: c.alignment("alignment")) { mask }
             }
         }
         r.modifier("clipped", .drawing) { m in

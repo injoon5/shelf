@@ -18,6 +18,8 @@ public struct Param: Equatable, Sendable {
     public var label: String?
     public var type: String
     public var hasDefault: Bool
+    /// Attributes before the label (`@ViewBuilder`), by name.
+    public var attributes: [String] = []
 }
 
 public struct Decl: Sendable {
@@ -158,6 +160,8 @@ public enum InterfaceParser {
                 name = l[k + 1].text
                 k += 2
             }
+            // A generic attribute: `@SliderTickBuilder<V>`.
+            if k < l.count, l[k].isPunct("<"), !l[k].spaceBefore { k = l.balanced(from: k) }
             var args: [Token]? = nil
             if k < l.count, l[k].isPunct("("), !l[k].spaceBefore {
                 let end = l.balanced(from: k)
@@ -172,7 +176,7 @@ public enum InterfaceParser {
     static func params(_ inner: [Token]) -> [Param] {
         guard !inner.isEmpty else { return [] }
         return inner.splitTopLevel(",").compactMap { part -> Param? in
-            var (_, k) = attributes(part, from: 0)
+            var (attrs, k) = attributes(part, from: 0)
             guard let colon = part.firstTopLevel(from: k, where: { $0.isPunct(":") }) else { return nil }
             var names: [String] = []
             while k < colon { if part[k].kind == .ident { names.append(part[k].text) }; k += 1 }
@@ -180,7 +184,7 @@ public enum InterfaceParser {
             let rest = Array(part[(colon + 1)...])
             let eq = rest.firstTopLevel(where: { $0.isPunct("=") })
             let type = Array(rest[..<(eq ?? rest.count)]).joined()
-            return Param(label: label, type: type, hasDefault: eq != nil)
+            return Param(label: label, type: type, hasDefault: eq != nil, attributes: attrs.map(\.name))
         }
     }
 

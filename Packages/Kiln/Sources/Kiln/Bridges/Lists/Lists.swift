@@ -25,7 +25,8 @@ final class ListsBridges: KBridgeFamily {
             v.form("content:content") { c in Form { c.content() } }
         }
         r.view("ForEach", .lists, notes: "Over arrays, ranges and bindings (`ForEach($items) { $item in }`), by `id:` or `Identifiable`.") { v in
-            v.forms(["_:any content:content", "_:any id:any content:content"]) { c in
+            // `liftedContent:`: iOS 18's name for tabs' content in a `TabView`.
+            v.forms(["_:any content:content", "_:any id:any content:content", "_:any liftedContent:content", "_:any id:any liftedContent:content"]) { c in
                 let rows = c.r.forEachRows(c.a)
                 ForEach(rows) { row in c.r.renderList(row.views) }
             }
@@ -81,7 +82,8 @@ final class ListsBridges: KBridgeFamily {
 
     @MainActor static func section(_ c: KCall) -> AnyView {
         let a = c.a, r = c.r
-        let body = r.renderContent(a.firstFunction ?? a.lastFunction)
+        // `content:` as bound: `Section(header: …, footer: …) { rows }` has it last.
+        let body = r.renderContent(c["content"] ?? a.firstFunction)
         if let title = ControlsBridges.stringTitle(c) { return AnyView(Section(title) { body }) }
         let header = a["header"].map { v -> AnyView in r.isFunction(v) ? r.renderContent(v) : r.renderList(KBuiltins.asViews(v, c.interp)) }
         let footer = a["footer"].map { v -> AnyView in r.isFunction(v) ? r.renderContent(v) : r.renderList(KBuiltins.asViews(v, c.interp)) }

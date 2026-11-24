@@ -178,7 +178,15 @@ final class DrawingBridges: KBridgeFamily {
             }
         }
         r.type("Gradient", .drawing) { t in
-            t.initializer(kinds: ["colors": .typedArray("Color")]) { c in .native(.implicit("gradient", [c.arg("colors") ?? .array([])])) }
+            t.initializer(kinds: ["colors": .typedArray("Color"), "stops": .typedArray("Gradient.Stop")]) { c in
+                if let stops = c.arg("stops") { return .native(.implicit("gradientStops", [stops])) }
+                return .native(.implicit("gradient", [c.arg("colors") ?? .array([])]))
+            }
+        }
+        r.type("Gradient.Stop", .drawing) { t in
+            t.initializer(kinds: ["color": .typed("Color"), "location": .number]) { c in
+                .native(.implicit("stop", [c.arg("color") ?? .nilValue, c.arg("location") ?? .double(0)]))
+            }
         }
         r.type("StrokeStyle", .drawing) { t in
             t.initializer { c in

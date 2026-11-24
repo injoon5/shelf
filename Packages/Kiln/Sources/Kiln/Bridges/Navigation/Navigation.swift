@@ -228,19 +228,21 @@ final class NavigationBridges: KBridgeFamily {
     }
 
     @MainActor static func navigationLink(_ c: KCall) -> AnyView {
-        let a = c.a, r = c.r
+        let r = c.r
         let title = ControlsBridges.stringTitle(c)
-        if let value = a["value"] {
-            let label: AnyView = title.map { AnyView(Text($0)) } ?? r.renderContent(a.lastFunction)
+        // By the parameter each argument bound to: `NavigationLink { Detail() } label: { … }`'s
+        // first closure is `destination:`, though it's written with no label.
+        if let value = c["value"] {
+            let label: AnyView = title.map { AnyView(Text($0)) } ?? r.renderContent(c["label"])
             return AnyView(NavigationLink(value: KNavValue(value: value)) { label })
         }
-        let dest = a["destination"] ?? (title != nil ? a.lastFunction : nil)
+        let dest = c["destination"]
         let destination = KLazyView {
             if let dest, r.isFunction(dest) { return r.renderContent(dest) }
             return r.renderList(KBuiltins.asViews(dest ?? .void, c.interp))
         }
         if let title { return AnyView(NavigationLink(title) { destination }) }
-        let labelFn = a["label"] ?? a.lastFunction
+        let labelFn = c["label"]
         return AnyView(NavigationLink { destination } label: { r.renderContent(labelFn) })
     }
 

@@ -22,7 +22,10 @@ extension DrawingBridges {
         }
         r.view("AsyncImage", .drawing, support: .partial) { v in
             v.forms(["url:any scale:number?", "url:any scale:number? content:content placeholder:content",
-                     "url:any scale:number? transaction:any? content:content"]) { c in asyncImage(c) }
+                     "url:any scale:number? transaction:any? content:content",
+                     // iOS 27: a `URLRequest`, loaded from its URL.
+                     "request:any scale:number?", "request:any scale:number? content:content placeholder:content",
+                     "request:any scale:number? transaction:any? content:content"]) { c in asyncImage(c) }
         }
         r.type("AsyncImagePhase", .drawing) { t in t.internal() }
         // What `Image(uiImage:)` shows: a picker's photo (§1.5), and Round 3's `UIImage(data:)`.
@@ -156,6 +159,7 @@ extension DrawingBridges {
         var url: URL? = nil
         if case .native(.url(let u))? = a["url"] ?? a.first { url = u }
         if let s = (a["url"] ?? a.first)?.asString { url = URL(string: s) }
+        if case .native(.object(_, let ref))? = a["request"], let req = ref.value as? NSURLRequest { url = req.url }
         let contentFn = a["content"] ?? a.unlabeledFunction(0)
         let placeholderFn = a["placeholder"]
         guard let contentFn else { return AnyView(AsyncImage(url: url)) }
