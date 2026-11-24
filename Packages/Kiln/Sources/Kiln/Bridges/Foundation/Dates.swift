@@ -11,6 +11,8 @@ extension FoundationBridges {
 
         r.type("Date", .foundation) { t in
             t.initializer { c in
+                // `try Date("2026-11-24T09:30:00Z", strategy: .iso8601)` (Text/ParseStrategies.swift).
+                if c.arg("strategy") != nil { return try KParsing.date(c) }
                 if let s = c.arg("timeIntervalSinceNow")?.asDouble { return .native(.date(Date(timeIntervalSinceNow: s))) }
                 if let s = c.arg("timeIntervalSince1970")?.asDouble { return .native(.date(Date(timeIntervalSince1970: s))) }
                 if let s = c.arg("timeIntervalSinceReferenceDate")?.asDouble { return .native(.date(Date(timeIntervalSinceReferenceDate: s))) }

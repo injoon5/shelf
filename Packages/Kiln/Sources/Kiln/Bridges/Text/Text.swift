@@ -18,6 +18,16 @@ final class KTextBridges: KBridgeFamily {
         typography(r)
         typesetting(r)
         attributed(r)
+        markdownOptions(r)
+        regexBuilder(r)
+        parseStrategies(r)
+        parsing(r)
+        naturalLanguage(r)
+    }
+
+    /// Parsing adds to `String`, `Range`, `Int`, `Double` and `Date`, which later families declare.
+    override class func extend(into r: KRegistry) {
+        parsingExtensions(r)
     }
 
     // MARK: Text

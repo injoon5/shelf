@@ -98,6 +98,8 @@ extension KInterpreter {
             }
         }
         if name == "self" { return .type(.builtin(typeName)) }
+        // A nested native type: `NSTextCheckingResult.CheckingType`, `UIImpactFeedbackGenerator.FeedbackStyle`.
+        if name.first?.isUppercase == true, registry.type(typeName + "." + name) != nil { return .type(.builtin(typeName + "." + name)) }
         // Other members of SwiftUI's types are symbolic until a view reads them (`Edge.Set.all`).
         return .native(.implicit(name, []))
     }
