@@ -165,6 +165,7 @@ let validation = Kiln.validate(source)   // validation.isValid, validation.error
 | Round 1: a doodle pad (gestures, `Canvas`, focus) | DoodlePad matches native on every step | 100% | as before |
 | Round 2A: trip notes (regex and RegexBuilder, data detectors, NaturalLanguage, `Decimal`, `Measurement`, haptics, the pasteboard) | TripNotes matches native on every step | 100% | as before |
 | Round 2C: a ledger (`Calendar`, format styles, `Decimal`, `KeyPathComparator`, a seeded generator, `UInt8`, CryptoKit, Combine, `callAsFunction`, `@dynamicMemberLookup`) | Ledger matches native on every step | 100% | as before |
+| Round 3B: a wayfinder (`CLLocation` distances and bearings, coordinates, typed Core Location enums, each sensor's availability and authorization) | Wayfinder matches native on every step | 100% | as before |
 
 ## Coverage
 
