@@ -2,7 +2,7 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**112 inputs: 73 identical, 39 different as expected, 0 different otherwise.**
+**117 inputs: 73 identical, 44 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
@@ -17,6 +17,7 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
 | Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
+| Packages/Kiln/Examples/Apps/TripNotes.swift | 2 | 1 | expected (Round 2A's Lab example: before, RegexBuilder, NSDataDetector, NaturalLanguage, Decimal, Measurement, haptics and the pasteboard weren't bridged.) |
 | Packages/Kiln/Examples/Apps/WaveStudio.swift | 341 | 13 | identical |
 | Packages/Kiln/Examples/AppleIntelligence/expense.md | 754 | 13 | expected (The reply writes .stepValue(0.1), which isn't a SwiftUI modifier: §1.4 reports it with its line, where before it was skipped silently.) |
 | Packages/Kiln/Examples/AppleIntelligence/habit.md | 377 | 13 | identical |
@@ -31,19 +32,23 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | fixtures/apps/controls-styles.swift | 508 | 13 | expected (Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.) |
 | fixtures/apps/focus-environment.swift | 703 | 13 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/gestures-canvas.swift | 6 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
+| fixtures/apps/haptics.swift | 2 | 1 | expected (Round 2A's Haptics fixture: before, `SensoryFeedback`'s values and `.sensoryFeedback(trigger:_:)` weren't bridged (the modifier was a stub).) |
 | fixtures/apps/images.swift | 663 | 13 | identical |
 | fixtures/apps/layout-scrolling.swift | 2 | 1 | expected (Round 1A's Layout fixture: before, @Entry on ContainerValues and ForEach(subviews:) stopped the body.) |
 | fixtures/apps/lists-selection.swift | 59 | 1 | expected (Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.) |
 | fixtures/apps/navigation-tabs.swift | 1431 | 13 | expected (Round 1A's Navigation fixture: before, Tab, ToolbarSpacer, zoom transitions and search scopes weren't bridged.) |
 | fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
+| fixtures/apps/sharing.swift | 30 | 1 | expected (Round 2A's Sharing fixture: before, `PasteButton`, `UIPasteboard`, `TextSelection`, `.copyable`, `.pasteDestination` and `ShareLink` for images, `Data` and `items:` weren't bridged.) |
 | fixtures/apps/state.swift | 599 | 13 | identical |
 | fixtures/apps/swift-builders.swift | 339 | 13 | expected (§1.6's fixture: before, the Card's @ViewBuilder content and the @Entry tint were missing and the steps builder stopped the body.) |
 | fixtures/apps/swift-codable.swift | 2 | 1 | expected (§1.6's fixture: before, the regex literal didn't parse.) |
 | fixtures/apps/swift-language.swift | 1213 | 13 | identical |
 | fixtures/apps/swift-protocols.swift | 2 | 1 | expected (§1.6's fixture: before, `case 500...:` didn't parse.) |
+| fixtures/apps/text-parsing.swift | 2 | 1 | expected (Round 2A's text-parsing fixture: before, RegexBuilder, NSDataDetector, NaturalLanguage and Decimal weren't bridged.) |
 | fixtures/apps/time.swift | 372 | 13 | identical |
 | fixtures/apps/todos-db.swift | 296 | 14 | identical |
+| fixtures/apps/units.swift | 37 | 1 | expected (Round 2A's Units fixture: before, `Measurement` was a stub holding its value, with no units or conversion.) |
 | fixtures/apps/views-custom-protocols.swift | 9 | 1 | expected (§1.5's fixture: before, `modifier(…)` called from a View extension wasn't found, and nothing below it showed.) |
 | fixtures/apps/views-input.swift | 502 | 14 | identical |
 | fixtures/apps/views-layout-drawing.swift | 2560 | 13 | identical |
@@ -368,6 +373,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +            .padding(.vertical, 6)
 +            .background(<view>)
 +              Capsule()
+…
+```
+
+## Packages/Kiln/Examples/Apps/TripNotes.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,442 @@
+-compile error: Line 91: expected a name, found '/'
+-  91 | guard let m = note.firstMatch(of: #/(\d{2}):(\d{2})/#) else { return "none" }
++== start
++ContentView {note="Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", travelers=2, distanceKm=12.0, packed=0, copied=false}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Note", {fn})
++        TextField("Note", text: $"Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", axis: .vertical)
++          .lineLimit(2...5)
++      Section("From the note", {fn})
++        LabeledContent("Tags", value: "zurich, ski")
++        LabeledContent("Date", value: "day 3 of month 12, 2026")
++        LabeledContent("Time", value: "09h 30m")
++        LabeledContent("Links", value: "1")
++        LabeledContent("Phones", value: "1")
++        LabeledContent("Words", value: "25")
++        LabeledContent("Language", value: "en")
++      Section("Budget", {fn})
++        LabeledContent("Each", value: "$625.00")
++        Button("Add traveler", {fn})
++          .sensoryFeedback(SensoryFeedback, trigger: 2)
++        Text(_literal: "Travelers: 2")
++      Section("Distance", {fn})
++        Text("12 kilometers")
++        Text("7.5 mi")
++        Button("Walk 2 km more", {fn})
++          .sensoryFeedback(trigger: 12.0, {fn})
++        LabeledContent("Base value", value: "12500 m")
++      Section("Pack", {fn})
++        Button("Pack a bag", {fn})
++        Text(_literal: "Bags packed: 0")
++        Button("Copy plan", {fn})
++        Text("Not copied")
++          .textSelection(.enabled)
++        ShareLink("Share plan", item: "Trip with 2 people, 12 kilometers, tags zurich ski")
++      .navigationTitle("Trip Notes")
++== after Button[Add traveler]@41
++ContentView {note="Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", travelers=3, distanceKm=12.0, packed=0, copied=false}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Note", {fn})
++        TextField("Note", text: $"Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", axis: .vertical)
++          .lineLimit(2...5)
++      Section("From the note", {fn})
++        LabeledContent("Tags", value: "zurich, ski")
++        LabeledContent("Date", value: "day 3 of month 12, 2026")
++        LabeledContent("Time", value: "09h 30m")
++        LabeledContent("Links", value: "1")
++        LabeledContent("Phones", value: "1")
++        LabeledContent("Words", value: "25")
++        LabeledContent("Language", value: "en")
++      Section("Budget", {fn})
++        LabeledContent("Each", value: "$416.67")
++        Button("Add traveler", {fn})
++          .sensoryFeedback(SensoryFeedback, trigger: 3)
++        Text(_literal: "Travelers: 3")
++      Section("Distance", {fn})
++        Text("12 kilometers")
++        Text("7.5 mi")
++        Button("Walk 2 km more", {fn})
++          .sensoryFeedback(trigger: 12.0, {fn})
++        LabeledContent("Base value", value: "12500 m")
++      Section("Pack", {fn})
++        Button("Pack a bag", {fn})
++        Text(_literal: "Bags packed: 0")
++        Button("Copy plan", {fn})
++        Text("Not copied")
++          .textSelection(.enabled)
++        ShareLink("Share plan", item: "Trip with 3 people, 12 kilometers, tags zurich ski")
++      .navigationTitle("Trip Notes")
++== after Button[Walk 2 km more]@48
++ContentView {note="Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", travelers=3, distanceKm=14.0, packed=0, copied=false}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Note", {fn})
++        TextField("Note", text: $"Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", axis: .vertical)
++          .lineLimit(2...5)
++      Section("From the note", {fn})
++        LabeledContent("Tags", value: "zurich, ski")
++        LabeledContent("Date", value: "day 3 of month 12, 2026")
++        LabeledContent("Time", value: "09h 30m")
++        LabeledContent("Links", value: "1")
++        LabeledContent("Phones", value: "1")
++        LabeledContent("Words", value: "25")
++        LabeledContent("Language", value: "en")
++      Section("Budget", {fn})
++        LabeledContent("Each", value: "$416.67")
++        Button("Add traveler", {fn})
++          .sensoryFeedback(SensoryFeedback, trigger: 3)
++        Text(_literal: "Travelers: 3")
++      Section("Distance", {fn})
++        Text("14 kilometers")
++        Text("8.7 mi")
++        Button("Walk 2 km more", {fn})
++          .sensoryFeedback(trigger: 14.0, {fn})
++        LabeledContent("Base value", value: "14500 m")
++      Section("Pack", {fn})
++        Button("Pack a bag", {fn})
++        Text(_literal: "Bags packed: 0")
++        Button("Copy plan", {fn})
++        Text("Not copied")
++          .textSelection(.enabled)
++        ShareLink("Share plan", item: "Trip with 3 people, 14 kilometers, tags zurich ski")
++      .navigationTitle("Trip Notes")
++== after Button.sensoryFeedback@49
++ContentView {note="Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", travelers=3, distanceKm=14.0, packed=0, copied=false}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Note", {fn})
++        TextField("Note", text: $"Flight to Zurich on 2026-12-03 at <time>. Hotel +41 44 668 18 00, https://www.example.com/hotel. Budget $1,250.00 #zurich #ski", axis: .vertical)
++          .lineLimit(2...5)
++      Section("From the note", {fn})
++        LabeledContent("Tags", value: "zurich, ski")
++        LabeledContent("Date", value: "day 3 of month 12, 2026")
++        LabeledContent("Time", value: "09h 30m")
++        LabeledContent("Links", value: "1")
++        LabeledContent("Phones", value: "1")
 …
 ```
 
@@ -1127,6 +1258,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/haptics.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,650 @@
+-compile error: Line 38: expected ']', found ':'
+-  38 | played[pad.id, default: 0] += 1
++== start
++ContentView {taps=0, last="Tap a pad", level=5, armed=false, played=[], pads=[Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")]}
++  NavigationStack({fn})
++    List({fn})
++      Section("SwiftUI", {fn})
++        LazyVGrid(columns: [GridItem], spacing: 12, {fn})
++          ForEach([Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")], {fn})
++            row "Success"
++              PadButton {pad=Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Warning"
++              PadButton {pad=Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Error"
++              PadButton {pad=Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Selection"
++              PadButton {pad=Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Heavy"
++              PadButton {pad=Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Soft"
++              PadButton {pad=Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++          .padding(.vertical, 4)
++        Stepper("Level 5", value: $5, in: 0...10)
++          .sensoryFeedback(trigger: 5, {fn})
++        Toggle("Armed", isOn: $false)
++          .sensoryFeedback(SensoryFeedback, trigger: false, {fn})
++          .sensoryFeedback(SensoryFeedback, trigger: false, {fn})
++      Section("UIKit generators", {fn})
++        Button("Impact (rigid)", {fn})
++        Button("Notification (success)", {fn})
++        Button("Selection changed", {fn})
++      Section({fn})
++        LabeledContent("Last", value: "Tap a pad")
++      .navigationTitle("Haptic Pad")
++== after Button(action)@82
++ContentView {taps=0, last="Success", level=5, armed=false, played=["Success": 1], pads=[Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")]}
++  NavigationStack({fn})
++    List({fn})
++      Section("SwiftUI", {fn})
++        LazyVGrid(columns: [GridItem], spacing: 12, {fn})
++          ForEach([Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")], {fn})
++            row "Success"
++              PadButton {pad=Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), count=1, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 1)
++            row "Warning"
++              PadButton {pad=Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Error"
++              PadButton {pad=Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Selection"
++              PadButton {pad=Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Heavy"
++              PadButton {pad=Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++            row "Soft"
++              PadButton {pad=Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 0)
++          .padding(.vertical, 4)
++        Stepper("Level 5", value: $5, in: 0...10)
++          .sensoryFeedback(trigger: 5, {fn})
++        Toggle("Armed", isOn: $false)
++          .sensoryFeedback(SensoryFeedback, trigger: false, {fn})
++          .sensoryFeedback(SensoryFeedback, trigger: false, {fn})
++      Section("UIKit generators", {fn})
++        Button("Impact (rigid)", {fn})
++        Button("Notification (success)", {fn})
++        Button("Selection changed", {fn})
++      Section({fn})
++        LabeledContent("Last", value: "Success")
++      .navigationTitle("Haptic Pad")
++== after Button[…]@82
++ContentView {taps=0, last="Success", level=5, armed=false, played=["Success": 1], pads=[Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")]}
++  NavigationStack({fn})
++    List({fn})
++      Section("SwiftUI", {fn})
++        LazyVGrid(columns: [GridItem], spacing: 12, {fn})
++          ForEach([Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), Pad(id: "Error", feedback: SensoryFeedback, symbol: "xmark.octagon"), Pad(id: "Selection", feedback: SensoryFeedback, symbol: "hand.point.up"), Pad(id: "Heavy", feedback: SensoryFeedback, symbol: "hammer"), Pad(id: "Soft", feedback: SensoryFeedback, symbol: "cloud")], {fn})
++            row "Success"
++              PadButton {pad=Pad(id: "Success", feedback: SensoryFeedback, symbol: "checkmark.circle"), count=1, action={fn}}
++                Button(action: {fn}, {fn})
++                  .buttonStyle(.bordered)
++                  .sensoryFeedback(SensoryFeedback, trigger: 1)
++            row "Warning"
++              PadButton {pad=Pad(id: "Warning", feedback: SensoryFeedback, symbol: "exclamationmark.triangle"), count=0, action={fn}}
++                Button(action: {fn}, {fn})
+…
+```
+
 ## fixtures/apps/layout-scrolling.swift
 
 ```diff
@@ -1525,6 +1782,132 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/sharing.swift
+
+```diff
+--- before
++++ after
+@@ -7,3 +7,6 @@
+         HStack({fn})
+-          content failed
++          PasteButton(payloadType: String, {fn})
++          Spacer()
++          Button("Add", {fn})
++            .disabled(true)
+       Section("Clips", {fn})
+@@ -12,10 +15,202 @@
+             HStack({fn})
+-              content failed
+-          row <uuid>
+-            HStack({fn})
+-              content failed
+-      Section("Share", {fn})
+-        content failed
++              Text("Pick up oat milk")
++                .textSelection(.enabled)
++              Spacer()
++              Button({fn}, label: {fn})
++                Image(systemName: "doc.on.doc")
++                .buttonStyle(.borderless)
++              ShareLink(item: Clip(id: <uuid>, text: "Pick up oat milk"), preview: SharePreview, {fn})
++                Image(systemName: "square.and.arrow.up")
++          row <uuid>
++            HStack({fn})
++              Text("https://www.apple.com")
++                .textSelection(.enabled)
++              Spacer()
++              Button({fn}, label: {fn})
++                Image(systemName: "doc.on.doc")
++                .buttonStyle(.borderless)
++              ShareLink(item: Clip(id: <uuid>, text: "https://www.apple.com"), preview: SharePreview, {fn})
++                Image(systemName: "square.and.arrow.up")
++      Section("Share", {fn})
++        ShareLink("All clips", items: ["Pick up oat milk", "https://www.apple.com"])
++        ShareLink("Apple", item: URL(https://www.apple.com), subject: <view>, message: <view>)
++          Text(_literal: "Look")
++          Text(_literal: "From Clip Board")
++        ShareLink(item: <view>, preview: SharePreview, {fn})
++          Image(systemName: "doc.on.clipboard")
++          Label("The icon", systemImage: "photo")
++        ShareLink(item: Data, preview: SharePreview, {fn})
++          Label("As data", systemImage: "doc")
+       Section({fn})
+         Text("Nothing copied yet")
++          .foregroundStyle(Color)
++        If false
++      .navigationTitle("Clip Board")
++      .copyable(["Pick up oat milk", "https://www.apple.com"])
++      .pasteDestination(for: String, {fn})
++== after PasteButton@32
++ContentView {clips=[Clip(id: <uuid>, text: "Pick up oat milk"), Clip(id: <uuid>, text: "https://www.apple.com")], draft="Pasted", selection=nil, status="Nothing copied yet"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New clip", {fn})
++        TextField("Type or paste", text: $"Pasted", selection: $nil)
++        HStack({fn})
++          PasteButton(payloadType: String, {fn})
++          Spacer()
++          Button("Add", {fn})
++            .disabled(false)
++      Section("Clips", {fn})
++        ForEach([Clip(id: <uuid>, text: "Pick up oat milk"), Clip(id: <uuid>, text: "https://www.apple.com")], {fn})
++          row <uuid>
++            HStack({fn})
++              Text("Pick up oat milk")
++                .textSelection(.enabled)
++              Spacer()
++              Button({fn}, label: {fn})
++                Image(systemName: "doc.on.doc")
++                .buttonStyle(.borderless)
++              ShareLink(item: Clip(id: <uuid>, text: "Pick up oat milk"), preview: SharePreview, {fn})
++                Image(systemName: "square.and.arrow.up")
++          row <uuid>
++            HStack({fn})
++              Text("https://www.apple.com")
++                .textSelection(.enabled)
++              Spacer()
++              Button({fn}, label: {fn})
++                Image(systemName: "doc.on.doc")
++                .buttonStyle(.borderless)
++              ShareLink(item: Clip(id: <uuid>, text: "https://www.apple.com"), preview: SharePreview, {fn})
++                Image(systemName: "square.and.arrow.up")
++      Section("Share", {fn})
++        ShareLink("All clips", items: ["Pick up oat milk", "https://www.apple.com"])
++        ShareLink("Apple", item: URL(https://www.apple.com), subject: <view>, message: <view>)
++          Text(_literal: "Look")
++          Text(_literal: "From Clip Board")
++        ShareLink(item: <view>, preview: SharePreview, {fn})
++          Image(systemName: "doc.on.clipboard")
++          Label("The icon", systemImage: "photo")
++        ShareLink(item: Data, preview: SharePreview, {fn})
++          Label("As data", systemImage: "doc")
++      Section({fn})
++        Text("Nothing copied yet")
++          .foregroundStyle(Color)
++        If false
++      .navigationTitle("Clip Board")
++      .copyable(["Pick up oat milk", "https://www.apple.com"])
++      .pasteDestination(for: String, {fn})
++== after Button[Add]@36
++ContentView {clips=[Clip(id: <uuid>, text: "Pick up oat milk"), Clip(id: <uuid>, text: "https://www.apple.com"), Clip(id: <uuid>, text: "Pasted")], draft="", selection=nil, status="Nothing copied yet"}
++  NavigationStack({fn})
++    List({fn})
++      Section("New clip", {fn})
++        TextField("Type or paste", text: $"", selection: $nil)
++        HStack({fn})
++          PasteButton(payloadType: String, {fn})
++          Spacer()
++          Button("Add", {fn})
++            .disabled(true)
++      Section("Clips", {fn})
++        ForEach([Clip(id: <uuid>, text: "Pick up oat milk"), Clip(id: <uuid>, text: "https://www.apple.com"), Clip(id: <uuid>, text: "Pasted")], {fn})
++          row <uuid>
++            HStack({fn})
++              Text("Pick up oat milk")
++                .textSelection(.enabled)
+…
+```
+
 ## fixtures/apps/swift-builders.swift
 
 ```diff
@@ -1901,6 +2284,109 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 +          row 0
 +            LabeledContent("Dune", value: "Epic")
 …
+```
+
+## fixtures/apps/text-parsing.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,33 @@
+-compile error: Line 46: unexpected '/'
+-  46 | for match in text.matches(of: /#(\w+)/) {
++== start
++ContentView {text="Lunch with Maria in Lisbon on 2026-12-03 was wonderful! #travel #food
++Call 555-010-4477 or see https://www.apple.com. Total: $1,234.50"}
++  NavigationStack({fn})
++    Form({fn})
++      Section("Note", {fn})
++        TextEditor(text: $"Lunch with Maria in Lisbon on 2026-12-03 was wonderful! #travel #food
++Call 555-010-4477 or see https://www.apple.com. Total: $1,234.50")
++          .frame(minHeight: 120)
++      Section("Found", {fn})
++        ForEach([Finding(id: <uuid>, kind: "Tag", value: "travel"), Finding(id: <uuid>, kind: "Tag", value: "food"), Finding(id: <uuid>, kind: "Date", value: "3/12/2026"), Finding(id: <uuid>, kind: "Phone", value: "555-010-4477"), Finding(id: <uuid>, kind: "Link", value: "www.apple.com"), Finding(id: <uuid>, kind: "Total", value: "$2,469.00 for two"), Finding(id: <uuid>, kind: "Person", value: "Maria"), Finding(id: <uuid>, kind: "Place", value: "Lisbon")], {fn})
++          row <uuid>
++            LabeledContent("Tag", value: "travel")
++          row <uuid>
++            LabeledContent("Tag", value: "food")
++          row <uuid>
++            LabeledContent("Date", value: "3/12/2026")
++          row <uuid>
++            LabeledContent("Phone", value: "555-010-4477")
++          row <uuid>
++            LabeledContent("Link", value: "www.apple.com")
++          row <uuid>
++            LabeledContent("Total", value: "$2,469.00 for two")
++          row <uuid>
++            LabeledContent("Person", value: "Maria")
++          row <uuid>
++            LabeledContent("Place", value: "Lisbon")
++      Section("Language", {fn})
++        LabeledContent("Language", value: "en")
++        LabeledContent("Words", value: "25")
++        LabeledContent("Mood", value: "Happy")
++        LabeledContent("Mentions "lisbon"", value: "Yes")
++      .navigationTitle("Note Reader")
+```
+
+## fixtures/apps/units.swift
+
+```diff
+--- before
++++ after
+@@ -26,12 +26,45 @@
+         Picker("Unit", selection: $1, {fn})
+-          content failed
++          ForEach(0..<5, id: KeyPath, {fn})
++            row 0
++              Text("m")
++                .tag(0)
++            row 1
++              Text("km")
++                .tag(1)
++            row 2
++              Text("ft")
++                .tag(2)
++            row 3
++              Text("mi")
++                .tag(3)
++            row 4
++              Text("smoot")
++                .tag(4)
+       Section("To", {fn})
+-        content failed
++        Picker("Unit", selection: $3, {fn})
++          ForEach(0..<5, id: KeyPath, {fn})
++            row 0
++              Text("m")
++                .tag(0)
++            row 1
++              Text("km")
++                .tag(1)
++            row 2
++              Text("ft")
++                .tag(2)
++            row 3
++              Text("mi")
++                .tag(3)
++            row 4
++              Text("smoot")
++                .tag(4)
++        Text("3.11 miles")
++          .font(Font)
+       Section("A run", {fn})
+-        content failed
++        LabeledContent("Total", value: "5.8 km")
++        LabeledContent("Longer than 3 miles", value: "Yes")
++        LabeledContent("Pace", value: "11.6 km per hour")
+       Section("Here", {fn})
+-        content failed
++        LabeledContent("Measurement system", value: "Metric")
++        LabeledContent("Body temperature", value: "37°C")
+       .navigationTitle("Converter")
+-error: Line 28: Cannot find 'UnitConverterLinear' in scope
+-error: Line 78: Cannot find 'MeasurementFormatter' in scope
+-error: Line 86: Value of type 'Locale' has no member 'measurementSystem'
 ```
 
 ## fixtures/apps/views-custom-protocols.swift

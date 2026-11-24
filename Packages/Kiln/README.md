@@ -36,6 +36,7 @@
 > - Code that can wait: `async`/`await` really suspends and resumes, on frames that live on the heap (see [Code that can wait](#code-that-can-wait)).
 > - A registry of bridges: every native view, modifier, type and function is declared once, by family, with its SwiftUI overloads; anything it doesn't have is an error with its line, and it exports `kiln-manifest.json` (see [Bridges](#bridges)).
 > - A coverage report: [COVERAGE.md](COVERAGE.md) compares Kiln with every view, modifier and style in the iOS SDK (see [Coverage](#coverage)).
+> - Round 1 (all of SwiftUI) and Round 2A (haptics, share and paste, text parsing, units): see [What Kiln runs](#what-kiln-runs).
 >
 > The module is still `Kiln`, and Shelf uses it as a local package (`path: Packages/Kiln` in `project.yml`). The README below is upstream's, kept as it was for 0.2.1 except where this copy differs; `assets/` (its GIFs and video) is left out and linked on GitHub.
 
@@ -133,6 +134,8 @@ let validation = Kiln.validate(source)   // validation.isValid, validation.error
 
 **Round 1, the rest of SwiftUI.** Every public view and modifier in SwiftUI is bridged or listed as won't-do in [COVERAGE.md](COVERAGE.md): every gesture, composed, with `@GestureState`; `Canvas` with a `GraphicsContext` that's a value; Liquid Glass; `matchedGeometryEffect`; phase and keyframe animators on SwiftUI's own timelines; symbol effects; a `@FocusState` that moves the keyboard; every environment value read from SwiftUI (`\.scenePhase` and `\.openURL` through the host); preferences; Swift Charts built from SwiftUI's own marks and axes; and every accessibility modifier.
 
+**Round 2A, APIs with no permission prompt.** Haptics: `.sensoryFeedback` in all three forms with every `SensoryFeedback`, and UIKit's three feedback generators. Share and paste: `ShareLink` for strings, URLs, images, `Data` and the app's own `Transferable` types (one or many, with previews), `PasteButton`, `UIPasteboard.general`, `TextSelection` and iOS 27's copy, cut and paste commands. Text parsing: the whole `Regex` API with RegexBuilder (`Capture`, `TryCapture`, `Reference`, character classes, Foundation's parsers), `NSRegularExpression`, `NSDataDetector`, `Scanner`, `CharacterSet`, NaturalLanguage's tokenizer, tagger, language recognizer and embeddings, parse strategies and `Decimal`. Units: `Measurement` in every unit Foundation ships and the app's own, with conversion, arithmetic, comparison, `.formatted(.measurement(…))`, `MeasurementFormatter` and the locale's measurement system.
+
 **Waiting.** `async` functions and closures, `await`, `Task {}` and `Task.detached {}`, `.task {}` and `.task(id:)` (cancelled when the view goes away), `.refreshable` that waits, `Task.sleep(for:)` and `(nanoseconds:)` that really wait, `Task.isCancelled` and `checkCancellation()`, `async let`, `withTaskGroup` and `withThrowingTaskGroup`, `for await` over task groups and `AsyncStream`s (`yield`, `finish`, `onTermination`, `makeStream`), `withCheckedContinuation`, and `await MainActor.run {}`. All of it runs on the main actor, like a SwiftUI app's own code, and none of it blocks the main thread.
 
 **Networking.** `try await URLSession.shared.data(from:)` (or `for:` a `URLRequest`), which waits without blocking, `dataTask(with:) { … }.resume()`, `URLComponents` and `URLQueryItem`, and `JSONDecoder().decode(T.self, from:)` into your own `Decodable` types, with `CodingKeys`, `.convertFromSnakeCase`, optionals, defaults, nested types and raw-value enums.
@@ -152,6 +155,7 @@ let validation = Kiln.validate(source)   // validation.isValid, validation.error
 | A sixth app (tabs, search, a shared store); SwiftUI's number formatting | 6 of 6 | 100% | 5 of 5 |
 | Bridges in a registry (§1.4): unknown modifiers are errors | 7 of 7 | 100% | 4 of 5: `expense.md` writes `.stepValue(0.1)`, which isn't SwiftUI |
 | Round 1: a doodle pad (gestures, `Canvas`, focus) | DoodlePad matches native on every step | 100% | as before |
+| Round 2A: trip notes (regex and RegexBuilder, data detectors, NaturalLanguage, `Decimal`, `Measurement`, haptics, the pasteboard) | TripNotes matches native on every step | 100% | as before |
 
 ## Coverage
 
@@ -196,7 +200,7 @@ Everything native that an app's code can name is a bridge in one registry (`Sour
 
 A call picks its overload by labels and by how each argument is written (a closure, a string literal), as Swift does, then by what the running OS has. Each argument is evaluated against its parameter's kind: `.font(.title)` against `Font`, a title's string literal as a `LocalizedStringKey`, a binding checked to be one. The bridge gets values, through helpers that read the same everywhere (`c.binding("selection", Date.self)`, `c.content()`).
 
-**Nothing is skipped silently.** An unknown modifier is `Line 12: Kiln doesn't support the .glassEffect() modifier`, an unknown view is `Cannot find 'Canvas3D' in scope`, and a call no overload takes says which ones there are. Modifiers Kiln accepts without an effect yet (`.sensoryFeedback`, `.focused`, `.gesture`) are declared as stubs, and the manifest says so.
+**Nothing is skipped silently.** An unknown modifier is `Line 12: Kiln doesn't support the .glassEffect() modifier`, an unknown view is `Cannot find 'Canvas3D' in scope`, and a call no overload takes says which ones there are. Anything Kiln accepts without an effect yet (`TimeZone`, `UIApplication`) is declared as a stub, and the manifest says so.
 
 The registry exports [`kiln-manifest.json`](kiln-manifest.json) (format: [Docs/manifest.md](Docs/manifest.md)), which the coverage report ([COVERAGE.md](COVERAGE.md)) and Shelf's prompt read. `Tools/manifest.sh` rewrites it; a test fails when it's stale.
 

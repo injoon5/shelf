@@ -280,3 +280,13 @@ PLAN.md §2, Round 1's second half (gestures, drawing, focus, environment, chart
 - **Kiln Lab** (`Tools/iterate.sh`): 12 of 12 apps match native on every step, labels 100%.
 - **What it costs.** A view that reads SwiftUI's environment, or has a `@FocusState` or `@Namespace`, is hosted inside one more view (`KHostInputs`); others are hosted as before.
 - **New inputs.** The four Round 1 fixtures (`gestures-canvas`, `focus-environment`, `charts`, `accessibility-motion`) and Lab's `DoodlePad`.
+
+### after-3a-round2a.json
+
+PLAN.md §3.1–§3.4, Round 2A (haptics, share and paste, text parsing, units), against the bar `after-2-round1-rest.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-3a-round2a.json --compare Benchmarks/after-2-round1-rest.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** By minimum, the worst is `AppleIntelligence/habit.md` at 7% (0.3 ms); by median, `apps/navigation-tabs.swift` at 9.9% (0.71 to 0.78 ms, 4% by minimum). The compute workloads are within 4%, Chess within 2%.
+- **What it costs.** An operator on two values the engine doesn't know first asks the operand's type bridge (`t.operator`), after every built-in case; a member of a native type that names a nested type (`NSTextCheckingResult.CheckingType`) is one more dictionary lookup.
+- **Kiln Lab:** `TripNotes` matches native on every step, labels and screenshots.
+- **New inputs.** The four Round 2A fixtures (`haptics`, `sharing`, `text-parsing`, `units`) and Lab's `TripNotes`. `text-parsing` and `TripNotes` validate in about 4 ms: NaturalLanguage's taggers and the data detector load their models on first use.
