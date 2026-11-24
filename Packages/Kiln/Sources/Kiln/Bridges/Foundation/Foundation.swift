@@ -77,6 +77,7 @@ final class FoundationBridges: KBridgeFamily {
         r.type("IndexSet", .foundation, support: .full) { t in
             t.initializer { c in
                 if let i = c.first?.asInt { return .native(.indexSet(IndexSet(integer: i))) }
+                if let xs = c.first.flatMap({ try? c.interp.sequence($0) }) { return .native(.indexSet(IndexSet(xs.compactMap(\.asInt)))) }
                 return .native(.indexSet(IndexSet()))
             }
             @MainActor func s(_ c: KCall) -> IndexSet { if case .native(.indexSet(let s)) = c.receiver { return s }; return [] }

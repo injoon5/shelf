@@ -165,6 +165,9 @@ final class KInterpreter {
     var budget = 4_000_000
     /// Random numbers for the program: seeded by Kiln.randomSeed, else the system's.
     var rng = KilnRandom(seed: Kiln.randomSeed)
+    /// The generic arguments of the type being constructed (`SIMD2<Double>(1, 2)`,
+    /// `PassthroughSubject<Int, Never>()`), for its bridge's initializer.
+    var constructingGenerics: [KETypeRef] = []
     var readTracker: KReadTracker?
     /// A global variable changed: re-render everything.
     var onGlobalChange: (() -> Void)?
@@ -914,6 +917,7 @@ final class KInterpreter {
             let old = o.fields[name] ?? .nilValue
             let v = coerce(newValue, to: decl?.type)
             if let ws = decl?.willSet { try runObserver(ws, v, selfLoc: .box(KBox(.object(o))), type: o.type) }
+            if o.combineHooks != nil { try KCombine.willSet(o, name, v) }
             o.fields[name] = v
             o.didChange()
             if let ds = decl?.didSet { try runObserver(ds, old, selfLoc: .box(KBox(.object(o))), type: o.type) }
@@ -1050,7 +1054,7 @@ final class KInterpreter {
             let named = labels.count == vals.count && labels.contains { $0 != nil } ? labels : old
             return .tuple(zip(vals, ts).map { coerce($0.0, to: $0.1) }, named)
         default:
-            if let make = registry.literalCoercions[t.core.name ?? ""], let v2 = make(v) { return v2 }
+            if let make = registry.literalCoercions[t.core.name ?? ""], let v2 = make(v, t) { return v2 }
             return v
         }
     }

@@ -22,6 +22,8 @@ final class LanguageBridges: KBridgeFamily {
         collections(r)
         hashing(r)
         regex(r)
+        integers(r)
+        stdlib(r)
     }
 
     // MARK: Global functions
@@ -111,7 +113,7 @@ final class LanguageBridges: KBridgeFamily {
                 case .double(let d)?: return d.isFinite ? .int(Int(d)) : .nilValue
                 case .string(let s)?: return Int(s.trimmingCharacters(in: .whitespaces)).map { .int($0) } ?? .nilValue
                 case .bool(let b)?: return .int(b ? 1 : 0)
-                default: return .int(0)
+                default: return c.first?.asInt.map { .int($0) } ?? .int(0)   // `Int(byte)`
                 }
             }
             t.staticProperties(["max": .int(.max), "min": .int(.min), "zero": .int(0)])
@@ -139,7 +141,6 @@ final class LanguageBridges: KBridgeFamily {
             // The rest of a number's methods, as a Double (`rounded`, `squareRoot`).
             t.fallback("FloatingPoint") { v, _ in .double(Double(v.asInt ?? 0)) }
         }
-        for alias in ["Int64", "Int32", "UInt", "Int16", "Int8"] { r.alias(alias, to: "Int") }
 
         r.type("Double", .language, support: .full) { t in
             t.initializer { c in
@@ -149,7 +150,7 @@ final class LanguageBridges: KBridgeFamily {
                 case .int(let i)?: return .double(Double(i))
                 case .double(let d)?: return .double(d)
                 case .string(let s)?: return Double(s.trimmingCharacters(in: .whitespaces)).map { .double($0) } ?? .nilValue
-                default: return .double(0)
+                default: return .double(c.first?.asDouble ?? 0)
                 }
             }
             t.staticProperties(["pi": .double(.pi), "infinity": .double(.infinity), "greatestFiniteMagnitude": .double(.greatestFiniteMagnitude),

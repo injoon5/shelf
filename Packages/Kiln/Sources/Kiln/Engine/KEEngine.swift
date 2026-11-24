@@ -40,7 +40,10 @@ enum KilnEngine {
         let code = parsed.source
         let program: KEProgram
         switch parsed.program {
-        case .success(let p): program = p
+        case .success(var p):
+            // `Result`, `AnyIterator`: the standard library's Swift, for an app that names them.
+            p.types = KSwiftPrelude.types(for: code, declared: Set(p.types.map(\.name))) + p.types
+            program = p
         case .failure(let e): throw Failure.syntax(formatSyntaxError(e, code))
         }
         let interp = try KInterpreter(program: program, headless: headless, context: context)

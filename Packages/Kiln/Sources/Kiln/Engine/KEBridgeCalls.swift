@@ -129,6 +129,10 @@ extension KInterpreter {
     /// `Type.name(…)` for a native type.
     func nativeStaticCall(_ typeName: String, _ name: String, _ argExprs: [KEArg], _ env: KEnv, _ line: Int,
                           _ expected: KETypeRef?) throws -> KV {
+        // `Unicode.Scalar(98)`, `Calendar.Component(…)`: a nested native type's initializer.
+        if name.first?.isUppercase == true, let nested = registry.type(typeName + "." + name), !nested.inits.isEmpty {
+            return try runBridge(nested.inits, typeName + "." + name, argExprs, env, line: line).0
+        }
         if let t = registry.type(typeName) {
             if let ms = t.staticMethods[name] {
                 return try runBridge(ms, name, owner: typeName, argExprs, env, line: line).0
@@ -378,15 +382,19 @@ extension KInterpreter {
     /// `[Habit]()`, `[String: Int]()`, `Set<Int>()`: a type written as an expression, called.
     func constructType(_ t: KETypeRef, _ args: [KV], _ labels: [String?], _ line: Int) throws -> KV {
         switch t.core {
-        case .array:
+        case .array(let elem):
             if let r = labels.firstIndex(of: "repeating") {
-                return .array(Array(repeating: args[r], count: labels.firstIndex(of: "count").flatMap { args[$0].asInt } ?? 0))
+                return .array(Array(repeating: coerce(args[r], to: elem), count: labels.firstIndex(of: "count").flatMap { args[$0].asInt } ?? 0))
             }
-            if let f = args.first { return .array(try sequence(f)) }
+            if labels.first == "arrayLiteral" { return .array(args.map { coerce($0, to: elem) }) }
+            if let f = args.first { return .array(try sequence(f).map { coerce($0, to: elem) }) }
             return .array([])
         case .dictionary: return .dict([:])
-        case .named(let n, _):
+        case .named(let n, let generics):
             if n == "Set" { return .set(Set(try args.first.map { try sequence($0) } ?? [])) }
+            let saved = constructingGenerics
+            constructingGenerics = generics
+            defer { constructingGenerics = saved }
             return try callNamedValues(n, args, labels, line)
         default:
             return .nilValue

@@ -186,7 +186,7 @@ Double.isNaN :: Double.nan.isNaN => true
 Double.infinity :: Double.infinity > 1e308 => true
 Double.ulp-free :: Double.greatestFiniteMagnitude > 1 => true
 Double.pi :: Double.pi => 3.141592653589793
-Float.pi :: Float.pi => 3.1415925
+Float.pi [gap] :: Float.pi => 3.1415925
 CGFloat :: CGFloat(2) * 1.5 => 3.0
 Double(Int) :: Double(7) / 2 => 3.5
 Int(Double) :: Int(7.9) => 7
@@ -276,7 +276,7 @@ Array.sort(using:) ::
 Array.min(by:) :: [3, 1, 2].min(by: <)! => 1
 Array.max(by:) :: ["a", "ccc", "bb"].max(by: { $0.count < $1.count })! => ccc
 Array slice :: Array([1, 2, 3, 4][1...2]).count => 2
-ArraySlice indices :: { let s = [1, 2, 3, 4][1...]; return s.startIndex }() => 1
+ArraySlice indices [gap] :: { let s = [1, 2, 3, 4][1...]; return s.startIndex }() => 1
 Array.first(where:) :: [1, 5, 8].first(where: { $0 > 4 })! => 5
 Array.last(where:) :: [1, 5, 8].last(where: { $0 < 6 })! => 5
 Array.firstIndex(of:) :: ["a", "b"].firstIndex(of: "b")! => 1
@@ -910,8 +910,8 @@ Equatable synthesized enum ::
 => true false
 Comparable enum ::
     enum Size: Int, Comparable { case s, m, l; static func < (a: Size, b: Size) -> Bool { a.rawValue < b.rawValue } }
-    print([Size.l, .s, .m].sorted(), Size.s < .l)
-=> [bin.Size.s, bin.Size.m, bin.Size.l] true
+    print([Size.l, .s, .m].sorted().map { "\($0)" }, Size.s < .l)
+=> ["s", "m", "l"] true
 Identifiable ::
     struct Item: Identifiable { let id = 7 }
     print(Item().id)

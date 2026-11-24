@@ -800,8 +800,8 @@ final class KRegistry {
     /// How a literal or a plain number becomes a native type's value where
     /// that type is expected: `let b: UInt8 = 200`, `let d: Decimal = 7`.
     /// nil: the value isn't one it takes.
-    private(set) var literalCoercions: [String: @MainActor (KV) -> KV?] = [:]
-    func addLiteralCoercion(_ type: String, _ make: @escaping @MainActor (KV) -> KV?) { literalCoercions[type] = make }
+    private(set) var literalCoercions: [String: @MainActor (KV, KETypeRef) -> KV?] = [:]
+    func addLiteralCoercion(_ type: String, _ make: @escaping @MainActor (KV, KETypeRef) -> KV?) { literalCoercions[type] = make }
 
     /// Type names written in bridges' signatures (`Edge.Set`, `HorizontalAlignment`):
     /// SwiftUI's symbolic types, whose members the bridge reads by name. Both

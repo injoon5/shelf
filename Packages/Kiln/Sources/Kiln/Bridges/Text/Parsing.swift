@@ -376,7 +376,7 @@ extension KTextBridges {
             t.method("isSuperset", "of:any") { c in .bool(try me(c).isSuperset(of: KCharacterSet.from(c["of"]) ?? CharacterSet())) }
             t.method("contains", "_:any") { c in
                 let set = try me(c)
-                guard let s = c[0]?.asString, let scalar = s.unicodeScalars.first else { return .bool(false) }
+                guard let scalar = KScalar.from(c[0]) else { return .bool(false) }
                 return .bool(set.contains(scalar))
             }
             t.method("insert", "charactersIn:string") { c in

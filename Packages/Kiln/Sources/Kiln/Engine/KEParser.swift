@@ -324,7 +324,8 @@ struct KEParser {
             case "subscript":
                 next()
                 let generics = try parseGenericParams()
-                let params = try parseParams()
+                // A subscript's parameters have no argument labels unless written twice (`dynamicMember key:`).
+                let params = try parseParams().map { p -> KEParam in var q = p; if q.label == q.name { q.label = nil }; return q }
                 var ret: KETypeRef? = nil
                 if atOp("->") { next(); ret = try parseType() }
                 _ = try parseWhere()

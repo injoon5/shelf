@@ -246,7 +246,10 @@ extension KInterpreter {
         case .tryExpr("try?", let x):
             let inner = staticType(x, env) ?? any
             return inner.isOptional ? inner : .optional(inner)
-        case .cast(_, "as", let t): return t
+        case .cast(let x, "as", let t):
+            // `x as Any` keeps what `x` is: an optional prints `Optional(…)`.
+            if t.name == "Any" || t.name == "AnyObject" { return staticType(x, env) }
+            return t
         case .cast(_, "as?", let t): return .optional(t)
         case .postfix("!", _): return nil
         case .member(let base, let name, _):

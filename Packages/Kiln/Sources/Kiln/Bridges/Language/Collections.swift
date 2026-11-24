@@ -53,7 +53,7 @@ extension LanguageBridges {
                     guard c.args.count > 1, case .function(let fun) = c.args[1] else { throw c.interp.fail("reduce(into:) needs a closure", c.line) }
                     let acc = KBox(c.args[0])
                     for x in a(c) {
-                        _ = try c.interp.call(fun, [.binding(KBinding(get: { acc.value }, set: { acc.value = $0 })), x], [nil, nil])
+                        _ = try c.interp.call(fun, [.binding(KBinding.inOut(get: { acc.value }, set: { acc.value = $0 })), x], [nil, nil])
                     }
                     return acc.value
                 }

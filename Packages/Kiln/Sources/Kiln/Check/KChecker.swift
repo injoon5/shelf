@@ -101,7 +101,14 @@ final class KChecker {
     private var openCache: [ObjectIdentifier: Bool] = [:]
     private let globalScope = KCScope(nil)
 
+    /// The standard library's Swift (`KSwiftPrelude`): declared, not checked.
+    private var prelude: Set<ObjectIdentifier> = []
+
     init(program: KEProgram, source: String) {
+        var program = program
+        let added = KSwiftPrelude.types(for: source, declared: Set(program.types.map(\.name)))
+        program.types = added + program.types
+        prelude = Set(added.map(ObjectIdentifier.init))
         self.program = program
         self.source = source
         lines = source.split(separator: "\n", omittingEmptySubsequences: false)
@@ -110,9 +117,9 @@ final class KChecker {
 
     func run() -> [KilnIssue] {
         checkRoot()
-        for t in decls.allTypes where !t.isProtocol { checkRequirements(t) }
+        for t in decls.allTypes where !t.isProtocol && !t.decls.allSatisfy({ prelude.contains(ObjectIdentifier($0)) }) { checkRequirements(t) }
         for t in decls.allTypes {
-            for d in t.decls { walkType(d, t) }
+            for d in t.decls where !prelude.contains(ObjectIdentifier(d)) { walkType(d, t) }
         }
         for (_, ext) in decls.extensions.sorted(by: { $0.key < $1.key }) {
             for d in ext.decls { walkType(d, nil) }
@@ -230,7 +237,7 @@ final class KChecker {
     private func checkRequirements(_ t: KCType) {
         guard let line = t.decls.first(where: { $0.kind != .extensionType })?.line ?? t.decls.first?.line else { return }
         for p in t.inherits {
-            guard let bridge = registry.protocols[p] else { continue }
+            guard let bridge = registry.protocols[p], decls.type(p, from: t.parent) == nil else { continue }
             for r in bridge.requirements where !r.hasSuffix("?") && !synthesized(p, r, t) {
                 let name = r.split(separator: "(").first.map(String.init) ?? r
                 if provides(t, name, isStatic: r == "allCases") != false { continue }
@@ -377,6 +384,7 @@ final class KChecker {
 
     private func instanceMember(_ t: KCType, _ name: String, _ visited: inout Set<ObjectIdentifier>) -> Found {
         guard visited.insert(ObjectIdentifier(t)).inserted else { return .none }
+        if name == "init" { return .value(.unknown) }     // `self.init(…)` in an initializer
         if let d = t.stored[name] ?? t.computed[name] { return .value(propertyType(d, owner: t)) }
         if let fs = t.methods[name] { return .function(fs, t) }
         // A property wrapper's projection and storage: `recipe.$servings`, `_servings`.
@@ -404,6 +412,10 @@ final class KChecker {
         if t.isClass && name == "id" && adopts(t, "Identifiable") { return .value(.unknown) }
         if ["self", "localizedDescription"].contains(name) { return .value(name == "self" ? .app(t.name) : .native("String")) }
         if decls.extensionMembers.contains(name) { return .value(.unknown) }
+        // `@dynamicMemberLookup` answers any name; a `Sequence` has the standard library's members.
+        if t.attributes.contains(where: { $0.name == "dynamicMemberLookup" }) { return .value(.unknown) }
+        if t.methods["next"] != nil || t.methods["makeIterator"] != nil, registry.type("Sequence")?.methods[name] != nil
+            || registry.type("Array")?.properties[name] != nil || registry.type("Array")?.methods[name] != nil { return .value(.unknown) }
         return unsure ? .unsure : .none
     }
 
@@ -477,7 +489,8 @@ final class KChecker {
         switch ref {
         case .optional(let w): return stype(w, from: owner)
         case .opaque(let w):
-            if let n = w.name, ["View", "Shape", "InsettableShape"].contains(n) { return .view }
+            // An app that declares its own `protocol Shape` means its own.
+            if let n = w.name, ["View", "Shape", "InsettableShape"].contains(n), decls.type(n, from: owner) == nil { return .view }
             return .unknown
         case .array(let e): return .array(stype(e, from: owner))
         case .dictionary: return registry.type("Dictionary") != nil ? .native("Dictionary") : .unknown
@@ -545,7 +558,8 @@ final class KChecker {
         let outer = KCCtx.make(nativeSelf: inNativeExtension, scope: scope, selfType: owner, isStatic: isStatic, wait: .unknown)
         for p in f.params {
             if let dv = p.defaultValue { _ = expr(dv, outer) }
-            s.names[p.name] = stype(p.type, from: owner)
+            // `_ xs: Int...` is an array of them.
+            s.names[p.name] = p.isVariadic ? .array(stype(p.type, from: owner)) : stype(p.type, from: owner)
         }
         block(f.body, KCCtx.make(nativeSelf: inNativeExtension, scope: s, selfType: owner, isStatic: isStatic, wait: wait))
     }
@@ -1063,7 +1077,7 @@ final class KChecker {
     }
 
     private func callNamed(_ name: String, _ args: [KEArg], _ line: Int, _ c: KCCtx) -> KSType {
-        if c.scope.lookup(name) != nil { walkArgs(args, c, wait: .unknown); return .unknown }
+        if c.scope.lookup(name) != nil || name.hasPrefix("$") { walkArgs(args, c, wait: .unknown); return .unknown }
         if let fs = c.scope.function(name) { return appCall(fs, name, args, line, c, owner: c.selfType) }
         if let s = c.selfType {
             switch instanceMember(s, name) {

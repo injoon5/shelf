@@ -266,10 +266,12 @@ struct KTypeBuilder {
     }
 
     /// `Type(…)`. A nil signature takes any labels; the bridge reads them.
+    /// `first`: tried before the forms already declared (a precise form ahead of an older lenient one).
     func initializer(_ signature: String? = nil, kinds: [String?: KArgKind] = [:], introduced: String? = nil,
-                     notes: String? = nil, closuresCanWait: Bool = false, _ run: @escaping KTypeBridge.Fn) {
-        bridge.inits.append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
-                                                          closuresCanWait: closuresCanWait), run: run))
+                     notes: String? = nil, closuresCanWait: Bool = false, first: Bool = false, _ run: @escaping KTypeBridge.Fn) {
+        let m = KTypeBridge.Method(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
+                                                          closuresCanWait: closuresCanWait), run: run)
+        if first { bridge.inits.insert(m, at: 0) } else { bridge.inits.append(m) }
     }
 
     func staticProperty(_ name: String, notes: String? = nil, support: KilnSupport = .full, _ get: @escaping KTypeBridge.Fn) {
@@ -295,9 +297,10 @@ struct KTypeBuilder {
 
     /// An instance method. A nil signature takes any labels.
     func method(_ name: String, _ signature: String? = nil, kinds: [String?: KArgKind] = [:], introduced: String? = nil,
-                notes: String? = nil, async: Bool = false, closuresCanWait: Bool = false, _ run: @escaping KTypeBridge.Fn) {
-        bridge.methods[name, default: []].append(.init(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
-                                                                               async: async, closuresCanWait: closuresCanWait), run: run))
+                notes: String? = nil, async: Bool = false, closuresCanWait: Bool = false, first: Bool = false, _ run: @escaping KTypeBridge.Fn) {
+        let m = KTypeBridge.Method(overload: Self.overload(signature, kinds: kinds, introduced: introduced, notes: notes,
+                                                          async: async, closuresCanWait: closuresCanWait), run: run)
+        if first { bridge.methods[name, default: []].insert(m, at: 0) } else { bridge.methods[name, default: []].append(m) }
     }
 
     /// The same body for several method names (`uppercased`, `lowercased`).

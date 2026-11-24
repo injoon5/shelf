@@ -19,7 +19,7 @@ extension KInterpreter {
         case .int(let i):
             if let n = expected?.core.name {
                 if ["Double", "CGFloat", "Float", "TimeInterval"].contains(n) { return .double(Double(i)) }
-                if let make = registry.literalCoercions[n], let v = make(.int(i)) { return v }
+                if let make = registry.literalCoercions[n], let v = make(.int(i), expected!) { return v }
             }
             return .int(i)
         case .double(let d): return .double(d)
@@ -403,6 +403,11 @@ extension KInterpreter {
         case .object(let o):
             readTracker?.objects[ObjectIdentifier(o)] = o
             if let f = o.fields[name] { return unwrapField(o.type, name, f) }
+            // Combine: `model.$count` (an `@Published` property's publisher) and `objectWillChange`.
+            if name.hasPrefix("$"), o.type.storedDecl(String(name.dropFirst()))?.wrapper == "Published" {
+                return KCombine.published(o, String(name.dropFirst()))
+            }
+            if name == "objectWillChange", o.type.computed[name] == nil { return KCombine.objectWillChange(o) }
             if !o.type.wrappedNames.isEmpty {
                 if o.type.wrappedNames.contains(name) { return try readWrapped(o.fields[wrapperField(name)], name, line: line) }
                 if name.hasPrefix("$"), let v = try projectedWrapped(base, String(name.dropFirst()), line: line) { return v }
@@ -728,10 +733,34 @@ extension KInterpreter {
 
     // MARK: - Implicit members
 
+    /// A type with a generic type's parameters replaced by the arguments an
+    /// expected type gives them (`Failure` in `Result<Int, AppError>`).
+    static func substitute(_ t: KETypeRef, _ generics: [KEGenericParam], _ expected: KETypeRef?) -> KETypeRef {
+        guard !generics.isEmpty, case .named(_, let args)? = expected?.core, args.count == generics.count else { return t }
+        func go(_ t: KETypeRef) -> KETypeRef {
+            switch t {
+            case .named(let n, let a):
+                if a.isEmpty, let i = generics.firstIndex(where: { $0.name == n }) { return args[i] }
+                return .named(n, a.map(go))
+            case .array(let e): return .array(go(e))
+            case .optional(let w): return .optional(go(w))
+            case .dictionary(let k, let v): return .dictionary(go(k), go(v))
+            case .tuple(let ts, let l): return .tuple(ts.map(go), l)
+            default: return t
+            }
+        }
+        return go(t)
+    }
+
     /// `.name` or `.name(args)`: a case or static member of the expected user
     /// type (or the one user type that has it); otherwise a symbolic value
     /// (`.segmented`, `.title`, `.degrees(90)`) for the consumer to interpret.
     func implicitMember(_ name: String, _ args: [KV]?, _ labels: [String?], _ expected: KETypeRef?) throws -> KV {
+        // `let x: Int? = .none`, `.some(5)`: Optional's own cases.
+        if expected?.isOptional == true {
+            if name == "none", args == nil { return .nilValue }
+            if name == "some", let a = args, a.count == 1 { return a[0] }
+        }
         if let ut = userType(expected), let v = try implicitOn(ut, name, args, labels: labels) { return v }
         if expected == nil || userType(expected) == nil {
             let builtinName = expected?.core.name
@@ -772,15 +801,20 @@ extension KInterpreter {
         return out
     }
 
-    /// Argument values, typed by the parameters they bind to.
+    /// Argument values, typed by the parameters they bind to. An
+    /// `@autoclosure` parameter gets the argument unevaluated, as a closure.
     func evalArgs(_ args: [KEArg], _ env: KEnv, params: [KEParam]) throws -> [KV] {
         var out: [KV] = []
         var pi = 0
         for a in args {
-            var t: KETypeRef? = nil
-            if let j = params.indices.first(where: { $0 >= pi && params[$0].label == a.label }) { t = params[j].type; pi = j + 1 }
-            else if pi < params.count { t = params[pi].type; pi += 1 }
-            out.append(try eval(a.value, env, t))
+            var p: KEParam? = nil
+            if let j = params.indices.first(where: { $0 >= pi && params[$0].label == a.label }) { p = params[j]; pi = j + 1 }
+            else if pi < params.count { p = params[pi]; pi += 1 }
+            if let p, p.attributes.contains(where: { $0.name == "autoclosure" }) {
+                out.append(.function(KFunction(.closure(KEClosure(params: [], body: [.expr(a.value)], hasExplicitParams: true, line: a.value.line), env))))
+                continue
+            }
+            out.append(try eval(a.value, env, p?.type))
         }
         return out
     }
@@ -917,7 +951,9 @@ extension KInterpreter {
             if let ut = userType(expected) {
                 if let c = ut.enumCase(name) {
                     try requireCaseLabels(ut, c, labels, line: line)
-                    let args = try evalArgs(argExprs, env, positional: c.associated.map(\.1))
+                    // `let r: Result<Int, AppError> = .failure(.bad)`: `Failure` is `AppError` here.
+                    let payload = c.associated.map { Self.substitute($0.1, ut.generics, expected) }
+                    let args = try evalArgs(argExprs, env, positional: payload)
                     return .enumV(KEnumValue(type: ut, caseName: c.name, payload: args, payloadLabels: labels))
                 }
                 if let m = ut.staticMethod(name, labels: labels) {

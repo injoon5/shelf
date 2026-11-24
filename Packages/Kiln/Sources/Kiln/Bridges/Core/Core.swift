@@ -86,11 +86,14 @@ final class CoreBridges: KBridgeFamily {
                 }
             }
         }
-        r.modifier("onReceive", .core, support: .partial, notes: "Timer publishers only: `Timer.publish(every:on:in:).autoconnect()`.") { m in
+        r.modifier("onReceive", .core, notes: "`Timer.publish(every:on:in:).autoconnect()`, and Combine's publishers: subjects, `$name` of an `@Published` property, `NotificationCenter.default.publisher(for:)`.") { m in
             m.form("_:any perform:action") { c, view in
                 if case .function(let fn)? = c.last, case .native(.publisher(let interval))? = c[0] {
                     let interp = c.interp
                     KTimerReceiver(interval: interval, action: { interp.perform(fn, [.native(.date(Date()))]) }, content: view)
+                } else if case .function(let fn)? = c.last, let pub = KPub.from(c[0]) {
+                    let interp = c.interp
+                    view.onReceive(KCombineBridge(pub: pub)) { v in interp.perform(fn, [v]) }
                 } else {
                     view
                 }
