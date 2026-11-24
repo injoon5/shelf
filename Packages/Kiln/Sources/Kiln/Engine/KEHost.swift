@@ -303,18 +303,6 @@ struct KTimerReceiver: View {
     }
 }
 
-/// Shown in place of a part of the view that failed to evaluate.
-struct KErrorView: View {
-    let message: String
-    var body: some View {
-        Label(message, systemImage: "exclamationmark.triangle.fill")
-            .font(.footnote)
-            .foregroundStyle(.red)
-            .padding(8)
-            .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-    }
-}
-
 // MARK: - Body evaluation
 
 extension KInterpreter {

@@ -160,12 +160,62 @@ struct RunContextTests {
         // Polled, not a fixed wait: the screen's crossfade runs late on a busy machine.
         let shown = ContinuousClock.now + .seconds(5)
         var labels = Self.texts(in: window)
-        while !labels.contains(where: { $0.contains("Broken couldn’t open") }), ContinuousClock.now < shown {
+        while !labels.contains(where: { $0.contains("Broken stopped") }), ContinuousClock.now < shown {
             try await Task.sleep(for: .milliseconds(20))
             labels = Self.texts(in: window)
         }
-        #expect(labels.contains { $0.contains("Broken couldn’t open") }, "\(labels)")
+        // It started: it stopped, rather than couldn't open.
+        #expect(labels.contains { $0.contains("Broken stopped") }, "\(labels)")
         #expect(!labels.contains("Total"), "\(labels)")
+    }
+
+    /// Part of the app failing where Kiln can't tell it's a `body` (a
+    /// custom style's `makeBody`, which SwiftUI calls on its own time):
+    /// Kiln reports it as a runtime error and draws an error in place.
+    /// Before the host's screen, that was Kiln's red label in an empty
+    /// app. Now Shelf's screen hears of it and takes the whole app's
+    /// place, with the line, the code and Copy for Agents.
+    @Test func aRuntimeErrorKilnDrawsReachesShelfsScreen() async throws {
+        let library = LibraryStore(demo: [], cache: AppCache(root: temporaryFolder()))
+        let meta = AppMeta(slug: "styled-\(UUID().uuidString.lowercased())", name: "Styled", tint: .red, version: "1")
+        let source = Self.app(#"""
+            Button("Go") {}
+                        .buttonStyle(Broken())
+            """#) + "\n" + #"""
+            struct Broken: ButtonStyle {
+                let sizes = [1, 2]
+                func makeBody(configuration: Configuration) -> some View {
+                    configuration.label.padding(CGFloat(sizes[3]))
+                }
+            }
+            """#
+        let heard = Locked<[CompileError]>([])
+        let runs = Locked<[AppRun]>([])
+        let window = try Self.window(AppStage(app: meta, source: source, store: .scratch(copying: nil), host: library.host,
+                                              permissions: StubAppPermissions(), onError: { e in heard.withLock { $0.append(e) } },
+                                              onRun: { run in runs.withLock { $0.append(run) } }))
+        defer { window.isHidden = true }
+        let deadline = ContinuousClock.now + .seconds(5)
+        while heard.value.isEmpty, ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        let error = try #require(heard.value.first)
+        #expect(error.line == 12, "\(error)")
+        #expect(error.message.contains("out of range"), "\(error.message)")
+        #expect(error.excerpt.contains { $0.number == 12 && $0.text.contains("sizes[3]") })
+        // Not a `body` error: before the host's screen, only a log heard of it.
+        let run = try #require(runs.value.first)
+        #expect(run.context.errors.map(\.phase) == [.runtime], "\(run.context.errors)")
+        #expect(run.context.provided(KilnErrorScreen.self) != nil)
+
+        let shown = ContinuousClock.now + .seconds(5)
+        var labels = Self.texts(in: window)
+        while !labels.contains(where: { $0.contains("Styled stopped") }), ContinuousClock.now < shown {
+            try await Task.sleep(for: .milliseconds(20))
+            labels = Self.texts(in: window)
+        }
+        #expect(labels.contains { $0.contains("Styled stopped") }, "\(labels)")
+        #expect(labels.contains { $0.contains("out of range") }, "\(labels)")
+        #expect(labels.contains("Copy for Agents"), "\(labels)")
+        #expect(!labels.contains("Go"), "\(labels)")
     }
 
     // MARK: Teardown

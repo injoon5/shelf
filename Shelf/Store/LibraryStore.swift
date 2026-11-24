@@ -95,7 +95,14 @@ final class LibraryStore {
 
     /// What every run of one of the library's apps is given (plan §1.7).
     var host: AppHost {
-        AppHost(data: data, defaults: defaults, files: files)
+        AppHost(data: data, defaults: defaults, files: files, fixKey: { [weak self] slug in await self?.updateKey(for: slug) })
+    }
+
+    /// A key that updates `slug` once, for an agent fixing it (Copy for
+    /// Agents): nil offline, signed out, or when the server won't mint one.
+    func updateKey(for slug: String, online: Bool = Connectivity.shared.isOnline) async -> Prompts.Install? {
+        guard online, let api else { return nil }
+        return Prompts.Install(try? await KeyRing.shared.key(for: slug, api: api))
     }
 
     /// The server the library talks to: nil while signed out, and always
