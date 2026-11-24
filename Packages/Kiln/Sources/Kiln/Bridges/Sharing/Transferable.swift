@@ -30,7 +30,9 @@ final class KTransferRep {
         case data(exported: UTType?, imported: UTType?, export: KFunction?, importing: KFunction?)
         /// `ProxyRepresentation`: `exporting` is a closure or a key path.
         case proxy(exporting: KV?, importing: KFunction?)
-        case file(exported: UTType?, imported: UTType?)
+        /// `FileRepresentation`: `exporting:` returns a `SentTransferredFile`,
+        /// `importing:` gets a `ReceivedTransferredFile` in the app's folder.
+        case file(exported: UTType?, imported: UTType?, export: KFunction?, importing: KFunction?)
     }
     let kind: Kind
     var suggestedFileName: String?
@@ -74,11 +76,28 @@ extension SharingBridges {
             t.initializer("exporting:any importing:closure?") { c in rep(.proxy(exporting: c.args[0], importing: c.function("importing"))) }
             t.initializer("importing:closure") { c in rep(.proxy(exporting: nil, importing: c.function("importing"))) }
         }
-        r.type("FileRepresentation", .sharing, support: .stub, notes: "Accepted; files are Round 3's (§4.1).") { t in
-            for sig in ["contentType:UTType exporting:closure importing:closure", "exportedContentType:UTType exporting:closure",
-                        "importedContentType:UTType importing:closure"] {
-                t.initializer(sig) { c in rep(.file(exported: FilesBridges.utType(c.args[0]), imported: FilesBridges.utType(c.args[0]))) }
+        r.type("FileRepresentation", .sharing, support: .full,
+               notes: "`exporting:` returns `SentTransferredFile(url)` for a file in the app's folder; `importing:` gets `received.file`, in the app's temporary folder: copy it to keep it.") { t in
+            t.initializer("contentType:UTType exporting:closure importing:closure") { c in
+                let type = FilesBridges.utType(c.args[0])
+                return rep(.file(exported: type, imported: type, export: c.function("exporting"), importing: c.function("importing")))
             }
+            t.initializer("exportedContentType:UTType exporting:closure") { c in
+                rep(.file(exported: FilesBridges.utType(c.args[0]), imported: nil, export: c.function("exporting"), importing: nil))
+            }
+            t.initializer("importedContentType:UTType importing:closure") { c in
+                rep(.file(exported: nil, imported: FilesBridges.utType(c.args[0]), export: nil, importing: c.function("importing")))
+            }
+        }
+        r.type("SentTransferredFile", .sharing, support: .full) { t in
+            for sig in ["_:URL", "_:URL allowAccessingOriginalFile:bool"] {
+                t.initializer(sig) { c in .native(.object("SentTransferredFile", KRef(KTransferredFile(file: c.url(0) ?? URL(fileURLWithPath: "/"), isOriginal: false)))) }
+            }
+            t.property("file") { c in (KCall.objectValue(c.receiver) as? KTransferredFile).map { .native(.url($0.file)) } ?? .nilValue }
+        }
+        r.type("ReceivedTransferredFile", .sharing, support: .full) { t in
+            t.property("file") { c in (KCall.objectValue(c.receiver) as? KTransferredFile).map { .native(.url($0.file)) } ?? .nilValue }
+            t.property("isOriginalFile") { c in .bool((KCall.objectValue(c.receiver) as? KTransferredFile)?.isOriginal ?? false) }
         }
         r.type("TransferRepresentation", .sharing) { t in
             @MainActor func receiver(_ c: KCall) -> KTransferRep? { KCall.objectValue(c.receiver) as? KTransferRep }
@@ -91,6 +110,16 @@ extension SharingBridges {
                 t.initializer(sig) { c in .native(.object("SharePreview", KRef(KSharePreview(title: c.title(0), image: c["image"], icon: c["icon"])))) }
             }
         }
+    }
+}
+
+/// A `SentTransferredFile` or `ReceivedTransferredFile`.
+final class KTransferredFile {
+    let file: URL
+    let isOriginal: Bool
+    init(file: URL, isOriginal: Bool) {
+        self.file = file
+        self.isOriginal = isOriginal
     }
 }
 
@@ -168,6 +197,9 @@ enum KTransferables {
                 return try JSONSerialization.data(withJSONObject: json, options: [.fragmentsAllowed, .sortedKeys])
             case .data(let exported?, _, let export?, _) where exported.conforms(to: type) || type.conforms(to: exported):
                 return KBuiltins.dataValue(try await interp.callAwaiting(export, [item]))
+            case .file(let exported?, _, let export?, _) where exported.conforms(to: type) || type.conforms(to: exported):
+                guard let sent = KCall.objectValue(try await interp.callAwaiting(export, [item])) as? KTransferredFile else { return nil }
+                return try Data(contentsOf: try interp.context.resolveFile(sent.file))
             case .proxy(let exporting?, _):
                 let v = try await apply(exporting, to: item, interp)
                 if let s = v.asString, type.conforms(to: .plainText) || type == .data { return Data(s.utf8) }
@@ -187,6 +219,7 @@ enum KTransferables {
             switch rep.kind {
             case .codable(let ct): out.append(ct)
             case .data(let exported?, _, _, _): out.append(exported)
+            case .file(let exported?, _, _, _): out.append(exported)
             case .proxy(let exporting?, _):
                 guard let v = applySync(exporting, to: item, interp) else { continue }
                 if v.asString != nil { out.append(.utf8PlainText) }
@@ -210,11 +243,40 @@ enum KTransferables {
                 return try await interp.callAwaiting(importing, [KBuiltins.data(data)])
             case .proxy(_, let importing?) where contentType.conforms(to: .plainText):
                 return try await interp.callAwaiting(importing, [.string(String(decoding: data, as: UTF8.self))])
+            case .file(_, let imported?, _, let importing?) where contentType.conforms(to: imported):
+                // The bytes as a file in the app's temporary folder, as the system would hand one over.
+                let name = "Received-\(UUID().uuidString.prefix(8))" + (contentType.preferredFilenameExtension.map { "." + $0 } ?? "")
+                let file = interp.context.files.temporary.appending(path: name)
+                try data.write(to: file)
+                return try await interp.callAwaiting(importing, [received(file)])
             default:
                 continue
             }
         }
         return nil
+    }
+
+    static func received(_ file: URL) -> KV {
+        .native(.object("ReceivedTransferredFile", KRef(KTransferredFile(file: file, isOriginal: false))))
+    }
+
+    /// Whether the app's type imports `contentType` from a file (`FileRepresentation`).
+    static func importsFile(_ t: KType, _ contentType: UTType, _ interp: KInterpreter) -> Bool {
+        ((try? representations(t, interp)) ?? []).contains {
+            if case .file(_, let imported?, _, _?) = $0.kind { return contentType.conforms(to: imported) }
+            return false
+        }
+    }
+
+    /// A value of the app's type from a file already in its folder: a
+    /// `FileRepresentation` gets the file itself; the others its bytes.
+    static func importFile(_ t: KType, file: URL, contentType: UTType, _ interp: KInterpreter) async throws -> KV? {
+        for rep in try representations(t, interp) {
+            if case .file(_, let imported?, _, let importing?) = rep.kind, contentType.conforms(to: imported) {
+                return try await interp.callAwaiting(importing, [received(file)])
+            }
+        }
+        return try await importValue(t, data: try Data(contentsOf: file), contentType: contentType, interp)
     }
 }
 
