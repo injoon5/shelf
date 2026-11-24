@@ -118,12 +118,13 @@ extension FilesBridges {
             m.formOnBase("for:any? action:closure isTargeted:closure?") { c in dropDestination(c) }
             m.formOnBase("for:any? isEnabled:bool? action:closure", introduced: "26.0") { c in dropDestination(c) }
             m.form("for:any? action:closure", receiver: "TabContent", introduced: "18.0") { _, view in view }
-            m.probe { _, args, interp in
+            m.probe { base, args, interp in
                 var calls: [KProbeCall] = []
                 let items = samples(args["for"], interp)
                 if case .function(let f)? = args["action"] {
                     let n = KRenderer(interp: interp).closureParamCount(.function(f))
-                    let second: KV = args["isEnabled"] != nil || takesSession(f) ? KDragSessions.endedDrop() : .native(.point(0, 0))
+                    let second: KV = base?.primitiveName == "ForEach" ? .int(0)
+                        : (args["isEnabled"] != nil || takesSession(f) ? KDragSessions.endedDrop() : .native(.point(0, 0)))
                     calls.append(KProbeCall(fn: f, args: n >= 2 ? [items, second] : [items], use: .action))
                 }
                 if case .function(let f)? = args["isTargeted"] { calls.append(KProbeCall(fn: f, args: [.bool(true)], use: .action)) }

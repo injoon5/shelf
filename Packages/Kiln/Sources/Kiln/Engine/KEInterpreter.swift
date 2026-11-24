@@ -1400,6 +1400,7 @@ final class KInterpreter {
             return (closed ? Array(l...h) : Array(l..<h)).map { .int($0) }
         case .string(let s): return s.map { .string(String($0)) }
         case .nilValue: return []
+        case .native(.indexSet(let set)): return set.map { .int($0) }
         case .native(.object(_, let ref)) where ref.value is KNativeSequence:
             return try (ref.value as! KNativeSequence).elements(self)
         case .native(.boxed(let b)) where b.value.base is KNativeSequence:

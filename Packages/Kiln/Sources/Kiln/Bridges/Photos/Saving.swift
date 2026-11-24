@@ -87,8 +87,16 @@ extension PhotosBridges {
             guard let f = c.function(0) else { return .void }
             let interp = c.interp, context = c.context
             let changes = try collect(f, interp)
-            return .suspension(KSuspension.async(headless: { record(changes); return .void }) {
-                if context.isStub { record(changes); return .void }
+            return .suspension(KSuspension.async(headless: {
+                guard context.capabilities.gate.answerWithoutAsking(.photoLibraryAdd) else { throw thrown(KPhotoSaves.deniedError) }
+                record(changes)
+                return .void
+            }) {
+                if context.isStub {
+                    guard context.capabilities.gate.answerWithoutAsking(.photoLibraryAdd) else { throw thrown(KPhotoSaves.deniedError) }
+                    record(changes)
+                    return .void
+                }
                 guard await context.capabilities.ask(.photoLibraryAdd) else { throw thrown(KPhotoSaves.deniedError) }
                 do { try await perform(changes) } catch { throw thrown(error) }
                 return .void
@@ -102,7 +110,10 @@ extension PhotosBridges {
             @MainActor func finish(_ error: Error?) {
                 interp.perform(done, [.bool(error == nil), error.map { KBuiltins.errorValue(($0 as NSError).localizedDescription) } ?? .nilValue])
             }
-            if interp.headless || context.isStub { record(changes); finish(nil); return .void }
+            if interp.headless || context.isStub {
+                if context.capabilities.gate.answerWithoutAsking(.photoLibraryAdd) { record(changes); finish(nil) } else { finish(KPhotoSaves.deniedError) }
+                return .void
+            }
             Task { @MainActor in
                 guard await context.capabilities.ask(.photoLibraryAdd) else { finish(KPhotoSaves.deniedError); return }
                 do { try await perform(changes); finish(nil) } catch { finish(error) }

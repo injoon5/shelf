@@ -71,14 +71,8 @@ extension PhotosBridges {
 
     /// What a check's `loadTransferable` answers: a small image as the type.
     @MainActor static func sample(_ type: KV?, _ interp: KInterpreter) -> KV {
-        #if canImport(UIKit)
-        let png = UIGraphicsImageRenderer(size: CGSize(width: 4, height: 4)).image { ctx in
-            UIColor.systemTeal.setFill()
-            ctx.fill(CGRect(x: 0, y: 0, width: 4, height: 4))
-        }.pngData() ?? Data()
-        #else
-        let png = Data()
-        #endif
+        // A 2 × 2 teal PNG.
+        let png = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEElEQVR4nGMw2HAAiBggFAArTgaBXvj7BQAAAABJRU5ErkJggg==") ?? Data()
         switch KShare.payloadName(type) {
         case "Data": return KBuiltins.data(png)
         case "Image", "UIImage": return KShare.imageValue(png, uiImage: KShare.payloadName(type) == "UIImage") ?? .nilValue

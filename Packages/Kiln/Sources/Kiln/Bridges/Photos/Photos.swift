@@ -295,6 +295,25 @@ final class PhotosBridges: KBridgeFamily {
                 return view
             }
         }
+        r.modifier("photosReferenceImageViewer", .photos, support: .partial, introduced: "27.0",
+                   notes: "The `fileURL:` form, for an image in the app's folder; the `asset:`, `pickerItem:` and `pickerResult:` forms read the photo library, which apps on Shelf can't.") { m in
+            m.form("fileURL:binding onProcessingCompletion:closure?", introduced: "27.0") { c, view in
+                #if canImport(PhotosUI) && os(iOS)
+                if #available(iOS 27, *), let b = c.kbinding("fileURL") {
+                    let interp = c.interp
+                    let done = c.function("onProcessingCompletion")
+                    let url = FilesBridges.previewBinding(b, c)
+                    return AnyView(view.photosReferenceImageViewer(fileURL: url, onProcessingCompletion: done.map { f in { result in
+                        switch result {
+                        case .success(let u): interp.perform(f, [FilesBridges.success(.native(.url(u)), interp)])
+                        case .failure(let e): interp.perform(f, [FilesBridges.failure(e, interp)])
+                        }
+                    } }))
+                }
+                #endif
+                return view
+            }
+        }
         r.type("PHPickerSearchText", .photos, support: .full, introduced: "27.0") { t in
             t.initializer("_:string") { c in .native(.object("PHPickerSearchText", KRef(KSearchText(text: c.string(0) ?? "")))) }
         }
