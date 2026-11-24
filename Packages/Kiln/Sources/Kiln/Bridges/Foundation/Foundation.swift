@@ -234,7 +234,7 @@ final class FoundationBridges: KBridgeFamily {
                 let m = me(c).measurementSystem
                 return .native(.implicit(m == .us ? "us" : (m == .uk ? "uk" : "metric"), []))
             }
-            t.property("usesMetricSystem") { c in .bool(me(c).measurementSystem == .metric) }
+            t.property("usesMetricSystem") { c in .bool((me(c) as NSLocale).usesMetricSystem) }
             t.property("region") { c in me(c).region.map { .tuple([.string($0.identifier)], ["identifier"]) } ?? .nilValue }
             t.property("language") { c in
                 let l = me(c).language

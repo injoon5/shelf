@@ -140,6 +140,13 @@ extension KTextBridges {
                 return KNSRange.offsets(ns, in: c.string("in") ?? "")
             }
         }
+        // `url.host()` (iOS 16), which detected links are read with.
+        r.extend("URL") { t in
+            t.method("host", "percentEncoded:bool?") { c in
+                guard case .native(.url(let u)) = c.receiver else { throw c.noMember() }
+                return u.host(percentEncoded: c.bool("percentEncoded", default: true)).map { .string($0) } ?? .nilValue
+            }
+        }
         r.extend("String") { t in
             @MainActor func s(_ c: KCall) -> String { c.receiver.asString ?? "" }
             t.property("utf16") { c in .array(s(c).utf16.map { .int(Int($0)) }) }

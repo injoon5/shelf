@@ -186,18 +186,20 @@ final class SharingBridges: KBridgeFamily {
         let note = "The Edit menu's and the keyboard's Copy, Cut and Paste for the focused view: `String`, `URL`, `Data` or your `Transferable`."
         r.modifier("copyable", .sharing, introduced: "27.0", notes: note) { m in
             m.form("_:any", introduced: "27.0") { c, view in
-                let interp = c.interp
-                let items = c[0] ?? .array([])
-                KShare.edit(view, interp) { v in v.copyable(KShare.transferItems(items, interp)) }
+                if #available(iOS 27, macOS 13, *) {
+                    let interp = c.interp
+                    let items = c[0] ?? .array([])
+                    view.copyable(KShare.transferItems(items, interp))
+                } else {
+                    view
+                }
             }
         }
         r.modifier("cuttable", .sharing, introduced: "27.0", notes: note) { m in
             m.form("for:any? action:closure", introduced: "27.0") { c, view in
-                if let f = c.function("action") {
+                if #available(iOS 27, macOS 13, *), let f = c.function("action") {
                     let interp = c.interp
-                    KShare.edit(view, interp) { v in
-                        v.cuttable(for: KShareItem.self) { KShare.transferItems(KHaptics.ask(interp, f, []) ?? .array([]), interp) }
-                    }
+                    view.cuttable(for: KShareItem.self) { KShare.transferItems(KHaptics.ask(interp, f, []) ?? .array([]), interp) }
                 } else {
                     view
                 }
@@ -205,19 +207,17 @@ final class SharingBridges: KBridgeFamily {
         }
         r.modifier("pasteDestination", .sharing, introduced: "27.0", notes: note) { m in
             m.form("for:any? action:closure validator:closure?", introduced: "27.0") { c, view in
-                if let f = c.function("action") {
+                if #available(iOS 27, macOS 13, *), let f = c.function("action") {
                     let interp = c.interp
                     let type = c["for"]
                     let validator = c.function("validator")
-                    KShare.edit(view, interp) { v in
-                        v.pasteDestination(for: KImportItem.self, action: { items in
-                            Task { @MainActor in
-                                var values = await KShare.imported(items, as: type, interp)
-                                if let validator, let kept = KHaptics.ask(interp, validator, [.array(values)]) { values = (try? interp.sequence(kept)) ?? values }
-                                if !values.isEmpty { interp.perform(f, [.array(values)]) }
-                            }
-                        })
-                    }
+                    view.pasteDestination(for: KImportItem.self, action: { items in
+                        Task { @MainActor in
+                            var values = await KShare.imported(items, as: type, interp)
+                            if let validator, let kept = KHaptics.ask(interp, validator, [.array(values)]) { values = (try? interp.sequence(kept)) ?? values }
+                            if !values.isEmpty { interp.perform(f, [.array(values)]) }
+                        }
+                    })
                 } else {
                     view
                 }
@@ -454,16 +454,6 @@ enum KShare {
             }
         }
         return out
-    }
-
-    /// The iOS 27 edit commands, where the OS has them.
-    static func edit(_ view: AnyView, _ interp: KInterpreter, _ apply: (AnyView) -> some View) -> AnyView {
-        #if os(iOS)
-        if #available(iOS 27, *) { return AnyView(apply(view)) }
-        return view
-        #else
-        return AnyView(apply(view))
-        #endif
     }
 
     /// One item with the index of its preview.

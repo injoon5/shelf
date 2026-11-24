@@ -46,7 +46,7 @@ enum KUnits {
                         "micrometers", "nanometers", "picometers", "inches", "feet", "yards", "miles", "scandinavianMiles", "lightyears",
                         "nauticalMiles", "fathoms", "furlongs", "astronomicalUnits", "parsecs"]),
         ("UnitMass", ["kilograms", "grams", "decigrams", "centigrams", "milligrams", "micrograms", "nanograms", "picograms", "ounces",
-                      "poundsMass", "stones", "metricTons", "shortTons", "carats", "ouncesTroy", "slugs"]),
+                      "pounds", "stones", "metricTons", "shortTons", "carats", "ouncesTroy", "slugs"]),
         ("UnitPower", ["terawatts", "gigawatts", "megawatts", "kilowatts", "watts", "milliwatts", "microwatts", "nanowatts", "picowatts",
                        "femtowatts", "horsepower"]),
         ("UnitPressure", ["newtonsPerMetersSquared", "gigapascals", "megapascals", "kilopascals", "hectopascals", "inchesOfMercury", "bars",
@@ -70,8 +70,19 @@ enum KUnits {
     /// `UnitLength.kilometers`: Foundation's own unit, by its class property.
     static func unit(_ dimension: String, _ name: String) -> Dimension? {
         guard names[dimension]?.contains(name) == true, let cls = NSClassFromString("NS" + dimension) as? NSObject.Type else { return nil }
-        return cls.perform(NSSelectorFromString(name))?.takeUnretainedValue() as? Dimension
+        return cls.perform(NSSelectorFromString(selectors[name] ?? name))?.takeUnretainedValue() as? Dimension
     }
+
+    /// `UnitLength(forLocale:)`: the locale's preferred unit (iOS 16).
+    static let forLocale: [String: (Locale) -> Dimension] = [
+        "UnitLength": { UnitLength(forLocale: $0) }, "UnitMass": { UnitMass(forLocale: $0) },
+        "UnitTemperature": { UnitTemperature(forLocale: $0) }, "UnitVolume": { UnitVolume(forLocale: $0) },
+        "UnitEnergy": { UnitEnergy(forLocale: $0) }, "UnitPressure": { UnitPressure(forLocale: $0) },
+        "UnitSpeed": { UnitSpeed(forLocale: $0) },
+    ]
+
+    /// Swift's names that aren't the Objective-C property's (Swift drops the redundant "Mass").
+    static let selectors = ["pounds": "poundsMass"]
 
     static func baseUnit(_ dimension: String) -> Dimension? {
         guard let cls = NSClassFromString("NS" + dimension) as? Dimension.Type else { return nil }
@@ -353,6 +364,10 @@ final class UnitsBridges: KBridgeFamily {
                 t.staticMethod("baseUnit", "") { c in
                     guard let u = KUnits.baseUnit(dimension) else { throw c.fail("no base unit") }
                     return KUnits.kv(u)
+                }
+                // The locale's own unit: `UnitTemperature(forLocale: .current)`.
+                if let make = KUnits.forLocale[dimension] {
+                    t.initializer("forLocale:any usage:any?") { c in KUnits.kv(make(FoundationBridges.locale(c["forLocale"]) ?? .current)) }
                 }
                 // Your own unit: `UnitLength(symbol: "smoot", converter: UnitConverterLinear(coefficient: 1.70180))`.
                 t.initializer("symbol:string converter:any") { c in
