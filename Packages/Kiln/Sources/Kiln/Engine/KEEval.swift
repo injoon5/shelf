@@ -947,6 +947,12 @@ extension KInterpreter {
                 let args = try evalArgs(argExprs, env, params: m.params)
                 return try invoke(m, args: args, labels: labels, selfContext: KSelfContext(type: sup, location: ctx.location, storage: ctx.storage), parent: globalEnv)
             }
+            // `super.init()` in a class whose superclass is native (`NSObject`,
+            // for a delegate): there's nothing of the app's to run.
+            if case .ident("super", _) = baseExpr, name == "init", labels.isEmpty, let ctx = env.nearestSelf, ctx.type.isClass,
+               ctx.type.superclass == nil {
+                return .void
+            }
             if let t = typeExpr(baseExpr, env) {
                 if let nested = t.nested[name] { return try construct(nested, argExprs, env, line) }
                 if let c = t.enumCase(name) {
