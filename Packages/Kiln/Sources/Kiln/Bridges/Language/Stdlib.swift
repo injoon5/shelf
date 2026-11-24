@@ -575,10 +575,17 @@ enum KSwiftPrelude {
         """),
     ]
 
+    /// Bridges that hand the app a `Result` it may never name (a file
+    /// picker's completion, `loadTransferable`'s handler): their names bring
+    /// the prelude's `Result` in too, so `try result.get()` works.
+    static let alsoNeeded: [String: [String]] = [
+        "Result": ["fileImporter", "fileExporter", "fileMover", "loadTransferable", "photosReferenceImageViewer"],
+    ]
+
     /// The prelude's declarations an app's code needs: those it names and doesn't declare.
     static func types(for source: String, declared: Set<String>) -> [KETypeDecl] {
         var out: [KETypeDecl] = []
-        for (name, _) in parts where mentions(source, name) && !declared.contains(name) {
+        for (name, _) in parts where !declared.contains(name) && (mentions(source, name) || (alsoNeeded[name] ?? []).contains { mentions(source, $0) }) {
             if let decls = parsed[name] { out.append(contentsOf: decls) }
         }
         return out
