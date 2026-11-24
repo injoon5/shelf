@@ -192,6 +192,10 @@ extension KInterpreter {
             }
         }
         if case .nilValue = base { _ = try evalArgs(argExprs, env); return (.nilValue, nil) }
+        // A nested native type's static method: `URLSessionWebSocketTask.Message.string(text)`.
+        if case .type(.builtin(let tn)) = base, registry.type(tn) != nil {
+            return (try nativeStaticCall(tn, name, argExprs, env, line, nil), nil)
+        }
         // The type's own methods, then each fallback's (converted only when reached).
         var tn = KRegistry.typeName(of: base)
         var value = base

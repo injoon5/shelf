@@ -279,8 +279,9 @@ extension KInterpreter {
         if let fs = functions[name], let f = fs.first { return .function(KFunction(.user(f, globalEnv, nil))) }
         if let t = nestedType(name, env) ?? types[name] { return .type(.user(t)) }
         if let op = KBuiltins.operatorFunction(name, self) { return op }
-        if name.first?.isUppercase == true { return .type(.builtin(name)) }
+        // A constant before a type: `AVSpeechUtteranceDefaultSpeechRate` is capitalized.
         if let v = nativeConstant(name) { return v }
+        if name.first?.isUppercase == true { return .type(.builtin(name)) }
         // Implicit `self` in an extension on a native type: `count`, `isEmpty`.
         if let ctx = env.nearestSelf, ctx.type.standIn, !ctx.isStatic, let sv = try? read(ctx.location), let v = try? member(sv, name, line: line) {
             return v

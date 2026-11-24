@@ -31,12 +31,17 @@ enum BridgeTest {
 
     /// Errors reported while the app is shown in a window for a moment.
     static func shown(_ source: String, size: CGSize = CGSize(width: 390, height: 844)) -> [String] {
-        var errors: [String] = []
+        shownErrors(source, size: size).map(\.message)
+    }
+
+    /// The errors themselves, with their lines.
+    static func shownErrors(_ source: String, size: CGSize = CGSize(width: 390, height: 844)) -> [KilnError] {
+        var errors: [KilnError] = []
         let context = KilnContext.stub()
-        context.onError = { errors.append($0.message) }
+        context.onError = { errors.append($0) }
         let result = Kiln.run(source, context: context)
-        errors += result.errors
-        guard let view = result.view else { return errors + ["no view"] }
+        errors += result.errors.map { KilnError(phase: .runtime, reported: $0) }
+        guard let view = result.view else { return errors + [KilnError(phase: .runtime, line: nil, message: "no view")] }
         #if canImport(AppKit) && !targetEnvironment(macCatalyst)
         let host = NSHostingView(rootView: view.frame(width: size.width, height: size.height))
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled], backing: .buffered, defer: false)

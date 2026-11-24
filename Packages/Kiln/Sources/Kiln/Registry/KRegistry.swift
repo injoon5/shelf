@@ -123,6 +123,14 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "`List` (one or a `Set` of `selection:`, with `EditButton`; `children:`), `Section` (`isExpanded:`), `ForEach` (`editActions:`), `OutlineGroup`, `.onDelete`, `.onMove`, `.refreshable`, `.swipeActions` (iOS 27: on any view in a `.swipeActionsContainer()`), `.reorderable()` in a `.reorderContainer(for:)` (iOS 27), and every list style and row and section modifier"
         case .navigation:
             return "`NavigationStack` (`path:` an array or `NavigationPath`), `NavigationSplitView`, `.navigationDestination`, `.navigationTransition(.zoom)` with `.matchedTransitionSource`, and `.crossFade` (iOS 27); `TabView` with `Tab` (`role: .search`), `TabSection`, `.page` style, `.tabViewBottomAccessory`, `.tabBarMinimizeBehavior`; `.toolbar` with every placement, `ToolbarSpacer`, `.visibilityPriority`; `.searchable` with scopes and tokens; `.sheet` with every `.presentation…` modifier, `.popover`, `.fullScreenCover`, `.inspector`; `\\.editMode`, `\\.isSearching`"
+        case .audio:
+            return "`AVAudioPlayer(data:)` or `(contentsOf:)` a file in the app's own folder (there's no app bundle), with `volume`, `numberOfLoops`, `currentTime` and its delegate; `AVPlayer(url:)` with `VideoPlayer`; `AudioServicesPlaySystemSound`; `AVSpeechSynthesizer` with `AVSpeechUtterance`. Sound stops when the app closes"
+        case .networking:
+            return "`try await URLSession.shared.data(from:)` or `data(for:)` a `URLRequest`, then `JSONDecoder`; `URLComponents`; `bytes(from:)` with `for try await line in bytes.lines`; WebSockets: `webSocketTask(with:)`, `resume()`, `try await send(.string(text))` and `receive()` (`.string`/`.data`) in a loop. Use `await` in `.task`, not completion handlers"
+        case .chart3D:
+            return "`Chart3D` with `PointMark(x:y:z:)` and `SurfacePlot(x:y:z:) { [state] x, z in … }`, their style and material modifiers, `.chart3DPose` (a binding people drag), `.chart3DCameraProjection` and `.chartZScale`. Every axis plots numbers; `RuleMark` and `RectangleMark` don't draw in 3D"
+        case .web:
+            return "`WebView(url:)`, or `WebView(page)` with a `WebPage()`: `load`, `title`, `url`, `isLoading`, `estimatedProgress`, `reload()`, `backForwardList`, `try await page.callJavaScript(…)`; the `.webView…` modifiers and `.findNavigator`. Each app has its own cookies"
         case .core:
             return "views' life cycle (`onAppear`, `.task`, `onChange`, `onReceive`), `TimelineView` (`.animation`, `.periodic`, `.everyMinute`, `.explicit`), and the `@Entry` and `@Animatable` macros"
         case .text:

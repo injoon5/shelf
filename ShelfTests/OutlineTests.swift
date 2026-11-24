@@ -270,6 +270,27 @@ struct OutlineTests {
         #expect(outline.contains("    func long(\n        a: Int,\n        b: Int\n    ) -> Int { … }"))
     }
 
+    /// A closure as a default value is code: its body goes, as a function's does.
+    @Test func closureDefaultsLoseTheirBodies() {
+        let source = """
+            final class Sounds {
+                var onFinish: (Bool) -> Void = { _ in }
+                var onSpoken: (String) -> Void = { text in
+                    print(text)
+                }
+                let formatter: DateFormatter = {
+                    DateFormatter()
+                }()
+                var count = 0 { didSet { print(count) } }
+            }
+            """
+        let outline = Outline.make(from: source)
+        #expect(outline.contains("    var onFinish: (Bool) -> Void = { … }\n"))
+        #expect(outline.contains("    var onSpoken: (String) -> Void = { … }\n"))
+        #expect(outline.contains("    let formatter: DateFormatter = {\n        DateFormatter()\n    }()"), "called at once: a value")
+        #expect(!outline.contains("print("))
+    }
+
     @Test func oneLineTypesGetOneMemberPerLine() {
         let outline = Outline.make(from: "struct Row: View { let title: String; var body: some View { Text(title) } }")
         #expect(outline == "struct Row: View {\n    let title: String\n    var body: some View { … }\n}\n")

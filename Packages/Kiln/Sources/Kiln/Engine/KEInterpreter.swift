@@ -171,6 +171,17 @@ final class KInterpreter {
     var readTracker: KReadTracker?
     /// A global variable changed: re-render everything.
     var onGlobalChange: (() -> Void)?
+    /// Nonzero while app code runs the way a framework calls it mid-draw
+    /// (SurfacePlot's function): its global writes don't re-render.
+    var globalRedrawsHeld = 0
+
+    /// Runs `body` with global writes kept from re-rendering, as compiled
+    /// Swift's globals never do.
+    func holdingGlobalRedraws<T>(_ body: () throws -> T) rethrows -> T {
+        globalRedrawsHeld += 1
+        defer { globalRedrawsHeld -= 1 }
+        return try body()
+    }
     /// A headless run (`validate`, the transcript): nothing really waits, and
     /// tasks run when the probe drains them (KEAsync).
     var headless: Bool
@@ -399,7 +410,7 @@ final class KInterpreter {
         let value = try decl.initial.map { try eval($0, globalEnv, decl.type) } ?? .nilValue
         try bindPattern(decl.pattern, value, in: globalEnv, isLet: decl.isLet, type: decl.type)
         if case .binding(let n, _) = decl.pattern, let box = globalEnv.vars[n] {
-            box.onChange = { [weak self] in self?.onGlobalChange?() }
+            box.onChange = { [weak self] in if self?.globalRedrawsHeld == 0 { self?.onGlobalChange?() } }
         }
     }
 
@@ -730,6 +741,8 @@ final class KInterpreter {
              (.array, "Array"), (.dict, "Dictionary"): return true
         case (.int, _), (.double, _), (.string, _), (.bool, _): return valueConforms(v, n)
         case (.native(.object("Error", _)), "CancellationError"): return KAsync.isCancellation(KEThrown(value: v))
+        // A number from Objective-C as `Any` (`callJavaScript`'s result) casts as `NSNumber` would.
+        case (.native(.object("NSNumber", _)), _): return KNativeValues.numberTypes.contains(n) || n == "Any"
         default:
             if let ut = v.userType { return ut.name == n || ut.conformances.contains(n) || (n == "AnyObject" && ut.isClass) }
             if protocols[n] != nil || builtinConformances.values.contains(where: { $0.contains(n) }) { return valueConforms(v, n) }
@@ -1041,6 +1054,8 @@ final class KInterpreter {
         switch (v, t.core) {
         case (.int(let i), .named(let n, _)) where ["Double", "CGFloat", "Float", "TimeInterval"].contains(n):
             return .double(Double(i))
+        case (.native(.object("NSNumber", let ref)), .named(let n, _)) where KNativeValues.numberTypes.contains(n):
+            return KNativeValues.number(ref.value as? NSNumber, as: n)
         case (.native(.implicit(let name, let args)), .named(let n, _)):
             if let ut = types[n] {
                 if let resolved = try? implicitOn(ut, name, args.isEmpty ? nil : args) { return resolved }
@@ -1093,7 +1108,7 @@ final class KInterpreter {
         }
         let value = try decl.initial.map { try eval($0, KEnv(parent: globalEnv, selfContext: ctx), decl.type) } ?? .nilValue
         let box = KBox(coerce(value, to: decl.type), type: decl.type)
-        box.onChange = { [weak self] in self?.onGlobalChange?() }
+        box.onChange = { [weak self] in if self?.globalRedrawsHeld == 0 { self?.onGlobalChange?() } }
         t.staticBoxes[name] = box
         return box.value
     }

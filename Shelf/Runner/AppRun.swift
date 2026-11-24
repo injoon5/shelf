@@ -60,6 +60,7 @@ enum RunContext {
         let context = KilnContext(slug: app.slug, name: app.name, defaults: host.defaults.suite(for: app.slug), files: files,
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
+        context.provide(AppAudio.session())
         context.openURL = { URLPolicy.open($0) }
         return context
     }
@@ -75,6 +76,9 @@ enum RunContext {
         let context = KilnContext(slug: app.slug, name: app.name, defaults: UserDefaults(suiteName: suite) ?? UserDefaults(),
                                   files: KilnFiles(root: folder), capabilities: PermissionsGate(permissions))
         context.provide(session)
+        context.provide(AppAudio.session())
+        // Its web pages' cookies and storage go with it.
+        context.provide(KilnEphemeralWebsiteData())
         context.openURL = { URLPolicy.open($0) }
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)

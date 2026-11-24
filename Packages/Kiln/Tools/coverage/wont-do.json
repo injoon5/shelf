@@ -137,11 +137,11 @@
     },
     {
       "id": "private-style-protocols",
-      "what": "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle` or `IndexViewStyle`",
-      "reason": "SwiftUI keeps their requirements private (`_makeView`, `_body`), so no app can adopt them, compiled or not. The built-in styles all work.",
+      "what": "Your own `PickerStyle`, `TextFieldStyle`, `ListStyle`, `TabViewStyle`, `NavigationViewStyle`, `IndexViewStyle` or `Chart3DSurfaceStyle`",
+      "reason": "SwiftUI and Swift Charts keep their requirements private (`_makeView`, `_body`, `_resolve`), so no app can adopt them, compiled or not. The built-in styles all work.",
       "status": "wontDo",
       "source": "Round 1 (Controls, Lists, Navigation)",
-      "match": { "ids": ["protocol:PickerStyle", "protocol:TextFieldStyle", "protocol:ListStyle", "protocol:TabViewStyle", "protocol:NavigationViewStyle", "protocol:IndexViewStyle"] }
+      "match": { "ids": ["protocol:PickerStyle", "protocol:TextFieldStyle", "protocol:ListStyle", "protocol:TabViewStyle", "protocol:NavigationViewStyle", "protocol:IndexViewStyle", "protocol:Chart3DSurfaceStyle"] }
     },
     {
       "id": "tables",
@@ -169,6 +169,22 @@
       "status": "wontDo",
       "source": "Round 1 (Navigation)",
       "match": { "ids": ["member:PresentationDetent.custom"] }
+    },
+    {
+      "id": "web-scroll-input",
+      "what": "`.webViewScrollInputBehavior(_:for:)`",
+      "reason": "iOS has no `ScrollInputKind` to pass it: its kinds are watchOS's and visionOS's.",
+      "status": "wontDo",
+      "source": "PLAN.md §3.6",
+      "match": { "ids": ["modifier:webViewScrollInputBehavior"] }
+    },
+    {
+      "id": "realtime-audio",
+      "what": "Real-time audio render callbacks (`AVAudioSourceNode`, `AVAudioSinkNode`, taps)",
+      "reason": "They'd call the app's code on the audio thread, many times a second; `AVAudioPlayer` plays `Data` the app makes (§3.5).",
+      "status": "wontDo",
+      "source": "PLAN.md §3.5",
+      "outsideSDK": true
     },
     {
       "id": "render-thread-protocols",

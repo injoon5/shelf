@@ -13,10 +13,10 @@ struct AppCleanupTests {
             data: AppData(root: folder.appending(path: "data"), api: { nil }),
             snapshots: LaunchSnapshots(root: folder.appending(path: "Snapshots")),
             permissions: .inMemory())
-        #expect(cleanup.steps.map(\.name) == ["source", "settings suite", "files folder", "DB store", "launch snapshot", "permission grants"])
+        #expect(cleanup.steps.map(\.name) == ["source", "settings suite", "files folder", "website data", "DB store", "launch snapshot", "permission grants"])
 
         let bare = AppCleanup.library(cache: AppCache(root: folder), defaults: .standard, files: AppFiles(root: folder))
-        #expect(bare.steps.map(\.name) == ["source", "settings suite", "files folder"])
+        #expect(bare.steps.map(\.name) == ["source", "settings suite", "files folder", "website data"])
     }
 
     /// Where a later feature plugs in: its step runs with the rest, in order.
