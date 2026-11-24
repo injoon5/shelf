@@ -126,7 +126,7 @@ public enum KilnFamily: String, CaseIterable, Sendable {
         case .core:
             return "views' life cycle (`onAppear`, `.task`, `onChange`, `onReceive`), `TimelineView` (`.animation`, `.periodic`, `.everyMinute`, `.explicit`), and the `@Entry` and `@Animatable` macros"
         case .text:
-            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values"
+            return "`Text` with every font and text modifier, `AttributedString` and Markdown, `Text(timerInterval:)`, and the text environment values; parsing: `Regex` and RegexBuilder, `NSRegularExpression`, `NSDataDetector`, `Scanner`, `NLTokenizer`, `NLTagger`, `NLLanguageRecognizer`, `NLEmbedding`, `Date(_:strategy:)`, `Double(_:format:)`, `Decimal`"
         case .gestures:
             return "every gesture (`TapGesture`, `SpatialTapGesture`, `LongPressGesture`, `DragGesture`, `MagnifyGesture`, `RotateGesture`, your own `Gesture`) with `.onChanged`, `.onEnded`, `.updating` and `@GestureState`, `.simultaneously`, `.sequenced`, `.exclusively`; `.gesture`, `.simultaneousGesture`, `.highPriorityGesture`, `.onTapGesture` (with the tap's location), `.onLongPressGesture`, hover and Pencil. A drag that starts at the very top or bottom edge closes the app instead"
         case .drawing:
@@ -139,6 +139,12 @@ public enum KilnFamily: String, CaseIterable, Sendable {
             return "every `accessibility…` modifier (labels, values, traits, actions, rotors, `@AccessibilityFocusState`), the speech modifiers and the accessibility environment values"
         case .charts:
             return "every mark and plot (`LinePlot(x:y:domain:)` draws a function), `.foregroundStyle(by:)`, annotations, `AxisMarks`, scales, legends, `.chartXSelection`, `.chartScrollableAxes` and `.chartOverlay` with `ChartProxy`; each axis takes one kind of value (text, numbers or dates)"
+        case .haptics:
+            return "`.sensoryFeedback` (a trigger, `condition:`, or a closure returning one) with every `SensoryFeedback`; UIKit's three feedback generators"
+        case .sharing:
+            return "`ShareLink` (a `String`, `URL`, `Image`, `Data` or your `Transferable`; `items:`; `SharePreview`), `PasteButton(payloadType:)`, `UIPasteboard.general`, `TextSelection`, `.copyable`, `.pasteDestination`"
+        case .units:
+            return "`Measurement` in any Foundation unit or your own (`UnitConverterLinear`): `converted(to:)`, arithmetic, comparisons, `.formatted(.measurement(width:usage:))`, `MeasurementFormatter`, `Locale.current.measurementSystem`"
         default:
             return nil
         }
@@ -597,6 +603,9 @@ final class KTypeBridge: KBridge {
     var anySetter: (@MainActor (inout KCall, String) throws -> Bool)?
     /// `.name` where this type is expected: `.red` for a `Color`.
     var implicit: (@MainActor (String, [KV], [String?]) -> KV?)?
+    /// Binary operators on this type's values (`a + b`, `a < b`), by operator:
+    /// the engine asks the left operand's type, then the right's. nil: not for these operands.
+    var operators: [String: @MainActor (KV, KV, Int) throws -> KV?] = [:]
     /// Another type whose members this one also has (`Set` → `Sequence`).
     var fallback: String?
     /// Turns a value of this type into the fallback's (a `String` into its characters).
@@ -699,6 +708,12 @@ final class KRegistry {
         for f in KilnFamily.allCases {
             guard let cls = NSClassFromString("KilnBridges_" + f.folder.replacingOccurrences(of: " ", with: "")) as? KBridgeFamily.Type else { continue }
             cls.register(into: self)
+        }
+        // A second pass, once every family's types exist: a family can add to
+        // a type a later family declares (Units adds `Double.init(_:format:)`).
+        for f in KilnFamily.allCases {
+            guard let cls = NSClassFromString("KilnBridges_" + f.folder.replacingOccurrences(of: " ", with: "")) as? KBridgeFamily.Type else { continue }
+            cls.extend(into: self)
         }
     }
 
@@ -854,4 +869,6 @@ final class KRegistry {
 @MainActor
 class KBridgeFamily: NSObject {
     @MainActor class func register(into r: KRegistry) {}
+    /// After every family has registered: `r.extend(…)` types other families declare.
+    @MainActor class func extend(into r: KRegistry) {}
 }

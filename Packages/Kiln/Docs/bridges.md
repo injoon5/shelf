@@ -207,11 +207,21 @@ r.type("WebPage", .web, notes: "Load a URL or HTML; read title, url and isLoadin
 - A native `AsyncSequence` becomes `for await`-able with `KAsyncSequence.wrapping(name, sequence) { element in kv }`.
 - `headless` is what `Kiln.validate` gets instead of waiting. nil means the check stops following that task.
 - **Say so, for the checker.** A method, static method, function or property that returns a suspension takes `async: true`: `Kiln.check` then reports a call to it with no `await` (`'Task.sleep' is async: call it with 'await'`). A bridge whose closures may `await` (it starts them as tasks, as `Task {}`, `.task {}`, `.refreshable {}` and `withTaskGroup` do) takes `closuresCanWait: true` (`m.closuresCanWait()` on a modifier). Everywhere else, `Kiln.check` calls an `await` in a closure argument an error, because the engine can't wait there either.
-- **An initializer makes its own type.** `Kiln.check` takes `T(…)` to be a `T` and checks the members called on it against `T`'s bridge. A type whose initializer makes something else (the haptic generators all make one stand-in) must have no instance members of its own.
+- **An initializer makes its own type.** `Kiln.check` takes `T(…)` to be a `T` and checks the members called on it against `T`'s bridge. A type whose initializer makes something else (`NSDataDetector` makes an `NSRegularExpression`) must have no instance members of its own.
 
 **Observation:** a native `@Observable` object read in a property getter is tracked by SwiftUI, because the app's `body` runs inside the hosting view's real `body`. `RegistryTests.testNativeObservableReadsAreTrackedBySwiftUI` pins this down.
 
-**Adding to another family's type:** `r.extend("URL") { t in … }`. For example, Files adds file URLs to Foundation's `URL`. Two families can't both register `type:URL`.
+**Adding to another family's type:** `r.extend("URL") { t in … }`. For example, Files adds file URLs to Foundation's `URL`. Two families can't both register `type:URL`. Families register in `KilnFamily`'s order, so a family can only `extend` a type an earlier family declared in `register(into:)`; to add to one a later family declares (Text adds `Range(_:in:)` and `String.utf16` to Language's types, Units formats through Foundation's), override `class func extend(into r: KRegistry)` in the family's class: it runs after every family has registered.
+
+**Value types the engine doesn't know.** Box them, so they compare by value: `.native(.boxed(KBoxed("Measurement", value)))` with a `Hashable` value (`KMeasure`, `KDecimal`, `KNSRange`). Then:
+
+- `typeRef(of:)` is the box's type, so `m.unit == .kilometers` resolves `.kilometers` with that type's `implicit`;
+- `t.operator("+") { a, b, line in … }` gives the type its operators (and `"<"` its ordering: `sorted()`, `max()`, `>` and `<=` follow). The engine asks the left operand's type, then the right's, after its own cases; return nil for operands the bridge doesn't take;
+- a value conforming to `KDescribable` prints as Swift prints it (`"\(distance)"` is "5.0 km"); a native object (`.native(.object(…))`) can conform too;
+- `KFormatting.valueFormatters["Measurement"] = { value, style, interp in … }` makes `.formatted(style)`, `Text(value, format:)` and string interpolation with a format use the type's own formatting;
+- a setter or a `mutating` method sets `c.mutated` to the new box, which the engine writes back.
+
+**Nested native types.** `NSTextCheckingResult.CheckingType.link` and `UIImpactFeedbackGenerator.FeedbackStyle.heavy` work when the nested type is registered by its dotted name (`r.type("NSTextCheckingResult.CheckingType", …)`).
 
 ## A host bridge
 

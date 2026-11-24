@@ -550,6 +550,16 @@ extension KInterpreter {
 
     func equal(_ a: KV, _ b: KV) -> Bool { a == b }
 
+    /// An operator a type bridge declares (`t.operator("+")`), on the left
+    /// operand's type, then the right's.
+    func nativeOperator(_ op: String, _ a: KV, _ b: KV, _ line: Int) throws -> KV? {
+        for v in [a, b] {
+            guard case .native = v, let f = registry.type(KRegistry.typeName(of: v))?.operators[op] else { continue }
+            if let r = try f(a, b, line) { return r }
+        }
+        return nil
+    }
+
     /// `a == b` needs Equatable, as in Swift: an enum without payloads has it;
     /// a struct, a class or an enum with payloads declares it (or `Hashable`,
     /// `Comparable`…) or writes `static func ==`. Comparing with `nil` is fine.
@@ -608,6 +618,11 @@ extension KInterpreter {
             let gt = truthy(try invoke(f, args: [b, a], labels: [nil, nil], selfContext: nil, parent: globalEnv))
             c = lt ? -1 : (gt ? 1 : 0)
         default:
+            // A native value type with its own `<` (`Measurement`, `Decimal`).
+            if let lt = try nativeOperator("<", a, b, line), let gt = try nativeOperator("<", b, a, line) {
+                c = truthy(lt) ? -1 : (truthy(gt) ? 1 : 0)
+                break
+            }
             guard let x = a.asDouble, let y = b.asDouble else { throw comparableFailure(a, b, line) }
             c = x < y ? -1 : (x > y ? 1 : 0)
         }
@@ -665,6 +680,7 @@ extension KInterpreter {
                 }
             }
         }
+        if let v = try nativeOperator(op, a, b, line) { return v }
         // `static func + (a: Vec, b: Vec)`, on either operand's type, or a global operator function.
         if let f = a.userType?.staticMethods[op]?.first ?? b.userType?.staticMethods[op]?.first ?? functions[op]?.first {
             return try invoke(f, args: [a, b], labels: [nil, nil], selfContext: nil, parent: globalEnv)

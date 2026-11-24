@@ -320,7 +320,7 @@ final class ControlsBridges: KBridgeFamily {
         r.view("SecureField", .controls) { v in
             v.forms(["_:title text:binding prompt:any?", "_:title text:binding onCommit:action", "text:binding prompt:any? label:content"]) { c in textField(c, secure: true) }
         }
-        r.view("TextEditor", .controls, support: .partial, notes: "`selection:` isn't kept.") { v in
+        r.view("TextEditor", .controls, support: .partial, notes: "`selection:` is a `TextSelection?` for a `String`; an `AttributedString` editor doesn't keep it.") { v in
             v.forms(["text:binding", "text:binding selection:binding"]) { c in textEditor(c) }
         }
     }
@@ -334,6 +334,10 @@ final class ControlsBridges: KBridgeFamily {
             let plain = Binding<String>(get: { String((KAttributed.value(b.get()) ?? AttributedString()).characters) },
                                         set: { b.set(KAttributed.kv(AttributedString($0))) })
             return AnyView(TextEditor(text: plain))
+        }
+        if #available(iOS 18, macOS 15, *), let sb = c.kbinding("selection") {
+            let text = c.binding("text", String.self)
+            return AnyView(TextEditor(text: text, selection: KTextSelection.binding(sb) { text.wrappedValue }))
         }
         return AnyView(TextEditor(text: c.binding("text", String.self)))
     }
@@ -378,7 +382,15 @@ final class ControlsBridges: KBridgeFamily {
         }
         let vertical = c.symbol("axis") == "vertical"
         var field: AnyView
-        if let label {
+        // `selection:` a `TextSelection?` (iOS 18), kept in character offsets (Sharing).
+        if #available(iOS 18, macOS 15, *), let sb = c.kbinding("selection") {
+            let selection = KTextSelection.binding(sb) { text.wrappedValue }
+            if let label {
+                field = AnyView(TextField(text: text, selection: selection, prompt: prompt, axis: vertical ? .vertical : nil) { label })
+            } else {
+                field = AnyView(TextField(placeholder, text: text, selection: selection, prompt: prompt, axis: vertical ? .vertical : nil))
+            }
+        } else if let label {
             field = vertical ? AnyView(TextField(text: text, prompt: prompt, axis: .vertical) { label }) : AnyView(TextField(text: text, prompt: prompt) { label })
         } else {
             field = vertical ? AnyView(TextField(placeholder, text: text, prompt: prompt, axis: .vertical)) : AnyView(TextField(placeholder, text: text, prompt: prompt))

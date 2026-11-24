@@ -96,8 +96,8 @@ final class CheckTests: XCTestCase {
     }
 
     func testUnknownTypesStaticMemberIsAnError() {
-        let issue = only(.unknownName, in: app(#"Button("Copy") { UIPasteboard.general.string = name }"#))
-        XCTAssertEqual(issue?.message, "Kiln doesn't have 'UIPasteboard'")
+        let issue = only(.unknownName, in: app(#"Button("Name") { print(UIDevice.current.name) }"#))
+        XCTAssertEqual(issue?.message, "Kiln doesn't have 'UIDevice'")
     }
 
     func testUnknownViewIsAnError() {
@@ -262,23 +262,22 @@ final class CheckTests: XCTestCase {
     // MARK: Stubs
 
     func testStubIsAWarningNotAnError() throws {
-        let check = Kiln.check(app(#"Image(systemName: "star").sensoryFeedback(.success, trigger: count)"#))
+        let check = Kiln.check(app(#"Button("Zone") { print(TimeZone.current) }"#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         let warning = try XCTUnwrap(check.warnings.first)
         XCTAssertEqual(warning.kind, .stub)
-        XCTAssertEqual(warning.message, "`.sensoryFeedback` is accepted but has no effect yet")
-        XCTAssertEqual(warning.suggestion, "Accepted; no feedback is played yet")
+        XCTAssertEqual(warning.message, "`TimeZone` is accepted but has no effect yet")
     }
 
     func testStubViewAndTypeAreWarnings() {
         let check = Kiln.check(app(#"""
             VStack {
-                Button("Tap") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+                Button("Open") { UIApplication.shared.open(URL(string: "https://apple.com")!) }
             }
             """#))
         XCTAssertTrue(check.passed, "\(check.issues)")
         XCTAssertEqual(Set(check.warnings.map(\.kind)), [.stub])
-        XCTAssertEqual(check.warnings.map(\.message), ["`UIImpactFeedbackGenerator` is accepted but has no effect yet"])
+        XCTAssertEqual(check.warnings.map(\.message), ["`UIApplication` is accepted but has no effect yet"])
     }
 
     // MARK: Results
@@ -286,7 +285,7 @@ final class CheckTests: XCTestCase {
     func testErrorsComeFirstInLineOrder() {
         let check = Kiln.check(app(#"""
             VStack {
-                Text("a").sensoryFeedback(.success, trigger: count)
+                Button("a") { print(TimeZone.current) }
                 Text("b").zzz()
                 Text("c").yyy()
             }

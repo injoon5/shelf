@@ -38,8 +38,13 @@ enum KFormatting {
         return String(format: normalized, arguments: cargs)
     }
 
+    /// Formatters for native value types other families bridge, by the
+    /// value's type (`Measurement`, `Decimal`): nil when the style isn't theirs.
+    static var valueFormatters: [String: @MainActor (KV, KV, KInterpreter) -> String?] = [:]
+
     /// `value.formatted(style)`.
     static func formatted(_ v: KV, _ style: KV, _ interp: KInterpreter) -> String {
+        if case .native(let n) = v, let f = valueFormatters[KRegistry.typeName(of: .native(n))], let s = f(v, style, interp) { return s }
         if case .native(.date(let d)) = v {
             if case .native(.format(let f)) = style, f.kind == .dateTime, !f.components.isEmpty {
                 var fs = Date.FormatStyle()

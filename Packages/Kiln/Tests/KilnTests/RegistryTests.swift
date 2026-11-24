@@ -90,8 +90,8 @@ final class RegistryTests: XCTestCase {
     }
 
     func testAStubIsAcceptedAndListedAsOne() {
-        XCTAssertEqual(Kiln.validate(app(#"Text("x").sensoryFeedback(.success, trigger: on)"#)).errors, [])
-        let m = KRegistry.shared.manifest().symbols.first { $0.id == "modifier:sensoryFeedback" }
+        XCTAssertEqual(Kiln.validate(app(#"Button("x") { print(TimeZone.current) }"#)).errors, [])
+        let m = KRegistry.shared.manifest().symbols.first { $0.id == "type:TimeZone" }
         XCTAssertEqual(m?.support, "stub")
     }
 

@@ -417,7 +417,11 @@ extension LanguageBridges {
 
     static func ranges(_ r: KRegistry) {
         r.type("Range", .language) { t in
-            t.initializer { c in c.first ?? .nilValue }
+            t.initializer { c in
+                // `Range(nsRange, in: text)` (Text/Parsing.swift).
+                if let text = c.arg("in")?.asString, let ns = KNSRange.from(c.first) { return KNSRange.offsets(ns, in: text) }
+                return c.first ?? .nilValue
+            }
             @MainActor func bounds(_ c: KCall) -> (KV, KV, Bool) {
                 if case .range(let lo, let hi, let closed) = c.receiver { return (lo, hi, closed) }
                 return (.nilValue, .nilValue, false)

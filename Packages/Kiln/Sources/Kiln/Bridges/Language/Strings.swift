@@ -106,12 +106,25 @@ extension LanguageBridges {
                 }
                 return .bool(s(c).contains(c.at(0)?.asString ?? ""))
             }
-            t.methods(["localizedCaseInsensitiveContains", "localizedStandardContains"]) { c, _ in
-                .bool(s(c).localizedCaseInsensitiveContains(c.at(0)?.asString ?? ""))
+            t.method("localizedCaseInsensitiveContains") { c in .bool(s(c).localizedCaseInsensitiveContains(c.at(0)?.asString ?? "")) }
+            // Case- and diacritic-insensitive, as Finder's search: "cafe" finds "Café".
+            t.method("localizedStandardContains") { c in .bool(s(c).localizedStandardContains(c.at(0)?.asString ?? "")) }
+            t.method("localizedStandardCompare") { c in
+                let r = s(c).localizedStandardCompare(c.at(0)?.asString ?? "")
+                return .native(.implicit(r == .orderedAscending ? "orderedAscending" : (r == .orderedDescending ? "orderedDescending" : "orderedSame"), []))
+            }
+            t.method("localizedStandardRange") { c in
+                let str = s(c)
+                return str.localizedStandardRange(of: (c.arg("of") ?? c.at(0))?.asString ?? "").map { KBuiltins.offsetRange($0, in: str) } ?? .nilValue
             }
             t.method("lowercasedContains") { c in .bool(s(c).lowercased().contains(c.at(0)?.asString?.lowercased() ?? "")) }
             t.method("split") { c in
                 let str = s(c)
+                // `split(separator: /\s*,\s*/)` (Regex.swift).
+                if let r = KBuiltins.regexBox(c.arg("separator") ?? c.first) {
+                    return .array(KBuiltins.split(str, r, maxSplits: c.arg("maxSplits")?.asInt ?? Int.max,
+                                                  omittingEmpty: c.arg("omittingEmptySubsequences").map { c.interp.truthy($0) } ?? true))
+                }
                 let sep = c.arg("separator")?.asString ?? c.first?.asString ?? " "
                 let maxSplits = c.arg("maxSplits")?.asInt ?? Int.max
                 let omit = c.arg("omittingEmptySubsequences").map { c.interp.truthy($0) } ?? true
@@ -122,11 +135,12 @@ extension LanguageBridges {
             }
             t.method("components") { c in
                 if let sep = c.arg("separatedBy")?.asString { return .array(s(c).components(separatedBy: sep).map { .string($0) }) }
+                if let set = KCharacterSet.from(c.arg("separatedBy")) { return .array(s(c).components(separatedBy: set).map { .string($0) }) }
                 return .array(s(c).components(separatedBy: .whitespaces).map { .string($0) })
             }
             t.method("trimmingCharacters") { c in
                 var set: CharacterSet = .whitespacesAndNewlines
-                if case .native(.implicit(let n, _))? = c.first {
+                if let given = KCharacterSet.from(c.first) { set = given } else if case .native(.implicit(let n, _))? = c.first {
                     switch n {
                     case "whitespaces": set = .whitespaces
                     case "newlines": set = .newlines
@@ -160,8 +174,28 @@ extension LanguageBridges {
                 return .string(str.padding(toLength: c.arg("toLength")?.asInt ?? str.count, withPad: c.arg("withPad")?.asString ?? " ", startingAt: 0))
             }
             t.method("isEmpty") { c in .bool(s(c).isEmpty) }
-            t.method("starts") { c in .bool(s(c).hasPrefix(c.arg("with")?.asString ?? "")) }
-            t.methods(["index", "firstIndex"]) { c, _ in
+            t.method("starts") { c in
+                if let r = KBuiltins.regexBox(c.arg("with")) { return .bool(s(c).starts(with: r.regex)) }
+                return .bool(s(c).hasPrefix(c.arg("with")?.asString ?? ""))
+            }
+            // Indices are character offsets: `index(_:offsetBy:)`, `index(after:)`, `distance(from:to:)`.
+            t.method("index") { c in
+                let str = s(c)
+                if let by = c.arg("offsetBy")?.asInt, let from = c.at(0)?.asInt {
+                    let i = from + by
+                    if let limit = c.arg("limitedBy")?.asInt, (by >= 0 ? i > limit : i < limit) { return .nilValue }
+                    guard i >= 0, i <= str.count else { throw c.interp.fail("String index \(i) is out of bounds (count \(str.count))", c.line) }
+                    return .int(i)
+                }
+                if let after = c.arg("after")?.asInt { return .int(min(after + 1, str.count)) }
+                if let before = c.arg("before")?.asInt { return .int(max(before - 1, 0)) }
+                if let ch = c.first?.asString, let first = ch.first, let i = str.firstIndex(of: first) {
+                    return .int(str.distance(from: str.startIndex, to: i))
+                }
+                return .nilValue
+            }
+            t.method("distance") { c in .int(((c.arg("to") ?? .int(0)).asInt ?? 0) - ((c.arg("from") ?? .int(0)).asInt ?? 0)) }
+            t.methods(["firstIndex"]) { c, _ in
                 let str = s(c)
                 if let ch = c.first?.asString, let first = ch.first, let i = str.firstIndex(of: first) {
                     return .int(str.distance(from: str.startIndex, to: i))

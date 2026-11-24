@@ -780,6 +780,8 @@ final class KInterpreter {
             if let box = env.lookup(name) { return .box(box) }
             if let ctx = env.nearestSelf, let loc = try selfMemberLocation(ctx, name) { return loc }
             if let box = globalEnv.vars[name] { return .box(box) }
+            // A native type, written through its static member (`UIPasteboard.general.string = s`).
+            if registry.type(name) != nil { return .box(KBox(try eval(e, env))) }
             throw fail("Cannot find '\(name)' in scope", line)
         case .selfRef(let line):
             guard let ctx = env.nearestSelf else { throw fail("'self' used outside of a type", line) }
