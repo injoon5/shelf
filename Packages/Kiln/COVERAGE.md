@@ -746,9 +746,9 @@ The SDK lists above are SwiftUI's. Foundation, Combine and the standard library 
 | Foundation | Images | 6 | 0 | 0 | 0 | 6 | 100% |
 | Language | Strings | 118 | 118 | 0 | 0 | 0 | 100% |
 | Language | Numbers | 92 | 91 | 1 | 0 | 0 | 98% |
-| Language | Collections | 142 | 141 | 1 | 0 | 0 | 99% |
+| Language | Collections | 143 | 142 | 1 | 0 | 0 | 99% |
 | Language | Language | 110 | 110 | 0 | 0 | 0 | 100% |
-| **All** | | 816 | 797 | 3 | 0 | 16 | 99% |
+| **All** | | 817 | 798 | 3 | 0 | 16 | 99% |
 
 ### Not passing
 

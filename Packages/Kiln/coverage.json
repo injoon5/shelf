@@ -186,7 +186,7 @@
             "passing" : 91
           },
           {
-            "entries" : 142,
+            "entries" : 143,
             "failing" : [
 
             ],
@@ -195,7 +195,7 @@
             ],
             "ios" : 0,
             "name" : "Collections",
-            "passing" : 141
+            "passing" : 142
           },
           {
             "entries" : 110,
