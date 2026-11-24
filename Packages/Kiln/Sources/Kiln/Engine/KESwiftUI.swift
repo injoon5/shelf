@@ -13,8 +13,16 @@ import SwiftUI
 final class KRef<T>: Hashable {
     let value: T
     init(_ value: T) { self.value = value }
-    static func == (a: KRef<T>, b: KRef<T>) -> Bool { a === b }
-    func hash(into h: inout Hasher) { h.combine(ObjectIdentifier(self)) }
+    static func == (a: KRef<T>, b: KRef<T>) -> Bool {
+        if a === b { return true }
+        // `Data` is held as an `NSData`: two compare by their bytes, as Swift's do.
+        if let x = a.value as? NSData, let y = b.value as? NSData { return x.isEqual(to: y as Data) }
+        return false
+    }
+    func hash(into h: inout Hasher) {
+        if let d = value as? NSData { h.combine(d.length); return }
+        h.combine(ObjectIdentifier(self))
+    }
 }
 
 /// A grid column or row: GridItem(.flexible(), spacing: 12).
@@ -27,11 +35,23 @@ struct KGridItem: Hashable {
 
 /// A format style: .currency(code:), .number, .percent, .dateTime …
 struct KFormat: Hashable {
-    enum Kind: Hashable { case currency(String), number, percent, dateTime, date(String, String), relative, list }
+    /// `named`: a format style by its name (`byteCount`, `list`, `iso8601`, `interval`…), Bridges/Foundation/FormatStyles.swift.
+    enum Kind: Hashable { case currency(String), number, percent, dateTime, date(String, String), relative, list, named(String) }
     var kind: Kind
     var fraction: ClosedRange<Int>?
     var components: [String] = []      // dateTime.hour().minute()
     var grouping = true
+    /// Every call made on the style, in order (`.precision(…)`, `.notation(.compactName)`),
+    /// replayed onto Foundation's own format style when a value is formatted.
+    var steps: [KFormatStep] = []
+}
+
+/// One call on a format style: `.notation(.compactName)`, `.rounded(rule: .up)`.
+struct KFormatStep: Hashable {
+    var name: String
+    var args: [KV]
+    var labels: [String?]
+    func arg(_ label: String) -> KV? { labels.firstIndex(of: label).map { args[$0] } }
 }
 
 struct KStrokeStyle: Hashable {
@@ -114,7 +134,7 @@ enum KNative: Hashable {
 
     @MainActor func describe(_ interp: KInterpreter) -> String {
         switch self {
-        case .date(let d): return d.formatted(date: .abbreviated, time: .shortened)
+        case .date(let d): return d.description      // `print(date)`: "2026-03-14 19:09:26 +0000", as Swift prints it
         case .uuid(let u): return u.uuidString
         case .url(let u): return u.absoluteString
         case .implicit(let n, let a): return "." + n + (a.isEmpty ? "" : "(" + a.map { interp.describe($0) }.joined(separator: ", ") + ")")

@@ -86,7 +86,8 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
         : KilnCorpus.parse((try? String(contentsOf: url, encoding: .utf8)) ?? "", family: url.deletingPathExtension().lastPathComponent)
     if !filters.isEmpty { entries = entries.filter { e in filters.contains { e.id.contains($0) || e.section.contains($0) || e.family == $0 } } }
     var failed = 0, gaps = 0
-    for e in entries {
+    let skipped = entries.filter { !KilnCorpus.runsHere($0) }.count
+    for e in entries where KilnCorpus.runsHere(e) {
         let got = KilnCorpus.run(e)
         let ok = got == e.expected
         if e.isGap { gaps += 1 }
@@ -99,7 +100,8 @@ final class OfflineProtocol: URLProtocol, @unchecked Sendable {
             }
         }
     }
-    print("\(entries.count - failed - gaps) of \(entries.count) pass; \(failed) fail, \(gaps) known gaps")
+    let ran = entries.count - skipped
+    print("\(ran - failed - gaps) of \(ran) pass; \(failed) fail, \(gaps) known gaps; \(skipped) need iOS")
 }
 #endif
 

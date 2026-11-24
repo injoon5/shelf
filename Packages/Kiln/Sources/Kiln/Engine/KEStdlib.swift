@@ -265,6 +265,9 @@ extension KInterpreter {
             }
             let optional: Set<String> = ["first", "last", "min", "max", "randomElement", "popLast", "firstIndex", "lastIndex", "index"]
             if optional.contains(name), peekIsCollection(base, env) { return .optional(any) }
+            // A string's searches find nothing as nil.
+            let searches: Set<String> = ["range", "firstRange", "rangeOfCharacter", "firstMatch", "wholeMatch", "prefixMatch"]
+            if searches.contains(name), peekUserType(base, env) == nil { return .optional(any) }
             return nil
         case .call(.ident(let n, _), let args, _):
             if env.lookup(n) == nil, let f = Self.fit(functions[n] ?? [], args.map(\.label)) { return f.returnType }

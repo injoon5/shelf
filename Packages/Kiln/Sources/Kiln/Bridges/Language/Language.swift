@@ -35,7 +35,7 @@ final class LanguageBridges: KBridgeFamily {
         for name in ["print", "debugPrint", "NSLog"] {
             r.function(name, .language, owner: name == "NSLog" ? "Foundation" : "Swift") { c in
                 let sep = c.arg("separator")?.asString ?? " "
-                let items = zip(c.args, c.labels).filter { $0.1 == nil }.map { c.interp.describe($0.0) }
+                let items = zip(c.args, c.labels).filter { $0.1 == nil }.map { c.interp.describe($0.0, quoted: name == "debugPrint") }
                 c.interp.console += items.joined(separator: sep) + (c.arg("terminator")?.asString ?? "\n")
                 return .void
             }

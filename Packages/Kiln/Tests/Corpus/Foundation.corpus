@@ -7,7 +7,7 @@ prelude ::
 
 ## System
 
-Bundle.main.bundleIdentifier :: Bundle.main.bundleIdentifier != nil => false
+Bundle.main.bundleIdentifier [ios] :: Bundle.main.bundleIdentifier != nil => true
 Bundle.main.infoDictionary :: Bundle.main.infoDictionary != nil => true
 Bundle.main.object(forInfoDictionaryKey:) :: (Bundle.main.object(forInfoDictionaryKey: "NoSuchKey") as? String) ?? "none" => none
 ProcessInfo.processInfo.systemUptime :: ProcessInfo.processInfo.systemUptime > 0 => true
@@ -439,7 +439,7 @@ SHA256 hex :: SHA256.hash(data: Data("abc".utf8)).map { String(format: "%02x", $
 SHA256 compactMap :: SHA256.hash(data: Data("abc".utf8)).compactMap { String(format: "%02x", $0) }.joined().prefix(8) => ba7816bf
 Insecure.MD5 :: Insecure.MD5.hash(data: Data("abc".utf8)).map { String(format: "%02x", $0) }.joined() => 900150983cd24fb0d6963f7d28e17f72
 SHA512 :: Array(SHA512.hash(data: Data("abc".utf8))).count => 64
-JSONSerialization.jsonObject(with:) :: String(describing: try! JSONSerialization.jsonObject(with: Data("[1]".utf8)))
+JSONSerialization.jsonObject(with:) [gap] :: String(describing: try! JSONSerialization.jsonObject(with: Data("[1]".utf8)))
 => (
 =>     1
 => )

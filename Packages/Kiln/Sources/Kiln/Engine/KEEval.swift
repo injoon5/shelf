@@ -1085,6 +1085,9 @@ extension KInterpreter {
             return try call(fn, try evalArgs(argExprs, env), labels)
         case .type(.user(let t)):
             return try evalCallInner(.member(.typeExpr(.named(t.name, [])), name, line: line), argExprs, labels, env, line, expected)
+        case .type(.builtin(let n)) where registry.type(n) != nil:
+            // `Insecure.MD5.hash(data:)`: a nested native type's static method.
+            return try nativeStaticCall(n, name, argExprs, env, line, expected)
         default:
             break
         }

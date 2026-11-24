@@ -124,10 +124,26 @@ import Foundation
 
     /// What an entry prints in Kiln: its console lines, then `error: …` for
     /// each error (the check's, or the run's).
+    /// Whether the entry can run here: one marked `[ios]` needs UIKit.
+    public static func runsHere(_ entry: KilnCorpusEntry) -> Bool {
+        #if os(iOS)
+        return true
+        #else
+        return !entry.flags.contains("ios")
+        #endif
+    }
+
     @MainActor public static func run(_ entry: KilnCorpusEntry) -> [String] {
-        let saved = NSTimeZone.default
-        NSTimeZone.default = TimeZone(identifier: timeZone)!
-        defer { NSTimeZone.default = saved }
+        // The corpus's time zone, as the oracle's `TZ`: `TimeZone.current` follows the process's.
+        let savedTZ = getenv("TZ").map { String(cString: $0) }
+        setenv("TZ", timeZone, 1)
+        tzset()
+        NSTimeZone.resetSystemTimeZone()
+        defer {
+            if let savedTZ { setenv("TZ", savedTZ, 1) } else { unsetenv("TZ") }
+            tzset()
+            NSTimeZone.resetSystemTimeZone()
+        }
         let source = entry.source
         let check = Kiln.check(source)
         let context = KilnContext.stub()

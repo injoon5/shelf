@@ -407,6 +407,12 @@ extension LanguageBridges {
             }
         }
         r.extend("String") { t in
+            t.initializer("format:string locale:any _:any...", first: true) { c in
+                let rest = zip(c.args, c.labels).filter { $0.1 == nil }.map(\.0)
+                let fmt = c.string("format") ?? ""
+                guard let locale = FoundationBridges.locale(c["locale"]) else { return .string(KFormatting.format(fmt, rest, c.interp)) }
+                return .string(KFormatting.format(fmt, rest, c.interp, locale: locale))
+            }
             t.initializer("_:any radix:number uppercase:bool?", first: true) { c in
                 let radix = c.int("radix") ?? 10
                 let upper = c.bool("uppercase", default: false)

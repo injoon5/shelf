@@ -19,6 +19,14 @@ final class FoundationBridges: KBridgeFamily {
         system(r)
         fileSystem(r)
         formatStyles(r)
+        formatters(r)
+        systemMore(r)
+        dataMore(r)
+    }
+
+    /// The second pass: types later families declare (`AttributedString`).
+    override class func extend(into r: KRegistry) {
+        extendLater(r)
     }
 
     // MARK: Values
@@ -185,11 +193,12 @@ final class FoundationBridges: KBridgeFamily {
                 }
                 return .void
             }
-            t.methods(["async", "sync"]) { c, _ in
-                if case .function(let f)? = c.last {
-                    let interp = c.interp
-                    DispatchQueue.main.async { MainActor.assumeIsolated { interp.perform(f) } }
-                }
+            t.methods(["async", "sync"]) { c, name in
+                guard case .function(let f)? = c.last else { return .void }
+                // `sync` runs the work now and returns what it returns.
+                if name == "sync" { return try c.interp.call(f, [], []) }
+                let interp = c.interp
+                DispatchQueue.main.async { MainActor.assumeIsolated { interp.perform(f) } }
                 return .void
             }
         }
@@ -245,13 +254,16 @@ final class FoundationBridges: KBridgeFamily {
             t.property("decimalSeparator") { c in me(c).decimalSeparator.map { .string($0) } ?? .nilValue }
             t.property("groupingSeparator") { c in me(c).groupingSeparator.map { .string($0) } ?? .nilValue }
             t.method("localizedString", "forIdentifier:string") { c in me(c).localizedString(forIdentifier: c.string("forIdentifier") ?? "").map { .string($0) } ?? .nilValue }
+            t.method("localizedString", "forRegionCode:string") { c in me(c).localizedString(forRegionCode: c.string("forRegionCode") ?? "").map { .string($0) } ?? .nilValue }
+            t.method("localizedString", "forLanguageCode:string") { c in me(c).localizedString(forLanguageCode: c.string("forLanguageCode") ?? "").map { .string($0) } ?? .nilValue }
+            t.method("localizedString", "forCurrencyCode:string") { c in me(c).localizedString(forCurrencyCode: c.string("forCurrencyCode") ?? "").map { .string($0) } ?? .nilValue }
+            t.staticProperty("preferredLanguages") { _ in .array(Locale.preferredLanguages.map { .string($0) }) }
+            t.staticProperty("availableIdentifiers") { _ in .array(Locale.availableIdentifiers.map { .string($0) }) }
+            t.property("currencySymbol") { c in me(c).currencySymbol.map { .string($0) } ?? .nilValue }
+            t.property("calendar") { c in KDates.calendarValue(me(c).calendar) }
         }
         r.type("Locale.MeasurementSystem", .foundation, support: .full) { t in
             for n in ["metric", "us", "uk"] { t.staticProperty(n) { _ in .native(.implicit(n, [])) } }
-        }
-        r.type("TimeZone", .foundation, support: .stub) { t in
-            t.initializer { _ in .native(.object("TimeZone", KRef(NSObject()))) }
-            t.staticProperty("current") { _ in .native(.object("TimeZone", KRef(NSObject()))) }
         }
 
         r.type("UIScreen", .foundation, notes: "`UIScreen.main.bounds` is an iPhone's screen; prefer GeometryReader.") { t in
@@ -292,9 +304,11 @@ final class FoundationBridges: KBridgeFamily {
         r.addContextFree("dateTime") { _, _, _ in .native(.format(KFormat(kind: .dateTime))) }
 
         r.type("FormatStyle", .foundation, notes: "`.number`, `.percent`, `.currency(code:)` with `.precision(.fractionLength(n))`, and `.dateTime` with its parts.") { t in
+            // Each call is kept (`steps`) and replayed onto Foundation's style (FormatStyles.swift).
             t.anyProperty { c, name in
                 guard case .native(.format(var f)) = c.receiver else { return nil }
                 if name == "grouping" { f.grouping = false } else { f.components.append(name) }
+                f.steps.append(KFormatStep(name: name, args: [], labels: []))
                 return .native(.format(f))
             }
             t.method("precision") { c in
@@ -303,16 +317,20 @@ final class FoundationBridges: KBridgeFamily {
                     if let n = pa.first?.asInt { f.fraction = n...n }
                     else if case .range(let lo, let hi, _)? = pa.first { f.fraction = (lo.asInt ?? 0)...(hi.asInt ?? 2) }
                 }
+                f.steps.append(KFormatStep(name: "precision", args: c.args, labels: c.labels))
                 return .native(.format(f))
             }
             t.method("grouping") { c in
                 guard case .native(.format(var f)) = c.receiver else { return c.receiver }
-                f.grouping = false
+                if KFormatStyles.symbol(c.first) != "automatic" { f.grouping = false }
+                f.steps.append(KFormatStep(name: "grouping", args: c.args, labels: c.labels))
                 return .native(.format(f))
             }
+            t.method("format", "_:any") { c in .string(KFormatting.formatted(c.first ?? .nilValue, c.receiver, c.interp)) }
             t.anyMethod { c, name in
                 guard case .native(.format(var f)) = c.receiver else { return nil }
                 f.components.append(name)
+                f.steps.append(KFormatStep(name: name, args: c.args, labels: c.labels))
                 return .native(.format(f))
             }
         }

@@ -121,6 +121,11 @@ final class DrawingBridges: KBridgeFamily {
         canvas(r)
         KAffines.register(r)
         round1(r)
+        imageRendering(r)
+    }
+
+    override class func extend(into r: KRegistry) {
+        imageRenderingLater(r)
     }
 
     // MARK: Colors and styles

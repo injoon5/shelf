@@ -1169,6 +1169,11 @@ final class KChecker {
     }
 
     private func nativeStaticCall(_ typeName: String, _ name: String, _ args: [KEArg], _ line: Int, _ c: KCCtx) -> KSType {
+        // `Date.FormatStyle(…)`, `Unicode.Scalar(…)`: a nested native type's initializer.
+        if name.first?.isUppercase == true, let nested = registry.type(typeName + "." + name), !nested.inits.isEmpty {
+            _ = bridgeCall(nested.inits.map(\.overload), display: nested.name, needle: name, args, line, c)
+            return initResult(nested)
+        }
         guard let b = registry.type(typeName) else {
             walkArgs(args, c, wait: .unknown)
             return name == "init" && registry.view(typeName) != nil ? .view : .unknown
