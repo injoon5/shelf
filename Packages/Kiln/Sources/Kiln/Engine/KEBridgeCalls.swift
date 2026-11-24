@@ -201,6 +201,7 @@ extension KInterpreter {
             if let set = t.properties[name]?.set {
                 var c = KCall.values(self, name, owner: tn, [value], line: 0, receiver: base)
                 try set(&c)
+                lastNativeMutation = c.mutated
                 return true
             }
             if let any = t.anySetter {

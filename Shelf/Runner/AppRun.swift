@@ -3,6 +3,7 @@ import Kiln
 import os
 import QuartzCore
 import SwiftUI
+import UIKit
 
 /// What Shelf gives every run of an app (plan §1.7): its data, its settings,
 /// its folder, and source parsed ahead of time.
@@ -60,6 +61,7 @@ enum RunContext {
                                   capabilities: PermissionsGate(permissions))
         context.provide(session)
         context.provide(AppAudio.session())
+        context.openURL = { URLPolicy.open($0) }
         return context
     }
 
@@ -77,6 +79,7 @@ enum RunContext {
         context.provide(AppAudio.session())
         // Its web pages' cookies and storage go with it.
         context.provide(KilnEphemeralWebsiteData())
+        context.openURL = { URLPolicy.open($0) }
         context.onTearDown {
             UserDefaults.standard.removePersistentDomain(forName: suite)
             try? FileManager.default.removeItem(at: folder)
@@ -91,6 +94,27 @@ enum RunContext {
         let context = KilnContext.stub(slug: app.slug, name: app.name, capabilities: PermissionsGate(permissions))
         context.provide(session)
         return context
+    }
+}
+
+/// What an app may open (`openURL`, `Link`, a link in `Text`; plan §2):
+/// the web, mail, phone, messages, FaceTime and Maps, in their own apps,
+/// which leaves Shelf. Any other scheme (another app's, `shelf:`, settings)
+/// is refused, and the app's `openURL(url) { accepted in }` hears `false`.
+enum URLPolicy {
+    static let schemes: Set<String> = ["http", "https", "mailto", "tel", "sms", "facetime", "facetime-audio", "maps"]
+
+    static func allows(_ url: URL) -> Bool {
+        url.scheme.map { schemes.contains($0.lowercased()) } ?? false
+    }
+
+    @MainActor static func open(_ url: URL) -> Bool {
+        guard allows(url) else {
+            RunContext.log.info("refused to open \(url.scheme ?? "a URL", privacy: .public)")
+            return false
+        }
+        UIApplication.shared.open(url)
+        return true
     }
 }
 

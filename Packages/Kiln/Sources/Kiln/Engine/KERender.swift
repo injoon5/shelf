@@ -103,7 +103,7 @@ struct KRenderer {
     func shapeStyle(_ v: KV?) -> AnyShapeStyle? {
         if let c = color(v) { return AnyShapeStyle(c) }
         switch v {
-        case .native(.implicit(let n, _))?:
+        case .native(.implicit(let n, let a))?:
             switch n {
             case "secondary": return AnyShapeStyle(.secondary)
             case "tertiary": return AnyShapeStyle(.tertiary)
@@ -121,10 +121,10 @@ struct KRenderer {
             case "separator": return AnyShapeStyle(.separator)
             default:
                 if n.hasSuffix(".gradient"), let c = KDrawing.colorNames[String(n.dropLast(9))] { return AnyShapeStyle(c.gradient) }
-                return nil
+                return moreShapeStyle(n, a)
             }
         case .view(let view)?:
-            return gradient(view).map { AnyShapeStyle($0) }
+            return gradient(view).map { AnyShapeStyle($0) } ?? styledColor(view)
         default: return nil
         }
     }
@@ -154,6 +154,8 @@ struct KRenderer {
     }
 
     func unitPoint(_ v: KV?) -> SwiftUI.UnitPoint? {
+        // `UnitPoint(x:y:)` and a gesture's `startAnchor`.
+        if case .native(.implicit("unitPoint", let a))? = v { return SwiftUI.UnitPoint(x: a.first?.asDouble ?? 0.5, y: a.last?.asDouble ?? 0.5) }
         guard case .native(.implicit(let n, _))? = v else { return nil }
         let map: [String: SwiftUI.UnitPoint] = ["top": .top, "bottom": .bottom, "leading": .leading, "trailing": .trailing, "center": .center,
             "topLeading": .topLeading, "topTrailing": .topTrailing, "bottomLeading": .bottomLeading, "bottomTrailing": .bottomTrailing]

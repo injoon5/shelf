@@ -523,12 +523,30 @@ These are declarations, which the manifest and the checker read:
 - `r.protocolBridge("Identifiable", .language, requirements: ["id"])`, with no proxy: the engine implements it. With a proxy, see [a protocol proxy](#a-protocol-proxy). `Kiln.check` reports an app type that adopts the protocol and leaves out a requirement. One with a default in Swift ends in `?` (`"errorDescription?"`, `"animatableData?"`), and isn't required.
 - `r.environmentValue("dismiss", .environment) { interp in … }` gives the value `@Environment(\.dismiss)` reads before SwiftUI's arrive.
 - `r.liveEnvironment("editMode", .navigation, read: { env, interp in … }, write: { view, value, c in … })` reads the value from SwiftUI's own environment where the view is shown: a view (or `ViewModifier`, or style) with such an `@Environment` property is hosted inside a reader of `EnvironmentValues` (`KLiveEnvironment`), and the others don't depend on the whole environment. `write` is what `.environment(\.editMode, $mode)` does.
+- `r.environmentValue("dynamicTypeSize", .text, value: { _ in … }, read: { env, interp in … }, write: { env, value, interp in … })` is the same, for a value that `.environment(\.key, v)` and `transformEnvironment` set in place (`writeEnvironment`): every SwiftUI environment value Round 1 bridges is in `Bridges/Environment/Values.swift`. Enum-like values are symbols the app compares with (`.compact`, `.dark`); an ordered one is a `KBoxed` with an `order` (`dynamicTypeSize >= .accessibility1`).
 - `r.wrapper("State", .environment)` declares a wrapper the engine implements (`KViewStorage`).
+- `r.macro("Entry", .core)` declares a macro the engine reads (`KEMacros.swift`); the manifest lists it as `macro:Entry`.
 - `r.implicitProperties["isScrolling"] = { base, args in … }` gives SwiftUI's symbolic values a property (`phase.isScrolling` on `.idle`, `mode.isEditing` on `.active`); return nil for a value that isn't yours.
 
 **An app's own control style** (`struct Pressable: ButtonStyle`) goes through a native style whose `makeBody(configuration:)` calls the app's, with the configuration as a value (`Bridges/Controls/CustomStyles.swift`): `configuration.label` is SwiftUI's own view, `configuration.isOn` a binding, and `Toggle(configuration)` shows the default. `ButtonStyle`, `PrimitiveButtonStyle`, `ToggleStyle`, `LabelStyle`, `ProgressViewStyle`, `GaugeStyle`, `GroupBoxStyle`, `LabeledContentStyle`, `DisclosureGroupStyle`, `ControlGroupStyle`, `FormStyle`, `MenuStyle`, `TextEditorStyle`, `DatePickerStyle`, `NavigationSplitViewStyle` and `ArrangementViewStyle` work this way; the styles whose requirements SwiftUI keeps private can't be adopted by any app.
 
-**Closures that aren't view content.** `Kiln.validate` calls every closure a modifier takes, as content, with no arguments. A closure that gets something (`alignmentGuide`'s `computeValue` gets dimensions, `onScrollGeometryChange`'s `of:` a geometry) says what with `m.probe { label, interp in [sample] }`, by its label (nil for a trailing closure).
+**Closures that aren't view content.** `Kiln.validate` calls every closure a modifier takes, as content, with no arguments. A closure that gets something (`alignmentGuide`'s `computeValue` gets dimensions, `onScrollGeometryChange`'s `of:` a geometry) says what with `m.probe { label, interp in [sample] }`, by its label (nil for a trailing closure; the bridge's `sampleArgs`). A bridge whose closures need more than that (a drag's `onChanged` gets a drag value, `updating` an `inout` state and a transaction, a `Canvas` renderer a context and a size, an action is fired rather than shown) takes the whole hook, `m.probe { base, args, interp in [KProbeCall(fn:args:use:)] }` (or `v.probe` on a view): `base` is what the modifier is on (the gesture, for `onChanged`), `use: .action` fires the closure after the walk, `.content` walks the views it makes. The transcript (`Tools/diff.sh`) runs the same calls.
+
+**`inout` closure parameters.** Pass `.binding(.inOut(get:set:))`: assigning the parameter in the app's closure writes through (`updating`'s `state`, `transformEnvironment`'s value, `Canvas`'s `context`).
+
+### SwiftUI's environment, namespaces and focus (`KEHostInputs.swift`)
+
+A view whose type reads a live environment value, or has `@Namespace`, `@FocusState`, `@AccessibilityFocusState` or a focused value, is hosted inside `KHostInputs`: one real `@Environment(\.self)`, `@Namespace`, `FocusState<KV?>` and `AccessibilityFocusState<KV?>` per host, which observes the view's storage so its `@State` still redraws it. The app's properties map onto them:
+
+- each `@Namespace` is the host's namespace with the property's name (`KNamespaceID`); a bridge gets it with `c.interp.namespace(c["in"])` and ids it with `KNamespacedID(slot:id:)` (`matchedGeometryEffect`, `glassEffectID`, `accessibilityRotorEntry`);
+- each `@FocusState` reads and writes the host's focus state as `(property, value)`; `$field` carries a `KFocusProjection` in `KBinding.native`, which `.focused` and `.defaultFocus` pass to SwiftUI;
+- `@FocusedValue`, `@FocusedBinding` and `@FocusedObject` go through eight real `FocusedValues` slots, one per key name (`KFocusSlots`).
+
+### Gestures, Canvas and charts
+
+- **A gesture** is a description (a primitive with modifiers, as a view); `KGestureBuilder` makes it SwiftUI's `AnyGesture<KV>`, every kind's value mapped to Kiln's, so `onChanged`, `updating`, `simultaneously(with:)` and the rest compose whatever the kinds. `@GestureState` resets through a real `GestureState` in `KGestureAttach`.
+- **A `Canvas`** renderer runs in a view's body and records into `KCanvasRecording`; SwiftUI's `Canvas` replays it. `GraphicsContext` is a value (`KGCState`), so a copy's transform stays on the copy.
+- **A chart's marks** become Swift Charts' own, erased to `AnyChartContent` (`KChartBuilder`), built for the axes' plottable types (`KPlotType`).
 
 ## What the checker and the prompt read
 

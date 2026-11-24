@@ -68,7 +68,7 @@ extension DrawingBridges {
         for name in ["resizable", "renderingMode", "interpolation", "antialiased"] {
             let sig: [String: String] = ["resizable": "capInsets:any? resizingMode:any?", "renderingMode": "_:Image.TemplateRenderingMode?",
                                          "interpolation": "_:Image.Interpolation", "antialiased": "_:bool"]
-            r.modifier(name, .drawing, support: name == "resizable" || name == "renderingMode" ? .full : .stub) { m in
+            r.modifier(name, .drawing) { m in
                 m.formOnBase(sig[name]!, receiver: "Image") { c in imageChain(c) ?? c.view }
             }
         }
@@ -87,9 +87,6 @@ extension DrawingBridges {
             m.form("_:Image.Scale") { c, view in
                 if let n = c.symbol(0) { view.imageScale(n == "large" ? .large : (n == "small" ? .small : .medium)) } else { view }
             }
-        }
-        r.modifier("symbolEffect", .drawing, support: .stub, notes: "Accepted; the symbol doesn't animate yet.") { m in
-            m.stub(["_:any options:any? value:any?", "_:any options:any? isActive:bool?"])
         }
     }
 
@@ -144,6 +141,10 @@ extension DrawingBridges {
         if let rm = applied.first(where: { $0.name == "renderingMode" }), case .native(.implicit(let n, _))? = rm.first {
             image = image.renderingMode(n == "template" ? .template : .original)
         }
+        if let im = applied.first(where: { $0.name == "interpolation" }), case .native(.implicit(let n, _))? = im.first {
+            image = image.interpolation(n == "none" ? .none : (n == "low" ? .low : (n == "medium" ? .medium : .high)))
+        }
+        if let aa = applied.first(where: { $0.name == "antialiased" }) { image = image.antialiased(aa.first.map { c.interp.truthy($0) } ?? true) }
         var out = AnyView(image)
         let own: Set<String> = ["renderingMode", "resizable", "interpolation", "antialiased"]
         for mm in applied where !own.contains(mm.name) { out = c.r.applyModifier(mm, to: out, base: .empty) }

@@ -242,7 +242,7 @@ final class RegistryTests: XCTestCase {
             XCTAssertFalse(s.overloads?.isEmpty ?? true, s.id)
         }
         XCTAssertTrue(symbols.contains { $0.id == "view:Toggle" && $0.overloads?.contains { $0.labels == ["_", "isOn"] } == true })
-        XCTAssertTrue(symbols.contains { $0.id == "modifier:ChartContent.annotation" && $0.support == "stub" })
+        XCTAssertTrue(symbols.contains { $0.id == "modifier:ChartContent.annotation" && $0.support == "full" })
         XCTAssertTrue(symbols.contains { $0.id == "style:PickerStyle.segmented" })
         XCTAssertTrue(symbols.contains { $0.id == "member:Color.red" })
     }

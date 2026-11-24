@@ -81,7 +81,7 @@
       "what": "StoreKit views and purchase modifiers",
       "reason": "Purchases need App Store products and an app record; Shelf apps aren't sold through the App Store.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["Store"] }
     },
     {
@@ -89,7 +89,7 @@
       "what": "Apple Pay and Wallet buttons",
       "reason": "They need a merchant ID, pass type IDs and entitlements that Shelf can't grant per app.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["Wallet"] }
     },
     {
@@ -97,7 +97,7 @@
       "what": "RealityKit, SceneKit and SpriteKit views, game controllers",
       "reason": "Scene graphs of subclassed native nodes, run at frame rate; see subclassing native classes. `Canvas` and `TimelineView` cover 2D games.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["3D & Games"] }
     },
     {
@@ -105,7 +105,7 @@
       "what": "MusicKit views (`ArtworkImage`, the music picker, subscription offer)",
       "reason": "MusicKit is registered per bundle ID, so every app would share Shelf's.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["Media"] }
     },
     {
@@ -113,7 +113,7 @@
       "what": "Sign in with Apple",
       "reason": "Needs an entitlement and server-side token checks per app.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["Sign-in"] }
     },
     {
@@ -121,7 +121,7 @@
       "what": "Siri and Shortcuts views, Screen Time, managed apps, PermissionKit, device discovery, screen capture",
       "reason": "Entitlement-gated, or they register the app with the system, which a Shelf app can't do.",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": { "families": ["System services"] }
     },
     {
@@ -129,7 +129,7 @@
       "what": "Xcode previews (`#Preview`, `@Previewable`, `preview*` modifiers)",
       "reason": "There's no canvas in Shelf; `#Preview` blocks are skipped when read (§1.6).",
       "status": "wontDo",
-      "source": "Proposed by §1.9 (not yet in PLAN.md)",
+      "source": "PLAN.md Won't do (proposed by §1.9, accepted in Round 1)",
       "match": [
         { "ids": ["macro:Preview", "macro:Previewable"] },
         { "kinds": ["modifier"], "patterns": ["^preview(Context|Device|DisplayName|InterfaceOrientation|Layout)$"] }
@@ -193,6 +193,46 @@
       "status": "wontDo",
       "source": "PLAN.md §3.5",
       "outsideSDK": true
+    },
+    {
+      "id": "render-thread-protocols",
+      "what": "Custom text renderers, animations and visual-effect types (`TextRenderer`, `customAttribute`, `CustomAnimation`, your own `VisualEffect`)",
+      "reason": "SwiftUI calls them on its render thread every frame, where an app's code can't run. `contentTransition(.numericText())`, `phaseAnimator`, `keyframeAnimator`, `Canvas` and `visualEffect`'s closure cover the effects.",
+      "status": "wontDo",
+      "source": "Round 1 (rest of SwiftUI)",
+      "match": { "ids": ["protocol:TextRenderer", "modifier:textRenderer", "modifier:customAttribute", "protocol:CustomAnimation", "protocol:VisualEffect"] }
+    },
+    {
+      "id": "rich-text-formatting",
+      "what": "Rich-text formatting definitions (`attributedTextFormattingDefinition`)",
+      "reason": "They constrain a `TextEditor`'s `AttributedString` with attribute-scope types the app declares, which Kiln can't make native.",
+      "status": "wontDo",
+      "source": "Round 1 (rest of SwiftUI)",
+      "match": { "ids": ["modifier:attributedTextFormattingDefinition"] }
+    },
+    {
+      "id": "chart-descriptors",
+      "what": "Custom audio-graph descriptors (`accessibilityChartDescriptor`)",
+      "reason": "A `Chart` already describes itself to VoiceOver; a custom descriptor needs `AXChartDescriptor` types Kiln doesn't bridge.",
+      "status": "wontDo",
+      "source": "Round 1 (rest of SwiftUI)",
+      "match": { "ids": ["modifier:accessibilityChartDescriptor"] }
+    },
+    {
+      "id": "urls-and-handoff",
+      "what": "Opening the app from a URL or Handoff (`onOpenURL`, `userActivity`, `onContinueUserActivity`)",
+      "reason": "A Shelf app has no URL scheme or activity types of its own: the system routes those to Shelf.",
+      "status": "wontDo",
+      "source": "Round 1 (rest of SwiftUI)",
+      "match": { "ids": ["modifier:onOpenURL", "modifier:userActivity", "modifier:onContinueUserActivity"] }
+    },
+    {
+      "id": "scene-overlays-and-storage",
+      "what": "`persistentSystemOverlays` and `defaultAppStorage`",
+      "reason": "Shelf owns the home indicator, whose swipe closes the app; and each app has one settings store, which `@AppStorage` already uses.",
+      "status": "wontDo",
+      "source": "Round 1 (rest of SwiftUI)",
+      "match": { "ids": ["modifier:persistentSystemOverlays", "modifier:defaultAppStorage"] }
     }
   ]
 }

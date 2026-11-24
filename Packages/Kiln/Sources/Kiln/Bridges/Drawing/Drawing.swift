@@ -90,6 +90,12 @@ enum KDrawing {
             if let r = arg("response") { return .spring(response: r, dampingFraction: arg("dampingFraction") ?? 0.825) }
             if let d = arg("duration") { return .spring(duration: d, bounce: arg("bounce") ?? 0) }
             return .spring()
+        case "timingCurve":
+            // `.timingCurve(0.2, 0.8, 0.2, 1, duration:)`, or a `UnitCurve` and a duration.
+            let numbers = zip(args, labels).filter { $0.1 == nil }.compactMap { $0.0.asDouble }
+            if numbers.count >= 4 { return .timingCurve(numbers[0], numbers[1], numbers[2], numbers[3], duration: duration ?? 0.35) }
+            if let curve = args.first?.boxed(UnitCurve.self) { return .timingCurve(curve, duration: duration ?? 0.35) }
+            return .easeInOut
         case "bouncy": return .bouncy
         case "snappy": return .snappy
         case "smooth": return .smooth
@@ -99,6 +105,8 @@ enum KDrawing {
 
     static let animationNames = ["default", "easeInOut", "easeIn", "easeOut", "linear", "spring", "interactiveSpring", "interpolatingSpring",
                                  "bouncy", "snappy", "smooth"]
+    /// Static methods with no property form (`Animation.timingCurve(…)`).
+    static let animationFunctions = ["timingCurve"]
 }
 
 @objc(KilnBridges_Drawing)
@@ -110,6 +118,9 @@ final class DrawingBridges: KBridgeFamily {
         animatable(r)
         images(r)
         effects(r)
+        canvas(r)
+        KAffines.register(r)
+        round1(r)
     }
 
     // MARK: Colors and styles
@@ -136,7 +147,10 @@ final class DrawingBridges: KBridgeFamily {
             }
             t.property("description") { c in .string(col(c).description) }
             t.method("opacity") { c in .native(.color(col(c).opacity(c.first?.asDouble ?? 1))) }
-            t.method("mix", notes: "Returns the color unchanged.") { c in .native(.color(col(c))) }
+            t.method("mix", "with:Color by:number in:any?") { c in
+                guard #available(iOS 18, macOS 15, *), let other = c.color("with") else { return .native(.color(col(c))) }
+                return .native(.color(col(c).mix(with: other, by: c.double("by") ?? 0.5)))
+            }
         }
         r.alias("UIColor", to: "Color")
         r.alias("NSColor", to: "Color")

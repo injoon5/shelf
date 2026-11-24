@@ -80,6 +80,9 @@ enum Demo {
     }
 
     static func library() -> LibraryStore {
+        // `-ShelfDemoFixtures <folder on the Mac>`: the fixture apps there,
+        // one icon each, for trying them in a card (plan §2, Round 1).
+        if let folder = UserDefaults.standard.string(forKey: "ShelfDemoFixtures") { return fixtures(URL(filePath: folder)) }
         // `-ShelfDemoEmpty YES` shows the empty library instead.
         let defaults = UserDefaults.standard
         let all = defaults.bool(forKey: "ShelfDemoEmpty") ? [] : apps + (defaults.bool(forKey: "ShelfDemoFull") ? moreApps : [])
@@ -90,6 +93,23 @@ enum Demo {
         let cache = AppCache(root: URL.temporaryDirectory.appending(path: "shelf-demo"))
         for app in cached { try? cache.writeSource(sources[app.slug] ?? source, for: app.slug) }
         return LibraryStore(demo: cached, dock: all.isEmpty ? [] : ["habits", "todos"], cache: cache)
+    }
+
+    static func fixtures(_ folder: URL) -> LibraryStore {
+        let files = ((try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)) ?? [])
+            .filter { $0.pathExtension == "swift" }.sorted { $0.lastPathComponent < $1.lastPathComponent }
+        let cache = AppCache(root: URL.temporaryDirectory.appending(path: "shelf-demo-fixtures"))
+        var cached: [CachedApp] = []
+        for file in files {
+            guard let source = try? String(contentsOf: file, encoding: .utf8) else { continue }
+            let slug = file.deletingPathExtension().lastPathComponent
+            let reply = ReplyParser.parse(source)
+            let app = CachedApp(meta: AppMeta(slug: slug, name: reply.name ?? slug, icon: reply.icon, tint: reply.tint, version: "demo"),
+                                cachedVersion: "demo", isNew: false)
+            try? cache.writeSource(source, for: slug)
+            cached.append(app)
+        }
+        return LibraryStore(demo: cached, dock: [], cache: cache)
     }
 
     /// Demo apps that keep something: Habits its count in `@AppStorage`,

@@ -21,8 +21,15 @@ final class KViewStorage: ObservableObject {
     private var prepared = false
     private var subscriptions: [ObjectIdentifier: AnyCancellable] = [:]
     private var defaultsWatch: AnyCancellable?
+    /// SwiftUI's own projections of the app's properties (a `@FocusState`'s), by name.
+    private var natives: [String: Any] = [:]
+    /// `@GestureState` initial values, which a gesture's end resets to.
+    private(set) var initials: [String: KV] = [:]
 
     func box(_ name: String) -> KBox? { boxes[name] }
+    func setNative(_ name: String, _ value: Any) { natives[name] = value }
+    func setBox(_ name: String, _ box: KBox) { boxes[name] = box }
+    func native(_ name: String) -> Any? { natives[name] }
 
     func prepare(_ value: KStructValue, _ interp: KInterpreter) {
         guard !prepared else { return }
@@ -30,8 +37,10 @@ final class KViewStorage: ObservableObject {
         for p in value.type.stored {
             guard let w = p.wrapper else { continue }
             switch w {
-            case "State", "StateObject", "FocusState", "GestureState", "SceneStorage", "Namespace":
-                let box = KBox(value.fields[p.name] ?? (p.type?.isOptional == true ? .nilValue : .void), type: p.type)
+            case "State", "StateObject", "FocusState", "GestureState", "SceneStorage", "Namespace", "AccessibilityFocusState":
+                let initial = value.fields[p.name] ?? (p.type?.isOptional == true ? .nilValue : .void)
+                if w == "GestureState" { initials[p.name] = initial }
+                let box = KBox(initial, type: p.type)
                 box.onChange = { [weak self] in self?.objectWillChange.send() }
                 boxes[p.name] = box
             case "ScaledMetric":
@@ -93,7 +102,9 @@ final class KViewStorage: ObservableObject {
 
     /// @Environment and @EnvironmentObject values, refreshed every render.
     func setEnvironment(_ value: KStructValue, dismiss: DismissAction, colorScheme: ColorScheme, objects: [String: KV],
-                        live: EnvironmentValues? = nil, interp: KInterpreter) {
+                        live: EnvironmentValues? = nil, interp: KInterpreter, inputs: KHostInputValues? = nil) {
+        if let inputs { connect(value, inputs, interp) }
+        let live = live ?? inputs?.environment
         for p in value.type.stored {
             if p.wrapper == "Environment" {
                 var v = interp.environmentDefault(p, overrides: objects)
@@ -138,21 +149,28 @@ struct KHostView: View {
     @SwiftUI.Environment(\.kilnObjects) private var objects
 
     var body: some View {
-        storage.prepare(value, interp)
-        // A view that reads `\.editMode` or `\.isSearching` reads SwiftUI's
-        // real environment; the others don't depend on all of it.
-        if interp.readsLiveEnvironment(value.type) {
-            return AnyView(KLiveEnvironment { env in render(env) })
+        let _ = storage.prepare(value, interp)
+        // A view that reads SwiftUI's own environment (`\.dynamicTypeSize`,
+        // `\.editMode`), or has a `@FocusState` or `@Namespace`, is hosted in
+        // a reader of them (KEHostInputs); the others don't depend on all of it.
+        if interp.needsHostInputs(value.type) {
+            let storage = self.storage, value = self.value, interp = self.interp, dismiss = self.dismiss, objects = self.objects
+            KHostInputs(storage: storage, readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
+                storage.setEnvironment(value, dismiss: dismiss, colorScheme: inputs.environment.colorScheme, objects: objects, interp: interp,
+                                       inputs: inputs)
+                return Self.render(value, interp, storage)
+            }
+        } else {
+            let _ = storage.setEnvironment(value, dismiss: dismiss, colorScheme: colorScheme, objects: objects, interp: interp)
+            Self.render(value, interp, storage)
         }
-        return render(nil)
     }
 
-    private func render(_ live: EnvironmentValues?) -> AnyView {
-        storage.setEnvironment(value, dismiss: dismiss, colorScheme: colorScheme, objects: objects, live: live, interp: interp)
+    @MainActor static func render(_ value: KStructValue, _ interp: KInterpreter, _ storage: KViewStorage, content: KV? = nil) -> AnyView {
         let tracker = KReadTracker()
-        let content = interp.renderBody(of: value, storage: storage, tracker: tracker)
+        let out = interp.renderBody(of: value, storage: storage, tracker: tracker, content: content)
         storage.observe(tracker.objects)
-        return content
+        return out
     }
 }
 
@@ -226,19 +244,19 @@ struct KModifierHost: View {
     @SwiftUI.Environment(\.kilnObjects) private var objects
 
     var body: some View {
-        storage.prepare(value, interp)
-        if interp.readsLiveEnvironment(value.type) {
-            return AnyView(KLiveEnvironment { env in render(env) })
+        let _ = storage.prepare(value, interp)
+        if interp.needsHostInputs(value.type) {
+            let storage = self.storage, value = self.value, interp = self.interp, dismiss = self.dismiss, objects = self.objects
+            let content = KNativeContent.value(self.content)
+            KHostInputs(storage: storage, readsFocusedValues: interp.readsFocusedValues(value.type)) { inputs in
+                storage.setEnvironment(value, dismiss: dismiss, colorScheme: inputs.environment.colorScheme, objects: objects, interp: interp,
+                                       inputs: inputs)
+                return KHostView.render(value, interp, storage, content: content)
+            }
+        } else {
+            let _ = storage.setEnvironment(value, dismiss: dismiss, colorScheme: colorScheme, objects: objects, interp: interp)
+            KHostView.render(value, interp, storage, content: KNativeContent.value(content))
         }
-        return render(nil)
-    }
-
-    private func render(_ live: EnvironmentValues?) -> AnyView {
-        storage.setEnvironment(value, dismiss: dismiss, colorScheme: colorScheme, objects: objects, live: live, interp: interp)
-        let tracker = KReadTracker()
-        let out = interp.renderBody(of: value, storage: storage, tracker: tracker, content: KNativeContent.value(content))
-        storage.observe(tracker.objects)
-        return out
     }
 }
 

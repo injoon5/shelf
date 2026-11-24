@@ -2,17 +2,18 @@
 
 Every input run on the engine at `b466f9c` and on this one, comparing their transcripts: the view tree each body evaluates to, the console, errors and warnings with their lines, and all of it again after each scripted action (`onAppear` and `.task` first, then each button and tap). `Tools/diff.sh` writes this file.
 
-**94 inputs: 70 identical, 24 different as expected, 0 different otherwise.**
+**112 inputs: 73 identical, 39 different as expected, 0 different otherwise.**
 
 | Input | Transcript lines | Steps | Result |
 |---|---:|---:|---|
 | Packages/Kiln/Examples/Apps/CardStyles.swift | 242 | 13 | identical |
 | Packages/Kiln/Examples/Apps/Chess.swift | 21125 | 13 | identical |
+| Packages/Kiln/Examples/Apps/DoodlePad.swift | 6 | 1 | expected (Round 1's Lab example: before, gestures, Canvas and focus weren't bridged (Canvas drew nothing; @FocusState and .gesture were stubs).) |
 | Packages/Kiln/Examples/Apps/ExpenseTracker.swift | 1654 | 13 | identical |
 | Packages/Kiln/Examples/Apps/FocusTimer.swift | 910 | 13 | identical |
 | Packages/Kiln/Examples/Apps/HabitTracker.swift | 1105 | 13 | identical |
 | Packages/Kiln/Examples/Apps/MemoryMatch.swift | 2656 | 14 | identical |
-| Packages/Kiln/Examples/Apps/PlantCare.swift | 1027 | 13 | expected (Round 1A's Lab example: before, the custom ToggleStyle and ButtonStyle, List(selection:) and the path weren't bridged.) |
+| Packages/Kiln/Examples/Apps/PlantCare.swift | 1455 | 13 | identical |
 | Packages/Kiln/Examples/Apps/ReadingList.swift | 125 | 1 | identical |
 | Packages/Kiln/Examples/Apps/TagCloud.swift | 4 | 1 | expected (§1.5's Lab example: before, `AnyLayout` and the app's `Layout` didn't exist and the body stopped.) |
 | Packages/Kiln/Examples/Apps/TipCalculator.swift | 42 | 1 | identical |
@@ -24,11 +25,15 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | Packages/Kiln/Examples/AppleIntelligence/tip.md | 1092 | 13 | identical |
 | Packages/Kiln/Examples/Networking/OpenLibrarySearch.swift | 22 | 2 | identical |
 | Packages/Kiln/Examples/LibraryApp.swift | 64 | 2 | identical |
+| fixtures/apps/accessibility-motion.swift | 2 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/async.swift | 283 | 14 | identical |
+| fixtures/apps/charts.swift | 81 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/controls-styles.swift | 508 | 13 | expected (Round 1A's Controls fixture: before, custom styles, MultiDatePicker and Menu(primaryAction:) weren't bridged.) |
+| fixtures/apps/focus-environment.swift | 703 | 13 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
+| fixtures/apps/gestures-canvas.swift | 6 | 1 | expected (Round 1's fixture: before, its gestures, Canvas, glass, animators, charts, focus, environment values or accessibility modifiers weren't bridged.) |
 | fixtures/apps/images.swift | 663 | 13 | identical |
 | fixtures/apps/layout-scrolling.swift | 2 | 1 | expected (Round 1A's Layout fixture: before, @Entry on ContainerValues and ForEach(subviews:) stopped the body.) |
-| fixtures/apps/lists-selection.swift | 8 | 1 | expected (Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.) |
+| fixtures/apps/lists-selection.swift | 59 | 1 | expected (Round 1A's Lists fixture: before, ForEach(editActions:) and OutlineGroup weren't bridged, and the probe read List(selection:)'s binding as its data.) |
 | fixtures/apps/navigation-tabs.swift | 1431 | 13 | expected (Round 1A's Navigation fixture: before, Tab, ToolbarSpacer, zoom transitions and search scopes weren't bridged.) |
 | fixtures/apps/network.swift | 211 | 14 | expected (Its dataTask handlers now run in a check: since §1.7 a check never touches the network, so the handler gets the offline error at once and the app shows its error state, where before the request started and its handler never ran.) |
 | fixtures/apps/saving-data.swift | 1076 | 14 | identical |
@@ -95,135 +100,148 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 | tests/ProxyTests-8.swift | 4 | 1 | expected (§1.5: `modifier(Card(…))` from a View extension now applies the app's ViewModifier; before, it wasn't found.) |
 | tests/ProxyTests-9.swift | 4 | 1 | identical |
 | tests/RegistryTests-0.swift | 2 | 1 | identical |
+| tests/RestOfSwiftUITests-0.swift | 5 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-10.swift | 312 | 13 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-11.swift | 10 | 2 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-12.swift | 17 | 2 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-13.swift | 15 | 2 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-14.swift | 14 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-15.swift | 8 | 2 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-16.swift | 5 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-19.swift | 2 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-2.swift | 5 | 1 | identical |
+| tests/RestOfSwiftUITests-20.swift | 9 | 1 | identical |
+| tests/RestOfSwiftUITests-3.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
+| tests/RestOfSwiftUITests-6.swift | 6 | 1 | expected (Round 1 (rest of SwiftUI): before, what this test exercises (gestures, Canvas, animators, focus, environment values, preferences, charts, accessibility) wasn't bridged.) |
 | tests/SnakeGameTests-0.swift | 3 | 1 | identical |
 | tests/SnakeGameTests-1.swift | 8 | 2 | identical |
 | tests/SnakeGameTests-2.swift | 3 | 1 | identical |
 | tests/WeatherRepro-0.swift | 209 | 13 | identical |
 | tests/WeatherRepro-1.swift | 183 | 14 | identical |
 
-## Packages/Kiln/Examples/Apps/PlantCare.swift
+## Packages/Kiln/Examples/Apps/DoodlePad.swift
 
 ```diff
 --- before
 +++ after
-@@ -6,2 +6,22 @@
-         List(selection: $Set(), {fn})
-+          Section("Thirsty soon", {fn})
-+            ForEach([Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], {fn})
-+              row 1
-+                NavigationLink(value: Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), {fn})
-+                  Label("Monstera, 2 days", systemImage: "leaf.fill")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 2
-+                NavigationLink(value: Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), {fn})
-+                  Label("Cactus, 12 days", systemImage: "sun.max")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 3
-+                NavigationLink(value: Plant(id: 3, name: "Basil", days: 1, symbol: "drop"), {fn})
-+                  Label("Basil, 1 days", systemImage: "drop")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-           .navigationTitle("Plants")
-@@ -79,8 +99,28 @@
-         Label("Settings", systemImage: "gear")
--== after Button[Water now]@64
--ContentView {plants=[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")]}
-+== after Button[Water]@53
-+ContentView {plants=[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")]}
-   TabView({fn})
--    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], path=[], selection=Set(), adding=false}
-+    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], path=[], selection=Set(), adding=false}
-       NavigationStack(path: $[], {fn})
-         List(selection: $Set(), {fn})
-+          Section("Thirsty soon", {fn})
-+            ForEach([Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], {fn})
-+              row 1
-+                NavigationLink(value: Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), {fn})
-+                  Label("Monstera, 7 days", systemImage: "leaf.fill")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 2
-+                NavigationLink(value: Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), {fn})
-+                  Label("Cactus, 12 days", systemImage: "sun.max")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 3
-+                NavigationLink(value: Plant(id: 3, name: "Basil", days: 1, symbol: "drop"), {fn})
-+                  Label("Basil, 1 days", systemImage: "drop")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-           .navigationTitle("Plants")
-@@ -107,3 +147,3 @@
-         Label("Plants", systemImage: "leaf")
--      .badge(2)
-+      .badge(1)
-     SettingsForm {reminders=true, quiet=false, hour=8.0, units="Days", snooze=1}
-@@ -158,8 +198,28 @@
-         Label("Settings", systemImage: "gear")
--== after Button[Add]@69
--ContentView {plants=[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")]}
-+== after Button[Water]@53
-+ContentView {plants=[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")]}
-   TabView({fn})
--    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], path=[], selection=Set(), adding=true}
-+    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], path=[], selection=Set(), adding=false}
-       NavigationStack(path: $[], {fn})
-         List(selection: $Set(), {fn})
-+          Section("Thirsty soon", {fn})
-+            ForEach([Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop")], {fn})
-+              row 1
-+                NavigationLink(value: Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), {fn})
-+                  Label("Monstera, 7 days", systemImage: "leaf.fill")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 2
-+                NavigationLink(value: Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), {fn})
-+                  Label("Cactus, 7 days", systemImage: "sun.max")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-+              row 3
-+                NavigationLink(value: Plant(id: 3, name: "Basil", days: 1, symbol: "drop"), {fn})
-+                  Label("Basil, 1 days", systemImage: "drop")
-+                  .swipeActions({fn})
-+                    Button("Water", {fn})
-+                      .tint(Color)
-           .navigationTitle("Plants")
-@@ -177,3 +237,3 @@
-               Button("Add", {fn})
--          .sheet(isPresented: $true, {fn})
-+          .sheet(isPresented: $false, {fn})
-             VStack(spacing: 16, {fn})
-@@ -186,3 +246,3 @@
-         Label("Plants", systemImage: "leaf")
--      .badge(2)
-+      .badge(1)
-     SettingsForm {reminders=true, quiet=false, hour=8.0, units="Days", snooze=1}
-@@ -237,8 +297,28 @@
-         Label("Settings", systemImage: "gear")
--== after Button[Add a fern]@75
--ContentView {plants=[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop"), Plant(id: 4, name: "Fern", days: 4, symbol: "leaf")]}
-+== after Button[Water]@53
-+ContentView {plants=[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 7, symbol: "drop")]}
-   TabView({fn})
--    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 2, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 12, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 1, symbol: "drop"), Plant(id: 4, name: "Fern", days: 4, symbol: "leaf")], path=[], selection=Set(), adding=false}
-+    PlantList {plants=$[Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 7, symbol: "drop")], path=[], selection=Set(), adding=false}
-       NavigationStack(path: $[], {fn})
-         List(selection: $Set(), {fn})
-+          Section("Thirsty soon", {fn})
-+            ForEach([Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), Plant(id: 2, name: "Cactus", days: 7, symbol: "sun.max"), Plant(id: 3, name: "Basil", days: 7, symbol: "drop")], {fn})
-+              row 1
-+                NavigationLink(value: Plant(id: 1, name: "Monstera", days: 7, symbol: "leaf.fill"), {fn})
-+                  Label("Monstera, 7 days", systemImage: "leaf.fill")
+@@ -3,4 +3,531 @@
+   VStack(spacing: 14, {fn})
+-    content failed
+-    .padding()
+-error: Line 37: Cannot find 'DragGesture' in scope
++    Canvas({fn})
++      .frame(height: 220)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 2)
++          .onChanged({fn})
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .accessibilityLabel("Doodle canvas")
++    Text(_literal: "Drag me")
++      .padding(12)
++      .background(<view>, in: .capsule)
++        Color(Color)
++          .opacity(0.2)
++      .offset(x: 0.0, y: 0.0)
++      .gesture(<view>)
++        DragGesture()
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++    TextField("Title", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .title)
++      .submitLabel(.next)
++      .onSubmit({fn})
++    TextField("Note", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .note)
++      .submitLabel(.done)
++      .onSubmit({fn})
++    HStack({fn})
++      Button("Clear", {fn})
++      Button("Save", {fn})
++      Button("Edit title", {fn})
++      .buttonStyle(.bordered)
++    Text("Nothing saved")
++    Text("No field focused")
++    Text(_literal: "Hidden from VoiceOver")
++      .accessibilityHidden(true)
++    .padding()
++== after Canvas@22
++ContentView {strokes=[[Point(30.0, 40.0), Point(120.0, 90.0), Point(210.0, 50.0)]], current=[], stamps=[], offset=Size(0.0, 0.0), dragging=Size(0.0, 0.0), title="", note="", saved="Nothing saved", field=nil}
++  VStack(spacing: 14, {fn})
++    Canvas({fn})
++      .frame(height: 220)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 2)
++          .onChanged({fn})
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .accessibilityLabel("Doodle canvas")
++    Text(_literal: "Drag me")
++      .padding(12)
++      .background(<view>, in: .capsule)
++        Color(Color)
++          .opacity(0.2)
++      .offset(x: 0.0, y: 0.0)
++      .gesture(<view>)
++        DragGesture()
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++    TextField("Title", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .title)
++      .submitLabel(.next)
++      .onSubmit({fn})
++    TextField("Note", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .note)
++      .submitLabel(.done)
++      .onSubmit({fn})
++    HStack({fn})
++      Button("Clear", {fn})
++      Button("Save", {fn})
++      Button("Edit title", {fn})
++      .buttonStyle(.bordered)
++    Text("Nothing saved")
++    Text("No field focused")
++    Text(_literal: "Hidden from VoiceOver")
++      .accessibilityHidden(true)
++    .padding()
++== after DragGesture.onChanged@38
++ContentView {strokes=[[Point(30.0, 40.0), Point(120.0, 90.0), Point(210.0, 50.0)]], current=[Point(0.0, 0.0)], stamps=[], offset=Size(0.0, 0.0), dragging=Size(0.0, 0.0), title="", note="", saved="Nothing saved", field=nil}
++  VStack(spacing: 14, {fn})
++    Canvas({fn})
++      .frame(height: 220)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 2)
++          .onChanged({fn})
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .accessibilityLabel("Doodle canvas")
++    Text(_literal: "Drag me")
++      .padding(12)
++      .background(<view>, in: .capsule)
++        Color(Color)
++          .opacity(0.2)
++      .offset(x: 0.0, y: 0.0)
++      .gesture(<view>)
++        DragGesture()
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++    TextField("Title", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .title)
++      .submitLabel(.next)
++      .onSubmit({fn})
++    TextField("Note", text: $"")
++      .textFieldStyle(.roundedBorder)
++      .focused($nil, equals: .note)
++      .submitLabel(.done)
++      .onSubmit({fn})
++    HStack({fn})
++      Button("Clear", {fn})
++      Button("Save", {fn})
 …
 ```
 
@@ -479,6 +497,258 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 …
 ```
 
+## fixtures/apps/accessibility-motion.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,754 @@
+ == start
+-error: Missing argument 'announce' in call to ContentView
++ContentView {running=false, rounds=3, expanded=false, announce=(), reduceMotion=false, space=()}
++  VStack(spacing: 28, {fn})
++    TimelineView(.periodic(<date>, 1), {fn})
++      Text(<date>, style: .time)
++        .font(Font)
++        .foregroundStyle(Color)
++        .accessibilityHidden(true)
++    Circle()
++      .fill(<view>)
++        LinearGradient(colors: [Color, Color])
++      .frame(width: 140, height: 140)
++      .phaseAnimator([.inhale, .hold, .exhale], trigger: false, {fn}, animation: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.4)
++          .opacity(1)
++        NativeContent(AnyView)
++          .scaleEffect(1.4)
++          .opacity(0.8)
++        NativeContent(AnyView)
++          .scaleEffect(0.8)
++          .opacity(1)
++      .accessibilityElement(children: .ignore)
++      .accessibilityLabel("Breathing circle")
++      .accessibilityValue("Paused")
++      .accessibilityAddTraits(.updatesFrequently)
++      .accessibilityAction(named: "Start", {fn})
++      .accessibilityFocused($())
++    HStack({fn})
++      Text(_literal: "Rounds")
++      Spacer()
++      Text(_literal: "3")
++        .contentTransition(.numericText(3.0))
++        .accessibilityHidden(true)
++      .padding()
++      .background(.thinMaterial, in: .rect(14))
++      .accessibilityElement(children: .combine)
++      .accessibilityValue("3 rounds")
++      .accessibilityAdjustableAction({fn})
++    Group({fn})
++      If false
++        Label("Tip", systemImage: "lightbulb")
++          .padding(10)
++          .background(<view>, in: .capsule)
++            Color(Color)
++              .opacity(0.15)
++          .matchedGeometryEffect(id: "tip", in: ())
++      .onTapGesture({fn})
++      .accessibilityAddTraits(.isButton)
++      .accessibilityHint("Shows how to breathe")
++    Button("Start", {fn})
++      .buttonStyle(.borderedProminent)
++      .accessibilitySortPriority(1)
++      .accessibilityInputLabels(["Start", "Go", "Pause"])
++    .padding()
++    .accessibilityRotor("Controls", {fn})
++      AccessibilityRotorEntry("Start button", id: "start")
++    .speechAnnouncementsQueued()
++== after Circle.phaseAnimator@40
++ContentView {running=true, rounds=3, expanded=false, announce=(), reduceMotion=false, space=()}
++  VStack(spacing: 28, {fn})
++    TimelineView(.periodic(<date>, 1), {fn})
++      Text(<date>, style: .time)
++        .font(Font)
++        .foregroundStyle(Color)
++        .accessibilityHidden(true)
++    Circle()
++      .fill(<view>)
++        LinearGradient(colors: [Color, Color])
++      .frame(width: 140, height: 140)
++      .phaseAnimator([.inhale, .hold, .exhale], trigger: true, {fn}, animation: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.4)
++          .opacity(1)
++        NativeContent(AnyView)
++          .scaleEffect(1.4)
++          .opacity(0.8)
++        NativeContent(AnyView)
++          .scaleEffect(0.8)
++          .opacity(1)
++      .accessibilityElement(children: .ignore)
++      .accessibilityLabel("Breathing circle")
++      .accessibilityValue("Running")
++      .accessibilityAddTraits(.updatesFrequently)
++      .accessibilityAction(named: "Start", {fn})
++      .accessibilityFocused($())
++    HStack({fn})
++      Text(_literal: "Rounds")
++      Spacer()
++      Text(_literal: "3")
++        .contentTransition(.numericText(3.0))
++        .accessibilityHidden(true)
++      .padding()
++      .background(.thinMaterial, in: .rect(14))
++      .accessibilityElement(children: .combine)
++      .accessibilityValue("3 rounds")
++      .accessibilityAdjustableAction({fn})
++    Group({fn})
++      If false
++        Label("Tip", systemImage: "lightbulb")
++          .padding(10)
++          .background(<view>, in: .capsule)
++            Color(Color)
++              .opacity(0.15)
++          .matchedGeometryEffect(id: "tip", in: ())
++      .onTapGesture({fn})
++      .accessibilityAddTraits(.isButton)
++      .accessibilityHint("Shows how to breathe")
++    Button("Pause", {fn})
++      .buttonStyle(.borderedProminent)
++      .accessibilitySortPriority(1)
++      .accessibilityInputLabels(["Start", "Go", "Pause"])
++    .padding()
++    .accessibilityRotor("Controls", {fn})
++      AccessibilityRotorEntry("Start button", id: "start")
++    .speechAnnouncementsQueued()
+…
+```
+
+## fixtures/apps/charts.swift
+
+```diff
+--- before
++++ after
+@@ -21,3 +21,5 @@
+         .chartYAxis({fn})
+-          content failed
++          AxisMarks(position: .leading, values: .automatic(4), {fn})
++            AxisGridLine()
++            AxisValueLabel()
+         .chartXAxisLabel("Day", position: .bottom)
+@@ -26,3 +28,12 @@
+       Chart({fn})
+-        content failed
++        LinePlot(x: "x", y: "y", domain: 0...12, {fn})
++          .foregroundStyle(Color)
++          .interpolationMethod(.catmullRom)
++        AreaPlot(x: "x", y: "y", domain: 0...12, {fn})
++          .foregroundStyle(<view>)
++            Color(Color)
++              .opacity(0.2)
++        PointMark(x: .value("x", 1.57), y: .value("y", 1.0))
++          .symbol(.diamond)
++          .symbolSize(80)
+         .chartXScale(domain: 0...12)
+@@ -77,5 +88,1135 @@
+         .chartPlotStyle({fn})
++          NativeContent(AnyView)
++            .background(<view>)
++              Color(Color)
++                .opacity(0.05)
+         .frame(height: 160)
+       .padding()
+-error: Line 53: Cannot find 'AxisMarks' in scope
+-error: Line 63: Cannot find 'LinePlot' in scope
++== after LinePlot@63
++ContentView {selectedDay=nil, selectedAngle=nil, amplitude=1.0, days=[Day(id: <uuid>, name: "Mon", steps: 6200, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Tue", steps: 9100, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Wed", steps: 4300, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Thu", steps: 10400, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Fri", steps: 7800, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Sat", steps: 12000, goal: 8000, kind: "Hike"), Day(id: <uuid>, name: "Sun", steps: 3100, goal: 8000, kind: "Walk")]}
++  ScrollView({fn})
++    VStack(alignment: .leading, spacing: 24, {fn})
++      Text("Tap a bar")
++        .font(Font)
++      Chart([Day(id: <uuid>, name: "Mon", steps: 6200, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Tue", steps: 9100, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Wed", steps: 4300, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Thu", steps: 10400, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Fri", steps: 7800, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Sat", steps: 12000, goal: 8000, kind: "Hike"), Day(id: <uuid>, name: "Sun", steps: 3100, goal: 8000, kind: "Walk")], {fn})
++        BarMark(x: .value("Day", nil), y: .value("Steps", nil))
++          .foregroundStyle(by: .value("Kind", nil))
++          .cornerRadius(6)
++          .opacity(1)
++          .annotation(position: .top, spacing: 2, {fn})
++            If true
++              Text(_literal: "nil")
++                .font(Font)
++        RuleMark(y: .value("Goal", nil))
++          .lineStyle(StrokeStyle)
++          .foregroundStyle(Color)
++        .chartXSelection(value: $nil)
++        .chartForegroundStyleScale(domain: ["Walk", "Run", "Hike"], range: [Color, Color, Color])
++        .chartYAxis({fn})
++          AxisMarks(position: .leading, values: .automatic(4), {fn})
++            AxisGridLine()
++            AxisValueLabel()
++        .chartXAxisLabel("Day", position: .bottom)
++        .chartLegend(position: .bottom, alignment: .center)
++        .frame(height: 220)
++      Chart({fn})
++        LinePlot(x: "x", y: "y", domain: 0...12, {fn})
++          .foregroundStyle(Color)
++          .interpolationMethod(.catmullRom)
++        AreaPlot(x: "x", y: "y", domain: 0...12, {fn})
++          .foregroundStyle(<view>)
++            Color(Color)
++              .opacity(0.2)
++        PointMark(x: .value("x", 1.57), y: .value("y", 1.0))
++          .symbol(.diamond)
++          .symbolSize(80)
++        .chartXScale(domain: 0...12)
++        .chartYScale(domain: -2...2)
++        .chartScrollableAxes(.horizontal)
++        .chartXVisibleDomain(length: 6)
++        .frame(height: 180)
++      Slider(value: $1.0, in: 0.2...2.0, {fn})
++        Text(_literal: "Amplitude")
++      Chart([Day(id: <uuid>, name: "Mon", steps: 6200, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Tue", steps: 9100, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Wed", steps: 4300, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Thu", steps: 10400, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Fri", steps: 7800, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Sat", steps: 12000, goal: 8000, kind: "Hike"), Day(id: <uuid>, name: "Sun", steps: 3100, goal: 8000, kind: "Walk")], {fn})
++        SectorMark(angle: .value("Steps", nil), innerRadius: .ratio(0.6), angularInset: 2)
++          .foregroundStyle(by: .value("Day", nil))
++          .opacity(1)
++        .chartAngleSelection(value: $nil)
++        .chartLegend(.hidden)
++        .frame(height: 200)
++      Chart({fn})
++        ForEach([Day(id: <uuid>, name: "Mon", steps: 6200, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Tue", steps: 9100, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Wed", steps: 4300, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Thu", steps: 10400, goal: 8000, kind: "Run"), Day(id: <uuid>, name: "Fri", steps: 7800, goal: 8000, kind: "Walk"), Day(id: <uuid>, name: "Sat", steps: 12000, goal: 8000, kind: "Hike"), Day(id: <uuid>, name: "Sun", steps: 3100, goal: 8000, kind: "Walk")], {fn})
++          row <uuid>
++            LineMark(x: .value("Day", "Mon"), y: .value("Steps", 6200))
++            PointMark(x: .value("Day", "Mon"), y: .value("Steps", 6200))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Tue"), y: .value("Steps", 9100))
++            PointMark(x: .value("Day", "Tue"), y: .value("Steps", 9100))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Wed"), y: .value("Steps", 4300))
++            PointMark(x: .value("Day", "Wed"), y: .value("Steps", 4300))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Thu"), y: .value("Steps", 10400))
++            PointMark(x: .value("Day", "Thu"), y: .value("Steps", 10400))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Fri"), y: .value("Steps", 7800))
++            PointMark(x: .value("Day", "Fri"), y: .value("Steps", 7800))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Sat"), y: .value("Steps", 12000))
++            PointMark(x: .value("Day", "Sat"), y: .value("Steps", 12000))
++              .symbolSize(30)
++          row <uuid>
++            LineMark(x: .value("Day", "Sun"), y: .value("Steps", 3100))
++            PointMark(x: .value("Day", "Sun"), y: .value("Steps", 3100))
++              .symbolSize(30)
++          .foregroundStyle(Color)
++        RectangleMark(xStart: .value("From", "Mon"), xEnd: .value("To", "Wed"), yStart: .value("Low", 0), yEnd: .value("High", 13000))
++          .foregroundStyle(<view>)
++            Color(Color)
++              .opacity(0.1)
+…
+```
+
 ## fixtures/apps/controls-styles.swift
 
 ```diff
@@ -602,6 +872,258 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -        content failed
 +        DatePicker("Time", selection: $<date>, in: Nov 24, 2026 at <time>...nil, displayedComponents: .hourAndMinute)
 +        MultiDatePicker("Weekly", selection: $Set())
+…
+```
+
+## fixtures/apps/focus-environment.swift
+
+```diff
+--- before
++++ after
+@@ -1,9 +1,15 @@
+ == start
+-ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=nil, bioFocused=(), bio="", filled=0, scenePhase=nil, openURL=nil, colorScheme=.light, sizeClass=.compact}
+-  NavigationStack({fn})
+-    Form({fn})
+-      Section("You", {fn})
+-        FieldRow {title="Name", text=$"", accent=nil, typeSize=nil}
+-          VStack(alignment: .leading, spacing: 4, {fn})
+-            content failed
++ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=nil, bioFocused=(), bio="", filled=0, scenePhase=.active, openURL=OpenURLAction, colorScheme=.light, sizeClass=.compact}
++  NavigationStack({fn})
++    Form({fn})
++      Section("You", {fn})
++        FieldRow {title="Name", text=$"", accent=Color, typeSize=DynamicTypeSize}
++          VStack(alignment: .leading, spacing: 4, {fn})
++            Text("Name")
++              .font(Font)
++              .foregroundStyle(Color)
++              .textCase(.uppercase)
++              .fontWidth(.condensed)
++            TextField("Name", text: $"")
++              .textFieldStyle(.roundedBorder)
+             .preference(key: Filled, value: 0)
+@@ -14,5 +20,11 @@
+           .onSubmit({fn})
+-        FieldRow {title="Email", text=$"", accent=nil, typeSize=nil}
+-          VStack(alignment: .leading, spacing: 4, {fn})
+-            content failed
++        FieldRow {title="Email", text=$"", accent=Color, typeSize=DynamicTypeSize}
++          VStack(alignment: .leading, spacing: 4, {fn})
++            Text("Email")
++              .font(Font)
++              .foregroundStyle(Color)
++              .textCase(.uppercase)
++              .fontWidth(.condensed)
++            TextField("Email", text: $"")
++              .textFieldStyle(.roundedBorder)
+             .preference(key: Filled, value: 0)
+@@ -38,3 +50,3 @@
+       Section("Now", {fn})
+-        LabeledContent("Scene", value: "nil")
++        LabeledContent("Scene", value: ".active")
+         LabeledContent("Appearance", value: "Light")
+@@ -53,12 +65,17 @@
+       .navigationTitle("Sign Up")
+-      .onChange(of: nil, {fn})
+-error: Line 41: Can't compare nil and .accessibility1
++      .onChange(of: .active, {fn})
+ == after view.onSubmit@69
+-ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=.email, bioFocused=(), bio="", filled=nil, scenePhase=nil, openURL=nil, colorScheme=.light, sizeClass=.compact}
+-  NavigationStack({fn})
+-    Form({fn})
+-      Section("You", {fn})
+-        FieldRow {title="Name", text=$"", accent=nil, typeSize=nil}
+-          VStack(alignment: .leading, spacing: 4, {fn})
+-            content failed
++ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=.email, bioFocused=(), bio="", filled=0, scenePhase=.active, openURL=OpenURLAction, colorScheme=.light, sizeClass=.compact}
++  NavigationStack({fn})
++    Form({fn})
++      Section("You", {fn})
++        FieldRow {title="Name", text=$"", accent=Color, typeSize=DynamicTypeSize}
++          VStack(alignment: .leading, spacing: 4, {fn})
++            Text("Name")
++              .font(Font)
++              .foregroundStyle(Color)
++              .textCase(.uppercase)
++              .fontWidth(.condensed)
++            TextField("Name", text: $"")
++              .textFieldStyle(.roundedBorder)
+             .preference(key: Filled, value: 0)
+@@ -69,5 +86,11 @@
+           .onSubmit({fn})
+-        FieldRow {title="Email", text=$"", accent=nil, typeSize=nil}
+-          VStack(alignment: .leading, spacing: 4, {fn})
+-            content failed
++        FieldRow {title="Email", text=$"", accent=Color, typeSize=DynamicTypeSize}
++          VStack(alignment: .leading, spacing: 4, {fn})
++            Text("Email")
++              .font(Font)
++              .foregroundStyle(Color)
++              .textCase(.uppercase)
++              .fontWidth(.condensed)
++            TextField("Email", text: $"")
++              .textFieldStyle(.roundedBorder)
+             .preference(key: Filled, value: 0)
+@@ -89,7 +112,7 @@
+           .focused($())
+-        Text(_literal: "nil of 2 fields filled")
+-          .contentTransition(.numericText(0.0))
+-          .monospacedDigit()
+-      Section("Now", {fn})
+-        LabeledContent("Scene", value: "nil")
++        Text(_literal: "0 of 2 fields filled")
++          .contentTransition(.numericText(0.0))
++          .monospacedDigit()
++      Section("Now", {fn})
++        LabeledContent("Scene", value: ".active")
+         LabeledContent("Appearance", value: "Light")
+@@ -108,11 +131,17 @@
+       .navigationTitle("Sign Up")
+-      .onChange(of: nil, {fn})
++      .onChange(of: .active, {fn})
+ == after view.onSubmit@77
+-ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=.password, bioFocused=(), bio="", filled=nil, scenePhase=nil, openURL=nil, colorScheme=.light, sizeClass=.compact}
+-  NavigationStack({fn})
+-    Form({fn})
+-      Section("You", {fn})
+-        FieldRow {title="Name", text=$"", accent=nil, typeSize=nil}
+-          VStack(alignment: .leading, spacing: 4, {fn})
+-            content failed
++ContentView {draft=Draft{name: "", email: "", password: "", saves: 0}, field=.password, bioFocused=(), bio="", filled=0, scenePhase=.active, openURL=OpenURLAction, colorScheme=.light, sizeClass=.compact}
++  NavigationStack({fn})
++    Form({fn})
++      Section("You", {fn})
++        FieldRow {title="Name", text=$"", accent=Color, typeSize=DynamicTypeSize}
++          VStack(alignment: .leading, spacing: 4, {fn})
++            Text("Name")
++              .font(Font)
+…
+```
+
+## fixtures/apps/gestures-canvas.swift
+
+```diff
+--- before
++++ after
+@@ -3,4 +3,1193 @@
+   VStack(spacing: 12, {fn})
+-    content failed
+-    .padding()
+-error: Line 108: Cannot find 'GlassEffectContainer' in scope
++    ZStack({fn})
++      Canvas({fn})
++        .gesture(<view>)
++          DragGesture(minimumDistance: 1)
++            .onChanged({fn})
++            .onEnded({fn})
++        .onTapGesture(count: 2, {fn})
++      Image(systemName: "star.fill")
++        .font(Font)
++        .foregroundStyle(Color)
++        .symbolEffect(.bounce, value: 0)
++        .scaleEffect(1.0)
++        .rotationEffect(0.0°)
++        .offset(x: 0.0, y: 0.0)
++        .gesture(<view>)
++          DragGesture()
++            .updating($Size(0.0, 0.0), {fn})
++            .onEnded({fn})
++        .simultaneousGesture(<view>)
++          MagnifyGesture()
++            .updating($1.0, {fn})
++            .onEnded({fn})
++            .simultaneously(with: <view>)
++              RotateGesture()
++                .updating($0.0°, {fn})
++                .onEnded({fn})
++        .highPriorityGesture(<view>)
++          LongPressGesture(minimumDuration: 0.4)
++            .updating($false, {fn})
++            .onEnded({fn})
++      .frame(maxHeight: inf)
++    Text("Double-tap to stamp")
++      .font(Font)
++      .foregroundStyle(Color)
++      .contentTransition(.numericText)
++    GlassEffectContainer(spacing: 10, {fn})
++      HStack(spacing: 10, {fn})
++        ForEach([Color, Color, Color, Color], id: KeyPath, {fn})
++          row Color
++            Circle()
++              .fill(Color)
++              .frame(width: 34, height: 34)
++              .overlay({fn})
++                If true
++                  Circle()
++                    .strokeBorder(Color, lineWidth: 3)
++                    .matchedGeometryEffect(id: "ring", in: ())
++              .onTapGesture({fn})
++              .accessibilityLabel("Color")
++          row Color
++            Circle()
++              .fill(Color)
++              .frame(width: 34, height: 34)
++              .overlay({fn})
++                If false
++              .onTapGesture({fn})
++              .accessibilityLabel("Color")
++          row Color
++            Circle()
++              .fill(Color)
++              .frame(width: 34, height: 34)
++              .overlay({fn})
++                If false
++              .onTapGesture({fn})
++              .accessibilityLabel("Color")
++          row Color
++            Circle()
++              .fill(Color)
++              .frame(width: 34, height: 34)
++              .overlay({fn})
++                If false
++              .onTapGesture({fn})
++              .accessibilityLabel("Color")
++        Button("Undo", systemImage: "arrow.uturn.backward", {fn})
++          If false
++          .labelStyle(.iconOnly)
++          .padding(10)
++          .glassEffect(.regular.interactive, in: .circle)
++      .keyframeAnimator(initialValue: Bounce(scale: 1.0, lift: 0.0), trigger: 0, {fn}, keyframes: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++          .offset(y: 0.0)
++        KeyframeTrack(KeyPath, {fn})
++          SpringKeyframe(1.08, duration: 0.15)
++          SpringKeyframe(1.0, duration: 0.3, spring: Spring)
++        KeyframeTrack(KeyPath, {fn})
++          LinearKeyframe(-6, duration: 0.15)
++          CubicKeyframe(0, duration: 0.3)
++    Slider(value: $6.0, in: 2...20, {fn})
++      Text(_literal: "Width")
++    .padding()
++== after Canvas@41
++ContentView {strokes=[], current=[], color=Color, width=6.0, stickerOffset=Size(0.0, 0.0), stickerDrag=Size(0.0, 0.0), stickerScale=1.0, pinch=1.0, stickerAngle=0.0°, twist=0.0°, pressing=false, stamps=0, lastTap="Double-tap to stamp", palette=(), colors=[Color, Color, Color, Color]}
++  VStack(spacing: 12, {fn})
++    ZStack({fn})
++      Canvas({fn})
++        .gesture(<view>)
++          DragGesture(minimumDistance: 1)
++            .onChanged({fn})
++            .onEnded({fn})
++        .onTapGesture(count: 2, {fn})
++      Image(systemName: "star.fill")
++        .font(Font)
++        .foregroundStyle(Color)
++        .symbolEffect(.bounce, value: 0)
++        .scaleEffect(1.0)
++        .rotationEffect(0.0°)
++        .offset(x: 0.0, y: 0.0)
++        .gesture(<view>)
++          DragGesture()
++            .updating($Size(0.0, 0.0), {fn})
++            .onEnded({fn})
++        .simultaneousGesture(<view>)
 …
 ```
 
@@ -736,64 +1258,19 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 ```diff
 --- before
 +++ after
-@@ -4,2 +4,57 @@
-     List(selection: $Set(), {fn})
-+      Section("To read", {fn})
-+        ForEach($[Book(id: 1, title: "Dune", author: "Herbert"), Book(id: 2, title: "Emma", author: "Austen"), Book(id: 3, title: "Ulysses", author: "Joyce"), Book(id: 4, title: "Beloved", author: "Morrison")], editActions: .all, {fn})
-+          row 1
-+            VStack(alignment: .leading, {fn})
-+              Text("Dune")
-+                .font(Font)
-+              Text("Herbert")
-+                .font(Font)
-+                .foregroundStyle(Color)
-+              .swipeActions(edge: .leading, {fn})
-+                Button("Top", systemImage: "arrow.up", {fn})
-+                  .tint(Color)
-+              .listRowSeparatorTint(Color)
-+          row 2
-+            VStack(alignment: .leading, {fn})
-+              Text("Emma")
-+                .font(Font)
-+              Text("Austen")
-+                .font(Font)
-+                .foregroundStyle(Color)
-+              .swipeActions(edge: .leading, {fn})
-+                Button("Top", systemImage: "arrow.up", {fn})
-+                  .tint(Color)
-+              .listRowSeparatorTint(Color)
-+          row 3
-+            VStack(alignment: .leading, {fn})
-+              Text("Ulysses")
-+                .font(Font)
-+              Text("Joyce")
-+                .font(Font)
-+                .foregroundStyle(Color)
-+              .swipeActions(edge: .leading, {fn})
-+                Button("Top", systemImage: "arrow.up", {fn})
-+                  .tint(Color)
-+              .listRowSeparatorTint(Color)
-+          row 4
-+            VStack(alignment: .leading, {fn})
-+              Text("Beloved")
-+                .font(Font)
-+              Text("Morrison")
-+                .font(Font)
-+                .foregroundStyle(Color)
-+              .swipeActions(edge: .leading, {fn})
-+                Button("Top", systemImage: "arrow.up", {fn})
-+                  .tint(Color)
-+              .listRowSeparatorTint(Color)
-+        .sectionIndexLabel("R")
-+      Section("Shelves", isExpanded: $true, {fn})
+@@ -52,3 +52,8 @@
+       Section("Shelves", isExpanded: $true, {fn})
+-        content failed
 +        OutlineGroup([Shelf(id: 10, name: "Fiction", children: [Shelf(id: 11, name: "Classics", children: nil), Shelf(id: 12, name: "Sci-fi", children: nil)]), Shelf(id: 20, name: "Poetry", children: nil)], children: KeyPath, {fn})
 +          row 10
 +            Label("Fiction", systemImage: "folder")
 +          row 20
 +            Label("Poetry", systemImage: "folder")
 +          .selectionDisabled()
-+        .headerProminence(.increased)
-       .listSectionSpacing(.compact)
+         .headerProminence(.increased)
+@@ -58,2 +63 @@
+         EditButton()
+-error: Line 51: Cannot find 'OutlineGroup' in scope
 ```
 
 ## fixtures/apps/navigation-tabs.swift
@@ -1936,4 +2413,915 @@ Every input run on the engine at `b466f9c` and on this one, comparing their tran
 -error: Line 13: Cannot find 'modifier' in scope
 +  Text(_literal: "Inside")
 +    .modifier(Card(title: "Hello"))
+```
+
+## tests/RestOfSwiftUITests-0.swift
+
+```diff
+--- before
++++ after
+@@ -3,3 +3,492 @@
+   VStack({fn})
+-    content failed
+-error: Line 20: Cannot find 'DragGesture' in scope
++    Circle()
++      .fill(Color)
++      .frame(width: 80, height: 80)
++      .offset(x: 0.0, y: 0.0)
++      .scaleEffect(1.0)
++      .rotationEffect(0.0°)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 0)
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++      .simultaneousGesture(<view>)
++        MagnifyGesture()
++          .onChanged({fn})
++      .highPriorityGesture(<view>, including: .all)
++        RotateGesture()
++          .onChanged({fn})
++    Rectangle()
++      .frame(width: 60, height: 60)
++      .gesture(<view>)
++        LongPressGesture(minimumDuration: 0.3)
++          .updating($false, {fn})
++          .sequenced(before: <view>)
++            DragGesture()
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .onLongPressGesture(minimumDuration: 0.5, {fn}, onPressingChanged: {fn})
++    Text("none")
++      .gesture(<view>)
++        TapGesture(count: 2)
++          .exclusively(before: <view>)
++            TapGesture()
++          .onEnded({fn})
++      .gesture(<view>, isEnabled: true)
++        SpatialTapGesture()
++          .onEnded({fn})
++== after DragGesture.updating@21
++ContentView {offset=Size(0.0, 0.0), drag=Size(0.0, 0.0), pressing=false, scale=1.0, angle=0.0°, log=[]}
++  VStack({fn})
++    Circle()
++      .fill(Color)
++      .frame(width: 80, height: 80)
++      .offset(x: 0.0, y: 0.0)
++      .scaleEffect(1.0)
++      .rotationEffect(0.0°)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 0)
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++      .simultaneousGesture(<view>)
++        MagnifyGesture()
++          .onChanged({fn})
++      .highPriorityGesture(<view>, including: .all)
++        RotateGesture()
++          .onChanged({fn})
++    Rectangle()
++      .frame(width: 60, height: 60)
++      .gesture(<view>)
++        LongPressGesture(minimumDuration: 0.3)
++          .updating($false, {fn})
++          .sequenced(before: <view>)
++            DragGesture()
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .onLongPressGesture(minimumDuration: 0.5, {fn}, onPressingChanged: {fn})
++    Text("none")
++      .gesture(<view>)
++        TapGesture(count: 2)
++          .exclusively(before: <view>)
++            TapGesture()
++          .onEnded({fn})
++      .gesture(<view>, isEnabled: true)
++        SpatialTapGesture()
++          .onEnded({fn})
++== after DragGesture.onEnded@24
++ContentView {offset=Size(0.0, 0.0), drag=Size(0.0, 0.0), pressing=false, scale=1.0, angle=0.0°, log=["ended 0.0"]}
++  VStack({fn})
++    Circle()
++      .fill(Color)
++      .frame(width: 80, height: 80)
++      .offset(x: 0.0, y: 0.0)
++      .scaleEffect(1.0)
++      .rotationEffect(0.0°)
++      .gesture(<view>)
++        DragGesture(minimumDistance: 0)
++          .updating($Size(0.0, 0.0), {fn})
++          .onEnded({fn})
++      .simultaneousGesture(<view>)
++        MagnifyGesture()
++          .onChanged({fn})
++      .highPriorityGesture(<view>, including: .all)
++        RotateGesture()
++          .onChanged({fn})
++    Rectangle()
++      .frame(width: 60, height: 60)
++      .gesture(<view>)
++        LongPressGesture(minimumDuration: 0.3)
++          .updating($false, {fn})
++          .sequenced(before: <view>)
++            DragGesture()
++          .onEnded({fn})
++      .onTapGesture(count: 2, {fn})
++      .onLongPressGesture(minimumDuration: 0.5, {fn}, onPressingChanged: {fn})
++    Text("ended 0.0")
++      .gesture(<view>)
++        TapGesture(count: 2)
++          .exclusively(before: <view>)
++            TapGesture()
++          .onEnded({fn})
++      .gesture(<view>, isEnabled: true)
++        SpatialTapGesture()
++          .onEnded({fn})
++== after MagnifyGesture.onChanged@30
++ContentView {offset=Size(0.0, 0.0), drag=Size(0.0, 0.0), pressing=false, scale=1.0, angle=0.0°, log=["ended 0.0"]}
++  VStack({fn})
+…
+```
+
+## tests/RestOfSwiftUITests-10.swift
+
+```diff
+--- before
++++ after
+@@ -96,2 +96,26 @@
+     .onKeyPress(.escape, {fn})
++== after Form.onKeyPress@34
++ContentView {field=nil, notesFocused=true, name="", email="", notes=""}
++  Form({fn})
++    TextField("Name", text: $"")
++      .focused($nil, equals: .name)
++      .textContentType(.name)
++      .textInputAutocapitalization(.words)
++      .submitLabel(.next)
++      .onSubmit({fn})
++    TextField("Email", text: $"")
++      .focused($nil, equals: .email)
++      .keyboardType(.emailAddress)
++      .textContentType(.emailAddress)
++      .autocorrectionDisabled()
++      .submitLabel(.done)
++      .onSubmit({fn})
++    TextEditor(text: $"")
++      .focused($true)
++    Button("Edit notes", {fn})
++      .keyboardShortcut("n", modifiers: [.command, .shift])
++      .focusedValue(KeyPath, "")
++    .scrollDismissesKeyboard(.interactively)
++    .defaultFocus($nil, .name)
++    .onKeyPress(.escape, {fn})
+ == after TextField.onSubmit@19
+@@ -168,2 +192,26 @@
+     .onKeyPress(.escape, {fn})
++== after Form.onKeyPress@34
++ContentView {field=nil, notesFocused=true, name="", email="", notes=""}
++  Form({fn})
++    TextField("Name", text: $"")
++      .focused($nil, equals: .name)
++      .textContentType(.name)
++      .textInputAutocapitalization(.words)
++      .submitLabel(.next)
++      .onSubmit({fn})
++    TextField("Email", text: $"")
++      .focused($nil, equals: .email)
++      .keyboardType(.emailAddress)
++      .textContentType(.emailAddress)
++      .autocorrectionDisabled()
++      .submitLabel(.done)
++      .onSubmit({fn})
++    TextEditor(text: $"")
++      .focused($true)
++    Button("Edit notes", {fn})
++      .keyboardShortcut("n", modifiers: [.command, .shift])
++      .focusedValue(KeyPath, "")
++    .scrollDismissesKeyboard(.interactively)
++    .defaultFocus($nil, .name)
++    .onKeyPress(.escape, {fn})
+ == after TextField.onSubmit@19
+@@ -240,73 +288,25 @@
+     .onKeyPress(.escape, {fn})
+-== after TextField.onSubmit@19
+-ContentView {field=.email, notesFocused=true, name="", email="", notes=""}
+-  Form({fn})
+-    TextField("Name", text: $"")
+-      .focused($.email, equals: .name)
+-      .textContentType(.name)
+-      .textInputAutocapitalization(.words)
+-      .submitLabel(.next)
+-      .onSubmit({fn})
+-    TextField("Email", text: $"")
+-      .focused($.email, equals: .email)
+-      .keyboardType(.emailAddress)
+-      .textContentType(.emailAddress)
+-      .autocorrectionDisabled()
+-      .submitLabel(.done)
+-      .onSubmit({fn})
+-    TextEditor(text: $"")
+-      .focused($true)
+-    Button("Edit notes", {fn})
+-      .keyboardShortcut("n", modifiers: [.command, .shift])
+-      .focusedValue(KeyPath, "")
+-    .scrollDismissesKeyboard(.interactively)
+-    .defaultFocus($.email, .name)
+-    .onKeyPress(.escape, {fn})
+-== after TextField.onSubmit@26
+-ContentView {field=nil, notesFocused=true, name="", email="", notes=""}
+-  Form({fn})
+-    TextField("Name", text: $"")
+-      .focused($nil, equals: .name)
+-      .textContentType(.name)
+-      .textInputAutocapitalization(.words)
+-      .submitLabel(.next)
+-      .onSubmit({fn})
+-    TextField("Email", text: $"")
+-      .focused($nil, equals: .email)
+-      .keyboardType(.emailAddress)
+-      .textContentType(.emailAddress)
+-      .autocorrectionDisabled()
+-      .submitLabel(.done)
+-      .onSubmit({fn})
+-    TextEditor(text: $"")
+-      .focused($true)
+-    Button("Edit notes", {fn})
+-      .keyboardShortcut("n", modifiers: [.command, .shift])
+-      .focusedValue(KeyPath, "")
+-    .scrollDismissesKeyboard(.interactively)
+-    .defaultFocus($nil, .name)
+-    .onKeyPress(.escape, {fn})
+-== after Button[Edit notes]@28
+-ContentView {field=nil, notesFocused=true, name="", email="", notes=""}
+-  Form({fn})
+-    TextField("Name", text: $"")
+-      .focused($nil, equals: .name)
+-      .textContentType(.name)
+-      .textInputAutocapitalization(.words)
+-      .submitLabel(.next)
+-      .onSubmit({fn})
+-    TextField("Email", text: $"")
+-      .focused($nil, equals: .email)
+-      .keyboardType(.emailAddress)
+-      .textContentType(.emailAddress)
+-      .autocorrectionDisabled()
+…
+```
+
+## tests/RestOfSwiftUITests-11.swift
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,3 @@
+ == start
+-ContentView {space=(), focused=(), size=nil, n=0}
++ContentView {space=(), focused=(), size=DynamicTypeSize, n=0}
+   Text(_literal: "n 0")
+@@ -6,3 +6,3 @@
+ == appeared (Text.onAppear@9)
+-ContentView {space=(), focused=(), size=nil, n=1}
++ContentView {space=(), focused=(), size=DynamicTypeSize, n=1}
+   Text(_literal: "n 1")
+```
+
+## tests/RestOfSwiftUITests-12.swift
+
+```diff
+--- before
++++ after
+@@ -2,3 +2,3 @@
+ ContentView {}
+-  Inner {size=nil, direction=nil, scheme=.light}
++  Inner {size=DynamicTypeSize, direction=.leftToRight, scheme=.light}
+     Text(_literal: "x")
+@@ -9,5 +9,7 @@
+ == appeared (Text.onAppear@7)
+-error: Line 8: Can't compare nil and .xLarge
++console: size false false false
++console: direction false
++console: scheme false
+ ContentView {}
+-  Inner {size=nil, direction=nil, scheme=.light}
++  Inner {size=DynamicTypeSize, direction=.leftToRight, scheme=.light}
+     Text(_literal: "x")
+```
+
+## tests/RestOfSwiftUITests-13.swift
+
+```diff
+--- before
++++ after
+@@ -2,14 +2,14 @@
+ ContentView {}
+-  Inner {phase=nil}
++  Inner {phase=.active}
+     Text(_literal: "x")
+       .onAppear({fn})
+-      .onChange(of: nil, {fn})
++      .onChange(of: .active, {fn})
+     .environment(KeyPath, .active)
+ == appeared (Text.onAppear@6)
+-console: phase nil
++console: phase .active
+ ContentView {}
+-  Inner {phase=nil}
++  Inner {phase=.active}
+     Text(_literal: "x")
+       .onAppear({fn})
+-      .onChange(of: nil, {fn})
++      .onChange(of: .active, {fn})
+     .environment(KeyPath, .active)
+```
+
+## tests/RestOfSwiftUITests-14.swift
+
+```diff
+--- before
++++ after
+@@ -9,6 +9,154 @@
+       .transformPreference(Total, {fn})
+-        content failed
+     .onPreferenceChange(Total, {fn})
+     .overlayPreferenceValue(Total, {fn})
+-      Text(_literal: "nil")
+-error: Line 12: Binary operator '+' can't be applied to nil and Int
++      Text(_literal: "0")
++== after Text.transformPreference@12
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after VStack.onPreferenceChange@14
++console: total 0
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after Text.transformPreference@12
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after VStack.onPreferenceChange@14
++console: total 0
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after Text.transformPreference@12
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after VStack.onPreferenceChange@14
++console: total 0
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after Text.transformPreference@12
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after VStack.onPreferenceChange@14
++console: total 0
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
++    .overlayPreferenceValue(Total, {fn})
++      Text(_literal: "0")
++== after Text.transformPreference@12
++ContentView {total=0}
++  VStack({fn})
++    Text(_literal: "a")
++      .preference(key: Total, value: 2)
++    Text(_literal: "b")
++      .preference(key: Total, value: 3)
++    Text(_literal: "c")
++      .transformPreference(Total, {fn})
++    .onPreferenceChange(Total, {fn})
+…
+```
+
+## tests/RestOfSwiftUITests-15.swift
+
+```diff
+--- before
++++ after
+@@ -1,3 +1,3 @@
+ == start
+-ContentView {openURL=nil}
++ContentView {openURL=OpenURLAction}
+   Text(_literal: "x")
+@@ -5,3 +5,3 @@
+ == appeared (Text.onAppear@5)
+-ContentView {openURL=nil}
++ContentView {openURL=OpenURLAction}
+   Text(_literal: "x")
+```
+
+## tests/RestOfSwiftUITests-16.swift
+
+```diff
+--- before
++++ after
+@@ -3,3 +3,427 @@
+   VStack({fn})
+-    content failed
+-error: Line 44: Cannot find 'BarPlot' in scope
++    Chart([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], {fn})
++      BarMark(x: .value("Day", nil), y: .value("Amount", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .cornerRadius(4)
++        .annotation(position: .top, {fn})
++          Text(_literal: "0")
++            .font(Font)
++      RuleMark(y: .value("Goal", 4))
++        .lineStyle(StrokeStyle)
++      .chartXSelection(value: $nil)
++      .chartForegroundStyleScale(domain: ["A", "B"], range: [Color, Color])
++      .chartYAxis({fn})
++        AxisMarks(position: .leading, {fn})
++          AxisGridLine()
++          AxisValueLabel()
++      .chartLegend(position: .bottom)
++    Chart({fn})
++      LinePlot(x: "x", y: "y", domain: 0...6.28, {fn})
++      PointMark(x: .value("x", 1.0), y: .value("y", 0.5))
++        .symbol(.diamond)
++        .symbolSize(60)
++      .chartXScale(domain: 0...6.28)
++      .chartScrollableAxes(.horizontal)
++      .chartXVisibleDomain(length: 3)
++    Chart({fn})
++      SectorMark(angle: .value("Share", 40), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++      SectorMark(angle: .value("Share", 60), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++    BarPlot([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], x: .value("Day", KeyPath), y: .value("Amount", KeyPath))
++== after LinePlot@34
++ContentView {selected=nil, sales=[Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")]}
++  VStack({fn})
++    Chart([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], {fn})
++      BarMark(x: .value("Day", nil), y: .value("Amount", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .cornerRadius(4)
++        .annotation(position: .top, {fn})
++          Text(_literal: "0")
++            .font(Font)
++      RuleMark(y: .value("Goal", 4))
++        .lineStyle(StrokeStyle)
++      .chartXSelection(value: $nil)
++      .chartForegroundStyleScale(domain: ["A", "B"], range: [Color, Color])
++      .chartYAxis({fn})
++        AxisMarks(position: .leading, {fn})
++          AxisGridLine()
++          AxisValueLabel()
++      .chartLegend(position: .bottom)
++    Chart({fn})
++      LinePlot(x: "x", y: "y", domain: 0...6.28, {fn})
++      PointMark(x: .value("x", 1.0), y: .value("y", 0.5))
++        .symbol(.diamond)
++        .symbolSize(60)
++      .chartXScale(domain: 0...6.28)
++      .chartScrollableAxes(.horizontal)
++      .chartXVisibleDomain(length: 3)
++    Chart({fn})
++      SectorMark(angle: .value("Share", 40), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++      SectorMark(angle: .value("Share", 60), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++    BarPlot([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], x: .value("Day", KeyPath), y: .value("Amount", KeyPath))
++== after LinePlot@34
++ContentView {selected=nil, sales=[Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")]}
++  VStack({fn})
++    Chart([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], {fn})
++      BarMark(x: .value("Day", nil), y: .value("Amount", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .cornerRadius(4)
++        .annotation(position: .top, {fn})
++          Text(_literal: "0")
++            .font(Font)
++      RuleMark(y: .value("Goal", 4))
++        .lineStyle(StrokeStyle)
++      .chartXSelection(value: $nil)
++      .chartForegroundStyleScale(domain: ["A", "B"], range: [Color, Color])
++      .chartYAxis({fn})
++        AxisMarks(position: .leading, {fn})
++          AxisGridLine()
++          AxisValueLabel()
++      .chartLegend(position: .bottom)
++    Chart({fn})
++      LinePlot(x: "x", y: "y", domain: 0...6.28, {fn})
++      PointMark(x: .value("x", 1.0), y: .value("y", 0.5))
++        .symbol(.diamond)
++        .symbolSize(60)
++      .chartXScale(domain: 0...6.28)
++      .chartScrollableAxes(.horizontal)
++      .chartXVisibleDomain(length: 3)
++    Chart({fn})
++      SectorMark(angle: .value("Share", 40), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++      SectorMark(angle: .value("Share", 60), innerRadius: .ratio(0.6), angularInset: 2)
++        .foregroundStyle(Color)
++    BarPlot([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], x: .value("Day", KeyPath), y: .value("Amount", KeyPath))
++== after LinePlot@34
++ContentView {selected=nil, sales=[Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")]}
++  VStack({fn})
++    Chart([Sale(id: <uuid>, day: "Mon", amount: 3.0, kind: "A"), Sale(id: <uuid>, day: "Tue", amount: 5.0, kind: "B"), Sale(id: <uuid>, day: "Wed", amount: 2.0, kind: "A")], {fn})
++      BarMark(x: .value("Day", nil), y: .value("Amount", nil))
++        .foregroundStyle(by: .value("Kind", nil))
++        .cornerRadius(4)
++        .annotation(position: .top, {fn})
++          Text(_literal: "0")
++            .font(Font)
++      RuleMark(y: .value("Goal", 4))
++        .lineStyle(StrokeStyle)
++      .chartXSelection(value: $nil)
++      .chartForegroundStyleScale(domain: ["A", "B"], range: [Color, Color])
++      .chartYAxis({fn})
++        AxisMarks(position: .leading, {fn})
++          AxisGridLine()
++          AxisValueLabel()
+…
+```
+
+## tests/RestOfSwiftUITests-19.swift
+
+```diff
+--- before
++++ after
+@@ -1,2 +1,403 @@
+ == start
+-error: Missing argument 'announced' in call to ContentView
++ContentView {announced=(), level=3}
++  VStack({fn})
++    Text(_literal: "Title")
++      .fontWidth(.condensed)
++      .allowsTightening(true)
++      .textScale(.secondary)
++    Text(_literal: "Body")
++      .typesettingLanguage(.init("en"))
++      .flipsForRightToLeftLayoutDirection(true)
++    Text(_literal: "Head")
++      .accessibilityHeading(.h1)
++      .accessibilityAddTraits(.isHeader)
++    Image(systemName: "star")
++      .accessibilityLabel("Favorite")
++      .accessibilityHint("Adds it")
++      .accessibilityValue("3 stars")
++      .accessibilityAdjustableAction({fn})
++      .accessibilityAction(named: "Reset", {fn})
++      .accessibilityFocused($())
++      .accessibilitySortPriority(2)
++    HStack({fn})
++      Text(_literal: "A")
++      Text(_literal: "B")
++      .accessibilityElement(children: .combine)
++      .accessibilityRotor("Letters", {fn})
++        AccessibilityRotorEntry("A", id: "a")
++    Text(_literal: "Hidden")
++      .accessibilityHidden(true)
++      .speechSpellsOutCharacters()
++    .dynamicTypeSize(nil...DynamicTypeSize)
++== after Image.accessibilityAdjustableAction@14
++ContentView {announced=(), level=1}
++  VStack({fn})
++    Text(_literal: "Title")
++      .fontWidth(.condensed)
++      .allowsTightening(true)
++      .textScale(.secondary)
++    Text(_literal: "Body")
++      .typesettingLanguage(.init("en"))
++      .flipsForRightToLeftLayoutDirection(true)
++    Text(_literal: "Head")
++      .accessibilityHeading(.h1)
++      .accessibilityAddTraits(.isHeader)
++    Image(systemName: "star")
++      .accessibilityLabel("Favorite")
++      .accessibilityHint("Adds it")
++      .accessibilityValue("1 stars")
++      .accessibilityAdjustableAction({fn})
++      .accessibilityAction(named: "Reset", {fn})
++      .accessibilityFocused($())
++      .accessibilitySortPriority(2)
++    HStack({fn})
++      Text(_literal: "A")
++      Text(_literal: "B")
++      .accessibilityElement(children: .combine)
++      .accessibilityRotor("Letters", {fn})
++        AccessibilityRotorEntry("A", id: "a")
++    Text(_literal: "Hidden")
++      .accessibilityHidden(true)
++      .speechSpellsOutCharacters()
++    .dynamicTypeSize(nil...DynamicTypeSize)
++== after Image.accessibilityAdjustableAction@14
++ContentView {announced=(), level=1}
++  VStack({fn})
++    Text(_literal: "Title")
++      .fontWidth(.condensed)
++      .allowsTightening(true)
++      .textScale(.secondary)
++    Text(_literal: "Body")
++      .typesettingLanguage(.init("en"))
++      .flipsForRightToLeftLayoutDirection(true)
++    Text(_literal: "Head")
++      .accessibilityHeading(.h1)
++      .accessibilityAddTraits(.isHeader)
++    Image(systemName: "star")
++      .accessibilityLabel("Favorite")
++      .accessibilityHint("Adds it")
++      .accessibilityValue("1 stars")
++      .accessibilityAdjustableAction({fn})
++      .accessibilityAction(named: "Reset", {fn})
++      .accessibilityFocused($())
++      .accessibilitySortPriority(2)
++    HStack({fn})
++      Text(_literal: "A")
++      Text(_literal: "B")
++      .accessibilityElement(children: .combine)
++      .accessibilityRotor("Letters", {fn})
++        AccessibilityRotorEntry("A", id: "a")
++    Text(_literal: "Hidden")
++      .accessibilityHidden(true)
++      .speechSpellsOutCharacters()
++    .dynamicTypeSize(nil...DynamicTypeSize)
++== after Image.accessibilityAdjustableAction@14
++ContentView {announced=(), level=1}
++  VStack({fn})
++    Text(_literal: "Title")
++      .fontWidth(.condensed)
++      .allowsTightening(true)
++      .textScale(.secondary)
++    Text(_literal: "Body")
++      .typesettingLanguage(.init("en"))
++      .flipsForRightToLeftLayoutDirection(true)
++    Text(_literal: "Head")
++      .accessibilityHeading(.h1)
++      .accessibilityAddTraits(.isHeader)
++    Image(systemName: "star")
++      .accessibilityLabel("Favorite")
++      .accessibilityHint("Adds it")
++      .accessibilityValue("1 stars")
++      .accessibilityAdjustableAction({fn})
++      .accessibilityAction(named: "Reset", {fn})
++      .accessibilityFocused($())
++      .accessibilitySortPriority(2)
++    HStack({fn})
++      Text(_literal: "A")
+…
+```
+
+## tests/RestOfSwiftUITests-3.swift
+
+```diff
+--- before
++++ after
+@@ -3,4 +3,63 @@
+   Canvas({fn}, symbols: {fn})
+-    If false
+     Image(systemName: "star.fill")
+       .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
++== after Canvas@5
++ContentView {}
++  Canvas({fn}, symbols: {fn})
++    Image(systemName: "star.fill")
++      .tag(1)
+```
+
+## tests/RestOfSwiftUITests-6.swift
+
+```diff
+--- before
++++ after
+@@ -3,4 +3,999 @@
+   VStack({fn})
+-    content failed
+-    .transition(.blurReplace)
+-error: Line 44: Cannot find 'MeshGradient' in scope
++    If false
++      RoundedRectangle(cornerRadius: 8)
++        .fill(Color)
++        .matchedGeometryEffect(id: "card", in: ())
++        .frame(width: 60, height: 60)
++    Text(_literal: "0")
++      .contentTransition(.numericText(0.0))
++      .font(Font)
++    Image(systemName: "bell")
++      .symbolEffect(.bounce.up.byLayer, options: .repeat(2), value: 0)
++    Image(systemName: "wifi")
++      .symbolEffect(.variableColor.iterative, isActive: false)
++    Image(systemName: "heart")
++      .phaseAnimator([1.0, 1.3, 1.0], trigger: 0, {fn}, animation: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++        NativeContent(AnyView)
++          .scaleEffect(1.3)
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++    Text(_literal: "Keys")
++      .keyframeAnimator(initialValue: Values(scale: 1.0, lift: 0.0, angle: 0.0°), trigger: 0, {fn}, keyframes: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++          .offset(y: 0.0)
++          .rotationEffect(0.0°)
++        KeyframeTrack(KeyPath, {fn})
++          LinearKeyframe(1.2, duration: 0.1)
++          SpringKeyframe(1.0, duration: 0.3, spring: Spring)
++        KeyframeTrack(KeyPath, {fn})
++          CubicKeyframe(-20, duration: 0.2)
++          MoveKeyframe(0)
++    Circle()
++      .union(<view>)
++        Rectangle()
++          .offset(x: 20)
++      .fill(Color)
++      .frame(width: 40, height: 40)
++    Capsule()
++      .inset(by: 4)
++      .rotation(20.0°)
++      .stroke(Color, lineWidth: 2)
++      .frame(width: 60, height: 30)
++    MeshGradient(width: 2, height: 2, points: [[0, 0], [1, 0], [0, 1], [1, 1]], colors: [Color, Color, Color, Color])
++      .frame(height: 40)
++    Text(_literal: "Glass")
++      .padding()
++      .glassEffect(.regular.tint.interactive, in: .capsule)
++    GlassEffectContainer(spacing: 8, {fn})
++      HStack({fn})
++        Text(_literal: "A")
++          .glassEffect()
++          .glassEffectID("a", in: ())
++        Text(_literal: "B")
++          .glassEffect()
++          .glassEffectUnion(id: "ab", namespace: ())
++    Text(_literal: "Blend")
++      .blendMode(.multiply)
++      .visualEffect({fn})
++        NativeContent(AnyView)
++          .offset(y: 4)
++    Text(_literal: "Tx")
++      .transaction({fn})
++    Rectangle()
++      .fill(<view>)
++        Color(Color)
++          .opacity(0.5)
++          .shadow(.drop(2))
++      .frame(height: 10)
++    Rectangle()
++      .fill(.linearGradient([Color, Color], .leading, .trailing))
++      .frame(height: 10)
++    Button("Go", {fn})
++    .transition(.blurReplace)
++== after Image.phaseAnimator@26
++ContentView {space=(), big=false, count=0, on=false}
++  VStack({fn})
++    If false
++      RoundedRectangle(cornerRadius: 8)
++        .fill(Color)
++        .matchedGeometryEffect(id: "card", in: ())
++        .frame(width: 60, height: 60)
++    Text(_literal: "0")
++      .contentTransition(.numericText(0.0))
++      .font(Font)
++    Image(systemName: "bell")
++      .symbolEffect(.bounce.up.byLayer, options: .repeat(2), value: 0)
++    Image(systemName: "wifi")
++      .symbolEffect(.variableColor.iterative, isActive: false)
++    Image(systemName: "heart")
++      .phaseAnimator([1.0, 1.3, 1.0], trigger: 0, {fn}, animation: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++        NativeContent(AnyView)
++          .scaleEffect(1.3)
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++    Text(_literal: "Keys")
++      .keyframeAnimator(initialValue: Values(scale: 1.0, lift: 0.0, angle: 0.0°), trigger: 0, {fn}, keyframes: {fn})
++        NativeContent(AnyView)
++          .scaleEffect(1.0)
++          .offset(y: 0.0)
++          .rotationEffect(0.0°)
++        KeyframeTrack(KeyPath, {fn})
++          LinearKeyframe(1.2, duration: 0.1)
++          SpringKeyframe(1.0, duration: 0.3, spring: Spring)
++        KeyframeTrack(KeyPath, {fn})
++          CubicKeyframe(-20, duration: 0.2)
++          MoveKeyframe(0)
++    Circle()
++      .union(<view>)
++        Rectangle()
++          .offset(x: 20)
+…
 ```

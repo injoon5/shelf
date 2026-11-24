@@ -270,6 +270,17 @@ PLAN.md §1.5: protocol proxies (Shape, Animatable, Layout, ViewModifier, Transi
 - **What it costs.** Loading a program checks each type that adopts one of the registry's protocols against its requirements (a set lookup per conformance). A proxy costs nothing until native code calls the app's value through it.
 - **New inputs.** Three Lab examples (`WaveStudio`, `TagCloud`, `CardStyles`) and two Shelf fixtures (`views-custom-protocols`, `views-uikit`), with nothing to compare against.
 
+### after-2-round1-rest.json
+
+PLAN.md §2, Round 1's second half (gestures, drawing, focus, environment, charts, text, accessibility), measured with Round 1A merged, against the bar `after-1.5-proxies.json`.
+
+- **The command.** `Benchmarks/run.sh Benchmarks/after-2-round1-rest.json --compare Benchmarks/after-1.5-proxies.json`. Date: 24 November 2026.
+- **No input is more than 10% slower.** The compute workloads are within 1% (`Collections` 7% and `Objects` 13% faster), Chess within 2%. A first run made while other builds ran showed `Arithmetic` 23% slower; run alone it was under 4%.
+- **Validate does more for Round 1 inputs.** Bridges' probes now run a `Canvas` renderer, a gesture's `onChanged` and an animator's content with sample arguments, where `validate` used to skip them, so `gestures-canvas` and `DoodlePad` take longer than before that change (recorded here after it).
+- **Kiln Lab** (`Tools/iterate.sh`): 12 of 12 apps match native on every step, labels 100%.
+- **What it costs.** A view that reads SwiftUI's environment, or has a `@FocusState` or `@Namespace`, is hosted inside one more view (`KHostInputs`); others are hosted as before.
+- **New inputs.** The four Round 1 fixtures (`gestures-canvas`, `focus-environment`, `charts`, `accessibility-motion`) and Lab's `DoodlePad`.
+
 ## §3.7: SurfacePlot
 
 `SurfacePlot(x:y:z:) { x, z in … }` hands Swift Charts a function it calls once per sample: 256 × 256 per pass, and two passes when a chart first draws. Each call is the app's closure, run by the interpreter.
