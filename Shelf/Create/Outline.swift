@@ -344,7 +344,7 @@ extension Outline {
         }
 
         /// The first `=` outside brackets that isn't part of `==` or `->`.
-        func hasInitializer(_ d: Decl) -> Bool {
+        func initializer(_ d: Decl) -> Int? {
             var depth = 0
             for i in d.start..<d.end where isCode(i) {
                 switch s[i] {
@@ -353,12 +353,14 @@ extension Outline {
                 case "=" where depth == 0:
                     let before = i > 0 ? s[i - 1] : " "
                     let after = i + 1 < count ? s[i + 1] : " "
-                    if after != "=" && !["=", "!", "<", ">", "+", "-", "*", "/", "%", "&", "|"].contains(before) { return true }
+                    if after != "=" && !["=", "!", "<", ">", "+", "-", "*", "/", "%", "&", "|"].contains(before) { return i }
                 default: break
                 }
             }
-            return false
+            return nil
         }
+
+        func hasInitializer(_ d: Decl) -> Bool { initializer(d) != nil }
 
         // MARK: Saved types
 
@@ -507,7 +509,11 @@ extension Outline {
             case .property:
                 guard let block = trailingBlock(d) else { return verbatim(d.start, d.end) }
                 if isAccessorRequirement(block) { return verbatim(d.start, d.end) }
-                if hasInitializer(d) && !isObserverBlock(block) { return verbatim(d.start, d.end) }
+                if let eq = initializer(d), !isObserverBlock(block) {
+                    // `var onFinish: (Bool) -> Void = { _ in }`: a closure's body is code.
+                    if nextCode(after: eq + 1, d.end) == block.open { return signature(d, open: block.open) }
+                    return verbatim(d.start, d.end)
+                }
                 return signature(d, open: block.open)
             case .other:
                 // `#Preview { … }` and other top-level code with a body.

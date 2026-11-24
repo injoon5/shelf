@@ -45,6 +45,10 @@ public enum KilnWebsiteData {
     public static func remove(for slug: String) async throws {
         #if canImport(WebKit) && !os(tvOS) && !os(watchOS)
         let id = identifier(for: slug)
+        // WebKit's main run loop starts with its first object: listing the
+        // stores before any (a deletion before the app's first page, in a
+        // fresh launch) crashed in WebKit's fetchAllDataStoreIdentifiers.
+        _ = WKWebsiteDataStore.default()
         let existing = await WKWebsiteDataStore.allDataStoreIdentifiers
         guard existing.contains(id) else { return }
         // WebKit's network process lets go of a store a moment after its
